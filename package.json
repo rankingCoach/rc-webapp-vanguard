@@ -1,7 +1,7 @@
 {
   "name": "@rankingcoach/vanguard",
   "description": "rC React components library",
-  "author": "rankingCoach GmbH",
+  "author": "rankingCoach",
   "private": false,
   "sideEffects": false,
   "version": "1.0.1",
@@ -116,7 +116,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://bitbucket.org/rankingcoach/rc-webapp-vanguard.git"
+    "url": "git+https://github.com/rankingCoach/rc-webapp-vanguard"
   },
   "peerDependencies": {
     "@emotion/react": "11.0.0",
@@ -129,7 +129,7 @@
     "react-redux": ">=7.2.6"
   },
   "license": "MIT",
-  "homepage": "https://bitbucket.org/rankingcoach/rc-webapp-vanguard#readme",
+  "homepage": "https://github.com/rankingCoach/rc-webapp-vanguard#readme",
   "directories": {
     "lib": "."
   },

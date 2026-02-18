@@ -1,12 +1,13 @@
-import standardVersion from "standard-version";
-import { getDefaultOptions } from "./helpers/get-default-options.mjs";
-import * as readline from "readline";
+import * as readline from 'node:readline';
+
+import standardVersion from 'standard-version';
+
+import { getDefaultOptions } from './helpers/get-default-options.mjs';
 
 function askQuestion(query) {
   const rl = readline.createInterface({
-    // eslint-disable-next-line no-undef
     input: process.stdin,
-    // eslint-disable-next-line no-undef
+
     output: process.stdout,
   });
 
@@ -21,16 +22,16 @@ function askQuestion(query) {
 // Options are the same as command line, except camelCase
 // standardVersion returns a Promise
 const options = getDefaultOptions();
-const dryRun = options["dry-run"];
+const dryRun = options['dry-run'];
 const doGenerate = (dryRun) => {
   standardVersion({
     noVerify: true,
-    infile: "CHANGELOG.md",
+    infile: 'CHANGELOG.md',
     silent: false,
     dryRun: dryRun,
-    commitUrlFormat: "https://bitbucket.org/rankingcoach/rc-webapp-vanguard/commits/{{hash}}",
+    commitUrlFormat: 'https://github.com/rankingCoach/rc-webapp-vanguard/commits/{{hash}}',
     compareUrlFormat:
-      "https://bitbucket.org/rankingcoach/rc-webapp-vanguard/branches/compare/{{currentTag}}%0D{{previousTag}}#diff",
+      'https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/{{currentTag}}%0D{{previousTag}}#diff',
   })
     .then((data) => {
       // standard-version is done
@@ -44,8 +45,8 @@ const doGenerate = (dryRun) => {
 if (dryRun) {
   doGenerate(dryRun);
 } else {
-  askQuestion("Password?").then((res) => {
-    if (res === "asd") {
+  askQuestion('Password?').then((res) => {
+    if (res === 'asd') {
       doGenerate(false);
     }
   });
