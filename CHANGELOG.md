@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.2](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.0.2%0Dv1.0.1#diff) (2026-02-18)
+
+
+### Bug Fixes
+
+* update registry and repository URLs to use GitHub ([9da4605](https://github.com/rankingCoach/rc-webapp-vanguard/commits/9da460591edf177be63cbeacd7284444ec553c86))
+
 ### 1.0.1 (2026-02-17)
 
 ### [0.1.192](https://bitbucket.org/rankingcoach/rc-webapp-vanguard/branches/compare/v0.1.192%0Dv0.1.191#diff) (2026-02-13)
