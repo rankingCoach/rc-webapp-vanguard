@@ -8,9 +8,10 @@ import {
 } from '@vanguard/GoogleMaps/_themes/GoogleMapBlackWhiteTheme';
 import { googleMapColouredTheme } from '@vanguard/GoogleMaps/_themes/GoogleMapColouredTheme';
 import { Render } from '@vanguard/Render/Render';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
+import { MapContext } from './map-context';
 // import GoogleMap, { GoogleMapProps } from "@vanguard/GoogleMaps/GoogleMap";
 
 /**
@@ -39,7 +40,10 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
     testId = 'presence-insights-competitors-map-google-itself-textid',
     onLoad,
     mapId,
+    children,
   } = props;
+
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
   // Load Google Maps API internally if apiKey is provided and external loading is not used
   const { isLoaded: internalIsJsApiLoaded } = useGoogleMapApiLoader([], apiKey);
@@ -48,6 +52,7 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
   const isJsApiLoaded = externalIsJsApiLoaded !== undefined ? externalIsJsApiLoaded : internalIsJsApiLoaded;
 
   const onLoadFn = (map: google.maps.Map) => {
+    setMapInstance(map);
     onLoad && onLoad(map);
   };
 
@@ -75,23 +80,25 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
    * Render view
    */
   return (
-    <ComponentContainer data-testid={testId} className={'GoogleMaps-container'}>
-      <Render if={isJsApiLoaded}>
-        <GoogleMap
-          {...props}
-          onLoad={onLoadFn}
-          mapContainerStyle={{
-            width: '100%',
-            height: '100%',
-          }}
-          options={{
-            gestureHandling: 'greedy',
-            ...props.options,
-            styles: getTheme(),
-            mapId: typeof mapId === 'string' ? mapId : mapId === true ? 'fb831772aadb7781' : undefined,
-          }}
-        />
-      </Render>
-    </ComponentContainer>
+      <ComponentContainer data-testid={testId} className={'GoogleMaps-container'}>
+        <Render if={isJsApiLoaded}>
+          <GoogleMap
+              {...props}
+              onLoad={onLoadFn}
+              mapContainerStyle={{
+                width: '100%',
+                height: '100%',
+              }}
+              options={{
+                gestureHandling: 'greedy',
+                ...props.options,
+                styles: getTheme(),
+                mapId: typeof mapId === 'string' ? mapId : mapId === true ? 'fb831772aadb7781' : undefined,
+              }}
+          >
+            {mapInstance !== null && <MapContext.Provider value={mapInstance}>{children}</MapContext.Provider>}
+          </GoogleMap>
+        </Render>
+      </ComponentContainer>
   );
 };
