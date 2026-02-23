@@ -4,7 +4,6 @@
 This document tracks the progress of auditing and standardizing all components in the Vanguard React component library to ensure they have comprehensive Storybook stories that test all props and follow the established guidelines.
 
 ### Objectives
-
 - **Comprehensive Testing**: Ensure every prop of each component is tested in Storybook stories.
 - **Structural Compliance**: All stories must follow the mandatory organization rules:
   - Main stories file: `_ComponentName.stories.tsx` with SbDecorator configuration and re-exports.
@@ -14,6 +13,7 @@ This document tracks the progress of auditing and standardizing all components i
   - Proper import/export patterns: Import with underscore alias, export with explicit type and spread.
 - **Testing Standards**: All tests must use vitest, follow specific import rules, use React Testing Library queries, and adhere to SCSS spacing/breakpoint rules.
 - **Completion Criteria**: A component is marked as DONE only when all props are tested and the structure fully complies with guidelines.
+
 
 ### Guidelines Reference
 - Use vitest for all testing (not Jest).
