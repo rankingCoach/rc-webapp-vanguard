@@ -52,7 +52,7 @@ function MyComponent() {
       <Text variant="h1">Welcome</Text>
       <Button variant="primary" onClick={() => console.log('clicked')}>
         <Icon name="star" />
-        Click me
+        Click me!
       </Button>
     </div>
   );
