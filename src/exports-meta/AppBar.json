@@ -1,0 +1,7 @@
+{
+  "id": "component:app-bar",
+  "kind": "component",
+  "summary": "Application top bar that contains branding, navigation shortcuts and global actions.",
+  "keywords": ["appbar", "header", "topbar", "navigation", "brand", "toolbar"],
+  "tags": ["layout", "navigation", "ui"]
+}

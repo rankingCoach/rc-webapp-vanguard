@@ -1,0 +1,7 @@
+{
+  "id": "helper:is-youtube-url",
+  "kind": "helper",
+  "summary": "Utility that detects whether a URL is a YouTube link and extracts video id if present.",
+  "keywords": ["youtube", "url", "detect", "video", "id", "media"],
+  "tags": ["media", "helpers", "utilities"]
+}

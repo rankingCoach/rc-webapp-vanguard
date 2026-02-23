@@ -1,0 +1,7 @@
+{
+  "id": "component:page-section-loading",
+  "kind": "component",
+  "summary": "Skeleton or loading placeholder for a `PageSection` while content is being fetched.",
+  "keywords": ["loading", "skeleton", "placeholder", "page", "section", "spinner"],
+  "tags": ["loading", "skeleton", "ui"]
+}

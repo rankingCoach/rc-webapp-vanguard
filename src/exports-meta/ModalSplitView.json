@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-split-view",
+  "kind": "component",
+  "summary": "Modal variant that displays two panels side-by-side for comparative content or complex flows.",
+  "keywords": ["modal", "split", "two-panel", "side-by-side", "layout"],
+  "tags": ["modals", "layout", "ui"]
+}

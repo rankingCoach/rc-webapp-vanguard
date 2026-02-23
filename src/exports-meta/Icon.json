@@ -1,0 +1,7 @@
+{
+  "id": "component:icon",
+  "kind": "component",
+  "summary": "SVG icon component supporting named icons and adjustable sizes for UI use.",
+  "keywords": ["icon", "svg", "symbol", "size", "ui", "graphic"],
+  "tags": ["icons", "visual", "ui"]
+}

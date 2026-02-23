@@ -1,0 +1,7 @@
+{
+  "id": "component:slider",
+  "kind": "component",
+  "summary": "Drag-driven slider control for selecting numeric ranges or values with accessibility support.",
+  "keywords": ["slider", "range", "input", "drag", "control", "value"],
+  "tags": ["forms", "input", "ui"]
+}

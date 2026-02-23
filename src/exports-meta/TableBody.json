@@ -1,0 +1,7 @@
+{
+  "id": "component:table-body",
+  "kind": "component",
+  "summary": "Table body container used to render rows and manage scroll or virtualization.",
+  "keywords": ["table", "body", "rows", "virtualization", "scroll"],
+  "tags": ["table", "ui", "data"]
+}

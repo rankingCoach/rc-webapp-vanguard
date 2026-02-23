@@ -1,0 +1,7 @@
+{
+  "id": "component:list",
+  "kind": "component",
+  "summary": "Generic list renderer supporting different item schemas, layouts and empty states.",
+  "keywords": ["list", "items", "collection", "render", "empty-state", "ui"],
+  "tags": ["lists", "ui", "core"]
+}

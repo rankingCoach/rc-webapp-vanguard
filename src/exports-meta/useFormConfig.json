@@ -1,0 +1,7 @@
+{
+  "id": "hook:use-form-config",
+  "kind": "hook",
+  "summary": "Hook that builds and manages form configuration objects for dynamic form rendering and validation.",
+  "keywords": ["form", "hook", "config", "validation", "dynamic", "schema"],
+  "tags": ["hooks", "forms", "validation"]
+}

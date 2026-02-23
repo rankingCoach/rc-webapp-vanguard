@@ -1,0 +1,7 @@
+{
+  "id": "component:textarea",
+  "kind": "component",
+  "summary": "Multi-line text input with validation, autosize and optional counter.",
+  "keywords": ["textarea", "input", "multiline", "autosize", "validation", "counter", "form"],
+  "tags": ["forms", "input", "ui"]
+}

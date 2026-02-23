@@ -1,0 +1,7 @@
+{
+  "id": "component:editable-card",
+  "kind": "component",
+  "summary": "Card component with inline editable fields and optional AI-assisted title editing.",
+  "keywords": ["card", "editable", "inline-edit", "ai", "title", "component"],
+  "tags": ["cards", "editable", "ui"]
+}

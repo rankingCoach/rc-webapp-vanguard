@@ -1,0 +1,7 @@
+{
+  "id": "component:arc-gauge",
+  "kind": "component",
+  "summary": "Visual arc gauge used to represent progress, percentages or single-value metrics.",
+  "keywords": ["gauge", "arc", "progress", "metric", "visualization"],
+  "tags": ["visuals", "charts", "ui"]
+}

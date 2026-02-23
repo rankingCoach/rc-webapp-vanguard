@@ -1,0 +1,7 @@
+{
+  "id": "component:text",
+  "kind": "component",
+  "summary": "Flexible text renderer supporting translations, formatting, links, truncation and line balancing.",
+  "keywords": ["text", "typography", "translation", "truncate", "see-more", "link-parsing", "sanitization"],
+  "tags": ["typography", "i18n", "content", "core"]
+}

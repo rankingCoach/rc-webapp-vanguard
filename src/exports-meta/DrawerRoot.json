@@ -1,0 +1,7 @@
+{
+  "id": "component:drawer-root",
+  "kind": "component",
+  "summary": "Root container managing drawer mount points, stacking and backdrop behavior.",
+  "keywords": ["drawer", "root", "container", "backdrop", "stack"],
+  "tags": ["navigation", "layout", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:page-section",
+  "kind": "component",
+  "summary": "Structural component representing a page section with title and optional actions.",
+  "keywords": ["section", "page", "layout", "header", "content", "block"],
+  "tags": ["layout", "page-structure", "ui"]
+}

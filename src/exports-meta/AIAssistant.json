@@ -1,0 +1,7 @@
+{
+  "id": "component:ai-assistant",
+  "kind": "component",
+  "summary": "Interactive AI assistant UI component for suggestions, prompts and conversational tasks.",
+  "keywords": ["ai", "assistant", "chat", "suggestions", "conversation", "help"],
+  "tags": ["ai", "assistant", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:radio-button",
+  "kind": "component",
+  "summary": "Single radio input element supporting labels and accessibility features.",
+  "keywords": ["radio", "input", "form", "choice", "accessibility", "option"],
+  "tags": ["forms", "input", "ui"]
+}

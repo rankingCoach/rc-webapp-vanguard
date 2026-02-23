@@ -1,0 +1,7 @@
+{
+  "id": "component:progress-bar",
+  "kind": "component",
+  "summary": "Linear progress bar for indicating completion percentage or upload progress.",
+  "keywords": ["progress", "bar", "linear", "upload", "status", "indicator"],
+  "tags": ["progress", "ui", "feedback"]
+}

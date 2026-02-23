@@ -1,0 +1,7 @@
+{
+  "id": "component:checkbox",
+  "kind": "component",
+  "summary": "Checkbox input with accessible labels and focused state handling for forms.",
+  "keywords": ["checkbox", "input", "form", "toggle", "accessibility", "ui"],
+  "tags": ["forms", "input", "ui"]
+}

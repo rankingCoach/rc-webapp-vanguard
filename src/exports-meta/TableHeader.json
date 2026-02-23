@@ -1,0 +1,7 @@
+{
+  "id": "component:table-header",
+  "kind": "component",
+  "summary": "Header row component for tables providing column labels, sort controls and actions.",
+  "keywords": ["table", "header", "columns", "sort", "labels"],
+  "tags": ["table", "ui", "data"]
+}

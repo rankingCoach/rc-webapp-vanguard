@@ -1,0 +1,7 @@
+{
+  "id": "helper:drawer-service",
+  "kind": "helper",
+  "summary": "Imperative service to open, close and manage drawer instances from anywhere in the app.",
+  "keywords": ["drawer", "service", "open", "close", "imperative"],
+  "tags": ["navigation", "service", "helpers"]
+}

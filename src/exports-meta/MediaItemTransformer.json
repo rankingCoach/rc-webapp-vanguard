@@ -1,0 +1,7 @@
+{
+  "id": "helper:media-item-transformer",
+  "kind": "helper",
+  "summary": "Generic transformer interface for processing media items (compress/crop/convert) before upload.",
+  "keywords": ["media", "transformer", "compress", "crop", "process", "upload"],
+  "tags": ["media", "helpers"]
+}

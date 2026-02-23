@@ -1,0 +1,7 @@
+{
+  "id": "helper:image-compressor-transformer",
+  "kind": "helper",
+  "summary": "Transformer that compresses images for upload or storage to reduce file size.",
+  "keywords": ["image", "compressor", "transformer", "optimize", "upload"],
+  "tags": ["media", "helpers", "optimization"]
+}

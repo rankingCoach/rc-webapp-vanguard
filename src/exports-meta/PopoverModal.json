@@ -1,0 +1,7 @@
+{
+  "id": "component:popover-modal",
+  "kind": "component",
+  "summary": "Modal that appears anchored to an element like a popover for contextual interactions.",
+  "keywords": ["popover", "modal", "anchor", "contextual", "dialog"],
+  "tags": ["modals", "overlays", "ui"]
+}

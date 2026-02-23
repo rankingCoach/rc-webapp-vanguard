@@ -1,0 +1,7 @@
+{
+  "id": "component:drag-and-drop-file",
+  "kind": "component",
+  "summary": "Drag-and-drop file upload area with visual dropzone, validation and progress.",
+  "keywords": ["drag-and-drop", "dropzone", "upload", "file", "drag", "upload"],
+  "tags": ["upload", "files", "ui"]
+}

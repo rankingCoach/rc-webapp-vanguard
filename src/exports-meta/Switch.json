@@ -1,0 +1,7 @@
+{
+  "id": "component:switch",
+  "kind": "component",
+  "summary": "Accessible toggle switch component representing boolean state with keyboard support.",
+  "keywords": ["switch", "toggle", "boolean", "input", "accessibility", "aria"],
+  "tags": ["forms", "input", "ui"]
+}

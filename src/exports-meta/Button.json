@@ -1,0 +1,7 @@
+{
+  "id": "component:button",
+  "kind": "component",
+  "summary": "Clickable button supporting sizes, variants and accessible labels.",
+  "keywords": ["button", "click", "cta", "action", "size", "variant", "accessible"],
+  "tags": ["buttons", "forms", "ui", "core"]
+}

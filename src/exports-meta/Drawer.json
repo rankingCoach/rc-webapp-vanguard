@@ -1,0 +1,7 @@
+{
+  "id": "component:drawer",
+  "kind": "component",
+  "summary": "Slide-in panel (drawer) that anchors to a side of the screen for off-canvas content.",
+  "keywords": ["drawer", "panel", "sidebar", "off-canvas", "slide-in", "overlay"],
+  "tags": ["navigation", "layout", "ui"]
+}

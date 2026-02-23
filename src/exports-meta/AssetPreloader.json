@@ -1,0 +1,7 @@
+{
+  "id": "component:asset-preloader",
+  "kind": "component",
+  "summary": "Preloads images, fonts and other assets to improve perceived performance and avoid layout shifts.",
+  "keywords": ["preload", "assets", "images", "fonts", "performance"],
+  "tags": ["performance", "assets", "ui"]
+}

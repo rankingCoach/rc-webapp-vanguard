@@ -1,0 +1,7 @@
+{
+  "id": "component:credit-card",
+  "kind": "component",
+  "summary": "Visual component for displaying credit card details and detecting card types with optional masking.",
+  "keywords": ["credit-card", "card", "payment", "mask", "type", "visual"],
+  "tags": ["payments", "forms", "ui"]
+}

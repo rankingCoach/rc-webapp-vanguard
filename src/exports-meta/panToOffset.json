@@ -1,0 +1,7 @@
+{
+  "id": "helper:pan-to-offset",
+  "kind": "helper",
+  "summary": "Utility to pan Google Maps to a given location with pixel offset adjustments for UI overlays.",
+  "keywords": ["map", "pan", "offset", "google-maps", "utility", "coordinates"],
+  "tags": ["maps", "helpers", "google-maps"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:divider",
+  "kind": "component",
+  "summary": "Simple horizontal or vertical divider used to separate content or sections visually.",
+  "keywords": ["divider", "rule", "separator", "layout", "line"],
+  "tags": ["layout", "ui"]
+}

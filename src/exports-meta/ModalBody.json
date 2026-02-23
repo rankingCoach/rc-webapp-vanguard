@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-body",
+  "kind": "component",
+  "summary": "Structural component for modal content area, used inside `Modal` to host main content.",
+  "keywords": ["modal", "body", "content", "dialog", "container"],
+  "tags": ["modals", "layout", "ui"]
+}

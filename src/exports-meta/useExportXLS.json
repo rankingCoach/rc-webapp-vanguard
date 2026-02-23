@@ -1,0 +1,7 @@
+{
+  "id": "hook:use-export-xls",
+  "kind": "hook",
+  "summary": "Hook for exporting data to XLS/XLSX format programmatically with config options.",
+  "keywords": ["export", "xls", "xlsx", "hook", "download", "spreadsheet"],
+  "tags": ["export", "data", "hooks"]
+}

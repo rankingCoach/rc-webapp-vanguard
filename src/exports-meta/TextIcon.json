@@ -1,0 +1,7 @@
+{
+  "id": "component:text-icon",
+  "kind": "component",
+  "summary": "Inline component combining an icon and text label for compact UI affordances.",
+  "keywords": ["icon", "text", "inline", "label", "accessibility", "ui"],
+  "tags": ["icons", "labels", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:img-with-loader",
+  "kind": "component",
+  "summary": "Image component that wraps `ImgLoader` with additional features like captions and responsive sizing.",
+  "keywords": ["image", "loader", "caption", "responsive", "fallback", "placeholder"],
+  "tags": ["images", "ui", "performance"]
+}

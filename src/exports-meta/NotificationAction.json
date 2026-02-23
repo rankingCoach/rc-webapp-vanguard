@@ -1,0 +1,7 @@
+{
+  "id": "component:notification-action",
+  "kind": "component",
+  "summary": "Action control used inside notifications for quick interactions (undo, view, open).",
+  "keywords": ["notification", "action", "button", "cta", "undo", "view"],
+  "tags": ["notifications", "actions", "ui"]
+}

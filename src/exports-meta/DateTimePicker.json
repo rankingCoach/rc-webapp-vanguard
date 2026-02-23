@@ -1,0 +1,7 @@
+{
+  "id": "component:date-time-picker",
+  "kind": "component",
+  "summary": "Combined date and time picker supporting timezone-aware values and validation helpers.",
+  "keywords": ["date", "time", "picker", "datetime", "input", "timezone"],
+  "tags": ["forms", "datetime", "ui"]
+}

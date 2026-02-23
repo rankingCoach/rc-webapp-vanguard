@@ -1,0 +1,7 @@
+{
+  "id": "component:notification-social-post",
+  "kind": "component",
+  "summary": "Notification representing social post activity with preview and engagement actions.",
+  "keywords": ["notification", "social", "post", "activity", "preview", "engagement"],
+  "tags": ["notifications", "social", "ui"]
+}

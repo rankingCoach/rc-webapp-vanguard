@@ -1,0 +1,7 @@
+{
+  "id": "component:color-picker",
+  "kind": "component",
+  "summary": "Color selection control offering swatches, hex input and preview for UI theming.",
+  "keywords": ["color", "picker", "swatch", "hex", "palette", "theme"],
+  "tags": ["forms", "inputs", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:action-card-action",
+  "kind": "component",
+  "summary": "Action component used inside `ActionCard` for inline controls like buttons or links.",
+  "keywords": ["action", "card", "button", "link", "control"],
+  "tags": ["cards", "actions", "ui"]
+}

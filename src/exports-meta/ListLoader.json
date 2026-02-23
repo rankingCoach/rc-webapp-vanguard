@@ -1,0 +1,7 @@
+{
+  "id": "component:list-loader",
+  "kind": "component",
+  "summary": "Loading placeholder for lists while items are fetched; used for skeleton and shimmer states.",
+  "keywords": ["list", "loader", "loading", "skeleton", "placeholder"],
+  "tags": ["loading", "lists", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:info-icon-modal",
+  "kind": "component",
+  "summary": "Modal component triggered from an InfoIcon to display extended help or documentation.",
+  "keywords": ["modal", "info", "help", "documentation", "tooltip", "dialog"],
+  "tags": ["modals", "help", "ui"]
+}

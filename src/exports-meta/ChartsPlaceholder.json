@@ -1,0 +1,7 @@
+{
+  "id": "component:charts-placeholder",
+  "kind": "component",
+  "summary": "Placeholder skeleton used while chart data is loading to preserve layout and provide feedback.",
+  "keywords": ["charts", "placeholder", "loading", "skeleton", "empty-state"],
+  "tags": ["charts", "loading", "ui"]
+}

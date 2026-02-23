@@ -1,0 +1,7 @@
+{
+  "id": "component:big-legend",
+  "kind": "component",
+  "summary": "Large-format legend used to provide detailed labels and color mappings for charts.",
+  "keywords": ["legend", "chart", "labels", "color", "big-legend", "key"],
+  "tags": ["charts", "legend", "ui"]
+}

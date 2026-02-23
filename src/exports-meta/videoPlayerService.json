@@ -1,0 +1,7 @@
+{
+  "id": "helper:video-player-service",
+  "kind": "helper",
+  "summary": "Service for programmatically controlling global video player instances (play, pause, seek).",
+  "keywords": ["video", "service", "player", "control", "api"],
+  "tags": ["media", "service", "helpers"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:relative-time",
+  "kind": "component",
+  "summary": "Renders a localized, human-friendly relative time label (e.g., '3 minutes ago').",
+  "keywords": ["time", "relative", "ago", "date", "format", "localization"],
+  "tags": ["time", "i18n", "formatting"]
+}

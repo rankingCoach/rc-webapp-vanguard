@@ -1,0 +1,7 @@
+{
+  "id": "constant:default-marker-icon",
+  "kind": "constant",
+  "summary": "Default SVG or image icon used as a fallback for map markers.",
+  "keywords": ["marker", "icon", "default", "fallback", "svg"],
+  "tags": ["maps", "assets", "icons"]
+}

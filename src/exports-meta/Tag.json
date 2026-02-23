@@ -1,0 +1,7 @@
+{
+  "id": "component:tag",
+  "kind": "component",
+  "summary": "Compact label/pill representing a category, status or attribute with optional close behavior.",
+  "keywords": ["tag", "pill", "label", "chip", "category", "status"],
+  "tags": ["labels", "chips", "ui"]
+}

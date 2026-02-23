@@ -1,0 +1,7 @@
+{
+  "id": "hook:use-dynamic-import",
+  "kind": "hook",
+  "summary": "Hook for dynamically importing modules at runtime with loading states and caching.",
+  "keywords": ["dynamic", "import", "hook", "lazy", "load", "code-splitting"],
+  "tags": ["hooks", "performance", "lazy-loading"]
+}

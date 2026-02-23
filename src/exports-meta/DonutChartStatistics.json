@@ -1,0 +1,7 @@
+{
+  "id": "component:donut-chart-statistics",
+  "kind": "component",
+  "summary": "Donut chart component that surfaces statistical summaries and percentages alongside the visualization.",
+  "keywords": ["donut", "chart", "statistics", "percentages", "visualization"],
+  "tags": ["charts", "visuals", "data"]
+}

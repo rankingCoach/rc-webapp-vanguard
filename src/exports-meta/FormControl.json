@@ -1,0 +1,7 @@
+{
+  "id": "component:form-control",
+  "kind": "component",
+  "summary": "Form control wrapper that provides consistent layout and label handling for inputs.",
+  "keywords": ["form", "control", "label", "input", "layout", "validation"],
+  "tags": ["forms", "layout", "ui"]
+}

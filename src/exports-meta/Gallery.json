@@ -1,0 +1,7 @@
+{
+  "id": "component:gallery",
+  "kind": "component",
+  "summary": "Media gallery component for displaying and interacting with image/video collections.",
+  "keywords": ["gallery", "images", "media", "photos", "videos", "grid", "carousel"],
+  "tags": ["media", "gallery", "ui"]
+}

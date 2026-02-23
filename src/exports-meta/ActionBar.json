@@ -1,0 +1,7 @@
+{
+  "id": "component:action-bar",
+  "kind": "component",
+  "summary": "Container for primary actions and controls, often fixed at the bottom/top of a view.",
+  "keywords": ["action", "bar", "controls", "footer", "actions", "toolbar"],
+  "tags": ["actions", "layout", "ui"]
+}
