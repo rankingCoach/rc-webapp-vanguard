@@ -4,6 +4,7 @@
 This document tracks the progress of auditing and standardizing all components in the Vanguard React component library to ensure they have comprehensive Storybook stories that test all props and follow the established guidelines.
 
 ### Objectives
+
 - **Comprehensive Testing**: Ensure every prop of each component is tested in Storybook stories.
 - **Structural Compliance**: All stories must follow the mandatory organization rules:
   - Main stories file: `_ComponentName.stories.tsx` with SbDecorator configuration and re-exports.
