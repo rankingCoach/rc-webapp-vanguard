@@ -10,9 +10,8 @@ import { googleMapColouredTheme } from '@vanguard/GoogleMaps/_themes/GoogleMapCo
 import { Render } from '@vanguard/Render/Render';
 import React, { useState } from 'react';
 
-import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
+import { ComponentContainer } from '@vanguard/ComponentContainer';
 import { MapContext } from './map-context';
-// import GoogleMap, { GoogleMapProps } from "@vanguard/GoogleMaps/GoogleMap";
 
 /**
  * Props
@@ -25,6 +24,8 @@ export type GoogleMapsProps = {
   onLoad?: ((map: google.maps.Map) => void | Promise<void>) | undefined;
   mapId?: boolean | string;
 } & GoogleMapProps;
+
+const DEFAULT_MAP_ID = 'fb831772aadb7781';
 
 /**
  * Google Maps Component
@@ -93,10 +94,10 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
                 gestureHandling: 'greedy',
                 ...props.options,
                 styles: getTheme(),
-                mapId: typeof mapId === 'string' ? mapId : mapId === true ? 'fb831772aadb7781' : undefined,
+                mapId: typeof mapId === 'string' ? mapId : mapId === true ? DEFAULT_MAP_ID : undefined,
               }}
           >
-            {mapInstance !== null && <MapContext.Provider value={mapInstance}>{children}</MapContext.Provider>}
+            {mapInstance !== null ? <MapContext.Provider value={mapInstance}>{children}</MapContext.Provider> : null}
           </GoogleMap>
         </Render>
       </ComponentContainer>

@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 import invariant from 'tiny-invariant';
 
 export const MapContext = createContext<google.maps.Map | null>(null);
-export function useGoogleMap(): google.maps.Map | null {
+export function useGoogleMap(): google.maps.Map {
   invariant(!!useContext, 'useGoogleMap is React hook and requires React version 16.8+');
 
   const map = useContext<google.maps.Map | null>(MapContext);

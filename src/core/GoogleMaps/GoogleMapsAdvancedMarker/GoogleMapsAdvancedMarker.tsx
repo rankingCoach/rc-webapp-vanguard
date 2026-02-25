@@ -1,7 +1,7 @@
-import { ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { MapContext } from '../map-context';
+import { useGoogleMap } from '../map-context';
 
 /**
  * Props for GoogleMapsAdvancedMarker component
@@ -57,7 +57,7 @@ export interface GoogleMapsAdvancedMarkerProps {
 export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) => {
   const { onClick, onMouseOver, onMouseOut, id, zIndex, pos, title, draggable, onDragEnd, children } = props;
 
-  const map = useContext(MapContext);
+  const map = useGoogleMap();
 
   // Stable DOM container used as AdvancedMarkerElement content
   const container = useMemo(() => document.createElement('div'), []);
@@ -66,7 +66,6 @@ export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) =
 
   // Create / destroy marker when map becomes available
   useEffect(() => {
-    if (!map) return;
     if (isNaN(pos.lat) || isNaN(pos.lng)) return;
 
     const marker = new google.maps.marker.AdvancedMarkerElement({
