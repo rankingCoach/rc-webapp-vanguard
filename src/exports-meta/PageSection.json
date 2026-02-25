@@ -2,6 +2,37 @@
   "id": "component:page-section",
   "kind": "component",
   "summary": "Structural component representing a page section with title and optional actions.",
-  "keywords": ["section", "page", "layout", "header", "content", "block"],
-  "tags": ["layout", "page-structure", "ui"]
+  "keywords": [
+    "section",
+    "page",
+    "layout",
+    "header",
+    "content",
+    "block"
+  ],
+  "tags": [
+    "layout",
+    "page-structure",
+    "ui"
+  ],
+  "recommendations": [
+    {
+      "reason": "Use PageSection to logically group related content on a page, improving readability and organization."
+    },
+    {
+      "reason": "Include a title in the PageSection to provide context and improve accessibility for screen readers."
+    },
+    {
+      "reason": "Consider using actions (e.g., buttons) in the header of the PageSection for relevant interactions related to that section's content."
+    },
+    {
+      "reason": "Use multiple PageSections on a page to break up content into manageable chunks, enhancing user experience."
+    },
+    {
+      "reason": "PageSection component can be used to define an entire page, splitting it into multiple sections for better structure and navigation. First section should have rounded corners at the top, and last section should have rounded corners at the bottom to create a cohesive page layout."
+    },
+    {
+      "reason": "When using multiple PageSections one after another, ensure that background is alternated: fist section use functionalBg, then frostedGlass, then functionalBg again, and so on. This will help visually separate the sections and improve readability"
+    }
+  ]
 }

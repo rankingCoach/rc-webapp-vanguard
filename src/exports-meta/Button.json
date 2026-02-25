@@ -2,6 +2,39 @@
   "id": "component:button",
   "kind": "component",
   "summary": "Clickable button supporting sizes, variants and accessible labels.",
-  "keywords": ["button", "click", "cta", "action", "size", "variant", "accessible"],
-  "tags": ["buttons", "forms", "ui", "core"]
+  "keywords": [
+    "button",
+    "click",
+    "cta",
+    "action",
+    "size",
+    "variant",
+    "accessible"
+  ],
+  "tags": [
+    "buttons",
+    "forms",
+    "ui",
+    "core"
+  ],
+  "recommendations": [
+    {
+      "id": "component:button-group",
+      "reason": "Use ButtonGroup to group multiple buttons together for better layout and accessibility."
+    },
+    {
+      "id": "component:icon-button",
+      "reason": "Use IconButton for buttons that only contain an icon, providing a more compact and visually distinct option."
+    },
+    {
+      "id": "component:link",
+      "reason": "Use Link for navigation purposes instead of Button, which is meant for actions."
+    },
+    {
+      "reason": "Primary buttons are best for important actions, while secondary buttons are suitable for less critical actions. There should typically be only one primary button per screen/section to avoid confusion."
+    },
+    {
+      "reason": "Use disabled state to indicate that a button is not currently actionable."
+    }
+  ]
 }
