@@ -1,384 +1,292 @@
-# Vanguard MCP Server
+# Vanguard MCP
 
-Model Context Protocol (MCP) server for the Vanguard component library. This server exposes Vanguard's 90+ components through an MCP interface, providing LLMs and other tools with detailed component metadata, props documentation, and usage examples from Storybook.
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that exposes the Vanguard design system — its components, hooks, and helpers — as structured, queryable tools for AI assistants (e.g. Claude).
 
-## Features
+---
 
-- **Component Discovery**: Search and browse all Vanguard components
-- **Props Documentation**: Access TypeScript interface definitions for component props
-- **Usage Examples**: Get code examples directly from Storybook stories
-- **Fast Startup**: Pre-indexed metadata from `storybook.json` (90+ components loaded instantly)
-- **Zero Configuration**: Works out of the box with existing Storybook setup
+## How it works
 
-## Quick Start
+The system has two distinct phases:
 
-### Installation
+1. **Generation** (build-time) — scripts that read the source library, extract metadata, props, and story examples, and write pre-processed JSON files to disk.
+2. **MCP Server** (runtime) — a Node.js process that reads those JSON files and serves them to an AI assistant via the MCP protocol over stdio.
 
-```bash
-npm install
-```
+---
 
-### Running the Server
-
-```bash
-npm start
-```
-
-The server will start and listen on stdio. You should see:
-```
-Starting Vanguard MCP Server...
-Loading storybook.json...
-Loaded 90 components
-Initializing TypeScript parser...
-```
-
-### Generating Component Context
-
-To pre-generate component metadata for faster MCP queries:
-
-```bash
-npm run gen:mcp-context
-```
-
-This generates:
-- `data/components.index.json` - Master catalog of all components
-- `data/props/*.json` - Per-component metadata with props, stories, and tags
-
-**When to use this:**
-- After building Storybook with `npm run storybook:build`
-- When component library changes
-- To enable richer component discovery for the MCP server
-
-**Optional environment variables:**
-```bash
-# Storybook index path (default: ../storybook-static/index.json)
-STORYBOOK_INDEX=../storybook-static/index.json npm run gen:mcp-context
-
-# Output directory (default: ./data)
-OUT_DIR=./data npm run gen:mcp-context
-
-# TypeScript config (default: ../tsconfig.json)
-TSCONFIG=../tsconfig.json npm run gen:mcp-context
-```
-
-## Tools
-
-### 1. `search_components`
-
-Search for components by name (case-insensitive, partial match).
-
-**Parameters:**
-- `query` (string): Search query (e.g., "button", "input")
-
-**Response:**
-```json
-{
-  "results": [
-    {
-      "name": "Button",
-      "storyCount": 30,
-      "componentPath": "src/core/Button/Button.tsx"
-    }
-  ]
-}
-```
-
-**Example:**
-```
-Search for "button" returns: Button, ActionButton, IconButton, RadioButton, ToggleButton, ToggleButtonGroup
-```
-
-### 2. `get_component_details`
-
-Get detailed information about a specific component including its props interface and all available stories.
-
-**Parameters:**
-- `componentName` (string): Name of the component (e.g., "Button", "Input")
-
-**Response:**
-```json
-{
-  "name": "Button",
-  "storyCount": 30,
-  "stories": [
-    {
-      "name": "Button Type Primary",
-      "id": "button-button--button-type-primary"
-    }
-  ],
-  "propsInterface": "export interface ButtonProps { ... }",
-  "componentPath": "src/core/Button/Button.tsx"
-}
-```
-
-**Example Use Cases:**
-- Get all props for a component
-- See what stories are available for a component
-- Find the component file location
-
-### 3. `get_component_examples`
-
-Get code examples from Storybook stories. Can request all stories or a specific story.
-
-**Parameters:**
-- `componentName` (string): Name of the component
-- `storyName` (string, optional): Specific story name to retrieve
-
-**Response:**
-```json
-{
-  "componentName": "Button",
-  "stories": [
-    {
-      "name": "Button Type Primary",
-      "code": "export const ButtonTypePrimary: Story = { args: { ... } }"
-    }
-  ]
-}
-```
-
-**Example Use Cases:**
-- Show concrete usage examples to users
-- Copy story code for reference
-- Understand component behavior through stories
-- Generate component implementations
-
-## Architecture
-
-### Project Structure
+## Directory structure
 
 ```
 vanguard-mcp/
-├── src/
-│   ├── index.ts                 # Main MCP server entry point
-│   ├── types.ts                 # TypeScript type definitions
+├── scripts/                        # Build-time generators (run once, before the server starts)
+│   ├── generate-component-context.mjs   # Main entry point for generation
 │   ├── loaders/
-│   │   └── storybook-loader.ts  # Loads and parses storybook.json
+│   │   └── meta-loader.mjs              # Reads src/exports-meta/*.json files
 │   ├── parsers/
-│   │   └── component-parser.ts  # Extracts TypeScript props
-│   └── tools/
-│       ├── search-components.ts     # Search tool
-│       ├── get-component-details.ts # Details tool
-│       └── get-component-examples.ts# Examples tool
-├── scripts/
-│   └── generate-component-context.mjs # Component context generator
-├── storybook.json               # Pre-built index (from Storybook)
-├── data/                        # Generated component metadata
-│   ├── components.index.json    # Master component catalog
-│   └── props/                   # Per-component metadata
-│       ├── button.json
-│       ├── input.json
-│       └── ...
-└── package.json
+│   │   └── index-parser.mjs             # Parses src/index.ts to classify exports
+│   ├── extractors/
+│   │   ├── signature-extractor.mjs      # Extracts TS signatures via ts-morph
+│   │   └── story-extractor.mjs          # Extracts story source code via regex
+│   └── generators/
+│       ├── catalogue-generator.mjs      # Writes data/catalogue.json
+│       └── detail-generator.mjs         # Writes data/items/{kind}__{id}.json
+│
+├── src/                            # MCP server runtime (TypeScript)
+│   ├── index.ts                    # Server entry point, tool registration
+│   ├── types.ts                    # Shared TypeScript interfaces
+│   ├── loaders/                    # Read pre-generated JSON files
+│   │   ├── catalogue-loader.ts     # Loads data/catalogue.json
+│   │   ├── detail-loader.ts        # Loads data/items/*.json on demand
+│   │   ├── storybook-loader.ts     # Loads vanguard.index.json (Storybook index)
+│   │   ├── props-loader.ts         # Loads data/props/*.json (legacy)
+│   │   ├── hook-loader.ts          # Loads data/hooks/*.json
+│   │   └── helper-loader.ts        # Loads data/helpers/*.json
+│   ├── parsers/
+│   │   └── component-parser.ts     # Live prop extraction via ts-morph (fallback)
+│   └── tools/                      # MCP tool implementations
+│       ├── search-components.ts
+│       ├── get-component-details.ts
+│       ├── get-component-examples.ts
+│       ├── get-related-components.ts
+│       ├── search-hooks.ts
+│       ├── get-hook-details.ts
+│       ├── search-helpers.ts
+│       └── get-helper-details.ts
+│
+└── data/                           # Generated — do not edit by hand
+    ├── catalogue.json              # Unified index of all components, hooks, helpers
+    ├── items/                      # Per-item detail files
+    │   └── {kind}__{id}.json       # e.g. component__button.json
+    ├── props/                      # Per-component props (legacy format)
+    ├── hooks/                      # Hook signatures
+    └── helpers/                    # Helper signatures
 ```
 
-### Key Classes
+---
 
-#### `StorybookLoader`
-- Loads `storybook.json` (pre-built by Storybook)
-- Builds component index by grouping stories
-- Extracts component names from story titles
-- Provides search functionality
+## Phase 1: Generation
 
-**Why it's fast:**
-- Single file load (294KB)
-- No filesystem scanning needed
-- No story file parsing needed (metadata pre-computed)
-
-#### `ComponentParser`
-- Extracts TypeScript props interfaces from `.tsx` files
-- Uses `ts-morph` for AST parsing (with regex fallback)
-- Caches parsed props to avoid re-parsing
-- Lazy-loads props on-demand
-
-**Why it's efficient:**
-- Only parses component files when props are requested
-- Caches results to avoid repeated parsing
-- Uses TypeScript AST for accurate extraction
-
-#### Tools
-- Simple functions that query the component index
-- Handle input validation with Zod
-- Format responses as JSON
-
-## Data Sources
-
-### `storybook.json`
-**What it contains:** 921 pre-indexed entries with component/story metadata
-**Built by:** Storybook (automatic, happens during build)
-**Used for:** Component discovery, story listing, import paths
-
-### Component `.tsx` files
-**What they contain:** TypeScript prop interfaces
-**Accessed when:** `get_component_details` is called
-**Why on-demand:** Props are only needed when explicitly requested
-
-### Story `.stories.tsx` files
-**What they contain:** Code examples and Storybook configurations
-**Accessed when:** `get_component_examples` is called
-**Format:** ES6 exports with metadata
-
-### Generated Component Metadata (from `gen:mcp-context`)
-**Location:** `data/components.index.json` and `data/props/*.json`
-**Built by:** `scripts/generate-component-context.mjs`
-**Updated:** Run `npm run gen:mcp-context` after Storybook builds
-**Contains:** Pre-extracted component props, stories, tags, and metadata
-
-## Configuration
-
-### Environment
-
-The server expects:
-- `storybook.json` in the MCP project root
-- TypeScript files at `../src/core/{ComponentName}/{ComponentName}.tsx`
-- Story files at `../src/core/{ComponentName}/*.stories.tsx`
-
-### Transport
-
-Currently configured for **stdio** (standard input/output). This is ideal for:
-- CLI tools (Claude Code, command-line clients)
-- Local development
-- Simple integration
-
-To use a different transport, modify `src/index.ts`:
-```typescript
-// Change from:
-const transport = new StdioServerTransport();
-
-// To:
-const transport = new HttpServerTransport(...); // or SSE, etc.
-```
-
-## Performance Characteristics
-
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Startup | ~100ms | Load storybook.json + initialize TS parser |
-| Search 100 components | ~1ms | In-memory filter |
-| Get component details | ~50ms | First call: parse TS file. Cached after. |
-| Get component examples | ~5ms | File I/O only, no parsing |
-
-## Extending the Server
-
-### Adding a New Tool
-
-1. Create tool handler in `src/tools/my-tool.ts`:
-```typescript
-import { z } from 'zod';
-
-export const MyToolInputSchema = z.object({
-  param1: z.string().describe('Description'),
-});
-
-export function myTool(componentIndex: ComponentIndex, input: z.infer<typeof MyToolInputSchema>) {
-  // Implementation
-}
-```
-
-2. Register in `src/index.ts`:
-```typescript
-server.tool(
-  'my_tool',
-  'Tool description',
-  MyToolInputSchema.shape,
-  (input) => {
-    const result = myTool(componentIndex, input);
-    return {
-      content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
-    };
-  }
-);
-```
-
-### Improving Component Detection
-
-The server automatically extracts component names from Storybook titles. Component categorization can be added by:
-1. Extending `ComponentInfo` type with a `category` field
-2. Detecting categories in `StorybookLoader.loadStorybook()`
-3. Exposing via the tools
-
-Example detection logic:
-```typescript
-const category =
-  name.includes('Input') ? 'form' :
-  name.includes('Button') ? 'interaction' :
-  name.includes('Icon') ? 'display' :
-  'other';
-```
-
-## Troubleshooting
-
-### "Cannot find module 'ts-morph'"
-- Run `npm install`
-- Check that `node_modules/@ts-morph` exists
-
-### "Loaded 0 components"
-- Verify `storybook.json` exists in the MCP project root
-- Check that storybook.json has `entries` object
-- Ensure stories were built: `npm run build:storybook` in parent
-
-### "Component not found"
-- Use `search_components` to verify the component exists
-- Component names are case-sensitive (e.g., "Button" not "button")
-- Component must have at least one story in Storybook
-
-### Props interface is empty/null
-- Not all components may have typed props (check manually)
-- Props might be defined in parent file or external type
-- Use examples tool as fallback for usage documentation
-
-## Development
-
-### Testing Tools Locally
-
-Create a test file:
-```typescript
-import { StorybookLoader } from './src/loaders/storybook-loader.js';
-import { searchComponents } from './src/tools/search-components.js';
-
-const index = StorybookLoader.loadStorybook();
-const results = searchComponents(index, { query: 'button' });
-console.log(results);
-```
-
-Run with: `npx tsx test-file.ts`
-
-### Building for Production
+Run generation from the repo root (or inside `vanguard-mcp/`):
 
 ```bash
-npm run build  # Compile TypeScript
+npm run gen:mcp-context
+# equivalent to: node vanguard-mcp/scripts/generate-component-context.mjs
 ```
 
-## Integration with Claude Code
+This runs once and produces the `data/` directory. Re-run it when:
+- New components, hooks, or helpers are added/removed
+- Metadata files in `src/exports-meta/` are updated
+- Storybook stories change
 
-1. Add to Claude Code settings:
+### What the generator does
+
+```
+src/index.ts            ──► index-parser          Classifies each export as component / hook / helper
+src/exports-meta/*.json ──► meta-loader            Loads human-authored metadata per export
+storybook-static/       ──► story-extractor        Reads compiled Storybook index + raw story source
+src/**/*.tsx            ──► signature-extractor    Extracts TypeScript function signatures via ts-morph
+                                     │
+                                     ▼
+                        catalogue-generator  ──►  data/catalogue.json
+                        detail-generator     ──►  data/items/{kind}__{id}.json
+                                                  data/props/*.json  (legacy)
+                                                  data/hooks/*.json
+                                                  data/helpers/*.json
+```
+
+#### `index-parser.mjs`
+Reads `src/index.ts` and classifies every re-export by name convention:
+- Names starting with `use` → hook
+- Known utility names → helper
+- Everything else → component
+
+#### `meta-loader.mjs`
+Reads `src/exports-meta/{ExportName}.json`. Each file contains human-authored metadata:
 ```json
 {
-  "mcpServers": {
-    "vanguard": {
-      "command": "npm",
-      "args": ["start"],
-      "cwd": "/path/to/vanguard-mcp"
-    }
-  }
+  "summary": "A short one-sentence description.",
+  "keywords": ["form", "input", "controlled"],
+  "tags": ["form", "ui"],
+  "category": "Forms"
+}
+```
+Filenames must match the export name exactly (case-sensitive).
+
+#### `signature-extractor.mjs`
+Uses `ts-morph` to open the TypeScript project and extract the function/component signature (parameter names, types, return type) for each export.
+
+#### `story-extractor.mjs`
+Reads the compiled Storybook `index.json` to discover story IDs, then reads the raw `.stories.tsx` source files to extract individual story code blocks via regex.
+
+#### `catalogue-generator.mjs`
+Merges all of the above into `data/catalogue.json` — a flat list of all items with their metadata, tags, keywords, and summary. This is the index used for fast search and filtering at runtime.
+
+#### `detail-generator.mjs`
+Produces one JSON file per item in `data/items/`. Files are named `{kind}__{id}.json` (double underscore) where `kind` is `component`, `hook`, or `helper` and `id` is kebab-case. Example: `data/items/component__button.json`.
+
+A detail file contains everything about an item: metadata, props interface, dependent types, story examples, and signature.
+
+---
+
+## Phase 2: MCP Server
+
+### Starting the server
+
+```bash
+# Development (tsx, no compile step needed)
+npm start
+
+# Production (compile first)
+npm run build
+node dist/index.js
+```
+
+The server communicates over **stdio** using the MCP protocol. Connect it from your AI client config (e.g. Claude Desktop `claude_desktop_config.json` or a `.mcp.json` in the repo root).
+
+### Startup sequence
+
+1. `StorybookLoader.loadStorybook()` — loads `vanguard.index.json` (or falls back to `components.index.json`) into a `ComponentIndex` map (component name → story paths).
+2. `HookLoader.loadAll()` / `HelperLoader.loadAll()` — reads all pre-generated hook and helper JSON files into memory.
+3. `ComponentParser.initialize()` — boots a `ts-morph` project pointing at the library source, used as a live fallback if a pre-generated props file is missing.
+4. The MCP server begins listening on stdio.
+
+### Loaders (runtime)
+
+| Loader | Data source | Caching |
+|---|---|---|
+| `StorybookLoader` | `data/vanguard.index.json` | Loaded once at startup |
+| `CatalogueLoader` | `data/catalogue.json` | In-memory singleton |
+| `DetailLoader` | `data/items/{kind}__{id}.json` | Per-item in-memory cache |
+| `PropsLoader` | `data/props/{Component}.json` | Per-component in-memory cache |
+| `HookLoader` | `data/hooks/*.json` | All loaded at startup |
+| `HelperLoader` | `data/helpers/*.json` | All loaded at startup |
+
+---
+
+## MCP Tools
+
+These are the tools the AI assistant can call.
+
+### `search_components`
+Search for components using one of four modes:
+
+| Mode | What it searches |
+|---|---|
+| `name` | Component name (fuzzy prefix match) |
+| `keyword` | Metadata keywords array |
+| `semantic` | All text fields (summary, keywords, tags, category) |
+| `all` | All of the above, combined with relevance scoring |
+
+**Parameters:**
+- `query` (string) — search term
+- `searchMode` (optional) — `"name"` | `"keyword"` | `"semantic"` | `"all"` (default: `"all"`)
+- `tags` (optional) — filter results to items with any of these tags
+- `category` (optional) — filter results to this category
+- `limit` (optional) — max number of results (default: 10)
+
+**Returns:** Array of matches with `name`, `summary`, `tags`, `keywords`, `score`.
+
+---
+
+### `get_component_details`
+Get everything known about a single component.
+
+**Parameters:**
+- `componentName` (string) — exact component name (e.g. `"Button"`)
+- `includeRelated` (optional boolean) — whether to include related components
+
+**Returns:** Props interface, dependent types (enums, unions), available story names, metadata (summary, keywords, tags, category), and optionally related components.
+
+---
+
+### `get_component_examples`
+Get story source code for a component.
+
+**Parameters:**
+- `componentName` (string)
+- `storyName` (optional string) — if omitted, returns all stories
+
+**Returns:** Map of story name → raw TSX source code.
+
+---
+
+### `get_related_components`
+Find components related to a given one.
+
+**Parameters:**
+- `componentName` (string)
+- `relationshipType` (optional) — `"tags"` | `"keywords"` | `"category"` | `"all"` (default: `"all"`)
+- `limit` (optional) — default: 5
+
+**Returns:** List of related components with a `reason` field explaining the relationship.
+
+---
+
+### `search_hooks`
+Search for hooks by name (fuzzy).
+
+**Parameters:** `query` (string)
+
+**Returns:** Matching hook names.
+
+---
+
+### `get_hook_details`
+Get the TypeScript signature and dependent types for a hook.
+
+**Parameters:** `name` (string) — hook name (e.g. `"useFormConfig"`)
+
+**Returns:** Signature string and any referenced types.
+
+---
+
+### `search_helpers`
+Search for helper utilities by name (fuzzy).
+
+**Parameters:** `query` (string)
+
+---
+
+### `get_helper_details`
+Get the TypeScript signature and dependent types for a helper.
+
+**Parameters:** `name` (string)
+
+---
+
+## Metadata files (`src/exports-meta/`)
+
+Each file corresponds to one export and must be named exactly after it:
+
+```
+src/exports-meta/Button.json
+src/exports-meta/useFormConfig.json
+src/exports-meta/classNames.json
+```
+
+Schema:
+```json
+{
+  "summary": "One sentence describing what this export does.",
+  "keywords": ["list", "of", "searchable", "terms"],
+  "tags": ["ui", "form"],
+  "category": "Forms"
 }
 ```
 
-2. Use in Claude Code:
+Run the coverage check to see which exports are missing metadata:
+
+```bash
+npm run check-meta-coverage
 ```
-Show me the Button component props
-What stories are available for Input?
-Search for date picker components
+
+---
+
+## Validation
+
+After running generation you can validate the output:
+
+```bash
+node vanguard-mcp/scripts/validate-generated-data.mjs
 ```
 
-## Contributing
-
-To add new capabilities:
-1. Extend types in `src/types.ts`
-2. Create new tool in `src/tools/`
-3. Register tool in `src/index.ts`
-4. Test with `npx tsx test-tools.ts`
-
-## License
-
-Same as Vanguard component library
+Reports errors, warnings, and statistics about the generated `data/` directory.

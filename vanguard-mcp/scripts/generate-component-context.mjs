@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { Project } from 'ts-morph';
-import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, '../..');
 const MCP_DIR = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(MCP_DIR, 'data');
-const PROPS_DIR = path.join(DATA_DIR, 'props');
 
 const STORYBOOK_INDEX_PATH = path.join(ROOT_DIR, 'storybook-static/index.json');
 const OUTPUT_INDEX_PATH = path.join(DATA_DIR, 'components.index.json');
@@ -104,8 +104,6 @@ async function main() {
     initializeProject();
 
     // Ensure output directories
-    fs.mkdirSync(path.join(DATA_DIR, 'hooks'), { recursive: true });
-    fs.mkdirSync(path.join(DATA_DIR, 'helpers'), { recursive: true });
     fs.mkdirSync(path.join(DATA_DIR, 'items'), { recursive: true });
 
     const componentDataList = [];
@@ -113,7 +111,6 @@ async function main() {
     // Process components
     for (const [componentId, componentData] of storiesByComponent) {
       // Resolve component file path from moduleSpec
-      let compPathCandidates = [];
       const mod = componentData.moduleSpec || '';
       const rootBase = path.join(ROOT_DIR, mod);
       // Try various heuristics
@@ -190,20 +187,19 @@ async function main() {
     for (const h of indexExports.hooks) {
       const sig = extractSignature(ROOT_DIR, TSCONFIG_PATH, h.moduleSpec, h.name);
       const id = h.name.replace(/([A-Z])/g, (m, p1, offset) =>
-        offset > 0 ? '-' + p1.toLowerCase() : p1.toLowerCase(),
+        offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase(),
       );
       const meta = metaMap.get(h.name);
-      const hookData = sig || { name: h.name, filePath: h.moduleSpec };
-      hookData.summary = meta?.summary;
-      hookData.keywords = meta?.keywords || [];
-      hookData.tags = meta?.tags || [];
-      const filePath = path.join(DATA_DIR, 'hooks', `${id}.json`);
-      try {
-        fs.writeFileSync(filePath, JSON.stringify(hookData, null, 2), 'utf-8');
-      } catch (err) {
-        console.warn(`  ⚠ Failed to write hook file ${filePath}: ${err.message}`);
-      }
-      hooksList.push({ id, name: h.name, filePath: sig?.filePath || h.moduleSpec, signature: sig?.signature || null });
+      hooksList.push({
+        id,
+        name: h.name,
+        filePath: sig?.filePath || h.moduleSpec,
+        signature: sig?.signature || null,
+        dependentTypes: sig?.dependentTypes || null,
+        summary: meta?.summary,
+        keywords: meta?.keywords || [],
+        tags: meta?.tags || [],
+      });
     }
 
     // Process helpers
@@ -211,24 +207,18 @@ async function main() {
     for (const hh of indexExports.helpers) {
       const sig = extractSignature(ROOT_DIR, TSCONFIG_PATH, hh.moduleSpec, hh.name);
       const id = hh.name.replace(/([A-Z])/g, (m, p1, offset) =>
-        offset > 0 ? '-' + p1.toLowerCase() : p1.toLowerCase(),
+        offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase(),
       );
       const meta = metaMap.get(hh.name);
-      const helperData = sig || { name: hh.name, filePath: hh.moduleSpec };
-      helperData.summary = meta?.summary;
-      helperData.keywords = meta?.keywords || [];
-      helperData.tags = meta?.tags || [];
-      const filePath = path.join(DATA_DIR, 'helpers', `${id}.json`);
-      try {
-        fs.writeFileSync(filePath, JSON.stringify(helperData, null, 2), 'utf-8');
-      } catch (err) {
-        console.warn(`  ⚠ Failed to write helper file ${filePath}: ${err.message}`);
-      }
       helpersList.push({
         id,
         name: hh.name,
         filePath: sig?.filePath || hh.moduleSpec,
         signature: sig?.signature || null,
+        dependentTypes: sig?.dependentTypes || null,
+        summary: meta?.summary,
+        keywords: meta?.keywords || [],
+        tags: meta?.tags || [],
       });
     }
 
@@ -256,11 +246,8 @@ async function main() {
         hooks: hooksList,
         helpers: helpersList,
       },
-      path.join(DATA_DIR, 'items')
+      path.join(DATA_DIR, 'items'),
     );
-
-    // Write per-component props files
-    writePropsFiles(componentDataList);
 
     // Write vanguard.index.json (new unified format)
     const vanguardIndex = {
@@ -296,12 +283,11 @@ async function main() {
 
     // Write legacy components.index.json for backward compatibility
     const componentCount = writeIndexFile(componentDataList);
-    console.log(`  ✓ Wrote ${componentCount} props files + index + vanguard.index.json\n`);
+    console.log(`  ✓ Wrote ${componentCount} components to index + vanguard.index.json\n`);
 
     console.log('✅ Generation complete!\n');
     console.log('Output:');
     console.log(`  📄 ${OUTPUT_INDEX_PATH}`);
-    console.log(`  📁 ${PROPS_DIR}/*.json (${componentDataList.length} files)\n`);
   } catch (error) {
     console.error('❌ Generation failed:', error.message);
     process.exit(1);
@@ -313,7 +299,6 @@ async function main() {
  */
 function ensureDirectories() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.mkdirSync(PROPS_DIR, { recursive: true });
 }
 
 /**
@@ -338,7 +323,7 @@ function loadStorybookIndex(filePath) {
  * "Button" → "button"
  */
 function normalizeComponentId(name) {
-  return name.replace(/([A-Z])/g, (match, p1, offset) => (offset > 0 ? '-' + p1.toLowerCase() : p1.toLowerCase()));
+  return name.replace(/([A-Z])/g, (match, p1, offset) => (offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase()));
 }
 
 /**
@@ -369,6 +354,81 @@ function initializeProject() {
 }
 
 /**
+ * Resolve a module specifier to an absolute file path, handling path aliases and relative imports.
+ * @param {string} moduleSpec - The import specifier (e.g. '@vanguard/Text/Text.types', './types')
+ * @param {string} importingFilePath - Absolute path of the file that contains the import
+ * @returns {string|null} Resolved absolute file path or null
+ */
+function resolveModulePath(moduleSpec, importingFilePath) {
+  let resolvedBase = null;
+
+  if (moduleSpec.startsWith('@vanguard/')) {
+    resolvedBase = path.join(ROOT_DIR, 'src/core', moduleSpec.slice('@vanguard/'.length));
+  } else if (moduleSpec.startsWith('@common/')) {
+    resolvedBase = path.join(ROOT_DIR, 'src/common', moduleSpec.slice('@common/'.length));
+  } else if (moduleSpec.startsWith('@helpers/')) {
+    resolvedBase = path.join(ROOT_DIR, 'src/helpers', moduleSpec.slice('@helpers/'.length));
+  } else if (moduleSpec.startsWith('@services/')) {
+    resolvedBase = path.join(ROOT_DIR, 'src/services', moduleSpec.slice('@services/'.length));
+  } else if (moduleSpec.startsWith('@stores/')) {
+    resolvedBase = path.join(ROOT_DIR, 'src/stores', moduleSpec.slice('@stores/'.length));
+  } else if (moduleSpec.startsWith('.')) {
+    resolvedBase = path.resolve(path.dirname(importingFilePath), moduleSpec);
+  } else {
+    return null; // external package, skip
+  }
+
+  for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
+    if (fs.existsSync(resolvedBase + ext)) return resolvedBase + ext;
+  }
+  for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
+    const idx = path.join(resolvedBase, `index${ext}`);
+    if (fs.existsSync(idx)) return idx;
+  }
+  return null;
+}
+
+/**
+ * Find a Props or {ComponentName}Props declaration in a source file or its imported types files.
+ * Returns { sourceFile, decl, kind } where kind is 'interface' or 'typeAlias'.
+ */
+function findPropsDecl(sourceFile, componentName) {
+  const propsNames = ['Props', `${componentName}Props`];
+
+  // 1. Look in the source file itself
+  for (const propsName of propsNames) {
+    const iface = sourceFile.getInterface(propsName);
+    if (iface) return { sourceFile, decl: iface, kind: 'interface' };
+    const alias = sourceFile.getTypeAlias(propsName);
+    if (alias) return { sourceFile, decl: alias, kind: 'typeAlias' };
+  }
+
+  // 2. Walk imports to find where Props is imported from
+  for (const imp of sourceFile.getImportDeclarations()) {
+    const namedImports = imp.getImportClause()?.getNamedImports() || [];
+    const importedPropsName = namedImports.find((n) => propsNames.includes(n.getName()))?.getName();
+    if (!importedPropsName) continue;
+
+    const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
+    if (!moduleSpec) continue;
+
+    const resolvedPath = resolveModulePath(moduleSpec, sourceFile.getFilePath());
+    if (!resolvedPath) continue;
+
+    try {
+      const importedFile = project.addSourceFileAtPath(resolvedPath);
+      const iface = importedFile.getInterface(importedPropsName);
+      if (iface) return { sourceFile: importedFile, decl: iface, kind: 'interface' };
+      const alias = importedFile.getTypeAlias(importedPropsName);
+      if (alias) return { sourceFile: importedFile, decl: alias, kind: 'typeAlias' };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {}
+  }
+
+  return null;
+}
+
+/**
  * Extract props using ts-morph
  */
 function extractPropsWithTsMorph(componentFilePath, componentName) {
@@ -378,31 +438,51 @@ function extractPropsWithTsMorph(componentFilePath, componentName) {
     }
 
     const sourceFile = project.addSourceFileAtPath(componentFilePath);
+    const found = findPropsDecl(sourceFile, componentName);
 
-    // Try various props names
-    const propsNames = ['Props', `${componentName}Props`];
+    if (!found) return null;
 
-    for (const propsName of propsNames) {
-      // Try interface
-      const interfaceDecl = sourceFile.getInterface(propsName);
-      if (interfaceDecl) {
-        const interfaceData = parseInterface(interfaceDecl);
-        // Extract dependent types referenced in props
-        const dependentTypes = extractDependentTypes(sourceFile, interfaceDecl);
-        return { ...interfaceData, dependentTypes };
+    const { sourceFile: propsSourceFile, decl, kind } = found;
+
+    if (kind === 'interface') {
+      const interfaceData = parseInterface(decl);
+      const dependentTypes = extractDependentTypes(propsSourceFile, decl);
+      return { ...interfaceData, dependentTypes };
+    } else {
+      const typeData = parseTypeAlias(decl, propsSourceFile);
+      // Collect dependent types from the flattened fields, not the alias text.
+      // The alias text (e.g. "BaseProps & SeeMoreProps") only references container types,
+      // not the actual prop types like TextTypes, FontWeights, etc.
+      //
+      // For simple re-export aliases like `export type TextProps = Props`, the fields come
+      // from the file that defines Props (e.g. Text.types.tsx). We need to also search that
+      // file for dependent types. Find it by following the import of the referenced type.
+      const sourceFiles = [propsSourceFile];
+      if (sourceFile !== propsSourceFile) sourceFiles.push(sourceFile);
+      const typeNode = decl.getTypeNode?.();
+      if (typeNode) {
+        const typeText = typeNode.getText().trim();
+        if (/^[A-Z]\w+$/.test(typeText) && typeText !== decl.getName?.()) {
+          // Walk imports of propsSourceFile to find where this referenced type comes from
+          for (const imp of propsSourceFile.getImportDeclarations()) {
+            const namedImports = imp.getImportClause()?.getNamedImports() || [];
+            if (!namedImports.find((n) => n.getName() === typeText)) continue;
+            const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
+            if (!moduleSpec) continue;
+            const resolvedPath = resolveModulePath(moduleSpec, propsSourceFile.getFilePath());
+            if (resolvedPath) {
+              try {
+                const importedFile = project.addSourceFileAtPath(resolvedPath);
+                if (!sourceFiles.includes(importedFile)) sourceFiles.push(importedFile);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              } catch (_) {}
+            }
+          }
+        }
       }
-
-      // Try type alias
-      const typeAlias = sourceFile.getTypeAlias(propsName);
-      if (typeAlias) {
-        const typeData = parseTypeAlias(typeAlias);
-        // Extract dependent types referenced in this type
-        const dependentTypes = extractDependentTypesFromTypeAlias(sourceFile, typeAlias);
-        return { ...typeData, dependentTypes };
-      }
+      const dependentTypes = collectDependentTypesFromFields(typeData?.props ?? [], sourceFiles);
+      return { ...typeData, dependentTypes };
     }
-
-    return null;
   } catch (error) {
     console.warn(`  ⚠ Error parsing ${componentName}: ${error.message}`);
     return null;
@@ -410,191 +490,106 @@ function extractPropsWithTsMorph(componentFilePath, componentName) {
 }
 
 /**
- * Extract dependent types referenced in an interface
+ * Resolve a single type name to its definition, searching the given source file and its imports.
+ * Returns a dependentTypes entry or null.
  */
-function extractDependentTypes(sourceFile, interfaceDecl) {
+function resolveDependentType(typeName, sourceFile) {
+  // Check in the current file first
+  const enumDecl = sourceFile.getEnum(typeName);
+  if (enumDecl) return { kind: 'enum', text: enumDecl.getText() };
+
+  const typeAlias = sourceFile.getTypeAlias(typeName);
+  if (typeAlias) return { kind: 'type', text: typeAlias.getText() };
+
+  const iface = sourceFile.getInterface(typeName);
+  if (iface) return { kind: 'interface', text: iface.getText() };
+
+  // Walk imports
+  for (const imp of sourceFile.getImportDeclarations()) {
+    const namedImports = imp.getImportClause()?.getNamedImports() || [];
+    if (!namedImports.find((n) => n.getName() === typeName)) continue;
+
+    const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
+    if (!moduleSpec) continue;
+
+    const resolvedPath = resolveModulePath(moduleSpec, sourceFile.getFilePath());
+    if (!resolvedPath) {
+      return { kind: 'import', from: moduleSpec };
+    }
+
+    try {
+      const importedFile = project.addSourceFileAtPath(resolvedPath);
+      const result = resolveDependentType(typeName, importedFile);
+      if (result) return result;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {}
+
+    return { kind: 'import', from: moduleSpec };
+  }
+
+  return null;
+}
+
+/**
+ * Collect all type names referenced in a set of property nodes and resolve their definitions.
+ */
+function collectDependentTypes(properties, sourceFile) {
   const dependentTypes = {};
-  const collectedTypeNames = new Set();
+  const typeNames = new Set();
 
-  try {
-    // Get all property types
-    const properties = interfaceDecl.getProperties();
-
-    for (const prop of properties) {
-      const typeNode = prop.getTypeNode();
-      if (!typeNode) continue;
-
-      // Extract type names from the type node text
-      const typeText = typeNode.getText();
-      const typeNames = extractTypeNamesFromText(typeText);
-
-      for (const typeName of typeNames) {
-        collectedTypeNames.add(typeName);
-      }
+  for (const prop of properties) {
+    const typeNode = prop.getTypeNode?.();
+    if (!typeNode) continue;
+    for (const name of extractTypeNamesFromText(typeNode.getText())) {
+      typeNames.add(name);
     }
+  }
 
-    // Now resolve each type name and get its definition
-    for (const typeName of collectedTypeNames) {
-      const enumDecl = sourceFile.getEnum(typeName);
-      if (enumDecl) {
-        dependentTypes[typeName] = {
-          kind: 'enum',
-          text: enumDecl.getText(),
-        };
-        continue;
-      }
-
-      const typeAlias = sourceFile.getTypeAlias(typeName);
-      if (typeAlias) {
-        dependentTypes[typeName] = {
-          kind: 'type',
-          text: typeAlias.getText(),
-        };
-        continue;
-      }
-
-      const interfaceDecl2 = sourceFile.getInterface(typeName);
-      if (interfaceDecl2) {
-        dependentTypes[typeName] = {
-          kind: 'interface',
-          text: interfaceDecl2.getText(),
-        };
-        continue;
-      }
-
-      // Try to find in imported modules
-      const allImports = sourceFile.getImportDeclarations();
-      for (const imp of allImports) {
-        const namedImports = imp.getImportClause()?.getNamedImports() || [];
-        const importedName = namedImports.find((n) => n.getName() === typeName);
-        if (importedName) {
-          const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
-
-          // Try to resolve relative imports
-          if (moduleSpec.startsWith('.') && project) {
-            try {
-              const importDir = path.dirname(sourceFile.getFilePath());
-              const importPath = path.resolve(importDir, moduleSpec);
-
-              // Try with common extensions
-              let resolvedFile = null;
-              for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
-                if (fs.existsSync(importPath + ext)) {
-                  resolvedFile = importPath + ext;
-                  break;
-                }
-              }
-
-              // Also try as a directory with index file
-              if (!resolvedFile) {
-                for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
-                  if (fs.existsSync(path.join(importPath, `index${ext}`))) {
-                    resolvedFile = path.join(importPath, `index${ext}`);
-                    break;
-                  }
-                }
-              }
-
-              if (resolvedFile) {
-                const importedSourceFile = project.addSourceFileAtPath(resolvedFile);
-
-                // Try to find the type in the imported file
-                const importedEnum = importedSourceFile.getEnum(typeName);
-                if (importedEnum) {
-                  dependentTypes[typeName] = {
-                    kind: 'enum',
-                    text: importedEnum.getText(),
-                  };
-                  break;
-                }
-
-                const importedType = importedSourceFile.getTypeAlias(typeName);
-                if (importedType) {
-                  dependentTypes[typeName] = {
-                    kind: 'type',
-                    text: importedType.getText(),
-                  };
-                  break;
-                }
-
-                const importedInterface = importedSourceFile.getInterface(typeName);
-                if (importedInterface) {
-                  dependentTypes[typeName] = {
-                    kind: 'interface',
-                    text: importedInterface.getText(),
-                  };
-                  break;
-                }
-              }
-            } catch (err) {
-              // Silently fail and fall through to import reference
-            }
-          }
-
-          // Fallback: store as import reference
-          dependentTypes[typeName] = {
-            kind: 'import',
-            from: moduleSpec,
-          };
-          break;
-        }
-      }
-    }
-  } catch (error) {
-    console.warn(`  ⚠ Error extracting dependent types: ${error.message}`);
+  for (const typeName of typeNames) {
+    const resolved = resolveDependentType(typeName, sourceFile);
+    if (resolved) dependentTypes[typeName] = resolved;
   }
 
   return Object.keys(dependentTypes).length > 0 ? dependentTypes : undefined;
 }
 
 /**
- * Extract dependent types from a type alias
+ * Extract dependent types referenced in an interface
  */
-function extractDependentTypesFromTypeAlias(sourceFile, typeAlias) {
-  const dependentTypes = {};
-  const collectedTypeNames = new Set();
-
+function extractDependentTypes(sourceFile, interfaceDecl) {
   try {
-    const typeNode = typeAlias.getTypeNode();
-    if (!typeNode) return undefined;
-
-    const typeText = typeNode.getText();
-    const typeNames = extractTypeNamesFromText(typeText);
-
-    for (const typeName of typeNames) {
-      collectedTypeNames.add(typeName);
-    }
-
-    // Resolve type names
-    for (const typeName of collectedTypeNames) {
-      const enumDecl = sourceFile.getEnum(typeName);
-      if (enumDecl) {
-        dependentTypes[typeName] = {
-          kind: 'enum',
-          text: enumDecl.getText(),
-        };
-        continue;
-      }
-
-      const typeAlias2 = sourceFile.getTypeAlias(typeName);
-      if (typeAlias2) {
-        dependentTypes[typeName] = {
-          kind: 'type',
-          text: typeAlias2.getText(),
-        };
-        continue;
-      }
-
-      const interfaceDecl = sourceFile.getInterface(typeName);
-      if (interfaceDecl) {
-        dependentTypes[typeName] = {
-          kind: 'interface',
-          text: interfaceDecl.getText(),
-        };
-      }
-    }
+    return collectDependentTypes(interfaceDecl.getProperties(), sourceFile);
   } catch (error) {
-    console.warn(`  ⚠ Error extracting dependent types from alias: ${error.message}`);
+    console.warn(`  ⚠ Error extracting dependent types: ${error.message}`);
+    return undefined;
+  }
+}
+
+/**
+ * Collect dependent types from an already-flattened array of field objects.
+ * Works from field.type strings rather than ts-morph property nodes.
+ * sourceFiles can be a single source file or an array to search in order.
+ */
+function collectDependentTypesFromFields(fields, sourceFiles) {
+  const dependentTypes = {};
+  const typeNames = new Set();
+  const files = Array.isArray(sourceFiles) ? sourceFiles : [sourceFiles];
+
+  for (const field of fields) {
+    if (!field?.type) continue;
+    for (const name of extractTypeNamesFromText(field.type)) {
+      typeNames.add(name);
+    }
+  }
+
+  for (const typeName of typeNames) {
+    for (const sf of files) {
+      const resolved = resolveDependentType(typeName, sf);
+      if (resolved) {
+        dependentTypes[typeName] = resolved;
+        break;
+      }
+    }
   }
 
   return Object.keys(dependentTypes).length > 0 ? dependentTypes : undefined;
@@ -693,171 +688,144 @@ function parseInterface(interfaceDecl) {
 }
 
 /**
- * Parse type alias declaration
+ * Extract props fields from a single type/interface member node.
  */
-function parseTypeAlias(typeAlias) {
-  try {
-    const typeNode = typeAlias.getTypeNode();
-    let raw = typeAlias.getText();
+function memberToField(member) {
+  const name = member.getName?.();
+  if (!name) return null;
+  const optional = member.hasQuestionToken ? member.hasQuestionToken() : false;
+  const type = member.getTypeNode
+    ? (member.getTypeNode()?.getText() ?? 'unknown')
+    : member.getType
+      ? member.getType().getText()
+      : 'unknown';
+  const jsDocs = member.getJsDocs ? member.getJsDocs() : [];
+  const description =
+    jsDocs
+      .map((d) => d.getComment())
+      .filter(Boolean)
+      .join('\n') || undefined;
+  const deprecated = jsDocs.some((d) => d.getTags().some((t) => t.getTagName() === 'deprecated'));
+  return { name, type, required: !optional, optional, description, deprecated: deprecated || undefined };
+}
 
-    // Try to extract members if it's an object type
-    if (typeNode && typeNode.getMembers) {
-      const members = typeNode.getMembers();
-      const props = members.map((member) => {
-        const name = member.getName();
-        const optional = member.hasQuestionToken ? member.hasQuestionToken() : false;
-        const type = member.getTypeNode
-          ? member.getTypeNode().getText()
-          : member.getType
-            ? member.getType().getText()
-            : 'unknown';
+/**
+ * Resolve a named type reference (e.g. "BaseProps") to its fields, looking in sourceFile and imports.
+ * Returns an array of field objects, or null if unresolvable.
+ */
+function resolveTypeToFields(typeName, sourceFile) {
+  // Look for interface in current file
+  const iface = sourceFile.getInterface(typeName);
+  if (iface) return iface.getProperties().map(memberToField).filter(Boolean);
 
-        const jsDocs = member.getJsDocs ? member.getJsDocs() : [];
-        const description =
-          jsDocs
-            .map((d) => d.getComment())
-            .filter(Boolean)
-            .join('\n') || undefined;
+  // Look for type alias in current file
+  const alias = sourceFile.getTypeAlias(typeName);
+  if (alias) return flattenTypeAliasToFields(alias, sourceFile);
 
-        const deprecated = jsDocs.some((d) => d.getTags().some((t) => t.getTagName() === 'deprecated'));
+  // Walk imports
+  for (const imp of sourceFile.getImportDeclarations()) {
+    const namedImports = imp.getImportClause()?.getNamedImports() || [];
+    if (!namedImports.find((n) => n.getName() === typeName)) continue;
 
-        return {
-          name,
-          type,
-          required: !optional,
-          optional,
-          description,
-          deprecated: deprecated || undefined,
-        };
-      });
+    const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
+    if (!moduleSpec) continue;
 
-      return { props, raw };
-    }
+    const resolvedPath = resolveModulePath(moduleSpec, sourceFile.getFilePath());
+    if (!resolvedPath) continue;
 
-    // For non-object types, try to resolve if it's a reference to another type
-    // e.g., "export type TextProps = Props;" should expand to show Props definition
-    if (typeNode) {
-      const sourceFile = typeAlias.getSourceFile();
-      const typeText = typeNode.getText();
+    try {
+      const importedFile = project.addSourceFileAtPath(resolvedPath);
+      const result = resolveTypeToFields(typeName, importedFile);
+      if (result) return result;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {}
+  }
 
-      // Check if it's a simple type reference (e.g., "Props", "ComponentProps")
-      const isSimpleReference = /^[A-Z]\w+$/.test(typeText.trim());
+  return null;
+}
 
-      if (isSimpleReference) {
-        // Try to find and resolve the referenced type locally first
-        const referencedType = sourceFile.getTypeAlias(typeText);
-        if (referencedType && referencedType !== typeAlias) {
-          // Found the referenced type, use its full definition
-          raw = referencedType.getText();
-        } else {
-          // Check for interface
-          const referencedInterface = sourceFile.getInterface(typeText);
-          if (referencedInterface) {
-            raw = referencedInterface.getText();
-          } else {
-            // Try to resolve from imports
-            const allImports = sourceFile.getImportDeclarations();
-            for (const imp of allImports) {
-              const namedImports = imp.getImportClause()?.getNamedImports() || [];
-              const importedName = namedImports.find((n) => n.getName() === typeText);
-              if (importedName) {
-                const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
+/**
+ * Flatten a type alias (including intersection types like A & B) to a flat field list.
+ */
+function flattenTypeAliasToFields(typeAlias, sourceFile) {
+  const typeNode = typeAlias.getTypeNode();
+  if (!typeNode) return [];
 
-                // Try to resolve the import
-                if (moduleSpec && project) {
-                  try {
-                    let resolvedPath = moduleSpec;
+  // Direct object type: type T = { foo: string }
+  if (typeNode.getMembers) {
+    return typeNode.getMembers().map(memberToField).filter(Boolean);
+  }
 
-                    // Handle path aliases from tsconfig.json
-                    if (moduleSpec.startsWith('@vanguard')) {
-                      // @vanguard/* -> ./src/core/*
-                      resolvedPath = moduleSpec.replace('@vanguard', path.join(ROOT_DIR, 'src/core'));
-                    } else if (moduleSpec.startsWith('@common')) {
-                      // @common/* -> ./src/common/*
-                      resolvedPath = moduleSpec.replace('@common', path.join(ROOT_DIR, 'src/common'));
-                    } else if (moduleSpec.startsWith('@helpers')) {
-                      // @helpers/* -> ./src/helpers/*
-                      resolvedPath = moduleSpec.replace('@helpers', path.join(ROOT_DIR, 'src/helpers'));
-                    } else if (moduleSpec.startsWith('@services')) {
-                      // @services/* -> ./src/services/*
-                      resolvedPath = moduleSpec.replace('@services', path.join(ROOT_DIR, 'src/services'));
-                    } else if (moduleSpec.startsWith('@stores')) {
-                      // @stores/* -> ./src/stores/*
-                      resolvedPath = moduleSpec.replace('@stores', path.join(ROOT_DIR, 'src/stores'));
-                    } else if (moduleSpec.startsWith('.')) {
-                      // Relative import
-                      const importDir = path.dirname(sourceFile.getFilePath());
-                      resolvedPath = path.resolve(importDir, moduleSpec);
-                    }
+  // Intersection (A & B) or union (A | B) — getTypeNodes() works for both
+  if (typeNode.getTypeNodes) {
+    const allFields = [];
+    const seen = new Set();
+    for (const constituent of typeNode.getTypeNodes()) {
+      let fields = null;
 
-                    // Try with common extensions
-                    let resolvedFile = null;
-                    for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
-                      if (fs.existsSync(resolvedPath + ext)) {
-                        resolvedFile = resolvedPath + ext;
-                        break;
-                      }
-                    }
+      // Inline object type literal: { foo: string; bar?: number }
+      if (constituent.getMembers) {
+        fields = constituent.getMembers().map(memberToField).filter(Boolean);
+      } else {
+        const constituentText = constituent.getText().trim();
+        // Strip Omit<X, ...> — just take X for display purposes
+        const baseTypeName = constituentText.replace(/^Omit\s*<\s*(\w+)\s*,[\s\S]*>$/, '$1').trim();
+        if (/^[A-Z]\w*$/.test(baseTypeName)) {
+          fields = resolveTypeToFields(baseTypeName, sourceFile);
+        }
+      }
 
-                    // Also try as a directory with index file
-                    if (!resolvedFile) {
-                      for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
-                        if (fs.existsSync(path.join(resolvedPath, `index${ext}`))) {
-                          resolvedFile = path.join(resolvedPath, `index${ext}`);
-                          break;
-                        }
-                      }
-                    }
-
-                    if (resolvedFile) {
-                      const importedSourceFile = project.addSourceFileAtPath(resolvedFile);
-                      const importedType = importedSourceFile.getTypeAlias(typeText);
-                      if (importedType) {
-                        raw = importedType.getText();
-                        break;
-                      }
-                      const importedInterface = importedSourceFile.getInterface(typeText);
-                      if (importedInterface) {
-                        raw = importedInterface.getText();
-                        break;
-                      }
-                    }
-                  } catch (err) {
-                    // Silently fail, keep original raw
-                  }
-                }
-                break;
-              }
-            }
+      if (fields) {
+        for (const f of fields) {
+          if (f && !seen.has(f.name)) {
+            seen.add(f.name);
+            allFields.push(f);
           }
         }
       }
     }
+    return allFields;
+  }
 
-    // For non-object types, return empty props with raw type
+  return [];
+}
+
+/**
+ * Parse type alias declaration
+ */
+function parseTypeAlias(typeAlias, sourceFile) {
+  try {
+    const typeNode = typeAlias.getTypeNode();
+    const raw = typeAlias.getText();
+    const sf = sourceFile ?? typeAlias.getSourceFile();
+
+    // Direct object type members
+    if (typeNode?.getMembers) {
+      const props = typeNode.getMembers().map(memberToField).filter(Boolean);
+      return { props, raw };
+    }
+
+    // Intersection or union — flatten to fields
+    if (typeNode?.getTypeNodes) {
+      const props = flattenTypeAliasToFields(typeAlias, sf);
+      return { props, raw };
+    }
+
+    // Simple reference: type T = SomeOtherType
+    if (typeNode) {
+      const typeText = typeNode.getText().trim();
+      if (/^[A-Z]\w+$/.test(typeText) && typeText !== typeAlias.getName()) {
+        const fields = resolveTypeToFields(typeText, sf);
+        if (fields && fields.length > 0) {
+          return { props: fields, raw };
+        }
+      }
+    }
+
     return { props: [], raw };
   } catch (error) {
     console.warn(`  ⚠ Error parsing type alias: ${error.message}`);
     return null;
-  }
-}
-
-/**
- * Write per-component props files
- */
-function writePropsFiles(componentDataList) {
-  for (const componentData of componentDataList) {
-    const filePath = path.join(PROPS_DIR, `${componentData.componentId}.json`);
-
-    // Remove hasProps field before writing
-    const payload = { ...componentData };
-    delete payload.hasProps;
-
-    try {
-      fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf-8');
-    } catch (error) {
-      console.warn(`  ⚠ Failed to write ${componentData.componentId}.json: ${error.message}`);
-    }
   }
 }
 

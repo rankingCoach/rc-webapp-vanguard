@@ -1,4 +1,5 @@
 import * as z from 'zod';
+
 import { HookLoader } from '../loaders/hook-loader.js';
 
 export const GetHookDetailsInputSchema = z.object({ name: z.string() });

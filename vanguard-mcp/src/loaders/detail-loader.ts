@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MCP_DIR = path.resolve(__dirname, '../..');
@@ -105,4 +105,14 @@ export class DetailLoader {
   static clearCache(): void {
     this.cache.clear();
   }
+}
+
+/**
+ * Normalize component name to component ID
+ * Icon → icon, AIOrb → ai-orb, CheckBox → check-box
+ */
+export function normalizeComponentId(name: string): string {
+  return name
+    .replace(/([A-Z])/g, (_, p1, offset) => (offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase()))
+    .toLowerCase();
 }

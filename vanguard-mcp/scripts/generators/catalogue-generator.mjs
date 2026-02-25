@@ -63,9 +63,7 @@ export function generateCatalogue(components, hooks, helpers) {
   }
 
   // Calculate statistics
-  const itemsWithMetadata = items.filter(
-    (item) => item.summary || (item.keywords && item.keywords.length > 0)
-  ).length;
+  const itemsWithMetadata = items.filter((item) => item.summary || (item.keywords && item.keywords.length > 0)).length;
 
   const stats = {
     totalComponents: components.length,

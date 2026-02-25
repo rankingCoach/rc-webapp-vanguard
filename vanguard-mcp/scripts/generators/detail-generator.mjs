@@ -1,6 +1,5 @@
-import fs from 'fs';
-import path from 'path';
-import { extractStoryCode } from '../extractors/story-extractor.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * Generate and write detail files for all items
@@ -9,7 +8,7 @@ import { extractStoryCode } from '../extractors/story-extractor.mjs';
  * @param {string} outputDir - Output directory for detail files
  * @returns {Promise<void>}
  */
-export async function writeDetailFiles(items, outputDir) {
+export function writeDetailFiles(items, outputDir) {
   const { components, hooks, helpers } = items;
 
   // Process components
@@ -105,6 +104,7 @@ function generateHookDetail(hookData) {
       path: hookData.filePath,
     },
     signature: hookData.signature,
+    dependentTypes: hookData.dependentTypes,
     generatedAt: new Date().toISOString(),
   };
 }
@@ -126,6 +126,7 @@ function generateHelperDetail(helperData) {
       path: helperData.filePath,
     },
     signature: helperData.signature,
+    dependentTypes: helperData.dependentTypes,
     generatedAt: new Date().toISOString(),
   };
 }

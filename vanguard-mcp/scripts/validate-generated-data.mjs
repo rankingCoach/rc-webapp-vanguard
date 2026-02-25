@@ -5,9 +5,9 @@
  * Checks catalogue structure, detail files, and data consistency
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MCP_DIR = path.resolve(__dirname, '..');
@@ -15,8 +15,8 @@ const DATA_DIR = path.join(MCP_DIR, 'data');
 const CATALOGUE_PATH = path.join(DATA_DIR, 'catalogue.json');
 const ITEMS_DIR = path.join(DATA_DIR, 'items');
 
-let errors = [];
-let warnings = [];
+const errors = [];
+const warnings = [];
 
 /**
  * Main validation function
@@ -44,7 +44,7 @@ function main() {
  */
 function validateCatalogueExists() {
   if (!fs.existsSync(CATALOGUE_PATH)) {
-    errors.push('Catalogue file not found at ' + CATALOGUE_PATH);
+    errors.push(`Catalogue file not found at ${CATALOGUE_PATH}`);
     return;
   }
 
@@ -52,7 +52,7 @@ function validateCatalogueExists() {
     const content = fs.readFileSync(CATALOGUE_PATH, 'utf-8');
     JSON.parse(content);
   } catch (err) {
-    errors.push('Catalogue file is not valid JSON: ' + (err instanceof Error ? err.message : String(err)));
+    errors.push(`Catalogue file is not valid JSON: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -93,7 +93,9 @@ function validateCatalogueStructure() {
       }
       const expectedTotal = stats.totalComponents + stats.totalHooks + stats.totalHelpers;
       if (stats.totalItems !== expectedTotal) {
-        errors.push(`Stats.totalItems (${stats.totalItems}) doesn't match sum of components + hooks + helpers (${expectedTotal})`);
+        errors.push(
+          `Stats.totalItems (${stats.totalItems}) doesn't match sum of components + hooks + helpers (${expectedTotal})`,
+        );
       }
     }
 
@@ -127,7 +129,7 @@ function validateCatalogueStructure() {
 
     console.log(`✓ Catalogue structure validated (${catalogue.items.length} items)`);
   } catch (err) {
-    errors.push('Error validating catalogue structure: ' + (err instanceof Error ? err.message : String(err)));
+    errors.push(`Error validating catalogue structure: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -139,14 +141,14 @@ function validateDetailFiles() {
     const catalogue = JSON.parse(fs.readFileSync(CATALOGUE_PATH, 'utf-8'));
 
     if (!fs.existsSync(ITEMS_DIR)) {
-      errors.push('Items directory does not exist: ' + ITEMS_DIR);
+      errors.push(`Items directory does not exist: ${ITEMS_DIR}`);
       return;
     }
 
     const actualFiles = new Set(fs.readdirSync(ITEMS_DIR));
     let validDetailFiles = 0;
-    let missingFiles = [];
-    let invalidJsonFiles = [];
+    const missingFiles = [];
+    const invalidJsonFiles = [];
 
     for (const item of catalogue.items) {
       const expectedFilename = path.basename(item.detailsRef);
@@ -177,7 +179,7 @@ function validateDetailFiles() {
 
     console.log(`✓ Detail files validated (${validDetailFiles} valid files)`);
   } catch (err) {
-    errors.push('Error validating detail files: ' + (err instanceof Error ? err.message : String(err)));
+    errors.push(`Error validating detail files: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -195,7 +197,7 @@ function validateDataConsistency() {
 
     if (catalogue.stats.totalComponents !== components.length) {
       errors.push(
-        `Component count mismatch: stats says ${catalogue.stats.totalComponents}, but found ${components.length}`
+        `Component count mismatch: stats says ${catalogue.stats.totalComponents}, but found ${components.length}`,
       );
     }
     if (catalogue.stats.totalHooks !== hooks.length) {
@@ -207,19 +209,19 @@ function validateDataConsistency() {
 
     // Check metadata coverage
     const itemsWithMetadata = catalogue.items.filter(
-      (item) => item.summary || (Array.isArray(item.keywords) && item.keywords.length > 0)
+      (item) => item.summary || (Array.isArray(item.keywords) && item.keywords.length > 0),
     ).length;
 
     const expectedCoverage = catalogue.stats.itemsWithMetadata;
     if (itemsWithMetadata !== expectedCoverage) {
       warnings.push(
-        `Metadata coverage mismatch: stats says ${expectedCoverage}, but found ${itemsWithMetadata} items with metadata`
+        `Metadata coverage mismatch: stats says ${expectedCoverage}, but found ${itemsWithMetadata} items with metadata`,
       );
     }
 
     console.log('✓ Data consistency validated');
   } catch (err) {
-    errors.push('Error validating data consistency: ' + (err instanceof Error ? err.message : String(err)));
+    errors.push(`Error validating data consistency: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 

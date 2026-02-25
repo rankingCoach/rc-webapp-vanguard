@@ -1,4 +1,5 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
+
 import { z } from 'zod';
 
 import { ComponentExamples, ComponentIndex } from '../types.js';
@@ -91,4 +92,4 @@ function extractStoryCode(fileContent: string, storyName: string): string | unde
   return undefined;
 }
 
-export { GetComponentExamplesInputSchema, GetComponentExamplesInput };
+export { GetComponentExamplesInput, GetComponentExamplesInputSchema };

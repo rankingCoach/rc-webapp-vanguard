@@ -1,7 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { ComponentIndex } from '../types.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const MCP_DIR = path.resolve(__dirname, '../..');
+const ROOT_DIR = path.resolve(MCP_DIR, '..');
 
 interface ComponentIndexEntry {
   id: string;
@@ -41,8 +46,8 @@ interface VanguardIndexFile {
  * Loads and parses the components.index.json or vanguard.index.json file to build a component index
  */
 export class StorybookLoader {
-  private static readonly COMPONENTS_INDEX_PATH = path.join(process.cwd(), 'data', 'components.index.json');
-  private static readonly VANGUARD_INDEX_PATH = path.join(process.cwd(), 'data', 'vanguard.index.json');
+  private static readonly COMPONENTS_INDEX_PATH = path.join(MCP_DIR, 'data', 'components.index.json');
+  private static readonly VANGUARD_INDEX_PATH = path.join(MCP_DIR, 'data', 'vanguard.index.json');
 
   /**
    * Load vanguard.index.json (preferred) or components.index.json (legacy) and build component index
@@ -61,7 +66,7 @@ export class StorybookLoader {
             stories: [],
             storyFilePath: component.componentPath ? this.getStoryFilePath(component.componentPath) : undefined,
             componentFilePath: component.componentPath
-              ? path.join(process.cwd(), '..', component.componentPath)
+              ? path.join(ROOT_DIR, component.componentPath)
               : undefined,
           };
         }
@@ -73,13 +78,12 @@ export class StorybookLoader {
       const content = fs.readFileSync(this.COMPONENTS_INDEX_PATH, 'utf-8');
       const indexFile = JSON.parse(content) as ComponentIndexFile;
 
-      // Map components from the index file
       for (const component of indexFile.components) {
         componentIndex[component.name] = {
           name: component.name,
           stories: [],
           storyFilePath: this.getStoryFilePath(component.componentPath),
-          componentFilePath: path.join(process.cwd(), '..', component.componentPath),
+          componentFilePath: path.join(ROOT_DIR, component.componentPath),
         };
       }
 
@@ -98,7 +102,7 @@ export class StorybookLoader {
     const dir = path.dirname(componentPath);
     const filename = path.basename(componentPath, path.extname(componentPath));
     const storyFile = `_${filename}.stories.tsx`;
-    return path.join(process.cwd(), '..', dir, storyFile);
+    return path.join(ROOT_DIR, dir, storyFile);
   }
 
   /**

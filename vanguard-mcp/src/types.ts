@@ -69,6 +69,7 @@ export interface ComponentDetails {
     id: string;
   }>;
   propsInterface?: string;
+  props?: PropsField[];
   componentPath?: string;
   dependentTypes?: Record<string, DependentType>;
   metadata?: {
@@ -202,20 +203,6 @@ export interface VanguardIndex {
   components: ExtendedComponentInfo[];
   hooks: HookInfo[];
   helpers: HelperInfo[];
-}
-
-/**
- * Response from search_by_use_case tool
- */
-export interface UseCaseSearchResult {
-  results: Array<{
-    name: string;
-    summary?: string;
-    tags?: string[];
-    matchReason: string;
-    relevanceScore: number;
-  }>;
-  suggestions: string[];
 }
 
 /**

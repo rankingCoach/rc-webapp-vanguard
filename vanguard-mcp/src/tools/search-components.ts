@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { StorybookLoader } from '../loaders/storybook-loader.js';
 import { CatalogueLoader } from '../loaders/catalogue-loader.js';
 import { DetailLoader } from '../loaders/detail-loader.js';
+import { StorybookLoader } from '../loaders/storybook-loader.js';
 import { ComponentIndex, SearchResult } from '../types.js';
 
 const SearchComponentsInputSchema = z.object({
@@ -11,7 +11,9 @@ const SearchComponentsInputSchema = z.object({
     .enum(['name', 'keyword', 'semantic', 'all'])
     .optional()
     .default('all')
-    .describe('Search mode: name (component name), keyword (metadata keywords), semantic (all text fields), all (combined)'),
+    .describe(
+      'Search mode: name (component name), keyword (metadata keywords), semantic (all text fields), all (combined)',
+    ),
   tags: z.array(z.string()).optional().describe('Filter by tags (e.g., ["forms", "input"])'),
   category: z.string().optional().describe('Filter by category (e.g., "core", "common")'),
   limit: z.number().optional().default(20).describe('Maximum number of results to return'),
@@ -109,7 +111,9 @@ export function searchComponents(componentIndex: ComponentIndex, input: SearchCo
     // Tag filtering
     if (tags && tags.length > 0) {
       const itemTags = (item.tags || []).map((t) => t.toLowerCase());
-      const hasAllTags = tags.every((filterTag) => itemTags.some((itemTag) => itemTag.includes(filterTag.toLowerCase())));
+      const hasAllTags = tags.every((filterTag) =>
+        itemTags.some((itemTag) => itemTag.includes(filterTag.toLowerCase())),
+      );
       if (!hasAllTags) {
         continue; // Skip if doesn't have all required tags
       }

@@ -1,5 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 import { Project } from 'ts-morph';
 
 import { ComponentPropsDetails, PropsField } from '../types.js';
@@ -103,7 +104,7 @@ export class ComponentParser {
       // Look for "export type {ComponentName}Props = " or "export interface {ComponentName}Props"
       const patterns = [
         new RegExp(`export (?:type|interface) ${componentName}Props\\s*(?:=|\\s*\\{)[^}]*(?:\\}|;)`, 's'),
-        new RegExp(`export (?:type|interface) Props\\s*(?:=|\\s*\\{)[^}]*(?:\\}|;)`, 's'),
+        new RegExp('export (?:type|interface) Props\\s*(?:=|\\s*\\{)[^}]*(?:\\}|;)', 's'),
       ];
 
       for (const pattern of patterns) {
@@ -237,8 +238,8 @@ export class ComponentParser {
       const content = fs.readFileSync(componentFilePath, 'utf-8');
 
       const patterns = [
-        new RegExp(`export (?:interface|type) ${componentName}Props\s*(?:=|\{)([\s\S]*?)\}`, 'm'),
-        new RegExp(`export (?:interface|type) Props\s*(?:=|\{)([\s\S]*?)\}`, 'm'),
+        new RegExp(`export (?:interface|type) ${componentName}Propss*(?:=|{)([sS]*?)}`, 'm'),
+        new RegExp('export (?:interface|type) Propss*(?:=|{)([sS]*?)}', 'm'),
       ];
 
       for (const pattern of patterns) {

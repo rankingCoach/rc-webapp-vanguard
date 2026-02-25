@@ -1,5 +1,6 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { Project } from 'ts-morph';
 
 function extractTypeNamesFromText(typeText) {
@@ -53,7 +54,7 @@ export function extractSignature(rootDir, tsConfigPath, sourceRelPath, exportNam
     if (!fn) {
       // Might be exported as default from file, or as named export from the module's default
       // Try to look for export assignments
-      const exported = sourceFile.getExportAssignment ? sourceFile.getExportAssignment(exportName) : null;
+      // const exported = sourceFile.getExportAssignment ? sourceFile.getExportAssignment(exportName) : null;
       // Fallback: return minimal info
       return { name: exportName, filePath: path.relative(rootDir, filePath), signature: null, dependentTypes: null };
     }

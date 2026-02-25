@@ -9,11 +9,9 @@ import { StorybookLoader } from './loaders/storybook-loader.js';
 import { ComponentParser } from './parsers/component-parser.js';
 import { getComponentDetails, GetComponentDetailsInputSchema } from './tools/get-component-details.js';
 import { getComponentExamples, GetComponentExamplesInputSchema } from './tools/get-component-examples.js';
-import { getComponentProps, GetComponentPropsInputSchema } from './tools/get-component-props.js';
 import { getHelperDetails, GetHelperDetailsInputSchema } from './tools/get-helper-details.js';
 import { getHookDetails, GetHookDetailsInputSchema } from './tools/get-hook-details.js';
 import { getRelatedComponents, GetRelatedComponentsInputSchema } from './tools/get-related-components.js';
-import { searchByUseCase, SearchByUseCaseInputSchema } from './tools/search-by-use-case.js';
 import { searchComponents, SearchComponentsInputSchema } from './tools/search-components.js';
 import { searchHelpers, SearchHelpersInputSchema } from './tools/search-helpers.js';
 import { searchHooks, SearchHooksInputSchema } from './tools/search-hooks.js';
@@ -55,29 +53,6 @@ server.tool(
             null,
             2,
           ),
-        },
-      ],
-    };
-  },
-);
-
-/**
- * Register tool: search_by_use_case (new - intent-based discovery)
- */
-server.tool(
-  'search_by_use_case',
-  'Search components by natural language use case description (e.g., "I need a date picker", "components for file upload"). Returns top matches with explanations and related search suggestions.',
-  SearchByUseCaseInputSchema.shape,
-  (input) => {
-    const result = searchByUseCase({
-      useCase: input.useCase,
-      limit: input.limit,
-    });
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: JSON.stringify(result, null, 2),
         },
       ],
     };
@@ -178,36 +153,6 @@ server.tool(
         {
           type: 'text' as const,
           text: JSON.stringify(examples, null, 2),
-        },
-      ],
-    };
-  },
-);
-
-/**
- * Register tool: get_component_props
- */
-server.tool(
-  'get_component_props',
-  'Get parsed props fields for a component including types, optional flag, JSDoc descriptions, and dependent types (enums, type aliases, etc.).',
-  GetComponentPropsInputSchema.shape,
-  (input) => {
-    const props = getComponentProps(componentIndex, { componentName: input.componentName });
-    if (!props) {
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: JSON.stringify({ error: `Component "${input.componentName}" not found or has no props` }, null, 2),
-          },
-        ],
-      };
-    }
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: JSON.stringify(props, null, 2),
         },
       ],
     };

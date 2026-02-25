@@ -1,19 +1,15 @@
 import { z } from 'zod';
 
 import { CatalogueLoader } from '../loaders/catalogue-loader.js';
-import { DetailLoader } from '../loaders/detail-loader.js';
-import { normalizeComponentId } from '../loaders/props-loader.js';
 import { RelatedComponentsResult } from '../types.js';
 
 const GetRelatedComponentsInputSchema = z.object({
   componentName: z.string().describe('Name of the reference component'),
   relationshipType: z
-    .enum(['similar', 'same-category', 'same-tags', 'all'])
+    .enum(['similar', 'same-tags', 'all'])
     .optional()
     .default('all')
-    .describe(
-      'Type of relationship: similar (shared tags+keywords), same-category (same category), same-tags (shared tags only), all (combined)',
-    ),
+    .describe('Type of relationship: similar (shared keywords), same-tags (shared tags only), all (combined)'),
   limit: z.number().optional().default(10).describe('Maximum number of related components to return'),
 });
 
@@ -32,22 +28,12 @@ interface ScoredRelated {
 function computeSimilarity(
   refKeywords: string[],
   refTags: string[],
-  refCategory: string | undefined,
   targetKeywords: string[],
   targetTags: string[],
-  targetCategory: string | undefined,
   relationshipType: string,
 ): { score: number; reasons: string[] } {
   let score = 0;
   const reasons: string[] = [];
-
-  // Category match (high weight)
-  if ((relationshipType === 'same-category' || relationshipType === 'all') && refCategory && targetCategory) {
-    if (refCategory.toLowerCase() === targetCategory.toLowerCase()) {
-      score += 10;
-      reasons.push(`Same category: ${refCategory}`);
-    }
-  }
 
   // Tag matching
   if (relationshipType === 'same-tags' || relationshipType === 'similar' || relationshipType === 'all') {
@@ -96,13 +82,8 @@ export function getRelatedComponents(input: GetRelatedComponentsInput): RelatedC
     return null;
   }
 
-  // Load detail file for reference component to get category
-  const refId = normalizeComponentId(componentName);
-  const refDetail = DetailLoader.loadDetail('component', refId);
-
   const refKeywords = refItem.keywords || [];
   const refTags = refItem.tags || [];
-  const refCategory = refDetail?.category;
 
   const results: ScoredRelated[] = [];
 
@@ -112,30 +93,17 @@ export function getRelatedComponents(input: GetRelatedComponentsInput): RelatedC
       continue;
     }
 
-    // Load detail for target
-    const targetId = normalizeComponentId(targetItem.name);
-    const targetDetail = DetailLoader.loadDetail('component', targetId);
-
     const targetKeywords = targetItem.keywords || [];
     const targetTags = targetItem.tags || [];
-    const targetCategory = targetDetail?.category;
 
-    const { score, reasons } = computeSimilarity(
-      refKeywords,
-      refTags,
-      refCategory,
-      targetKeywords,
-      targetTags,
-      targetCategory,
-      relationshipType,
-    );
+    const { score, reasons } = computeSimilarity(refKeywords, refTags, targetKeywords, targetTags, relationshipType);
 
     if (score > 0) {
       results.push({
         name: targetItem.name,
         summary: targetItem.summary,
         relationshipReason: reasons.join('; '),
-        similarityScore: Math.min(score / 20, 1), // Normalize to 0-1
+        similarityScore: Math.min(score / 10, 1), // Normalize to 0-1
       });
     }
   }

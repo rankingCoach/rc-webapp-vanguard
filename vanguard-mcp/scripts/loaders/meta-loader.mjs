@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * Load all metadata files from exports-meta directory
@@ -45,7 +45,7 @@ export function buildMetaMap(metaFiles) {
 
   for (const meta of metaFiles) {
     if (!meta.id) {
-      console.warn(`  ⚠ Meta file missing 'id' field: ${JSON.stringify(meta).substring(0, 50)}`);
+      console.warn(`  ⚠ Meta file missing 'id' field: ${JSON.stringify(meta).slice(0, 50)}`);
       continue;
     }
 

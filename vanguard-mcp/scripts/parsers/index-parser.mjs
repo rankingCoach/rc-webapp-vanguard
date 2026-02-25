@@ -1,12 +1,13 @@
-import path from 'path';
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { Project } from 'ts-morph';
 
 /**
  * Parse src/index.ts exports and categorize them into components, hooks, and helpers.
  * Returns {components: [], hooks: [], helpers: [], all: {name -> entry}}
  */
-export async function parseIndexExports(rootDir, tsConfigPath) {
+export function parseIndexExports(rootDir, tsConfigPath) {
   const project = new Project({
     tsConfigFilePath: tsConfigPath,
     compilerOptions: { allowJs: true, skipLibCheck: true },
@@ -83,15 +84,15 @@ export async function parseIndexExports(rootDir, tsConfigPath) {
           const exportDecls = sf.getExportDeclarations();
           let skip = false;
           for (const ed of exportDecls) {
-            const named = ed.getNamedExports().map((n) => n.getName());
-            if (!ed.getModuleSpecifierValue() || !named.includes(name)) continue;
+            const edNamedExports = ed.getNamedExports().map((n) => n.getName());
+            if (!ed.getModuleSpecifierValue() || !edNamedExports.includes(name)) continue;
 
             // Resolve the module specifier relative to resolvedFile
-            const moduleSpec = ed.getModuleSpecifierValue();
+            const edModuleSpec = ed.getModuleSpecifierValue();
             const baseDir = path.dirname(resolvedFile);
-            const targetBase = moduleSpec.startsWith('.')
-              ? path.resolve(baseDir, moduleSpec)
-              : path.resolve(rootDir, moduleSpec);
+            const targetBase = edModuleSpec.startsWith('.')
+              ? path.resolve(baseDir, edModuleSpec)
+              : path.resolve(rootDir, edModuleSpec);
             const targetCandidates = [];
             for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
               targetCandidates.push(targetBase + ext);
@@ -126,6 +127,7 @@ export async function parseIndexExports(rootDir, tsConfigPath) {
 
           if (skip) continue;
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         // ignore resolution errors and continue
       }
@@ -141,15 +143,6 @@ export async function parseIndexExports(rootDir, tsConfigPath) {
         // fallback: treat as component
         components.push(entry);
       }
-    }
-  }
-
-  // Also handle export * from ... (re-exports)
-  for (const exp of sourceFile.getExportDeclarations()) {
-    if (!exp.getNamedExports().length && exp.getModuleSpecifierValue()) {
-      const moduleSpec = exp.getModuleSpecifierValue();
-      const normalized = moduleSpec.startsWith('.') ? path.join('src', moduleSpec.replace(/^\.\/?/, '')) : moduleSpec;
-      // We can't enumerate names easily here without loading the referenced file, so skip.
     }
   }
 
