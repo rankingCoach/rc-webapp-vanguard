@@ -85,6 +85,10 @@ export interface ComponentDetails {
     relationshipReason: string;
     similarityScore: number;
   }>;
+  recommendations?: Array<{
+    id?: string;
+    reason: string;
+  }>;
 }
 
 /**

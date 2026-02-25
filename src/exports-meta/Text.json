@@ -3,5 +3,18 @@
   "kind": "component",
   "summary": "Flexible text renderer supporting translations, formatting, links, truncation and line balancing.",
   "keywords": ["text", "typography", "translation", "truncate", "see-more", "link-parsing", "sanitization"],
-  "tags": ["typography", "i18n", "content", "core"]
+  "tags": ["typography", "i18n", "content", "core"],
+  "recommendations": [
+    "Use the `type` prop (`TextTypes`) to select the correct typographic role — `heading1`–`heading4` render `<h1>`–`<h4>`, `display1`/`display2` render `<h1>` with display styles, and all others render a `<span>`.",
+    "String children are automatically passed through the translation service; set `translate={false}` to opt out and prevent Google Translate from touching the content.",
+    "Use `replacements` to inject dynamic values into translation keys; use `links` for inline anchor replacements with `href` or `onClick`.",
+    "Use `maxChar` with `seeMore` to enable a truncated \"See More / See Less\" interaction — `seeMore={true}` uses built-in translated labels, or pass a `seeMore` object with custom `seeMoreContent` / `seeLessContent` nodes.",
+    "Use `maxLines` alongside the `seeMore` object with `seeMoreContent` for CSS line-clamp truncation with a custom expand trigger.",
+    "Set `ellipsis` to overflow-ellipsis the text; pair with `maxWidth` and `textWrap` for predictable single-line truncation.",
+    "Use `fontWeight` (`regular` | `medium` | `bold`), `color` (CSS variable or hex), `uppercase`, `capitalize`, and `textAlign` for inline style overrides without extra wrappers.",
+    "Set `isBlurred` to visually blur sensitive text (e.g. hidden data previews).",
+    "Set `allowNewLines` to convert `\\n` characters to `<br>` — note this also adds `notranslate` to prevent FullStory conflicts with Google Translate.",
+    "Use `balanced` to enable `TextWrapBalancer` for headings with uneven line lengths.",
+    "Use `animateWords` to apply per-word animation styles to the rendered text."
+  ]
 }

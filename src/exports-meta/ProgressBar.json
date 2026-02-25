@@ -3,5 +3,13 @@
   "kind": "component",
   "summary": "Linear progress bar for indicating completion percentage or upload progress.",
   "keywords": ["progress", "bar", "linear", "upload", "status", "indicator"],
-  "tags": ["progress", "ui", "feedback"]
+  "tags": ["progress", "ui", "feedback"],
+  "recommendations": [
+    "Use the `variant` prop to switch between `determinate` (known percentage) and `indeterminate` (unknown duration) modes — default is `determinate`.",
+    "Pass `progressValue` as a number between 0–100 for determinate progress; it has no effect in `indeterminate` mode.",
+    "Use `color` and `bgColor` to accept CSS variables (e.g. `--i500`) or raw hex values — both are parsed via `parseCssVariable`.",
+    "Set `isBlurred` to true to visually obscure sensitive progress (e.g. hidden data); this forces height to 5px and renders a blurred neutral bar regardless of `progressValue`.",
+    "Control dimensions with `height` (default `12px`) and `width` (default `100%`) — these map to MUI `LinearProgress` sx styles.",
+    "Wrap with `ComponentContainer` for consistent layout context; avoid providing conflicting outer width constraints."
+  ]
 }

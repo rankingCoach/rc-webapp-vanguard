@@ -3,5 +3,15 @@
   "kind": "component",
   "summary": "Slide-in panel (drawer) that anchors to a side of the screen for off-canvas content.",
   "keywords": ["drawer", "panel", "sidebar", "off-canvas", "slide-in", "overlay"],
-  "tags": ["navigation", "layout", "ui"]
+  "tags": ["navigation", "layout", "ui"],
+  "recommendations": [
+    "Use `anchor` (`left` | `right` | `top` | `bottom`) to control which edge the drawer slides in from — defaults to `right`.",
+    "Set `variant` to `temporary` for overlay drawers (backdrop + click-outside-to-close) or `persistent` for drawers that push content — defaults to `persistent`.",
+    "Provide `title` and optionally `description` to render a built-in `Header`; use `isHeaderCompact` for a condensed header variant.",
+    "Set `isHeaderSticky` to true to pin the header while the drawer body scrolls independently.",
+    "Enable `showCloseButton` to render an icon button in the top corner; pair with `onClose` to handle the close event.",
+    "Pass `zIndex` when nesting drawers or working alongside modals; if omitted the drawer defaults to z-index 1099.",
+    "For programmatic use (opening without direct JSX), prefer `DrawerService.open()` backed by a single `DrawerRoot` mounted at the app root.",
+    "The `onClose` callback receives a `ModalResponse<DrawerCloseResponse>` — check `reason` to distinguish backdrop-click from explicit close."
+  ]
 }

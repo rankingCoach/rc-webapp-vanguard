@@ -13,9 +13,9 @@ function extractTypeNamesFromText(typeText) {
   return typeNames;
 }
 
-export function extractSignature(rootDir, tsConfigPath, sourceRelPath, exportName) {
+export function extractSignature(rootDir, tsConfigPath, sourceRelPath, exportName, sharedProject) {
   try {
-    const project = new Project({
+    const project = sharedProject ?? new Project({
       tsConfigFilePath: tsConfigPath,
       compilerOptions: { allowJs: true, skipLibCheck: true },
     });
@@ -26,7 +26,7 @@ export function extractSignature(rootDir, tsConfigPath, sourceRelPath, exportNam
     const possibleFiles = [];
 
     // If path points directly to a file with extension, prefer it
-    if (fs.existsSync(candidate)) {
+    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
       possibleFiles.push(candidate);
     }
 

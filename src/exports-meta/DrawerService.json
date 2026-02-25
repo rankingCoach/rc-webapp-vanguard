@@ -3,5 +3,13 @@
   "kind": "helper",
   "summary": "Imperative service to open, close and manage drawer instances from anywhere in the app.",
   "keywords": ["drawer", "service", "open", "close", "imperative"],
-  "tags": ["navigation", "service", "helpers"]
+  "tags": ["navigation", "service", "helpers"],
+  "recommendations": [
+    "Requires a `DrawerRoot` to be mounted in the component tree; `DrawerService` communicates with it via pub-sub events.",
+    "Use `DrawerService.open(component, options?)` to open any React node as a drawer — returns a unique `drawerId` you can store to close it later.",
+    "The opened component automatically receives an `onClose` prop injected by the service; use it inside the drawer content to trigger self-close.",
+    "Use `DrawerService.close(drawerId)` for targeted closing, or `DrawerService.closeLast()` to close the most recently opened drawer without tracking the id.",
+    "Use `DrawerService.openTextEditDrawer(options, drawerOptions?)` and `DrawerService.openMultiSelectDrawer(options, drawerOptions?)` for built-in specialised drawer patterns.",
+    "Pass `DrawerProps` as the second argument to `open()` to customise `anchor`, `variant`, `hideBackdrop`, `title` etc. on a per-open basis."
+  ]
 }

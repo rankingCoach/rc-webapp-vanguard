@@ -3,5 +3,13 @@
   "kind": "component",
   "summary": "Root container managing drawer mount points, stacking and backdrop behavior.",
   "keywords": ["drawer", "root", "container", "backdrop", "stack"],
-  "tags": ["navigation", "layout", "ui"]
+  "tags": ["navigation", "layout", "ui"],
+  "recommendations": [
+    "Mount exactly one `DrawerRoot` near the top of the app tree (e.g. in the main layout) so `DrawerService` has a single target to render into.",
+    "Use the `padding` prop to control the inner content padding of every drawer opened through `DrawerService` — defaults to `40px 48px`.",
+    "Do not nest multiple `DrawerRoot` components; it subscribes to global pub-sub events and a second instance will receive the same open/close signals.",
+    "`DrawerRoot` internally renders a `Drawer` with `variant: temporary`, providing backdrop and click-outside-to-close behaviour for all service-opened drawers.",
+    "For drawers that need custom `variant`, `anchor` or `hideBackdrop`, pass those options as the second argument to `DrawerService.open(component, options)`.",
+    "The root manages one drawer at a time; opening a new drawer while one is already open replaces the previous content — close the active drawer first if stacking is required."
+  ]
 }

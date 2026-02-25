@@ -1,8 +1,39 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 
 import { DetailLoader, normalizeComponentId } from '../loaders/detail-loader.js';
 import { ComponentDetails, ComponentIndex, DependentType } from '../types.js';
 import { getRelatedComponents } from './get-related-components.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const MCP_DIR = path.resolve(__dirname, '../..');
+const ROOT_DIR = path.resolve(MCP_DIR, '..');
+const EXPORTS_META_DIR = path.join(ROOT_DIR, 'src/exports-meta');
+
+interface ExportsMetaRecommendation {
+  id?: string;
+  reason: string;
+}
+
+interface ExportsMeta {
+  recommendations?: ExportsMetaRecommendation[];
+}
+
+function loadExportsMetaRecommendations(componentName: string): ExportsMetaRecommendation[] {
+  try {
+    const filePath = path.join(EXPORTS_META_DIR, `${componentName}.json`);
+    if (!fs.existsSync(filePath)) {
+      return [];
+    }
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const meta = JSON.parse(content) as ExportsMeta;
+    return meta.recommendations ?? [];
+  } catch {
+    return [];
+  }
+}
 
 const GetComponentDetailsInputSchema = z.object({
   componentName: z.string().describe('Name of the component'),
@@ -31,6 +62,8 @@ export function getComponentDetails(
   const componentId = normalizeComponentId(input.componentName);
   const detail = DetailLoader.loadDetail('component', componentId);
 
+  const recommendations = loadExportsMetaRecommendations(input.componentName);
+
   if (detail) {
     const result: ComponentDetails = {
       name: detail.name,
@@ -46,6 +79,7 @@ export function getComponentDetails(
         tags: detail.tags,
         category: detail.category,
       },
+      recommendations,
     };
 
     if (input.includeRelated) {
@@ -65,6 +99,7 @@ export function getComponentDetails(
       id: story.id,
     })),
     componentPath: component.componentFilePath,
+    recommendations,
   };
 
   if (input.includeRelated) {

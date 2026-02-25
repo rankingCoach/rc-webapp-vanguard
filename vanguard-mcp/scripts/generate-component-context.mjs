@@ -12,7 +12,6 @@ const MCP_DIR = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(MCP_DIR, 'data');
 
 const STORYBOOK_INDEX_PATH = path.join(ROOT_DIR, 'storybook-static/index.json');
-const OUTPUT_INDEX_PATH = path.join(DATA_DIR, 'components.index.json');
 const TSCONFIG_PATH = path.join(ROOT_DIR, 'tsconfig.json');
 
 let project;
@@ -115,6 +114,8 @@ async function main() {
       const rootBase = path.join(ROOT_DIR, mod);
       // Try various heuristics
       const candidates = [
+        // If moduleSpec already ends with an extension, use it directly
+        ...((/\.(tsx?|jsx?)$/.test(mod)) ? [rootBase] : []),
         `${rootBase}.tsx`,
         `${rootBase}.ts`,
         path.join(rootBase, `${componentData.name}.tsx`),
@@ -129,6 +130,13 @@ async function main() {
           fullComponentPath = c;
           break;
         }
+      }
+
+      // If we landed on a barrel index file, walk it to find the sub-file that actually
+      // declares this component (so props extraction targets the right file).
+      if (fullComponentPath && path.basename(fullComponentPath).startsWith('index.')) {
+        const walked = resolveBarrelToSourceFile(fullComponentPath, componentData.name, ROOT_DIR, project);
+        if (walked) fullComponentPath = walked;
       }
 
       let componentPath = undefined;
@@ -185,8 +193,8 @@ async function main() {
     // Process hooks
     const hooksList = [];
     for (const h of indexExports.hooks) {
-      const sig = extractSignature(ROOT_DIR, TSCONFIG_PATH, h.moduleSpec, h.name);
-      const id = h.name.replace(/([A-Z])/g, (m, p1, offset) =>
+      const sig = extractSignature(ROOT_DIR, TSCONFIG_PATH, h.moduleSpec, h.name, project);
+      const id = h.name.replace(/([A-Z])/g, (_m, p1, offset) =>
         offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase(),
       );
       const meta = metaMap.get(h.name);
@@ -205,8 +213,8 @@ async function main() {
     // Process helpers
     const helpersList = [];
     for (const hh of indexExports.helpers) {
-      const sig = extractSignature(ROOT_DIR, TSCONFIG_PATH, hh.moduleSpec, hh.name);
-      const id = hh.name.replace(/([A-Z])/g, (m, p1, offset) =>
+      const sig = extractSignature(ROOT_DIR, TSCONFIG_PATH, hh.moduleSpec, hh.name, project);
+      const id = hh.name.replace(/([A-Z])/g, (_m, p1, offset) =>
         offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase(),
       );
       const meta = metaMap.get(hh.name);
@@ -281,13 +289,9 @@ async function main() {
       throw new Error(`Failed to write vanguard.index.json: ${err.message}`);
     }
 
-    // Write legacy components.index.json for backward compatibility
-    const componentCount = writeIndexFile(componentDataList);
-    console.log(`  ✓ Wrote ${componentCount} components to index + vanguard.index.json\n`);
+    console.log(`  ✓ Wrote ${componentDataList.length} components to vanguard.index.json\n`);
 
     console.log('✅ Generation complete!\n');
-    console.log('Output:');
-    console.log(`  📄 ${OUTPUT_INDEX_PATH}`);
   } catch (error) {
     console.error('❌ Generation failed:', error.message);
     process.exit(1);
@@ -323,7 +327,7 @@ function loadStorybookIndex(filePath) {
  * "Button" → "button"
  */
 function normalizeComponentId(name) {
-  return name.replace(/([A-Z])/g, (match, p1, offset) => (offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase()));
+  return name.replace(/([A-Z])/g, (_match, p1, offset) => (offset > 0 ? `-${p1.toLowerCase()}` : p1.toLowerCase()));
 }
 
 /**
@@ -333,6 +337,51 @@ function normalizeComponentId(name) {
  */
 function extractComponentName(title) {
   return title.split('/')[0];
+}
+
+/**
+ * Given a barrel index file (e.g. src/core/Modal/index.ts), walk its named re-exports
+ * to find which sub-file actually declares `componentName`.
+ * Returns the absolute path of that sub-file, or null if not found.
+ */
+function resolveBarrelToSourceFile(barrelPath, componentName, rootDir, tsProject) {
+  try {
+    if (!tsProject) return null;
+    const sf = tsProject.addSourceFileAtPath(barrelPath);
+
+    for (const ed of sf.getExportDeclarations()) {
+      const exportedNames = ed.getNamedExports().map((n) => n.getName());
+      if (!exportedNames.includes(componentName)) continue;
+
+      const edSpec = ed.getModuleSpecifierValue();
+      if (!edSpec) continue;
+
+      const baseDir = path.dirname(barrelPath);
+      const targetBase = edSpec.startsWith('.') ? path.resolve(baseDir, edSpec) : path.resolve(rootDir, edSpec);
+
+      const targetCandidates = [];
+      // If the spec already has a file extension, try it directly first
+      if (/\.(tsx?|jsx?)$/.test(edSpec)) targetCandidates.push(targetBase);
+      for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
+        targetCandidates.push(targetBase + ext);
+        targetCandidates.push(path.join(targetBase, `index${ext}`));
+      }
+
+      const targetFile = targetCandidates.find((p) => fs.existsSync(p));
+      if (!targetFile) continue;
+
+      // If we hit another barrel, recurse one level
+      if (path.basename(targetFile).startsWith('index.')) {
+        const deeper = resolveBarrelToSourceFile(targetFile, componentName, rootDir, tsProject);
+        if (deeper) return deeper;
+      }
+
+      return targetFile;
+    }
+  } catch {
+    // ignore — fall back to barrel path
+  }
+  return null;
 }
 
 /**
@@ -423,6 +472,67 @@ function findPropsDecl(sourceFile, componentName) {
       if (alias) return { sourceFile: importedFile, decl: alias, kind: 'typeAlias' };
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_) {}
+  }
+
+  // 3. Fallback: find the component function and read the type name of its first parameter.
+  //    Handles cases like `rcInputBaseProps` where the type name doesn't follow *Props convention.
+  const propsTypeName = resolvePropsTypeNameFromComponent(sourceFile, componentName);
+  if (propsTypeName) {
+    // Search in the source file itself first
+    const iface = sourceFile.getInterface(propsTypeName);
+    if (iface) return { sourceFile, decl: iface, kind: 'interface' };
+    const alias = sourceFile.getTypeAlias(propsTypeName);
+    if (alias) return { sourceFile, decl: alias, kind: 'typeAlias' };
+
+    // Then walk imports for it
+    for (const imp of sourceFile.getImportDeclarations()) {
+      const namedImports = imp.getImportClause()?.getNamedImports() || [];
+      if (!namedImports.find((n) => n.getName() === propsTypeName)) continue;
+      const moduleSpec = imp.getModuleSpecifier()?.getLiteralValue();
+      if (!moduleSpec) continue;
+      const resolvedPath = resolveModulePath(moduleSpec, sourceFile.getFilePath());
+      if (!resolvedPath) continue;
+      try {
+        const importedFile = project.addSourceFileAtPath(resolvedPath);
+        const iface2 = importedFile.getInterface(propsTypeName);
+        if (iface2) return { sourceFile: importedFile, decl: iface2, kind: 'interface' };
+        const alias2 = importedFile.getTypeAlias(propsTypeName);
+        if (alias2) return { sourceFile: importedFile, decl: alias2, kind: 'typeAlias' };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {}
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Find the component function/variable declaration for `componentName` in `sourceFile`
+ * and return the type name of its first parameter (e.g. "rcInputBaseProps").
+ * Returns null if not determinable.
+ */
+function resolvePropsTypeNameFromComponent(sourceFile, componentName) {
+  // Arrow function or variable: const Foo = (props: FooProps) => ...
+  const varDecl = sourceFile.getVariableDeclaration(componentName);
+  if (varDecl) {
+    const init = varDecl.getInitializer?.();
+    if (init) {
+      const params = init.getParameters?.();
+      if (params?.length > 0) {
+        const typeNode = params[0].getTypeNode?.();
+        if (typeNode) return typeNode.getText().trim();
+      }
+    }
+  }
+
+  // Function declaration: function Foo(props: FooProps) { ... }
+  const fnDecl = sourceFile.getFunction(componentName);
+  if (fnDecl) {
+    const params = fnDecl.getParameters();
+    if (params.length > 0) {
+      const typeNode = params[0].getTypeNode?.();
+      if (typeNode) return typeNode.getText().trim();
+    }
   }
 
   return null;
@@ -826,37 +936,6 @@ function parseTypeAlias(typeAlias, sourceFile) {
   } catch (error) {
     console.warn(`  ⚠ Error parsing type alias: ${error.message}`);
     return null;
-  }
-}
-
-/**
- * Write master index file
- */
-function writeIndexFile(componentDataList) {
-  const components = componentDataList
-    .map((data) => ({
-      id: data.componentId,
-      name: data.componentName,
-      displayName: data.displayName,
-      componentPath: data.componentPath,
-      storyCount: data.storyCount,
-      hasProps: data.props.length > 0,
-      tags: data.tags,
-    }))
-    .sort((a, b) => a.id.localeCompare(b.id));
-
-  const index = {
-    version: '1.0.0',
-    generatedAt: new Date().toISOString(),
-    totalComponents: components.length,
-    components,
-  };
-
-  try {
-    fs.writeFileSync(OUTPUT_INDEX_PATH, JSON.stringify(index, null, 2), 'utf-8');
-    return components.length;
-  } catch (error) {
-    throw new Error(`Failed to write index file: ${error.message}`);
   }
 }
 

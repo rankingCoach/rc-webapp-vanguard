@@ -3,5 +3,15 @@
   "kind": "component",
   "summary": "Color selection control offering swatches, hex input and preview for UI theming.",
   "keywords": ["color", "picker", "swatch", "hex", "palette", "theme"],
-  "tags": ["forms", "inputs", "ui"]
+  "tags": ["forms", "inputs", "ui"],
+  "recommendations": [
+    "Use the `color` prop for controlled usage — the component reacts to external changes and keeps the native color picker and hex text input in sync.",
+    "The deprecated `initialColor` prop sets an initial uncontrolled value; migrate to `color` for consistent controlled behaviour.",
+    "Provide `onColorChange` to receive updates; the callback fires on both native picker and hex text input changes, debounced at 50 ms.",
+    "The hex text input only triggers `onColorChange` for valid hex values — invalid intermediate typing is shown in the input but not propagated.",
+    "Wrap in a `Form` with a `formconfig` to integrate with the form validation system; if no `formconfig` is provided, an internal one with hex validation is created automatically.",
+    "Use `maxWidth` (CSS length or percentage) to constrain the picker container width, e.g. `300px` or `50%`.",
+    "Use `label` (required) to provide a visible label; pass `replacements` if the label contains translation placeholders.",
+    "Use `testId` to attach data-testid attributes to both the native color input (`{testId}-color`) and the text input (`{testId}-text`)."
+  ]
 }
