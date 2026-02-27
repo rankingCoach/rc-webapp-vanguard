@@ -1,10 +1,12 @@
-import React, {RefObject} from 'react';
-import {classNames} from '@helpers/classNames';
-import {ComponentContainer} from '@vanguard/ComponentContainer';
-import {FrostedGlass} from '@vanguard/FrostedGlass';
-import {Header, HeaderTypes} from '@vanguard/Header';
-import {Render} from '@vanguard/Render';
-import {TextReplacements} from '@vanguard/Text';
+import { classNames } from '@helpers/classNames';
+import { ComponentContainer } from '@vanguard/ComponentContainer';
+import { FrostedGlass } from '@vanguard/FrostedGlass';
+import { Header, HeaderTypes } from '@vanguard/Header';
+import { Render } from '@vanguard/Render';
+import { TextReplacements } from '@vanguard/Text';
+import React, { RefObject } from 'react';
+
+import { GradientRcBackground } from './GradientRcBackground';
 import styles from './PageSection.module.scss';
 
 export enum PageSectionBackground {
@@ -50,9 +52,7 @@ export type PageSectionWithoutTitle = PageSectionBaseProps & {
   headerType?: never;
 };
 
-export type PageSectionProps =
-  | PageSectionWithTitle
-  | PageSectionWithoutTitle;
+export type PageSectionProps = PageSectionWithTitle | PageSectionWithoutTitle;
 
 export const PageSection = (props: PageSectionProps) => {
   const {
@@ -125,8 +125,10 @@ const PageSectionContainer = (props: PageSectionProps) => {
     styles.container,
     getBackgroundClass(),
     !noDefaultPadding && styles.defaultPadding,
-    (roundedEdges === PageSectionRoundedEdges.top || roundedEdges === PageSectionRoundedEdges.both) && styles.roundedTop,
-    (roundedEdges === PageSectionRoundedEdges.bottom || roundedEdges === PageSectionRoundedEdges.both) && styles.roundedBottom,
+    (roundedEdges === PageSectionRoundedEdges.top || roundedEdges === PageSectionRoundedEdges.both) &&
+      styles.roundedTop,
+    (roundedEdges === PageSectionRoundedEdges.bottom || roundedEdges === PageSectionRoundedEdges.both) &&
+      styles.roundedBottom,
     className,
   );
 
@@ -140,6 +142,7 @@ const PageSectionContainer = (props: PageSectionProps) => {
 
   return (
     <ComponentContainer testId={testId} className={containerClasses} innerRef={innerRef}>
+      {background === PageSectionBackground.gradientRc && <GradientRcBackground />}
       {children}
     </ComponentContainer>
   );

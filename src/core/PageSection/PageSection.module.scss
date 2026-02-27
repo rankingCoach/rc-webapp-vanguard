@@ -1,6 +1,23 @@
 @import "@styles/spacings";
 @import "@styles/media-mixins";
 
+:root {
+  --lp-hero-dynamic-gradient-primary: var(--p500);
+  --lp-hero-dynamic-gradient-color1-hueShift: 89;
+  --lp-hero-dynamic-gradient-color2-hueShift: 21;
+  --lp-hero-dynamic-gradient-color3-hueShift: 108;
+
+  --lp-hero-dynamic-gradient-color1: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)));
+  --lp-hero-dynamic-gradient-color1-60: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0.60);
+  --lp-hero-dynamic-gradient-color1-40: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0.40);
+  --lp-hero-dynamic-gradient-color1-30: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShiftt)) / 0.30);
+  --lp-hero-dynamic-gradient-color1-0: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0);
+  --lp-hero-dynamic-gradient-color2: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.371 0.255 calc(h + var(--lp-hero-dynamic-gradient-color2-hueShift)));
+  --lp-hero-dynamic-gradient-color2-0: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.371 0.255 calc(h + var(--lp-hero-dynamic-gradient-color2-hueShift)) / 0);
+  --lp-hero-dynamic-gradient-color3: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.519 0.264 calc(h + var(--lp-hero-dynamic-gradient-color3-hueShift)));
+  --lp-hero-dynamic-gradient-color3-0: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.519 0.264 calc(h + var(--lp-hero-dynamic-gradient-color3-hueShift)) / 0);
+}
+
 .functionalBg {
   background-color: var(--fn-bg);
 }
@@ -10,7 +27,22 @@
 }
 
 .gradientRc {
-  background: linear-gradient(198deg, rgba(145, 53, 168, 0.00) 77.49%, #9135A8 102.76%), linear-gradient(142deg, rgba(65, 88, 227, 0.00) 55.57%, #4158E3 94.62%), radial-gradient(42.86% 14.53% at 76.88% 14.51%, rgba(166, 48, 153, 0.24) 0%, rgba(166, 48, 153, 0.00) 100%), radial-gradient(47.98% 27.67% at 93.55% 47.92%, #7AC8E7 0%, rgba(61, 188, 222, 0.00) 100%), radial-gradient(38.14% 23.87% at 20.52% 13.19%, #6ACFEA 0%, rgba(61, 188, 222, 0.00) 100%), radial-gradient(72.95% 40.89% at 24.94% 25.76%, #3DBCDE 0%, rgba(61, 188, 222, 0.00) 100%), linear-gradient(245deg, #2471FB 8.81%, #2E91EF 31.6%, #3266E6 69.98%, #D1267B 87.83%);
+  position: relative;
+  overflow: hidden;
+
+  > :not(.gradientRcSvg) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.gradientRcSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .gradientBgVarTop {
