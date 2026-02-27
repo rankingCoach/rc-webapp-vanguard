@@ -16,6 +16,7 @@ import { NoDefaultPadding as _NoDefaultPadding } from './stories/NoDefaultPaddin
 import { Visibility as _Visibility } from './stories/Visibility.story';
 import { BehaviorContract as _BehaviorContract } from './stories/BehaviorContract.story';
 import { Backgrounds as _Backgrounds } from '@vanguard/PageSection/stories/Backgrounds.story.tsx';
+import { GradientRcBreaks as _GradientRcBreaks } from './stories/GradientRcBreaks.story';
 
 export const Default: Story = _Default;
 export const DefaultUseCases: Story = _DefaultUseCases;
@@ -27,6 +28,7 @@ export const NoDefaultPadding: Story = _NoDefaultPadding;
 export const Visibility: Story = _Visibility;
 export const BehaviorContract: Story = _BehaviorContract;
 export const Backgrounds: Story = _Backgrounds;
+export const GradientRcBreaks: Story = _GradientRcBreaks;
 
 const sb = SbDecorator({
   title: 'Vanguard/PageSection',
