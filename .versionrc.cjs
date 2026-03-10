@@ -8,7 +8,6 @@ module.exports = {
     { type: 'test', section: 'Tests', hidden: true },
     { type: 'style', section: 'Style', hidden: true },
   ],
-  commitUrlFormat: 'https://bitbucket.org/rankingcoach/rc-webapp-vanguard/commits/{{hash}}',
-  compareUrlFormat:
-    'https://bitbucket.org/rankingcoach/rc-webapp-vanguard/branches/compare/{{currentTag}}%0D{{previousTag}}#diff',
+  commitUrlFormat: 'https://github.com/rankingCoach/rc-webapp-vanguard/commit/{{hash}}',
+  compareUrlFormat: 'https://github.com/rankingCoach/rc-webapp-vanguard/compare/{{previousTag}}...{{currentTag}}',
 };
