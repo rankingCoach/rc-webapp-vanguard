@@ -6,10 +6,10 @@ import { PageSection, PageSectionBackground, PageSectionRoundedEdges } from '../
 import type { Story } from './_PageSection.default';
 
 /**
- * GradientRc breakpoint tests.
+ * GradientPrimaryMesh breakpoint tests.
  * Covers every realistic way the inline SVG gradient background can break.
  */
-export const GradientRcBreaks: Story = {
+export const GradientPrimaryMeshBreaks: Story = {
   render: () => {
     const refSpy = (node?: Element | null) => {
       (window as any).__ps_gradient_ref__ = node;
@@ -19,9 +19,9 @@ export const GradientRcBreaks: Story = {
       <div style={{display: 'flex', flexDirection: 'column', gap: 24}}>
         {/* 1. Basic: SVG renders inside the container */}
         <PageSection
-          testId="GRC_Basic"
-          title="Basic gradientRc"
-          background={PageSectionBackground.gradientRc}
+          testId="GPM_Basic"
+          title="Basic gradientPrimaryMesh"
+          background={PageSectionBackground.gradientPrimaryMesh}
           roundedEdges={PageSectionRoundedEdges.both}
         >
           <div>Basic gradient content</div>
@@ -29,7 +29,7 @@ export const GradientRcBreaks: Story = {
 
         {/* 2. No SVG leak: other backgrounds must NOT contain the SVG */}
         <PageSection
-          testId="GRC_NoLeak_FunctionalBg"
+          testId="GPM_NoLeak_FunctionalBg"
           title="FunctionalBg (no SVG)"
           background={PageSectionBackground.functionalBg}
         >
@@ -37,7 +37,7 @@ export const GradientRcBreaks: Story = {
         </PageSection>
 
         <PageSection
-          testId="GRC_NoLeak_Transparent"
+          testId="GPM_NoLeak_Transparent"
           title="Transparent (no SVG)"
           background={PageSectionBackground.transparent}
         >
@@ -46,12 +46,12 @@ export const GradientRcBreaks: Story = {
 
         {/* 3. Content above SVG: children must be interactive */}
         <PageSection
-          testId="GRC_Interactive"
+          testId="GPM_Interactive"
           title="Interactive content above SVG"
-          background={PageSectionBackground.gradientRc}
-          headerActionArea={<Button testId="GRC_ActionBtn">Click me</Button>}
+          background={PageSectionBackground.gradientPrimaryMesh}
+          headerActionArea={<Button testId="GPM_ActionBtn">Click me</Button>}
         >
-          <button data-testid="GRC_ChildBtn" type="button" onClick={() => {
+          <button data-testid="GPM_ChildBtn" type="button" onClick={() => {
             (window as any).__ps_gradient_clicked__ = true;
           }}>
             Clickable child
@@ -60,35 +60,35 @@ export const GradientRcBreaks: Story = {
 
         {/* 4. Multiple instances: gradient IDs must not collide */}
         <PageSection
-          testId="GRC_Multi_A"
+          testId="GPM_Multi_A"
           title="Multi A"
-          background={PageSectionBackground.gradientRc}
+          background={PageSectionBackground.gradientPrimaryMesh}
         >
           <div>Instance A</div>
         </PageSection>
 
         <PageSection
-          testId="GRC_Multi_B"
+          testId="GPM_Multi_B"
           title="Multi B"
-          background={PageSectionBackground.gradientRc}
+          background={PageSectionBackground.gradientPrimaryMesh}
         >
           <div>Instance B</div>
         </PageSection>
 
-        {/* 5. roundedEdges + gradientRc: overflow clips, classes apply */}
+        {/* 5. roundedEdges + gradientPrimaryMesh: overflow clips, classes apply */}
         <PageSection
-          testId="GRC_RoundedBoth"
+          testId="GPM_RoundedBoth"
           title="Rounded both"
-          background={PageSectionBackground.gradientRc}
+          background={PageSectionBackground.gradientPrimaryMesh}
           roundedEdges={PageSectionRoundedEdges.both}
         >
           <div>Rounded both content</div>
         </PageSection>
 
         <PageSection
-          testId="GRC_RoundedTop"
+          testId="GPM_RoundedTop"
           title="Rounded top"
-          background={PageSectionBackground.gradientRc}
+          background={PageSectionBackground.gradientPrimaryMesh}
           roundedEdges={PageSectionRoundedEdges.top}
         >
           <div>Rounded top content</div>
@@ -96,8 +96,8 @@ export const GradientRcBreaks: Story = {
 
         {/* 6. innerRef still receives the container node */}
         <PageSection
-          testId="GRC_InnerRef"
-          background={PageSectionBackground.gradientRc}
+          testId="GPM_InnerRef"
+          background={PageSectionBackground.gradientPrimaryMesh}
           innerRef={refSpy}
         >
           <div>InnerRef test</div>
@@ -105,27 +105,27 @@ export const GradientRcBreaks: Story = {
 
         {/* 7. isVisible=false: nothing in DOM at all */}
         <PageSection
-          testId="GRC_Hidden"
+          testId="GPM_Hidden"
           isVisible={false}
-          background={PageSectionBackground.gradientRc}
+          background={PageSectionBackground.gradientPrimaryMesh}
           title="Should not exist"
         >
           <div>Hidden gradient body</div>
         </PageSection>
 
-        {/* 8. noDefaultPadding + gradientRc */}
+        {/* 8. noDefaultPadding + gradientPrimaryMesh */}
         <PageSection
-          testId="GRC_NoPadding"
-          background={PageSectionBackground.gradientRc}
+          testId="GPM_NoPadding"
+          background={PageSectionBackground.gradientPrimaryMesh}
           noDefaultPadding
         >
           <div>No padding content</div>
         </PageSection>
 
-        {/* 9. className merging + gradientRc */}
+        {/* 9. className merging + gradientPrimaryMesh */}
         <PageSection
-          testId="GRC_CustomClass"
-          background={PageSectionBackground.gradientRc}
+          testId="GPM_CustomClass"
+          background={PageSectionBackground.gradientPrimaryMesh}
           className="my-gradient-extra"
         >
           <div>Custom class content</div>
@@ -133,8 +133,8 @@ export const GradientRcBreaks: Story = {
 
         {/* 10. Children testId suffix still works */}
         <PageSection
-          testId="GRC_ChildrenSuffix"
-          background={PageSectionBackground.gradientRc}
+          testId="GPM_ChildrenSuffix"
+          background={PageSectionBackground.gradientPrimaryMesh}
         >
           <div>ChildrenSuffix body</div>
         </PageSection>
@@ -145,12 +145,12 @@ export const GradientRcBreaks: Story = {
   play: async ({canvasElement}) => {
     const canvas = within(canvasElement);
 
-    // ── 1. SVG renders inside the gradientRc container ──────────────
-    const basic = canvas.getByTestId('GRC_Basic');
+    // ── 1. SVG renders inside the gradientPrimaryMesh container ──────────────
+    const basic = canvas.getByTestId('GPM_Basic');
     const basicSvg = basic.querySelector('svg');
     await expect(basicSvg).not.toBeNull();
     await expect(basicSvg!.getAttribute('aria-hidden')).toBe('true');
-    await expect(basic.className).toContain('gradientRc');
+    await expect(basic.className).toContain('gradientPrimaryMesh');
 
     // SVG must contain <defs> with radialGradient definitions
     const defs = basicSvg!.querySelector('defs');
@@ -158,26 +158,26 @@ export const GradientRcBreaks: Story = {
     const gradients = defs!.querySelectorAll('radialGradient');
     await expect(gradients.length).toBe(11);
 
-    // ── 2. No SVG leak into non-gradientRc backgrounds ─────────────
-    const fnBg = canvas.getByTestId('GRC_NoLeak_FunctionalBg');
+    // ── 2. No SVG leak into non-gradientPrimaryMesh backgrounds ─────────────
+    const fnBg = canvas.getByTestId('GPM_NoLeak_FunctionalBg');
     await expect(fnBg.querySelector('svg')).toBeNull();
     await expect(fnBg.className).toContain('functionalBg');
-    await expect(fnBg.className).not.toContain('gradientRc');
+    await expect(fnBg.className).not.toContain('gradientPrimaryMesh');
 
-    const transparentBg = canvas.getByTestId('GRC_NoLeak_Transparent');
+    const transparentBg = canvas.getByTestId('GPM_NoLeak_Transparent');
     await expect(transparentBg.querySelector('svg')).toBeNull();
 
     // ── 3. Content is interactive above the SVG ─────────────────────
-    const childBtn = canvas.getByTestId('GRC_ChildBtn');
+    const childBtn = canvas.getByTestId('GPM_ChildBtn');
     await userEvent.click(childBtn);
     await expect((window as any).__ps_gradient_clicked__).toBe(true);
 
-    const actionBtn = canvas.getByTestId('GRC_ActionBtn');
+    const actionBtn = canvas.getByTestId('GPM_ActionBtn');
     await expect(actionBtn).toBeInTheDocument();
 
     // ── 4. Multiple instances have unique gradient IDs ──────────────
-    const multiA = canvas.getByTestId('GRC_Multi_A');
-    const multiB = canvas.getByTestId('GRC_Multi_B');
+    const multiA = canvas.getByTestId('GPM_Multi_A');
+    const multiB = canvas.getByTestId('GPM_Multi_B');
 
     const svgA = multiA.querySelector('svg')!;
     const svgB = multiB.querySelector('svg')!;
@@ -196,14 +196,14 @@ export const GradientRcBreaks: Story = {
     const rectB = svgB.querySelectorAll('rect')[2];
     await expect(rectB.getAttribute('fill')).toContain(idB);
 
-    // ── 5. roundedEdges classes coexist with gradientRc ─────────────
-    const roundedBoth = canvas.getByTestId('GRC_RoundedBoth');
-    await expect(roundedBoth.className).toContain('gradientRc');
+    // ── 5. roundedEdges classes coexist with gradientPrimaryMesh ─────────────
+    const roundedBoth = canvas.getByTestId('GPM_RoundedBoth');
+    await expect(roundedBoth.className).toContain('gradientPrimaryMesh');
     await expect(roundedBoth.className).toContain('roundedTop');
     await expect(roundedBoth.className).toContain('roundedBottom');
     await expect(roundedBoth.querySelector('svg')).not.toBeNull();
 
-    const roundedTop = canvas.getByTestId('GRC_RoundedTop');
+    const roundedTop = canvas.getByTestId('GPM_RoundedTop');
     await expect(roundedTop.className).toContain('roundedTop');
     await expect(roundedTop.className).not.toContain('roundedBottom');
 
@@ -213,22 +213,22 @@ export const GradientRcBreaks: Story = {
     await expect(refNode.querySelector('svg')).not.toBeNull();
 
     // ── 7. isVisible=false: nothing in DOM ──────────────────────────
-    await expect(canvas.queryByTestId('GRC_Hidden')).not.toBeInTheDocument();
+    await expect(canvas.queryByTestId('GPM_Hidden')).not.toBeInTheDocument();
     await expect(canvas.queryByText('Hidden gradient body')).not.toBeInTheDocument();
 
     // ── 8. noDefaultPadding: no padding class, SVG still present ────
-    const noPadding = canvas.getByTestId('GRC_NoPadding');
-    await expect(noPadding.className).toContain('gradientRc');
+    const noPadding = canvas.getByTestId('GPM_NoPadding');
+    await expect(noPadding.className).toContain('gradientPrimaryMesh');
     await expect(noPadding.className).not.toContain('defaultPadding');
     await expect(noPadding.querySelector('svg')).not.toBeNull();
 
-    // ── 9. className merging with gradientRc ────────────────────────
-    const customClass = canvas.getByTestId('GRC_CustomClass');
-    await expect(customClass.className).toContain('gradientRc');
+    // ── 9. className merging with gradientPrimaryMesh ────────────────────────
+    const customClass = canvas.getByTestId('GPM_CustomClass');
+    await expect(customClass.className).toContain('gradientPrimaryMesh');
     await expect(customClass.className).toContain('my-gradient-extra');
 
     // ── 10. Children testId suffix still works ──────────────────────
-    await expect(canvas.getByTestId('GRC_ChildrenSuffix_Children')).toBeInTheDocument();
+    await expect(canvas.getByTestId('GPM_ChildrenSuffix_Children')).toBeInTheDocument();
 
     // ── 11. SVG positioning: absolute, full-cover, non-interactive ──
     const svgEl = basic.querySelector('svg')!;

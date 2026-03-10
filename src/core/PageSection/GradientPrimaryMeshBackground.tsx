@@ -2,13 +2,13 @@ import React, { useId } from 'react';
 
 import styles from './PageSection.module.scss';
 
-export const GradientRcBackground = () => {
+export const GradientPrimaryMeshBackground = () => {
   const uid = useId();
   const gId = (n: number) => `${uid}-gBg${n}`;
 
   return (
     <svg
-      className={styles.gradientRcSvg}
+      className={styles.gradientPrimaryMeshSvg}
       viewBox="0 0 1620 720"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

@@ -10,7 +10,7 @@
   --lp-hero-dynamic-gradient-color1: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)));
   --lp-hero-dynamic-gradient-color1-60: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0.60);
   --lp-hero-dynamic-gradient-color1-40: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0.40);
-  --lp-hero-dynamic-gradient-color1-30: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShiftt)) / 0.30);
+  --lp-hero-dynamic-gradient-color1-30: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0.30);
   --lp-hero-dynamic-gradient-color1-0: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.825 0.127 calc(h - var(--lp-hero-dynamic-gradient-color1-hueShift)) / 0);
   --lp-hero-dynamic-gradient-color2: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.371 0.255 calc(h + var(--lp-hero-dynamic-gradient-color2-hueShift)));
   --lp-hero-dynamic-gradient-color2-0: oklch(from var(--lp-hero-dynamic-gradient-primary) 0.371 0.255 calc(h + var(--lp-hero-dynamic-gradient-color2-hueShift)) / 0);
@@ -26,17 +26,17 @@
   background-color: transparent;
 }
 
-.gradientRc {
+.gradientPrimaryMesh {
   position: relative;
   overflow: hidden;
 
-  > :not(.gradientRcSvg) {
+  > :not(.gradientPrimaryMeshSvg) {
     position: relative;
     z-index: 1;
   }
 }
 
-.gradientRcSvg {
+.gradientPrimaryMeshSvg {
   position: absolute;
   inset: 0;
   width: 100%;

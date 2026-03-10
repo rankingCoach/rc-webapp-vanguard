@@ -6,14 +6,14 @@ import { Render } from '@vanguard/Render';
 import { TextReplacements } from '@vanguard/Text';
 import React, { RefObject } from 'react';
 
-import { GradientRcBackground } from './GradientRcBackground';
+import { GradientPrimaryMeshBackground } from './GradientPrimaryMeshBackground';
 import styles from './PageSection.module.scss';
 
 export enum PageSectionBackground {
   frostedGlass = 'frostedGlass',
   functionalBg = 'functionalBg',
   transparent = 'transparent',
-  gradientRc = 'gradientRc',
+  gradientPrimaryMesh = 'gradientPrimaryMesh',
   gradientBgVarTop = 'gradientBgVarTop',
   gradientBgVarBottom = 'gradientBgVarBottom',
 }
@@ -108,8 +108,8 @@ const PageSectionContainer = (props: PageSectionProps) => {
         return styles.frostedGlass;
       case PageSectionBackground.functionalBg:
         return styles.functionalBg;
-      case PageSectionBackground.gradientRc:
-        return styles.gradientRc;
+      case PageSectionBackground.gradientPrimaryMesh:
+        return styles.gradientPrimaryMesh;
       case PageSectionBackground.transparent:
         return styles.transparent;
       case PageSectionBackground.gradientBgVarTop:
@@ -142,7 +142,7 @@ const PageSectionContainer = (props: PageSectionProps) => {
 
   return (
     <ComponentContainer testId={testId} className={containerClasses} innerRef={innerRef}>
-      {background === PageSectionBackground.gradientRc && <GradientRcBackground />}
+      {background === PageSectionBackground.gradientPrimaryMesh && <GradientPrimaryMeshBackground />}
       {children}
     </ComponentContainer>
   );
