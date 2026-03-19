@@ -569,6 +569,8 @@ export { RcNavLink } from './core/RcNavLink';
 // RichTextEditor
 export type { RichTextEditorProps } from './core/RichTextEditor';
 export { RichTextEditor } from './core/RichTextEditor';
+export { default as sanitizeHtml } from 'sanitize-html';
+export type { IOptions as SanitizeHtmlOptions } from 'sanitize-html';
 
 // SearchableSelect
 export type { SearchableSelectProps } from './core/SearchableSelect';
