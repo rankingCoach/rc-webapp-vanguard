@@ -1,7 +1,7 @@
 import { classNames } from '@helpers/classNames';
 // import parse from "html-react-parser";
 import { parseCssVariable } from '@helpers/css-variables-parser';
-import { sanitizeHTML } from '@helpers/sanitize-html';
+import { sanitizeHtml } from '@helpers/sanitize-html';
 import { translationHelper } from '@helpers/translation-helper';
 import { translationService } from '@services/translation.service';
 import { rcWindow } from '@stores/window.store';
@@ -292,9 +292,9 @@ export const TextHighlighted = (props: TextHighlightedProps) => {
      * Ex: <Text>I am <b>Bold</b></Text>
      */
     if (typeof translated === 'string') {
-      const sanitized = sanitizeHTML(translated).children as any;
+      const sanitized = sanitizeHtml(translated, { allowedAttributes: { span: ['class'] } });
 
-      return { dangerouslySetInnerHTML: { __html: sanitized.props.html } };
+      return { dangerouslySetInnerHTML: { __html: sanitized } };
     }
     //@ts-ignore
     if (

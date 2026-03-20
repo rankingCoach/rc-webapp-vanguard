@@ -7,7 +7,7 @@ import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
 import { debounce } from '@helpers/debounce';
 import { preventInput } from '@helpers/input-preventions/prevent-input';
-import { sanitizeHTML } from '@helpers/sanitize-html';
+import { sanitizeHtml } from '@helpers/sanitize-html';
 import { highlightedTextMaxLength } from '@helpers/string-helpers';
 import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
@@ -616,8 +616,11 @@ export const InputBase = (props: rcInputBaseProps) => {
       }
     }
 
-    const sanitizedContent = sanitizeHTML(content).children;
-    setBackdrop({ __html: sanitizedContent?.props.html });
+    const sanitizedContent = sanitizeHtml(content, {
+      allowedAttributes: { span: ['class'] },
+      allowedClasses: ['vanguard-input-mark-red', 'vanguard-input-mark-green', 'vanguard-input-mark-blue'],
+    });
+    setBackdrop({ __html: sanitizedContent });
   };
 
   /**
