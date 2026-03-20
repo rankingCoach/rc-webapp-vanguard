@@ -7,6 +7,7 @@ import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
 import { debounce } from '@helpers/debounce';
 import { preventInput } from '@helpers/input-preventions/prevent-input';
+import { sanitizeHtml } from '@helpers/sanitize-html';
 import { highlightedTextMaxLength } from '@helpers/string-helpers';
 import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
@@ -19,7 +20,6 @@ import { Popover } from '@vanguard/Popover/Popover';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
-import sanitizeHTML from 'sanitize-html';
 
 /**
  * Props: Value
@@ -616,7 +616,7 @@ export const InputBase = (props: rcInputBaseProps) => {
       }
     }
 
-    const sanitizedContent = sanitizeHTML(content, { allowedAttributes: { span: ['class'] } });
+    const sanitizedContent = sanitizeHtml(content, { allowedAttributes: { span: ['class'] } });
     setBackdrop({ __html: sanitizedContent });
   };
 

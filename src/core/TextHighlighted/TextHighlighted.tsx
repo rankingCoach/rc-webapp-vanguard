@@ -1,6 +1,7 @@
 import { classNames } from '@helpers/classNames';
 // import parse from "html-react-parser";
 import { parseCssVariable } from '@helpers/css-variables-parser';
+import { sanitizeHtml } from '@helpers/sanitize-html';
 import { translationHelper } from '@helpers/translation-helper';
 import { translationService } from '@services/translation.service';
 import { rcWindow } from '@stores/window.store';
@@ -10,7 +11,6 @@ import { parseFullLinks } from '@vanguard/Text/text-links-parser';
 import { TextWrapBalancer } from '@vanguard/Text/TextWrapBalancer/TextWrapBalancer';
 import React, { JSX, useMemo, useState } from 'react';
 import { renderToString } from 'react-dom/server';
-import sanitizeHtml from 'sanitize-html';
 
 export interface Props {
   testId?: string;

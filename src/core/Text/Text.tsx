@@ -2,7 +2,7 @@ import './Text.scss';
 
 import { classNames } from '@helpers/classNames';
 import { parseCssVariable } from '@helpers/css-variables-parser';
-import { sanitizeHTML } from '@helpers/sanitize-html';
+import { sanitizeHTMLToReactNode } from '@helpers/sanitize-html';
 import { translationHelper } from '@helpers/translation-helper';
 import { translationService } from '@services/translation.service';
 import { rcWindow } from '@stores/window.store';
@@ -303,14 +303,14 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     }
 
     if (typeof translated === 'string') {
-      const content: any = sanitizeHTML(translated as string);
+      const content: any = sanitizeHTMLToReactNode(translated as string);
       if (typeof seeMore === 'boolean' && seeMore) {
         const seeMoreText = expanded ? boldAndTranslated('See Less') : boldAndTranslated('See More');
         const truncatedText = expanded ? translated : `${translated.slice(0, maxChar)}...`;
         if (showSeeMore) {
           content.children = (
             <>
-              {sanitizeHTML(truncatedText).children} <a onClick={toggleExpanded}>{seeMoreText}</a>
+              {sanitizeHTMLToReactNode(truncatedText).children} <a onClick={toggleExpanded}>{seeMoreText}</a>
             </>
           );
         }
@@ -324,7 +324,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
         if (seeMore) {
           content.children = (
             <span className={'see-more'} style={{ WebkitLineClamp: maxLines }}>
-              {sanitizeHTML(translated).children}
+              {sanitizeHTMLToReactNode(translated).children}
               {translated.length > 100 && (
                 <span className={'see-more-content'}>
                   {
@@ -348,7 +348,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
           if (seeMore) {
             content.children = (
               <span onClick={toggleExpanded}>
-                {sanitizeHTML(translated).children}{' '}
+                {sanitizeHTMLToReactNode(translated).children}{' '}
                 {
                   // @ts-ignore
                   seeMoreVisible && seeMore.seeLessContent
