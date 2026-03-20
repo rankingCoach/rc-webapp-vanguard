@@ -616,7 +616,10 @@ export const InputBase = (props: rcInputBaseProps) => {
       }
     }
 
-    const sanitizedContent = sanitizeHtml(content, { allowedAttributes: { span: ['class'] } });
+    const sanitizedContent = sanitizeHtml(content, {
+      allowedAttributes: { span: ['class'] },
+      allowedClasses: ['vanguard-input-mark-red', 'vanguard-input-mark-green', 'vanguard-input-mark-blue'],
+    });
     setBackdrop({ __html: sanitizedContent });
   };
 

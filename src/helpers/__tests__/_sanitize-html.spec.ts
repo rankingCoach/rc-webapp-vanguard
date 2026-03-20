@@ -209,6 +209,84 @@ describe('sanitizeHtml', () => {
     });
   });
 
+  describe('combined allowedTags and allowedAttributes', () => {
+    it('applies both tag and attribute filtering together', () => {
+      expect(
+        sanitizeHtml('<div class="box"><p id="one" class="text">Hello</p><span>World</span></div>', {
+          allowedTags: ['div', 'p'],
+          allowedAttributes: { div: ['class'], p: ['id'] },
+        }),
+      ).toBe('<div class="box"><p id="one">Hello</p>World</div>');
+    });
+
+    it('strips dangerous URL attributes even when tag and attribute are both allowed', () => {
+      expect(
+        sanitizeHtml('<a href="javascript:evil()">click</a>', {
+          allowedTags: ['a'],
+          allowedAttributes: { a: ['href'] },
+        }),
+      ).toBe('<a>click</a>');
+    });
+
+    it('strips on* attributes even when tag and attribute are both explicitly listed', () => {
+      expect(
+        sanitizeHtml('<p onclick="evil()">Hello</p>', {
+          allowedTags: ['p'],
+          allowedAttributes: { p: ['onclick'] },
+        }),
+      ).toBe('<p>Hello</p>');
+    });
+  });
+
+  describe('allowedClasses', () => {
+    it('keeps only listed class names', () => {
+      expect(
+        sanitizeHtml('<span class="vanguard-input-mark-red evil-class">text</span>', {
+          allowedAttributes: { span: ['class'] },
+          allowedClasses: ['vanguard-input-mark-red'],
+        }),
+      ).toBe('<span class="vanguard-input-mark-red">text</span>');
+    });
+
+    it('removes the class attribute entirely when no classes pass the filter', () => {
+      expect(
+        sanitizeHtml('<span class="evil-class another-bad-class">text</span>', {
+          allowedAttributes: { span: ['class'] },
+          allowedClasses: ['vanguard-input-mark-red'],
+        }),
+      ).toBe('<span>text</span>');
+    });
+
+    it('allows multiple listed class names on one element', () => {
+      expect(
+        sanitizeHtml('<span class="vanguard-input-mark-red vanguard-input-mark-green">text</span>', {
+          allowedAttributes: { span: ['class'] },
+          allowedClasses: ['vanguard-input-mark-red', 'vanguard-input-mark-green', 'vanguard-input-mark-blue'],
+        }),
+      ).toBe('<span class="vanguard-input-mark-red vanguard-input-mark-green">text</span>');
+    });
+
+    it('does not restrict classes when allowedClasses is not set', () => {
+      expect(
+        sanitizeHtml('<span class="any-class">text</span>', {
+          allowedAttributes: { span: ['class'] },
+        }),
+      ).toBe('<span class="any-class">text</span>');
+    });
+
+    it('applies class filtering to nested spans', () => {
+      expect(
+        sanitizeHtml(
+          '<p>Hello <span class="vanguard-input-mark-red evil">world</span> and <span class="evil">more</span></p>',
+          {
+            allowedAttributes: { span: ['class'] },
+            allowedClasses: ['vanguard-input-mark-red', 'vanguard-input-mark-green', 'vanguard-input-mark-blue'],
+          },
+        ),
+      ).toBe('<p>Hello <span class="vanguard-input-mark-red">world</span> and <span>more</span></p>');
+    });
+  });
+
   describe('comments', () => {
     it('strips HTML comments', () => {
       expect(sanitizeHtml('<p><!-- secret -->Hello</p>')).toBe('<p>Hello</p>');

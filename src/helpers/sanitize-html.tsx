@@ -99,6 +99,7 @@ export const sanitizeHTMLToReactNode = function (str: string | []): { children: 
 export interface SanitizeHtmlOptions {
   allowedTags?: string[];
   allowedAttributes?: Record<string, string[]>;
+  allowedClasses?: string[];
 }
 
 const REMOVED_TAGS = new Set(['script', 'style', 'iframe', 'object', 'embed', 'noscript']);
@@ -163,6 +164,7 @@ function cleanNodes(
   nodes: ChildNode[],
   allowedTags: Set<string>,
   allowedAttributes: Record<string, string[]>,
+  allowedClasses?: Set<string>,
 ): ChildNode[] {
   const result: ChildNode[] = [];
 
@@ -183,7 +185,7 @@ function cleanNodes(
         continue;
       }
 
-      const cleanedChildren = cleanNodes(node.children, allowedTags, allowedAttributes);
+      const cleanedChildren = cleanNodes(node.children, allowedTags, allowedAttributes, allowedClasses);
 
       if (!allowedTags.has(tagName)) {
         result.push(...cleanedChildren);
@@ -194,6 +196,18 @@ function cleanNodes(
       for (const [attr, value] of Object.entries(node.attribs)) {
         if (isAllowedAttribute(tagName, attr, value, allowedAttributes)) {
           filteredAttribs[attr] = value;
+        }
+      }
+
+      if (allowedClasses && 'class' in filteredAttribs) {
+        const filtered = filteredAttribs['class']
+          .split(/\s+/)
+          .filter((cls) => cls && allowedClasses.has(cls))
+          .join(' ');
+        if (filtered) {
+          filteredAttribs['class'] = filtered;
+        } else {
+          delete filteredAttribs['class'];
         }
       }
 
@@ -217,9 +231,10 @@ export function sanitizeHtml(dirty: string, options?: SanitizeHtmlOptions): stri
 
   const allowedTags = options?.allowedTags ? new Set(options.allowedTags) : DEFAULT_ALLOWED_TAGS;
   const allowedAttributes = options?.allowedAttributes ?? DEFAULT_ALLOWED_ATTRIBUTES;
+  const allowedClasses = options?.allowedClasses ? new Set(options.allowedClasses) : undefined;
 
   const doc = parseDocument(dirty);
-  doc.children = cleanNodes(doc.children, allowedTags, allowedAttributes);
+  doc.children = cleanNodes(doc.children, allowedTags, allowedAttributes, allowedClasses);
 
   return render(doc);
 }
