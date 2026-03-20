@@ -35,6 +35,9 @@ import { HelperLinkTest as _HelperLinkTest } from "./HelperLinkTest.story";
 import { InputBaseWithRedux as _InputBaseWithRedux } from "./InputBaseWithRedux.story";
 import { WithTheme as _WithTheme } from "./WithTheme.story";
 import { XSS as _XSS } from "./XSS.story";
+import { HighlightWordsTest as _HighlightWordsTest } from "./HighlightWordsTest.story";
+import { HighlightLengthExceededTest as _HighlightLengthExceededTest } from "./HighlightLengthExceededTest.story";
+import { HighlightUrlTest as _HighlightUrlTest } from "./HighlightUrlTest.story";
 
 // Decorate stories with provided settings
 export default {
@@ -82,6 +85,10 @@ export const InputBaseWithRedux = { ..._InputBaseWithRedux };
 export const WithTheme = { ..._WithTheme };
 
 export const XSS = { ..._XSS };
+
+export const HighlightWordsTest = { ..._HighlightWordsTest };
+export const HighlightLengthExceededTest = { ..._HighlightLengthExceededTest };
+export const HighlightUrlTest = { ..._HighlightUrlTest };
 
 // TODO: The following stories still need to be extracted to individual files:
 // - InputBaseWithReduxDefaultValue
