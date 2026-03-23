@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.2.0%0Dv1.1.1#diff) (2026-03-23)
+
+
+### Features
+
+* **button:** support themed border radius ([1a66b5a](https://github.com/rankingCoach/rc-webapp-vanguard/commits/1a66b5a3ce613062937857cf555e3ec952f0b4fc)), closes [#VAN-43](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-43)
+
 ### [1.1.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.1.1%0Dv1.1.0#diff) (2026-03-10)
 
 ## [1.1.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.1.0%0Dv1.0.2#diff) (2026-03-10)
