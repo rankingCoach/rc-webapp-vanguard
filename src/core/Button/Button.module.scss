@@ -79,7 +79,7 @@
    --icon-padding: #{$x1+$x0_5};
    --label-height: #{$x2};
    --letter-spacing: 0.04em;
-   --border-radius: #{$x0_5};
+   --border-radius: var(--buttons-border-radius, #{$x0_5});
  
    position: relative;
    display: inline-flex;
