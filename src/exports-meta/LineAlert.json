@@ -1,0 +1,7 @@
+{
+  "id": "component:line-alert",
+  "kind": "component",
+  "summary": "Single-line inline alert for prominent notices (info, warning, error) within layouts.",
+  "keywords": ["alert", "line", "message", "inline", "warning", "error"],
+  "tags": ["alerts", "ui", "notifications"]
+}

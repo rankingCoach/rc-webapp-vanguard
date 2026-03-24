@@ -1,0 +1,7 @@
+{
+  "id": "component:illustration-blob",
+  "kind": "component",
+  "summary": "Decorative blob illustration used as background or accent in hero and layout sections.",
+  "keywords": ["illustration", "blob", "decorative", "background", "hero", "graphic"],
+  "tags": ["visuals", "decorative", "ui"]
+}

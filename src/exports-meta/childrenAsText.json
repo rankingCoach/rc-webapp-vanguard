@@ -1,0 +1,7 @@
+{
+  "id": "helper:children-as-text",
+  "kind": "helper",
+  "summary": "Utility that extracts plain text from React `children` for translation, analytics or processing.",
+  "keywords": ["children", "text", "parse", "utility", "react", "translation", "analytics"],
+  "tags": ["helpers", "i18n", "testing"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:rating",
+  "kind": "component",
+  "summary": "Star rating component for collecting and displaying ratings with optional precision.",
+  "keywords": ["rating", "stars", "review", "score", "feedback"],
+  "tags": ["ratings", "ui", "feedback"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:star-rating",
+  "kind": "component",
+  "summary": "Star rating control for collecting and displaying ratings with interactive selection.",
+  "keywords": ["rating", "stars", "component", "survey", "feedback"],
+  "tags": ["ratings", "ui", "feedback"]
+}

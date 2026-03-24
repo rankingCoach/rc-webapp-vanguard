@@ -1,0 +1,7 @@
+{
+  "id": "component:modal",
+  "kind": "component",
+  "summary": "Composable modal dialog component that handles content, visibility and basic keyboard/overlay behavior.",
+  "keywords": ["modal", "dialog", "overlay", "dialogue", "popup", "close", "overlay"],
+  "tags": ["modals", "ui", "accessibility"]
+}

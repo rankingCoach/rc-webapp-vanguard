@@ -1,0 +1,7 @@
+{
+  "id": "component:action-card-actions",
+  "kind": "component",
+  "summary": "Container for action controls in `ActionCard` (primary/secondary actions).",
+  "keywords": ["actions", "card", "controls", "buttons", "cta"],
+  "tags": ["cards", "actions", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:gallery-media-item",
+  "kind": "component",
+  "summary": "Individual media item used inside `Gallery` with preview, selection and metadata display.",
+  "keywords": ["media", "item", "gallery", "preview", "image", "video", "thumbnail"],
+  "tags": ["media", "components", "ui"]
+}

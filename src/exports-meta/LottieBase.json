@@ -1,0 +1,7 @@
+{
+  "id": "component:lottie-base",
+  "kind": "component",
+  "summary": "Base component wrapper for rendering a single Lottie animation instance.",
+  "keywords": ["lottie", "animation", "base", "svg", "json", "animation-player"],
+  "tags": ["animations", "lottie", "ui"]
+}

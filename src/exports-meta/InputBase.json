@@ -1,0 +1,7 @@
+{
+  "id": "component:input-base",
+  "kind": "component",
+  "summary": "Low-level input base used by higher-level Input components for adornments and shared behavior.",
+  "keywords": ["input", "base", "adornment", "form", "control", "component", "internal"],
+  "tags": ["forms", "internal", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:social-media-link",
+  "kind": "component",
+  "summary": "Link component tailored for social media URLs with preview and iconography.",
+  "keywords": ["social", "link", "twitter", "facebook", "social-media", "preview"],
+  "tags": ["social", "links", "ui"]
+}

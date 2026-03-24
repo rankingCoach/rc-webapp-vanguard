@@ -1,0 +1,7 @@
+{
+  "id": "constant:default-google-marker",
+  "kind": "constant",
+  "summary": "Fallback default marker asset or config used for Google Maps markers.",
+  "keywords": ["marker", "default", "google-maps", "icon", "fallback"],
+  "tags": ["maps", "constants", "assets"]
+}

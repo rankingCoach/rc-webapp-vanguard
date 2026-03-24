@@ -1,0 +1,7 @@
+{
+  "id": "component:big-legend-item",
+  "kind": "component",
+  "summary": "Single item within a `BigLegend`, showing color swatch and descriptive label.",
+  "keywords": ["legend-item", "big-legend", "chart", "label", "swatch"],
+  "tags": ["charts", "legend", "ui"]
+}

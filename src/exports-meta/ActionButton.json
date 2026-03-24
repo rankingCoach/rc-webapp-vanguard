@@ -1,0 +1,7 @@
+{
+  "id": "component:action-button",
+  "kind": "component",
+  "summary": "Button component optimized for action calls, supports icons and variants.",
+  "keywords": ["button", "action", "cta", "icon", "click", "variant"],
+  "tags": ["buttons", "actions", "ui"]
+}

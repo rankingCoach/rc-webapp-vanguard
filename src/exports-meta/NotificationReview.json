@@ -1,0 +1,7 @@
+{
+  "id": "component:notification-review",
+  "kind": "component",
+  "summary": "Notification type for review-related updates and moderation workflows.",
+  "keywords": ["notification", "review", "moderation", "update", "approval"],
+  "tags": ["notifications", "review", "ui"]
+}

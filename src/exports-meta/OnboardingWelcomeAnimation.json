@@ -1,0 +1,7 @@
+{
+  "id": "component:onboarding-welcome-animation",
+  "kind": "component",
+  "summary": "Animated welcome sequence used on onboarding screens to guide new users.",
+  "keywords": ["onboarding", "animation", "welcome", "lottie", "intro", "tutorial"],
+  "tags": ["onboarding", "animations", "ui"]
+}

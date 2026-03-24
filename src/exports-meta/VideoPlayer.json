@@ -1,0 +1,7 @@
+{
+  "id": "component:video-player",
+  "kind": "component",
+  "summary": "Video player component with playback controls, captions and service hooks.",
+  "keywords": ["video", "player", "playback", "captions", "controls", "media"],
+  "tags": ["media", "player", "ui"]
+}

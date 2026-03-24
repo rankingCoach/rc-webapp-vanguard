@@ -1,0 +1,7 @@
+{
+  "id": "helper:image-cropper-transformer",
+  "kind": "helper",
+  "summary": "Transformer that crops images to specified aspect ratios and sizes for consistent media.",
+  "keywords": ["image", "crop", "transformer", "resize", "aspect-ratio", "thumbnail"],
+  "tags": ["media", "helpers", "image-processing"]
+}

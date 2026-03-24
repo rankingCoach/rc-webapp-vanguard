@@ -1,0 +1,7 @@
+{
+  "id": "component:hsb-chart",
+  "kind": "component",
+  "summary": "HSB chart visualization supporting hue/saturation/brightness metrics and custom series.",
+  "keywords": ["hsb", "chart", "visualization", "hue", "saturation", "brightness"],
+  "tags": ["charts", "visuals", "data"]
+}

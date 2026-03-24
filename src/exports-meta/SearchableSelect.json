@@ -1,0 +1,7 @@
+{
+  "id": "component:searchable-select",
+  "kind": "component",
+  "summary": "Select input with search/filter capabilities and keyboard navigation for large option sets.",
+  "keywords": ["select", "search", "filter", "dropdown", "autocomplete", "options"],
+  "tags": ["forms", "input", "ui"]
+}

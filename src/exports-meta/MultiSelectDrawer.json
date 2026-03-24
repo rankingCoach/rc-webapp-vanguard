@@ -1,0 +1,7 @@
+{
+  "id": "component:multi-select-drawer",
+  "kind": "component",
+  "summary": "Drawer variant that supports selecting multiple items from a list with search and bulk actions.",
+  "keywords": ["drawer", "multi-select", "selection", "picker", "bulk", "drawer"],
+  "tags": ["drawers", "forms", "ui"]
+}

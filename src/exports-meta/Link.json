@@ -1,0 +1,7 @@
+{
+  "id": "component:link",
+  "kind": "component",
+  "summary": "Accessible link component supporting external targets, click handlers and routing needs.",
+  "keywords": ["link", "anchor", "navigation", "href", "external", "target", "accessibility"],
+  "tags": ["navigation", "ui", "core"]
+}

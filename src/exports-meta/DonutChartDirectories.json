@@ -1,0 +1,7 @@
+{
+  "id": "component:donut-chart-directories",
+  "kind": "component",
+  "summary": "Donut-chart variant showing directory-based breakdowns, optimized for multi-group data.",
+  "keywords": ["donut", "chart", "directories", "visualization", "data", "breakdown"],
+  "tags": ["charts", "visuals", "data"]
+}

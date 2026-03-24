@@ -1,0 +1,7 @@
+{
+  "id": "component:ai-budget-end",
+  "kind": "component",
+  "summary": "UI component that notifies users when their AI budget or credits have been exhausted.",
+  "keywords": ["ai", "budget", "notification", "credits", "quota", "alert"],
+  "tags": ["ai", "notifications", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:time-picker",
+  "kind": "component",
+  "summary": "UI control to select a time of day with optional formats and validation.",
+  "keywords": ["time", "picker", "timepicker", "input", "schedule", "format"],
+  "tags": ["forms", "datetime", "ui"]
+}

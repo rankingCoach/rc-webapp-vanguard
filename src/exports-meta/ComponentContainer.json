@@ -1,0 +1,7 @@
+{
+  "id": "component:component-container",
+  "kind": "component",
+  "summary": "Container component that wraps content and provides consistent structure, accessibility attributes, and layout helpers.",
+  "keywords": ["container", "layout", "wrapper", "accessibility", "component", "section", "box"],
+  "tags": ["layout", "utility", "core"]
+}

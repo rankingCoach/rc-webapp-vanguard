@@ -1,0 +1,7 @@
+{
+  "id": "component:toggle-button",
+  "kind": "component",
+  "summary": "Button-like toggle for switching between states; supports accessibility and keyboard use.",
+  "keywords": ["toggle", "button", "switch", "state", "toggle-button"],
+  "tags": ["controls", "input", "ui"]
+}

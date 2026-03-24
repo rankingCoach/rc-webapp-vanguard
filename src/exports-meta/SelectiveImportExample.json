@@ -1,0 +1,7 @@
+{
+  "id": "example:selective-import",
+  "kind": "example",
+  "summary": "Small example component demonstrating selective/dynamic imports for code-splitting.",
+  "keywords": ["example", "selective", "dynamic", "import", "demo", "code-splitting"],
+  "tags": ["examples", "performance", "hooks"]
+}

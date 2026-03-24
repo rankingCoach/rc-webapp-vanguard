@@ -1,0 +1,7 @@
+{
+  "id": "helper:extract-set-errors-from-config",
+  "kind": "helper",
+  "summary": "Utility that configures and sets form errors based on validation results or server responses.",
+  "keywords": ["form", "errors", "validation", "set", "config", "server", "response"],
+  "tags": ["forms", "validation", "helpers"]
+}

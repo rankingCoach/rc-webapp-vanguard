@@ -1,0 +1,7 @@
+{
+  "id": "component:notification",
+  "kind": "component",
+  "summary": "Notification card for system or user messages with optional actions and variants.",
+  "keywords": ["notification", "message", "toast", "card", "alert", "action"],
+  "tags": ["notifications", "ui"]
+}

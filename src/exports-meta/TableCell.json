@@ -1,0 +1,7 @@
+{
+  "id": "component:table-cell",
+  "kind": "component",
+  "summary": "Table cell component with flexible rendering and alignment options.",
+  "keywords": ["cell", "table", "column", "render", "align"],
+  "tags": ["table", "ui"]
+}

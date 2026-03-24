@@ -1,0 +1,7 @@
+{
+  "id": "component:google-maps-marker",
+  "kind": "component",
+  "summary": "Custom marker component for Google Maps that supports custom icons and info windows.",
+  "keywords": ["marker", "map", "google-maps", "pin", "info-window", "location"],
+  "tags": ["maps", "markers", "ui"]
+}

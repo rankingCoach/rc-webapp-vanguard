@@ -1,0 +1,7 @@
+{
+  "id": "component:list-items",
+  "kind": "component",
+  "summary": "Renderer for collections of list items with layout options and optional selection handling.",
+  "keywords": ["list", "items", "collection", "render", "selection", "ui"],
+  "tags": ["lists", "ui"]
+}

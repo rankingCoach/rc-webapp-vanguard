@@ -1,0 +1,7 @@
+{
+  "id": "component:success-modal",
+  "kind": "component",
+  "summary": "Modal used to confirm a successful operation with optional next-step actions.",
+  "keywords": ["modal", "success", "confirmation", "dialog", "ok", "done"],
+  "tags": ["modals", "success", "ui"]
+}

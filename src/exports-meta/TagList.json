@@ -1,0 +1,7 @@
+{
+  "id": "component:tag-list",
+  "kind": "component",
+  "summary": "Layout component that displays a list of `Tag` items with wrapping, ordering and optional removal.",
+  "keywords": ["tags", "list", "chips", "wrap", "remove", "labels"],
+  "tags": ["tags", "lists", "ui"]
+}

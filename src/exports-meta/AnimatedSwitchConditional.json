@@ -1,0 +1,7 @@
+{
+  "id": "helper:animated-switch-conditional",
+  "kind": "helper",
+  "summary": "Helper that toggles between two states with an animated transition when a condition changes.",
+  "keywords": ["animation", "conditional", "switch", "transition", "helper"],
+  "tags": ["animation", "helpers", "transitions"]
+}

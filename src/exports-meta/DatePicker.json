@@ -1,0 +1,7 @@
+{
+  "id": "component:date-picker",
+  "kind": "component",
+  "summary": "Date picker input component with calendar UI, selection modes and validation support.",
+  "keywords": ["date", "picker", "calendar", "input", "select", "datepicker"],
+  "tags": ["forms", "date", "ui"]
+}

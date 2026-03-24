@@ -1,0 +1,7 @@
+{
+  "id": "component:info-box",
+  "kind": "component",
+  "summary": "Box component used to display informational messages with optional icon and actions.",
+  "keywords": ["info", "box", "message", "notification", "help", "alert"],
+  "tags": ["messages", "ui", "help"]
+}

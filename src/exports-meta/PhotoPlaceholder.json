@@ -1,0 +1,7 @@
+{
+  "id": "component:photo-placeholder",
+  "kind": "component",
+  "summary": "Placeholder used for empty gallery slots or during image loading to maintain layout.",
+  "keywords": ["placeholder", "image", "photo", "skeleton", "loading", "gallery"],
+  "tags": ["media", "loading", "ui"]
+}

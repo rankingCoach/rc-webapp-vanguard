@@ -1,0 +1,7 @@
+{
+  "id": "component:date-range-picker-imask-input",
+  "kind": "component",
+  "summary": "IMask-based input tailored for date range entry used internally by `DateRangePicker`.",
+  "keywords": ["imask", "date", "input", "mask", "date-range", "picker"],
+  "tags": ["forms", "date", "input"]
+}
