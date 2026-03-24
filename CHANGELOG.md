@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.2.0%0Dv1.1.1#diff) (2026-03-23)
+
+
+### Features
+
+* **button:** support themed border radius ([1a66b5a](https://github.com/rankingCoach/rc-webapp-vanguard/commits/1a66b5a3ce613062937857cf555e3ec952f0b4fc)), closes [#VAN-43](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-43)
+
+### [1.1.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.1.1%0Dv1.1.0#diff) (2026-03-10)
+
+## [1.1.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.1.0%0Dv1.0.2#diff) (2026-03-10)
+
+
+### Features
+
+* **pagesection:** add SVG-based dynamic gradientRc background ([70803cc](https://github.com/rankingCoach/rc-webapp-vanguard/commits/70803cc00a8a87e6c7d50fdbb5eb899758eaa63d)), closes [#VAN-39](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-39)
+
+
+### Bug Fixes
+
+* update button text to include exclamation mark ([bb23941](https://github.com/rankingCoach/rc-webapp-vanguard/commits/bb23941876bbc3a9eece516a035090b31799ca7e))
+
 ### [1.0.2](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.0.2%0Dv1.0.1#diff) (2026-02-18)
 
 

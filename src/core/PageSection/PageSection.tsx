@@ -1,17 +1,19 @@
-import React, {RefObject} from 'react';
-import {classNames} from '@helpers/classNames';
-import {ComponentContainer} from '@vanguard/ComponentContainer';
-import {FrostedGlass} from '@vanguard/FrostedGlass';
-import {Header, HeaderTypes} from '@vanguard/Header';
-import {Render} from '@vanguard/Render';
-import {TextReplacements} from '@vanguard/Text';
+import { classNames } from '@helpers/classNames';
+import { ComponentContainer } from '@vanguard/ComponentContainer';
+import { FrostedGlass } from '@vanguard/FrostedGlass';
+import { Header, HeaderTypes } from '@vanguard/Header';
+import { Render } from '@vanguard/Render';
+import { TextReplacements } from '@vanguard/Text';
+import React, { RefObject } from 'react';
+
+import { GradientPrimaryMeshBackground } from './GradientPrimaryMeshBackground';
 import styles from './PageSection.module.scss';
 
 export enum PageSectionBackground {
   frostedGlass = 'frostedGlass',
   functionalBg = 'functionalBg',
   transparent = 'transparent',
-  gradientRc = 'gradientRc',
+  gradientPrimaryMesh = 'gradientPrimaryMesh',
   gradientBgVarTop = 'gradientBgVarTop',
   gradientBgVarBottom = 'gradientBgVarBottom',
 }
@@ -50,9 +52,7 @@ export type PageSectionWithoutTitle = PageSectionBaseProps & {
   headerType?: never;
 };
 
-export type PageSectionProps =
-  | PageSectionWithTitle
-  | PageSectionWithoutTitle;
+export type PageSectionProps = PageSectionWithTitle | PageSectionWithoutTitle;
 
 export const PageSection = (props: PageSectionProps) => {
   const {
@@ -108,8 +108,8 @@ const PageSectionContainer = (props: PageSectionProps) => {
         return styles.frostedGlass;
       case PageSectionBackground.functionalBg:
         return styles.functionalBg;
-      case PageSectionBackground.gradientRc:
-        return styles.gradientRc;
+      case PageSectionBackground.gradientPrimaryMesh:
+        return styles.gradientPrimaryMesh;
       case PageSectionBackground.transparent:
         return styles.transparent;
       case PageSectionBackground.gradientBgVarTop:
@@ -125,8 +125,10 @@ const PageSectionContainer = (props: PageSectionProps) => {
     styles.container,
     getBackgroundClass(),
     !noDefaultPadding && styles.defaultPadding,
-    (roundedEdges === PageSectionRoundedEdges.top || roundedEdges === PageSectionRoundedEdges.both) && styles.roundedTop,
-    (roundedEdges === PageSectionRoundedEdges.bottom || roundedEdges === PageSectionRoundedEdges.both) && styles.roundedBottom,
+    (roundedEdges === PageSectionRoundedEdges.top || roundedEdges === PageSectionRoundedEdges.both) &&
+      styles.roundedTop,
+    (roundedEdges === PageSectionRoundedEdges.bottom || roundedEdges === PageSectionRoundedEdges.both) &&
+      styles.roundedBottom,
     className,
   );
 
@@ -140,6 +142,7 @@ const PageSectionContainer = (props: PageSectionProps) => {
 
   return (
     <ComponentContainer testId={testId} className={containerClasses} innerRef={innerRef}>
+      {background === PageSectionBackground.gradientPrimaryMesh && <GradientPrimaryMeshBackground />}
       {children}
     </ComponentContainer>
   );

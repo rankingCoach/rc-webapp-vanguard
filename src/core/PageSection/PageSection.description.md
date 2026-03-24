@@ -64,7 +64,7 @@ function MyPage() {
     - `functionalBg`
     - `frostedGlass`
     - `transparent`
-    - `gradientRc`
+    - `gradientPrimaryMesh`
     - `gradientBgVarTop`
     - `gradientBgVarBottom`
 
