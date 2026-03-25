@@ -15,7 +15,6 @@ export default {
 import { TextHighlightedDefault as _TextHighlightedDefault } from './stories/TextHighlightedDefault.story';
 import { TextHighlightedMultiWord as _TextHighlightedMultiWord } from './stories/TextHighlightedMultiWord.story';
 import { TextHighlightedWithEmphasis as _TextHighlightedWithEmphasis } from './stories/TextHighlightedWithEmphasis.story';
-import { TextHighlightedXSSProtection as _TextHighlightedXSSProtection } from './stories/TextHighlightedXSSProtection.story';
 import { TextHighlightedStripsImgTag as _TextHighlightedStripsImgTag } from './stories/TextHighlightedSanitization.story';
 import { TextHighlightedStripsScriptTag as _TextHighlightedStripsScriptTag } from './stories/TextHighlightedSanitization.story';
 import { TextHighlightedStripsEventAttributes as _TextHighlightedStripsEventAttributes } from './stories/TextHighlightedSanitization.story';
@@ -30,7 +29,6 @@ import { TestCaseInsensitiveTrue as _TestCaseInsensitiveTrue } from './stories/T
 export const TextHighlightedDefault = { ..._TextHighlightedDefault };
 export const TextHighlightedMultiWord = { ..._TextHighlightedMultiWord };
 export const TextHighlightedWithEmphasis = { ..._TextHighlightedWithEmphasis };
-export const TextHighlightedXSSProtection = { ..._TextHighlightedXSSProtection };
 export const TextHighlightedStripsImgTag = { ..._TextHighlightedStripsImgTag };
 export const TextHighlightedStripsScriptTag = { ..._TextHighlightedStripsScriptTag };
 export const TextHighlightedStripsEventAttributes = { ..._TextHighlightedStripsEventAttributes };
