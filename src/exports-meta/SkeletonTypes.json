@@ -1,0 +1,7 @@
+{
+  "id": "constant:skeleton-types",
+  "kind": "constant",
+  "summary": "Enum of skeleton placeholder variants used by `Skeleton` (e.g., text, avatar, card) for loading states.",
+  "keywords": ["skeleton", "placeholder", "loading", "enum", "types", "skeleton-types"],
+  "tags": ["loading", "skeleton", "constants"]
+}

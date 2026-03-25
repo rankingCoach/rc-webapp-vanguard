@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.3.1%0Dv1.3.0#diff) (2026-03-24)
+
+## [1.3.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.3.0%0Dv1.2.0#diff) (2026-03-24)
+
+
+### Features
+
+* **avatar:** add new directory logos and icon mappings ([6537d40](https://github.com/rankingCoach/rc-webapp-vanguard/commits/6537d40ab5ea07a38b774e2782dceef22f6892d2))
+
 ## [1.2.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.2.0%0Dv1.1.1#diff) (2026-03-23)
 
 

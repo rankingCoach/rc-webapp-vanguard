@@ -1,0 +1,7 @@
+{
+  "id": "helper:render",
+  "kind": "helper",
+  "summary": "Utility component that safely renders render-props, nodes or fallback content.",
+  "keywords": ["render", "fallback", "conditional", "helper", "render-prop"],
+  "tags": ["helpers", "render", "ui"]
+}

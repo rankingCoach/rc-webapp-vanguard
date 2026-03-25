@@ -1,0 +1,7 @@
+{
+  "id": "helper:export-xls",
+  "kind": "helper",
+  "summary": "Utility to export tabular data to XLS/XLSX files, with optional hook for programmatic exports.",
+  "keywords": ["export", "xls", "xlsx", "spreadsheet", "download", "excel", "data"],
+  "tags": ["export", "data", "helpers"]
+}

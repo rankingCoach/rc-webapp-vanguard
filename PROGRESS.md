@@ -14,6 +14,7 @@ This document tracks the progress of auditing and standardizing all components i
 - **Testing Standards**: All tests must use vitest, follow specific import rules, use React Testing Library queries, and adhere to SCSS spacing/breakpoint rules.
 - **Completion Criteria**: A component is marked as DONE only when all props are tested and the structure fully complies with guidelines.
 
+
 ### Guidelines Reference
 - Use vitest for all testing (not Jest).
 - Import only from `import { userEvent, within, expect, fireEvent } from "storybook/test";`

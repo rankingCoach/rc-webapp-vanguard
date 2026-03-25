@@ -1,0 +1,7 @@
+{
+  "id": "component:ai-glow",
+  "kind": "component",
+  "summary": "Visual glow effect component used to indicate AI processing or emphasis around elements.",
+  "keywords": ["ai", "glow", "visual", "indicator", "highlight", "effect"],
+  "tags": ["ai", "visuals", "ui"]
+}

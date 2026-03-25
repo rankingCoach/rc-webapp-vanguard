@@ -1,0 +1,7 @@
+{
+  "id": "component:avatar-stack",
+  "kind": "component",
+  "summary": "Displays overlapping avatars with count overflow handling for group representations.",
+  "keywords": ["avatar", "stack", "group", "overlap", "count", "team"],
+  "tags": ["avatars", "lists", "ui"]
+}

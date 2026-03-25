@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-stepper",
+  "kind": "component",
+  "summary": "Stepper UI for multi-step modals, providing next/prev controls and step indicators.",
+  "keywords": ["modal", "stepper", "wizard", "steps", "multi-step", "navigation"],
+  "tags": ["modals", "navigation", "ui"]
+}

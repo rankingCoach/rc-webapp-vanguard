@@ -1,0 +1,7 @@
+{
+  "id": "component:ai-orb",
+  "kind": "component",
+  "summary": "Small indicator showing AI status and activity with size and status variants.",
+  "keywords": ["ai", "indicator", "status", "orb", "status-indicator"],
+  "tags": ["ai", "indicators", "ui"]
+}

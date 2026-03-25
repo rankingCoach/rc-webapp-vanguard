@@ -1,0 +1,7 @@
+{
+  "id": "component:popover",
+  "kind": "component",
+  "summary": "Floating, anchored panel positioned relative to a target element for contextual UI content.",
+  "keywords": ["popover", "tooltip", "anchor", "position", "overlay", "contextual"],
+  "tags": ["overlays", "ui", "accessibility"]
+}

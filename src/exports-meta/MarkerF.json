@@ -1,0 +1,7 @@
+{
+  "id": "component:marker-f",
+  "kind": "component",
+  "summary": "Functional marker component used for rendering custom map markers on Google Maps.",
+  "keywords": ["marker", "map", "google-maps", "pin", "location", "custom"],
+  "tags": ["maps", "markers", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:skeleton",
+  "kind": "component",
+  "summary": "Visual skeleton placeholders used while content is loading; supports multiple types and sizes.",
+  "keywords": ["skeleton", "loading", "placeholder", "shimmer", "ui", "placeholder"],
+  "tags": ["loading", "skeleton", "ui"]
+}

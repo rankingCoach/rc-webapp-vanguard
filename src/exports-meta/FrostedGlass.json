@@ -1,0 +1,7 @@
+{
+  "id": "component:frosted-glass",
+  "kind": "component",
+  "summary": "Visual container that applies a frosted glass (blur + overlay) effect to its content.",
+  "keywords": ["frosted", "glass", "blur", "overlay", "visual", "container"],
+  "tags": ["visual", "decorative", "ui"]
+}

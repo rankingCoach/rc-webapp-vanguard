@@ -1,0 +1,7 @@
+{
+  "id": "component:radio-button-group",
+  "kind": "component",
+  "summary": "Group wrapper that manages radio button sets, keyboard navigation and selection state.",
+  "keywords": ["radio", "group", "form", "selection", "keyboard", "options"],
+  "tags": ["forms", "input", "ui"]
+}

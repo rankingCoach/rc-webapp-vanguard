@@ -1,0 +1,7 @@
+{
+  "id": "component:fade-carousel-auto",
+  "kind": "component",
+  "summary": "Auto-advancing carousel with fade transitions for rotating visual content.",
+  "keywords": ["carousel", "fade", "slideshow", "auto", "rotation", "gallery"],
+  "tags": ["carousels", "visual", "ui"]
+}

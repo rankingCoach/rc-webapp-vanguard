@@ -1,0 +1,7 @@
+{
+  "id": "component:bar-chart",
+  "kind": "component",
+  "summary": "Bar chart visualization for comparing categories and values with axis and legends.",
+  "keywords": ["bar-chart", "chart", "visualization", "categories", "values", "legend"],
+  "tags": ["charts", "visuals", "data"]
+}

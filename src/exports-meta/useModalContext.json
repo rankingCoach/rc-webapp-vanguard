@@ -1,0 +1,7 @@
+{
+  "id": "hook:use-modal-context",
+  "kind": "hook",
+  "summary": "Hook to access modal context for opening, closing and querying modal state.",
+  "keywords": ["hook", "modal", "context", "useModal", "open", "close"],
+  "tags": ["hooks", "modals", "state"]
+}

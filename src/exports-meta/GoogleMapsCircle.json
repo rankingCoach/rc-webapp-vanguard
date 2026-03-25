@@ -1,0 +1,7 @@
+{
+  "id": "component:google-maps-circle",
+  "kind": "component",
+  "summary": "Circle overlay component for Google Maps to visualize radius or area on a map.",
+  "keywords": ["map", "circle", "overlay", "radius", "google-maps", "geo"],
+  "tags": ["maps", "overlays", "ui"]
+}

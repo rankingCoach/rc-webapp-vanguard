@@ -1,0 +1,7 @@
+{
+  "id": "component:link-conditional",
+  "kind": "component",
+  "summary": "Renders a link only when a condition is met; renders fallback otherwise.",
+  "keywords": ["link", "conditional", "render", "navigation", "fallback"],
+  "tags": ["navigation", "helpers", "ui"]
+}

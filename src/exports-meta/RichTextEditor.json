@@ -1,0 +1,7 @@
+{
+  "id": "component:rich-text-editor",
+  "kind": "component",
+  "summary": "WYSIWYG rich text editor with formatting controls, media embedding and change handling.",
+  "keywords": ["rich-text", "editor", "wysiwyg", "formatting", "content", "media"],
+  "tags": ["editor", "content", "ui"]
+}

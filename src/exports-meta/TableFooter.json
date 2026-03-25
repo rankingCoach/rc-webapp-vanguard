@@ -1,0 +1,7 @@
+{
+  "id": "component:table-footer",
+  "kind": "component",
+  "summary": "Footer section for tables to host totals, actions, and pagination controls.",
+  "keywords": ["table", "footer", "totals", "pagination", "actions"],
+  "tags": ["table", "ui", "data"]
+}

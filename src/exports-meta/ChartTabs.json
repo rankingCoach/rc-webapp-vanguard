@@ -1,0 +1,7 @@
+{
+  "id": "component:chart-tabs",
+  "kind": "component",
+  "summary": "Tabs control to switch between different chart views or datasets.",
+  "keywords": ["chart", "tabs", "switch", "view", "datasets"],
+  "tags": ["charts", "navigation", "ui"]
+}

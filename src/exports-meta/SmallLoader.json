@@ -1,0 +1,7 @@
+{
+  "id": "component:small-loader",
+  "kind": "component",
+  "summary": "Compact loader used inline or in buttons to indicate small/short-duration async activity.",
+  "keywords": ["loader", "small", "spinner", "inline", "loading", "indicator"],
+  "tags": ["loading", "ui"]
+}

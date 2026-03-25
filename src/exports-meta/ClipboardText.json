@@ -1,0 +1,7 @@
+{
+  "id": "component:clipboard-text",
+  "kind": "component",
+  "summary": "Small control that copies text to clipboard and shows visual confirmation/snackbars.",
+  "keywords": ["clipboard", "copy", "text", "copy-to-clipboard", "feedback"],
+  "tags": ["clipboard", "helpers", "ui"]
+}

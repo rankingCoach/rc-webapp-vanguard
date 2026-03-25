@@ -1,0 +1,7 @@
+{
+  "id": "component:line-chart-base",
+  "kind": "component",
+  "summary": "Base line chart component providing core rendering and series handling for line charts.",
+  "keywords": ["line-chart", "chart", "line", "series", "visualization"],
+  "tags": ["charts", "visuals", "data"]
+}

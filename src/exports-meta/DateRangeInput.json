@@ -1,0 +1,7 @@
+{
+  "id": "component:date-range-input",
+  "kind": "component",
+  "summary": "Input component for selecting start and end dates in a compact control, with validation.",
+  "keywords": ["date", "range", "input", "start", "end", "picker"],
+  "tags": ["forms", "date", "ui"]
+}

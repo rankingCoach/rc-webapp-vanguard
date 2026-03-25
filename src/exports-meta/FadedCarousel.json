@@ -1,0 +1,7 @@
+{
+  "id": "component:faded-carousel",
+  "kind": "component",
+  "summary": "Carousel component with fade effects for transitioning between items.",
+  "keywords": ["carousel", "fade", "gallery", "slides", "transition"],
+  "tags": ["carousels", "visual", "ui"]
+}

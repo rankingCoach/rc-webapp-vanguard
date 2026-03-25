@@ -1,0 +1,7 @@
+{
+  "id": "component:select",
+  "kind": "component",
+  "summary": "Dropdown select with options rendering, keyboard navigation and optional search support.",
+  "keywords": ["select", "dropdown", "options", "keyboard", "accessibility", "search"],
+  "tags": ["forms", "input", "ui"]
+}

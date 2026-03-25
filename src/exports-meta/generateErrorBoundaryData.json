@@ -1,0 +1,7 @@
+{
+  "id": "helper:generate-error-boundary-data",
+  "kind": "helper",
+  "summary": "Helper to extract diagnostic data from caught errors for reporting and debugging.",
+  "keywords": ["error", "boundary", "diagnostic", "report", "debug"],
+  "tags": ["errors", "helpers", "diagnostics"]
+}

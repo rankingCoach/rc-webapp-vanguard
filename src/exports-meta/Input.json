@@ -1,0 +1,7 @@
+{
+  "id": "component:input",
+  "kind": "component",
+  "summary": "Text input with label, validation, counters, and adornment support used in forms.",
+  "keywords": ["input", "text", "form", "validation", "adornment", "counter", "control"],
+  "tags": ["forms", "input", "ui"]
+}

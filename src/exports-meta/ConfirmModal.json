@@ -1,0 +1,7 @@
+{
+  "id": "component:confirm-modal",
+  "kind": "component",
+  "summary": "Standard confirmation modal with primary and secondary actions for user confirmation flows.",
+  "keywords": ["modal", "confirm", "dialog", "ok", "cancel", "confirmation"],
+  "tags": ["modals", "standard", "ui"]
+}

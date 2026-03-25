@@ -1,0 +1,7 @@
+{
+  "id": "component:dropdown-menu",
+  "kind": "component",
+  "summary": "Accessible dropdown menu component for actions and navigation with keyboard support.",
+  "keywords": ["dropdown", "menu", "actions", "navigation", "keyboard", "accessibility"],
+  "tags": ["menus", "navigation", "ui"]
+}

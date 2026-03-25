@@ -1,0 +1,7 @@
+{
+  "id": "component:info-icon",
+  "kind": "component",
+  "summary": "Small informational icon used to show helper text or tooltips for UI elements.",
+  "keywords": ["info", "icon", "tooltip", "help", "assistant", "modal"],
+  "tags": ["icons", "help", "ui"]
+}

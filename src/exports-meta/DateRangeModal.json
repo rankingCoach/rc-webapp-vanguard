@@ -1,0 +1,7 @@
+{
+  "id": "component:date-range-modal",
+  "kind": "component",
+  "summary": "Modal for selecting date ranges with calendars, presets and validation.",
+  "keywords": ["modal", "date", "range", "calendar", "picker", "selection"],
+  "tags": ["modals", "date", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "helper:extract-error-scopes",
+  "kind": "helper",
+  "summary": "Parse and extract error scopes from a form error object to map field-level errors.",
+  "keywords": ["form", "errors", "validation", "extract", "scopes", "setErrors"],
+  "tags": ["forms", "validation", "helpers"]
+}
