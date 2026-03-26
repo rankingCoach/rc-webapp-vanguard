@@ -231,7 +231,7 @@
     "rollup-plugin-visualizer": "5.12.0",
     "run": "1.5.0",
     "rxjs": "7.8.1",
-    "sanitize-html": "2.11.0",
+
     "sass": "1.62.1",
     "standard-version": "9.5.0",
     "storybook": "9.1.2",
@@ -260,6 +260,9 @@
   "dependencies": {
     "@testing-library/react": "16.3.0",
     "date-fns": "2.30.0",
+    "dom-serializer": "2.0.0",
+    "domhandler": "5.0.3",
+    "htmlparser2": "8.0.2",
     "redux-logger": "3.0.6",
     "type-fest": "4.41.0"
   }
