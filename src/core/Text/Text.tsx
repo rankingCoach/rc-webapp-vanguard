@@ -13,6 +13,7 @@ import { TextWrapBalancer } from '@vanguard/Text/TextWrapBalancer/TextWrapBalanc
 import parse from 'html-react-parser';
 import * as React from 'react';
 import { JSX, useMemo, useState } from 'react';
+import { renderToString } from 'react-dom/server';
 
 import { childrenAsText } from './child-to-text';
 
@@ -84,6 +85,10 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     ellipsis,
     allowNewLines = false,
     animateWords = undefined,
+    highlightWords,
+    highlightColor,
+    highlightMode = 'background',
+    caseInsensitive = false,
     ...rest
   } = props;
 
@@ -144,6 +149,28 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
   translated = translate
     ? parse(translationData.value, { htmlparser2: { lowerCaseTags: false } })
     : translationService.justReplace(toTranslate, replacements);
+
+  if (typeof translated === 'string' && highlightWords?.length) {
+    const spanStyle = {
+      backgroundColor: highlightMode === 'background' ? highlightColor : undefined,
+      color: highlightMode === 'text' ? highlightColor : undefined,
+      fontWeight: highlightMode === 'bold' ? ('bold' as const) : undefined,
+    };
+
+    highlightWords.forEach((word) => {
+      if (caseInsensitive) {
+        const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        const matches = (translated as string).match(regex);
+        if (matches) {
+          matches.forEach((match) => {
+            translated = (translated as string).replace(match, renderToString(<span style={spanStyle}>{match}</span>));
+          });
+        }
+      } else {
+        translated = (translated as string).replace(word, renderToString(<span style={spanStyle}>{word}</span>));
+      }
+    });
+  }
 
   useMemo(() => {
     if (translate) {
