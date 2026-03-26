@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.0%0Dv1.3.1#diff) (2026-03-26)
+
+
+### Features
+
+* add vanguard mcp ([f92d5c0](https://github.com/rankingCoach/rc-webapp-vanguard/commits/f92d5c0700180916748ff24753005a075b5c00cf))
+* enhance Button and PageSection components with additional recommendations ([7de103d](https://github.com/rankingCoach/rc-webapp-vanguard/commits/7de103d1789d5b1c7a85e074668af399d4b7f660))
+* **sanitize-html:** add allowed classes option ([46aec18](https://github.com/rankingCoach/rc-webapp-vanguard/commits/46aec18838693e05c51b6a795d1d5f9d716e4a3c))
+* **sanitize-html:** export package through vanguard ([37ec741](https://github.com/rankingCoach/rc-webapp-vanguard/commits/37ec741a6aa02f422c7f10b5412e3158dacfc53e)), closes [#VAN-42](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-42)
+* **sanitize-html:** implement custom HTML sanitizer ([ce9188a](https://github.com/rankingCoach/rc-webapp-vanguard/commits/ce9188adac72b4f1514f676e29142b8887c3a131)), closes [#VAN-42](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-42)
+
+
+### Bug Fixes
+
+* **TextHighlighted:** html sanitization ([9ede274](https://github.com/rankingCoach/rc-webapp-vanguard/commits/9ede2743cbe97276e824ba7832e174c2e6caffe1))
+
 ### [1.3.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.3.1%0Dv1.3.0#diff) (2026-03-24)
 
 ## [1.3.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.3.0%0Dv1.2.0#diff) (2026-03-24)
