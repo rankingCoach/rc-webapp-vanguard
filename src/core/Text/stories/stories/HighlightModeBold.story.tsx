@@ -6,7 +6,7 @@ export const HighlightModeBold: Story = {
     children: 'Contact us at CONTACT@example.com for Support',
     highlightWords: ['contact', 'support'],
     translate: false,
-    caseInsensitive: true,
+    highlightCaseInsensitive: true,
     highlightMode: 'bold',
     highlightColor: 'var(--p500)',
   },

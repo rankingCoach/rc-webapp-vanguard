@@ -11,7 +11,7 @@ const baseArgs = {
 export const HighlightCaseInsensitiveFalse: Story = {
   args: {
     ...baseArgs,
-    caseInsensitive: false,
+    highlightCaseInsensitive: false,
   },
   play: async ({ canvasElement }) => {
     const spans = canvasElement.querySelectorAll<HTMLElement>('span[style*="background-color"]');
@@ -24,7 +24,7 @@ export const HighlightCaseInsensitiveFalse: Story = {
 export const HighlightCaseInsensitiveTrue: Story = {
   args: {
     ...baseArgs,
-    caseInsensitive: true,
+    highlightCaseInsensitive: true,
   },
   play: async ({ canvasElement }) => {
     const spans = canvasElement.querySelectorAll<HTMLElement>('span[style*="background-color"]');

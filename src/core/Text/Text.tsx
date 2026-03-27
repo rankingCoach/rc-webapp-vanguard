@@ -88,7 +88,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     highlightWords,
     highlightColor,
     highlightMode = 'background',
-    caseInsensitive = false,
+    highlightCaseInsensitive = false,
     ...rest
   } = props;
 
@@ -158,7 +158,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     };
 
     highlightWords.forEach((word) => {
-      if (caseInsensitive) {
+      if (highlightCaseInsensitive) {
         const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
         const matches = (translated as string).match(regex);
         if (matches) {

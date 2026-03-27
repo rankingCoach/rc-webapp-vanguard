@@ -6,7 +6,7 @@ export const HighlightModeText: Story = {
     children: '@john mentioned @Jane in this conversation',
     highlightWords: ['@john', '@jane'],
     translate: false,
-    caseInsensitive: true,
+    highlightCaseInsensitive: true,
     highlightMode: 'text',
     highlightColor: 'var(--p500)',
   },

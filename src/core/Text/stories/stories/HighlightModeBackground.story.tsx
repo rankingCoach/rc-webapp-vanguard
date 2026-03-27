@@ -6,7 +6,7 @@ export const HighlightModeBackground: Story = {
     children: 'Search results for Query inside a longer sentence with query repeated',
     highlightWords: ['query'],
     translate: false,
-    caseInsensitive: true,
+    highlightCaseInsensitive: true,
     highlightMode: 'background',
     highlightColor: 'var(--p500)',
   },

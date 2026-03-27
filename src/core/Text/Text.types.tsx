@@ -57,7 +57,7 @@ type BaseProps = {
   highlightWords?: string[];
   highlightColor?: string;
   highlightMode?: 'background' | 'text' | 'bold';
-  caseInsensitive?: boolean;
+  highlightCaseInsensitive?: boolean;
 };
 
 type SeeMoreProps =
