@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.1%0Dv1.4.0#diff) (2026-03-31)
+
 ## [1.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.0%0Dv1.3.1#diff) (2026-03-26)
 
 
