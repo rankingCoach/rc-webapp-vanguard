@@ -470,6 +470,12 @@ export { GoogleMapsMarker } from './core/GoogleMaps';
 export type { GoogleMapsMarkerDefaultProps } from './core/GoogleMaps';
 export { GoogleMapsMarkerDefault } from './core/GoogleMaps';
 export { defaultMarkerIcon, defaultGoogleMarker } from './core/GoogleMaps';
+export { AdvancedMarkerF, AdvancedMarker } from './core/GoogleMaps';
+export type { AdvancedMarkerProps } from './core/GoogleMaps';
+export type { GoogleMapsAdvancedMarkerProps } from './core/GoogleMaps';
+export { GoogleMapsAdvancedMarker } from './core/GoogleMaps';
+export type { GoogleMapsAdvancedMarkerContentProps } from './core/GoogleMaps';
+export { GoogleMapsAdvancedMarkerContent } from './core/GoogleMaps';
 
 // IconButton
 export type { IconButtonProps } from './core/IconButton';
