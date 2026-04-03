@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.2](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.2%0Dv1.4.1#diff) (2026-04-03)
+
+
+### Bug Fixes
+
+* **inputbase:** sync Select input ref before change detection ([7d12147](https://github.com/rankingCoach/rc-webapp-vanguard/commits/7d12147a75e7a8ea2f028dd9fd8eac090ff2d61b)), closes [#VAN-40](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-40)
+
 ### [1.4.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.1%0Dv1.4.0#diff) (2026-03-31)
 
 ## [1.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.0%0Dv1.3.1#diff) (2026-03-26)
