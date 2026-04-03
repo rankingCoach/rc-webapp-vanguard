@@ -124,7 +124,7 @@
    .button-icon,
    [class^="icon-"] {
      transition: all $transitionTime ease-in-out;
-     padding: calc(var(--icon-padding) / 2) 2 0 calc(var(--icon-padding) / 2);
+     padding: calc(var(--icon-padding) / 2) 2px calc(var(--icon-padding) / 2) 0 ;
      box-sizing: content-box;
      font-size: var(--label-height);
      line-height: var(--label-height);
