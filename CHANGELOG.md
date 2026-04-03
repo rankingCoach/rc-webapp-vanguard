@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.5.0%0Dv1.4.2#diff) (2026-04-03)
+
+
+### Features
+
+* **Menu:** implement Menu and MenuItem components ([8a4dc03](https://github.com/rankingCoach/rc-webapp-vanguard/commits/8a4dc037f820eb8d22ee7dd15d4c469b9e437d4e))
+
 ### [1.4.2](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.2%0Dv1.4.1#diff) (2026-04-03)
 
 
