@@ -6,11 +6,10 @@ import { useFormConfig } from "@custom-hooks/useFormConfig";
 import { FormRootState, FormSLice } from "./bootstrap/form.test.slice";
 import { Story, waitForFormUpdate } from "./_Form.default";
 
-const capturedErrors: Array<string | undefined> = [];
-
 export const DeveloperPassErrorHandling: Story = {
   render: () => {
     const [isValid, setIsValid] = React.useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = React.useState<string>("(empty)");
 
     const { formConfig } = useFormConfig({
       slice: FormSLice,
@@ -27,6 +26,12 @@ export const DeveloperPassErrorHandling: Story = {
       },
     });
 
+    React.useEffect(() => {
+      const secondItemConfig = (formConfig as any).items1;
+      const nextMessage = secondItemConfig?.errors?.[0];
+      setErrorMessage(nextMessage ?? "(empty)");
+    }, [formConfig, isValid]);
+
     return (
       <div data-testid="developer-pass-error-story">
         <Form
@@ -40,22 +45,15 @@ export const DeveloperPassErrorHandling: Story = {
         </Form>
         <div data-testid="pass-error-debug">
           <span data-testid="pass-error-valid">{isValid ? "true" : "false"}</span>
-          <span data-testid="pass-error-message">{capturedErrors[1] ?? "(empty)"}</span>
+          <span data-testid="pass-error-message">{errorMessage}</span>
         </div>
       </div>
     );
   },
 
-  beforeEach: () => {
-    capturedErrors.length = 0;
-  },
-
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitForFormUpdate(200);
-
-    const secondInput = canvas.getByTestId("pass-error-1");
-    capturedErrors[1] = (secondInput as any).querySelector("input")?.getAttribute("aria-invalid") ? "Second item backend error" : undefined;
 
     await expect(canvas.getByTestId("pass-error-valid")).toHaveTextContent("false");
     await expect(canvas.getByTestId("pass-error-message")).toHaveTextContent("Second item backend error");
