@@ -799,6 +799,12 @@ export const InputBase = (props: rcInputBaseProps) => {
         doValidate(formconfig);
       }, 100);
 
+      // MUI Select updates its native input asynchronously after the change
+      // event, so eagerly sync the DOM ref to prevent getValue() reading
+      // a stale value during change detection.
+      if (formFieldType === 'Select' && formconfig._inputRef?.current) {
+        formconfig._inputRef.current.value = e.target?.value ?? '';
+      }
       // Form Callback
       formconfig?._onChange && formconfig?._onChange();
     } else {

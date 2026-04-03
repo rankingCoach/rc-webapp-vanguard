@@ -1,4 +1,4 @@
-import { ReduxGenerator } from '@helpers/redux-common';
+import { ReduxGenerator, withInitialState } from '@helpers/redux-common';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 
@@ -7,13 +7,17 @@ import { MiddleWareConfig } from '../../../../main.store.ts';
 type State = {
   textValue: string;
   colorValue: string;
+  selectedCMS: string;
 };
-const initialState: State = {
+const baseState: State = {
   textValue: '',
   colorValue: '#3366cc',
+  selectedCMS: 'WordPress',
 };
 
-const G = new ReduxGenerator<State>();
+const initialState = withInitialState(baseState);
+
+const G = new ReduxGenerator<typeof initialState>();
 export const formSlice = createSlice({
   name: 'form',
   initialState,
