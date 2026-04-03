@@ -4,15 +4,14 @@
 export * as VanguardStyle from './styles/general.module.tsx';
 
 // Export styles helpers
-export * from './styles';
-
-export { ComponentContainer } from './core/ComponentContainer/ComponentContainer.tsx';
 export type { ComponentContainerProps } from './core/ComponentContainer/ComponentContainer.tsx';
+export { ComponentContainer } from './core/ComponentContainer/ComponentContainer.tsx';
+export * from './styles';
 
 // Text
 export type { LinkReplacements, LinkReplacementsData, TextProps, TextReplacements } from './core/Text';
-export { FontWeights, Text, TextTypes } from './core/Text';
 export type { Props, SeeMoreConfig, TextWordBreak } from './core/Text';
+export { FontWeights, Text, TextTypes } from './core/Text';
 export { childrenAsText } from './core/Text';
 export type { TextHighlightedProps } from './core/TextHighlighted';
 export { TextHighlighted } from './core/TextHighlighted';
@@ -35,7 +34,7 @@ export { Button, ButtonSizes, ButtonTypes } from './core/Button';
 
 // Form
 export type { FormStatus } from './core/Form';
-export { Form, extractErrorScopes, extractSetErrorsFromConfig } from './core/Form';
+export { extractErrorScopes, extractSetErrorsFromConfig, Form } from './core/Form';
 
 // CheckBox
 export type { CheckBoxProps } from './core/CheckBox';
@@ -54,22 +53,32 @@ export type {
   InputValueProps,
 } from './core/_internal';
 export { InputBase } from './core/_internal';
-export type { InputProps } from './core/Input';
-export { Input } from './core/Input';
 export type { IMaskInputProps } from './core/IMaskInput';
 export { IMaskInput } from './core/IMaskInput';
+export type { InputProps } from './core/Input';
+export { Input } from './core/Input';
 export type { LinkProps } from './core/Link';
 export { Link } from './core/Link';
 export type { SelectOnChange, SelectOptionProp, SelectOptionProps, SelectProps } from './core/Select';
 export type { SelectOptionsComponentProps } from './core/Select';
 export { Select } from './core/Select';
+
+// Menu
+export type { MenuItemConfig, MenuProps } from './core/Menu';
+export { Menu } from './core/Menu';
+
+// MenuItem
+export type { MenuItemIconPosition, MenuItemProps } from './core/MenuItem';
+export { MenuItem } from './core/MenuItem';
+
+// Tabs
 export type { TabProps } from './core/Tabs';
 export type { TabConfig, TabsProps } from './core/Tabs';
 export { Tabs } from './core/Tabs';
 
 // Icon
 export type { IconProps } from './core/Icon';
-export { Icon, IconSize, IconNames } from './core/Icon';
+export { Icon, IconNames, IconSize } from './core/Icon';
 
 // InfoIcons
 export type { InfoIconProps } from './common/InfoIcon/InfoIcon.tsx';
@@ -86,7 +95,7 @@ export type { AccordionProps } from './core/Accordion';
 export { Accordion } from './core/Accordion';
 
 // PageSection
-export type { PageSectionProps, PageSectionWithTitle, PageSectionWithoutTitle } from './core/PageSection';
+export type { PageSectionProps, PageSectionWithoutTitle, PageSectionWithTitle } from './core/PageSection';
 export { PageSection, PageSectionBackground, PageSectionRoundedEdges } from './core/PageSection';
 
 // PageSectionLoading
@@ -100,22 +109,22 @@ export { FrostedGlass } from './core/FrostedGlass';
 
 // Modals
 export type { EditModalProps } from './core/CustomModals';
-export { FullScreenModalContainer } from './core/Modal';
 export type { ModalProps } from './core/Modal';
+export type { ModalFooterAction, ModalFooterProps, SubButtonProps } from './core/Modal';
+export type { ModalType } from './core/Modal';
+export type { ModalResponse } from './core/Modal';
+export type { ModalResponseHandler, ModalState, StandardModalProps } from './core/Modal';
+export type { ComponentWithId, ModalOpts } from './core/Modal';
+export type { Step } from './core/Modal';
+export { FullScreenModalContainer } from './core/Modal';
 export { Modal } from './core/Modal';
 export { ModalBody } from './core/Modal';
 export { ModalProvider, useModalContext } from './core/Modal';
-export type { ModalFooterAction, ModalFooterProps, SubButtonProps } from './core/Modal';
 export { ModalFooter } from './core/Modal';
-export type { ModalType } from './core/Modal';
 export { ModalHeader } from './core/Modal';
-export type { ModalResponse } from './core/Modal';
-export type { ModalResponseHandler, ModalState, StandardModalProps } from './core/Modal';
 export { ModalRoot } from './core/Modal';
-export type { ComponentWithId, ModalOpts } from './core/Modal';
 export { ModalService } from './core/Modal';
 export { ModalSplitView } from './core/Modal';
-export type { Step } from './core/Modal';
 export { ModalStepper } from './core/Modal';
 // CustomModals
 export { BigAssEditModal } from './core/CustomModals';
@@ -129,8 +138,8 @@ export { TagList } from './core/TagList';
 
 // List, ListShowMore
 export type { ListElementSchema, ListProps, ListType } from './core/List';
-export { List } from './core/List';
 export type { ListShowMoreProps } from './core/List';
+export { List } from './core/List';
 export { ListShowMore } from './core/List';
 
 // Popover
@@ -166,8 +175,8 @@ export type {
   StatusBadgeReviewStatus,
   StatusBadgeStatus,
 } from './core/StatusBadge';
-export { StatusBadge } from './core/StatusBadge';
 export type { StatusBadgeIconProps } from './core/StatusBadge';
+export { StatusBadge } from './core/StatusBadge';
 export { StatusBadgeIcon } from './core/StatusBadge';
 
 // Autocomplete
@@ -189,28 +198,19 @@ export type {
   LottieRefCurrentProps,
   PartialListener,
 } from './core/LottieAnimationLoader';
+export type { Action, Axis, InitInteractivity, InteractivityProps, Position } from './core/LottieAnimationLoader';
+export type { LottieAnimationLoaderProps, LottieAnimationType } from './core/LottieAnimationLoader';
 export { useLottie } from './core/LottieAnimationLoader';
-export type {
-  Action,
-  Axis,
-  InitInteractivity,
-  InteractivityProps,
-  Position,
-} from './core/LottieAnimationLoader';
 export {
   getContainerCursorPosition,
   getContainerVisibility,
   useInitInteractivity,
   useLottieInteractivity,
 } from './core/LottieAnimationLoader';
-export type {
-  LottieAnimationLoaderProps,
-  LottieAnimationType,
-} from './core/LottieAnimationLoader';
 // Export lottieAnimation as a dummy value for backward compatibility
 export const lottieAnimation = '';
-export { LottieAnimationLoader } from './core/LottieAnimationLoader';
 export type { LottieBaseProps } from './core/LottieAnimationLoader';
+export { LottieAnimationLoader } from './core/LottieAnimationLoader';
 export { LottieBase } from './core/LottieAnimationLoader';
 
 // Slide transition
@@ -218,9 +218,7 @@ export type { SlideTransitionProps } from './core/SlideTransition';
 export { SlideTransition } from './core/SlideTransition';
 
 // OnboardingWelcomeAnimation
-export type {
-  OnboardingWelcomeAnimationProps,
-} from './common/OnboardingWelcomeAnimation/OnboardingWelcomeAnimation.tsx';
+export type { OnboardingWelcomeAnimationProps } from './common/OnboardingWelcomeAnimation/OnboardingWelcomeAnimation.tsx';
 export { OnboardingWelcomeAnimation } from './common/OnboardingWelcomeAnimation/OnboardingWelcomeAnimation.tsx';
 
 // StyledSVG
@@ -233,10 +231,10 @@ export { AIBudgetEnd } from './common/AIBudgetEnd/AIBudgetEnd.tsx';
 
 // Avatar
 export type { KeyOfAvatarIconMap, ValueOfAvatarIconMap } from './core/Avatar';
-export { AvatarIconMap } from './core/Avatar';
 export type { AvatarIcon, AvatarProps, AvatarSize } from './core/Avatar';
-export { Avatar } from './core/Avatar';
 export type { AvatarPreloadProps } from './core/Avatar';
+export { AvatarIconMap } from './core/Avatar';
+export { Avatar } from './core/Avatar';
 export { AvatarPreload } from './core/Avatar';
 
 // AiGlow
@@ -248,14 +246,11 @@ export type { ArcGaugeProps } from './core/ArcGauge';
 export { ArcGauge } from './core/ArcGauge';
 
 // ActionBar
-export { actionBarService } from './core/ActionBar';
 export type { ActionBarProps } from './core/ActionBar';
+export type { ActionBarFooterButton, ActionBarFooterProps } from './core/ActionBar';
+export { actionBarService } from './core/ActionBar';
 export { ActionBar } from './core/ActionBar';
 export { ActionBarRoot } from './core/ActionBar';
-export type {
-  ActionBarFooterButton,
-  ActionBarFooterProps,
-} from './core/ActionBar';
 
 // ActionButton
 export type { ActionButtonProps } from './core/ActionButton';
@@ -263,8 +258,8 @@ export { ActionButton } from './core/ActionButton';
 
 // ActionCard
 export type { ActionCardProps } from './core/ActionCard';
-export { ActionCard } from './core/ActionCard';
 export type { ActionCardActionProps } from './core/ActionCard';
+export { ActionCard } from './core/ActionCard';
 export { ActionCardAction } from './core/ActionCard';
 export { ActionCardActions } from './core/ActionCard';
 export { ActionCardBody } from './core/ActionCard';
@@ -299,29 +294,25 @@ export { AvatarStack } from './core/AvatarStack';
 
 // Charts
 export type { AreaChartProps } from './core/Charts';
-export { AreaChart } from './core/Charts';
 export type { BarChartProps, BarChartSeries } from './core/Charts';
-export { BarChart } from './core/Charts';
 export type { BigLegendProps } from './core/Charts';
-export { BigLegend } from './core/Charts';
 export type { BigLegendItemProps } from './core/Charts';
+export type { ChartTabsProps } from './core/Charts';
+export type { DonutChartDirectoriesProps } from './core/Charts';
+export type { DonutChartStatisticsProps } from './core/Charts';
+export type { DonutChartProps } from './core/Charts';
+export type { HSBChartProps, HSBChartSeries, RenderBigLegendFnType } from './core/Charts';
+export type { BigLegendDataTypeBase, LineChartBaseProps, lineChartBaseSeriesType } from './core/Charts';
+export { AreaChart } from './core/Charts';
+export { BarChart } from './core/Charts';
+export { BigLegend } from './core/Charts';
 export { BigLegendItem } from './core/Charts';
 export { ChartsPlaceholder } from './core/Charts';
-export type { ChartTabsProps } from './core/Charts';
 export { ChartTabs } from './core/Charts';
-export type { DonutChartDirectoriesProps } from './core/Charts';
 export { DonutChartDirectories } from './core/Charts';
-export type { DonutChartStatisticsProps } from './core/Charts';
 export { DonutChartStatistics } from './core/Charts';
-export type { DonutChartProps } from './core/Charts';
 export { DonutChart } from './core/Charts';
-export type { HSBChartProps, HSBChartSeries, RenderBigLegendFnType } from './core/Charts';
 export { HSBChart } from './core/Charts';
-export type {
-  BigLegendDataTypeBase,
-  LineChartBaseProps,
-  lineChartBaseSeriesType,
-} from './core/Charts';
 export { LineChartBase } from './core/Charts';
 
 // ClipboardText
@@ -341,8 +332,8 @@ export { CreditCard, CreditCardType } from './core/CreditCard';
 
 // CustomDrawers
 export type { MultiSelectDrawerProps } from './core/CustomDrawers';
-export { MultiSelectDrawer } from './core/CustomDrawers';
 export type { TextEditDrawerProps } from './core/CustomDrawers';
+export { MultiSelectDrawer } from './core/CustomDrawers';
 export { TextEditDrawer } from './core/CustomDrawers';
 
 // DatePicker
@@ -353,22 +344,19 @@ export { DatePicker } from './core/DatePicker';
 export { DateRangeInput } from './core/DateRangeInput';
 
 // DateRangePicker
+export type { StaticRangeWithDefault } from './core/DateRangePicker';
+export type { DateRangePickerProps, DateRangePickerReturn, DateRangePickerState } from './core/DateRangePicker';
 export {
   areDatesEqual,
   createDatePickerRange,
   ensureIsRealDate,
   formatDateForComparison,
 } from './core/DateRangePicker';
-export type { StaticRangeWithDefault } from './core/DateRangePicker';
-export type {
-  DateRangePickerProps,
-  DateRangePickerReturn,
-  DateRangePickerState,
-} from './core/DateRangePicker';
 export { DateRangePicker } from './core/DateRangePicker';
 export { DateRangePickerIMaskInput as maskInput } from './core/DateRangePicker/DateRangePickerIMaskInput.tsx';
 
 // DateTimePicker
+export type { DateTimePickerProps } from './core/DateTimePicker';
 export {
   isBackendDateAfterNow,
   isDateTimePickerAfterNow,
@@ -378,7 +366,6 @@ export {
   mapDateTimePickerToUnix,
   mapToBackendDate,
 } from './core/DateTimePicker';
-export type { DateTimePickerProps } from './core/DateTimePicker';
 export { DateTimePicker } from './core/DateTimePicker';
 
 // Divider
@@ -386,6 +373,8 @@ export { Divider } from './core/Divider';
 
 // Documents
 export type { DocumentDataType, DocumentFileMimeType, MediaItemFileType } from './core/Documents';
+export type { DocumentDisplayProps } from './core/Documents';
+export type { DocumentUploadProps } from './core/Documents';
 export {
   CONTENT_TYPE_IMAGE_ANY,
   CONTENT_TYPE_IMAGE_JPEG,
@@ -397,9 +386,7 @@ export {
   ContentType,
   CONTENY_TYPE_APPLICATION_PDF,
 } from './core/Documents';
-export type { DocumentDisplayProps } from './core/Documents';
 export { DocumentDisplay } from './core/Documents';
-export type { DocumentUploadProps } from './core/Documents';
 export { DocumentUpload } from './core/Documents';
 
 //DragAndDropFile
@@ -408,9 +395,9 @@ export { DragAndDropFile } from './core/DragAndDropFile';
 
 //Drawer
 export type { AllowedDrawerProps, DrawerProps } from './core/Drawer';
+export type { BaseDrawerProps } from './core/Drawer';
 export { Drawer } from './core/Drawer';
 export { DrawerRoot } from './core/Drawer';
-export type { BaseDrawerProps } from './core/Drawer';
 export { DrawerService } from './core/Drawer';
 
 //DropdownMenu
@@ -459,17 +446,17 @@ export type { GlobalStateComponentProps } from './core/GlobalStateComponent';
 export { GlobalStateComponent } from './core/GlobalStateComponent';
 
 //GoogleMaps
-export { panToOffset } from './core/GoogleMaps';
 export type { GoogleMapsProps } from './core/GoogleMaps';
-export { GoogleMaps } from './core/GoogleMaps';
 export type { GoogleMapsCircleProps } from './core/GoogleMaps';
+export type { GoogleMapsMarkerProps } from './core/GoogleMaps';
+export type { GoogleMapsMarkerDefaultProps } from './core/GoogleMaps';
+export { panToOffset } from './core/GoogleMaps';
+export { GoogleMaps } from './core/GoogleMaps';
 export { GoogleMapsCircle } from './core/GoogleMaps';
 export { MarkerF } from './core/GoogleMaps';
-export type { GoogleMapsMarkerProps } from './core/GoogleMaps';
 export { GoogleMapsMarker } from './core/GoogleMaps';
-export type { GoogleMapsMarkerDefaultProps } from './core/GoogleMaps';
 export { GoogleMapsMarkerDefault } from './core/GoogleMaps';
-export { defaultMarkerIcon, defaultGoogleMarker } from './core/GoogleMaps';
+export { defaultGoogleMarker, defaultMarkerIcon } from './core/GoogleMaps';
 
 // IconButton
 export type { IconButtonProps } from './core/IconButton';
@@ -515,10 +502,10 @@ export { ListLoader } from './core/ListLoader';
 export { Loader } from './core/Loader';
 
 // Notification
-export { ContentPlaceholder } from './core/Notification';
 export type { NotificationProps } from './core/Notification';
-export { Notification } from './core/Notification';
 export type { NotificationActionProps } from './core/Notification';
+export { ContentPlaceholder } from './core/Notification';
+export { Notification } from './core/Notification';
 export { NotificationAction } from './core/Notification';
 export { NotificationReview } from './core/Notification';
 export { NotificationSocialPost } from './core/Notification';
@@ -569,8 +556,8 @@ export { RcNavLink } from './core/RcNavLink';
 // RichTextEditor
 export type { RichTextEditorProps } from './core/RichTextEditor';
 export { RichTextEditor } from './core/RichTextEditor';
-export { sanitizeHtml } from './helpers/sanitize-html';
 export type { SanitizeHtmlOptions } from './helpers/sanitize-html';
+export { sanitizeHtml } from './helpers/sanitize-html';
 
 // SearchableSelect
 export type { SearchableSelectProps } from './core/SearchableSelect';
@@ -604,29 +591,23 @@ export { LoadingModal } from './core/StandardModals';
 export { SuccessModal } from './core/StandardModals';
 
 // StarRating
-export { Star } from './core/StarRating';
 export type { StarValueChangedEventHandler } from './core/StarRating';
 export type { StarRatingProps } from './core/StarRating';
+export { Star } from './core/StarRating';
 export { StarRating } from './core/StarRating';
 
 // Table
-export type {
-  TableColumnProps,
-  TableDataProps,
-  TableOptionsProps,
-  TableProps,
-  TableRowProps,
-} from './core/Table';
-export { Table } from './core/Table';
+export type { TableColumnProps, TableDataProps, TableOptionsProps, TableProps, TableRowProps } from './core/Table';
 export type { TableBodyProps } from './core/Table';
-export { TableBody } from './core/Table';
 export type { TableCellProps } from './core/Table';
-export { TableCell } from './core/Table';
 export type { TableFooterProps } from './core/Table';
-export { TableFooter } from './core/Table';
 export type { TableHeaderProps } from './core/Table';
-export { TableHeader } from './core/Table';
 export type { CtaWithIconProps } from './core/Table';
+export { Table } from './core/Table';
+export { TableBody } from './core/Table';
+export { TableCell } from './core/Table';
+export { TableFooter } from './core/Table';
+export { TableHeader } from './core/Table';
 export { CtaWithIcon } from './core/Table';
 
 // TimePicker
@@ -649,8 +630,8 @@ export { videoPlayerService } from './core/VideoPlayer';
 export { isYouTubeUrl } from './core/VideoPlayer';
 
 //Header
-export { Header, HeaderTypes } from './core/Header';
 export type { HeaderProps } from './core/Header';
+export { Header, HeaderTypes } from './core/Header';
 
 /**
  * Custom hooks
