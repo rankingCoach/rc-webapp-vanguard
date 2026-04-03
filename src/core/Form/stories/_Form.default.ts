@@ -14,6 +14,9 @@ export const createMockInputNumberChange = () => fn();
 export const createMockInputEmailChange = () => fn();
 export const createMockDatePickerChange = () => fn();
 export const createMockInputPasswordChange = () => fn();
+export const createMockCheckBoxChange = () => fn();
+export const createMockTextareaInputChange = () => fn();
+export const createMockPhoneNumberChange = () => fn();
 
 // Test utilities
 export const waitForFormUpdate = (ms: number = 100) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -65,4 +68,6 @@ export const selectors = {
   debugSection: '.debug-section',
   textarea: '[data-testid="test-id"]',
   textField: '[data-testid="base-text-field"]',
+  phoneNumber: '[data-testid="phone-number-input"]',
+  checkbox: '[data-testid="form-checkbox"]',
 } as const;

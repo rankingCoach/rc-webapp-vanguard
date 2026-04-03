@@ -59,7 +59,7 @@ export const WithOnChange: Story = {
 
     // Find and interact with input
     const inputWrapper = canvas.getByTestId("test-input");
-    const input = inputWrapper.querySelector('input[type="text"]') as HTMLInputElement;
+    const input = within(inputWrapper).getByRole("textbox") as HTMLInputElement;
     await expect(input).toBeInTheDocument();
 
     // Type in the input

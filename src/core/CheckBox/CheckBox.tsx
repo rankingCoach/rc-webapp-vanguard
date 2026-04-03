@@ -154,12 +154,20 @@ export const CheckBox = (props: CheckBoxProps) => {
    * Function: Toggle Checkbox
    */
   const toggleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsChecked((prev) => !prev);
+    const nextChecked = e.currentTarget.checked;
+
+    setIsChecked(nextChecked);
+
+    if (checkboxRef?.current) {
+      checkboxRef.current.checked = nextChecked;
+    }
 
     // Dispatch value to formConfig
     if (formconfig?.setStateValue) {
-      dispatch(formconfig.setStateValue(!isChecked));
+      dispatch(formconfig.setStateValue(nextChecked));
     }
+
+    formconfig?._onChange?.(e);
 
     // Callback
     onChange && onChange(e);

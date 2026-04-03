@@ -8,11 +8,21 @@ type State = {
   textValue: string;
   colorValue: string;
   selectedCMS: string;
+  termsAccepted: boolean;
+  notes: string;
+  phoneNumber: string;
+  items: string[];
+  itemErrors: Array<string | undefined>;
 };
 const baseState: State = {
   textValue: '',
   colorValue: '#3366cc',
   selectedCMS: 'WordPress',
+  termsAccepted: false,
+  notes: '',
+  phoneNumber: '9876543210',
+  items: ['first item', 'second item'],
+  itemErrors: [undefined, undefined],
 };
 
 const initialState = withInitialState(baseState);

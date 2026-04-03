@@ -87,13 +87,11 @@ export const SelectChangeDetection: Story = {
 
     // --- FIRST CHANGE: WordPress → Drupal ---
     const selectWrapper = canvas.getByTestId('cms-select-wrapper');
-    // MUI Select: click to open the dropdown
-    const selectButton = selectWrapper.querySelector('[role="combobox"]') as HTMLElement;
+    const selectButton = within(selectWrapper).getByRole('combobox');
     await userEvent.click(selectButton);
     await waitForFormUpdate(200);
 
-    // Select "Drupal" from the dropdown
-    const drupalListbox = document.querySelector('[role="listbox"]') as HTMLElement;
+    const drupalListbox = await within(canvasElement.ownerDocument.body).findByRole('listbox');
     const drupalOption = await within(drupalListbox).findByText('Drupal');
     await userEvent.click(drupalOption);
     await waitForFormUpdate(500);
@@ -117,7 +115,7 @@ export const SelectChangeDetection: Story = {
     await userEvent.click(selectButton);
     await waitForFormUpdate(200);
 
-    const listbox = document.querySelector('[role="listbox"]') as HTMLElement;
+    const listbox = await within(canvasElement.ownerDocument.body).findByRole('listbox');
     const wixOption = await within(listbox).findByText('Wix');
     await userEvent.click(wixOption);
     await waitForFormUpdate(500);
