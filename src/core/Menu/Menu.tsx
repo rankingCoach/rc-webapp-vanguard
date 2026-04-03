@@ -2,6 +2,8 @@ import { Menu as MuiMenu, MenuProps as MuiMenuProps } from '@mui/material';
 import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';
 import React from 'react';
 
+import styles from './Menu.module.scss';
+
 export type MenuItemConfig = MenuItemProps & {
   key?: React.Key;
 };
@@ -25,7 +27,7 @@ export const Menu = ({ testId, items, children, width, height, maxWidth, maxHeig
     : rest.slotProps;
 
   return (
-    <MuiMenu data-testid={testId} {...rest} slotProps={slotProps}>
+    <MuiMenu data-testid={testId} {...rest} slotProps={slotProps} className={styles.menu}>
       {items ? items.map(({ key, ...itemProps }, index) => <MenuItem key={key ?? index} {...itemProps} />) : children}
     </MuiMenu>
   );

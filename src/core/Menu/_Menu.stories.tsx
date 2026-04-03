@@ -199,7 +199,23 @@ export const MaxHeight: Story = {
 };
 
 export const FixedWidthAndHeight: Story = {
-  render: () => <ControlledMenu width={600} height={400} />,
+  render: () => <ControlledMenu width={600} height={400} items={[
+    { key: 'edit', children: 'Edit project details', icon: IconNames.edit, iconPosition: 'before' },
+    { key: 'share', children: 'Share with team', icon: IconNames.share, iconPosition: 'before' },
+    { key: 'export', children: 'Export data', icon: IconNames.download, iconPosition: 'before' },
+    { key: 'archive', children: 'Archive project', icon: IconNames.document, iconPosition: 'before' },
+    { key: 'delete', children: 'Delete project', icon: IconNames.trash, iconPosition: 'after', disabled: true },
+    { key: 'edit', children: 'Edit project details', icon: IconNames.edit, iconPosition: 'before' },
+    { key: 'share', children: 'Share with team', icon: IconNames.share, iconPosition: 'before' },
+    { key: 'export', children: 'Export data', icon: IconNames.download, iconPosition: 'before' },
+    { key: 'archive', children: 'Archive project', icon: IconNames.document, iconPosition: 'before' },
+    { key: 'delete', children: 'Delete project', icon: IconNames.trash, iconPosition: 'after', disabled: true },
+    { key: 'edit', children: 'Edit project details', icon: IconNames.edit, iconPosition: 'before' },
+    { key: 'share', children: 'Share with team', icon: IconNames.share, iconPosition: 'before' },
+    { key: 'export', children: 'Export data', icon: IconNames.download, iconPosition: 'before' },
+    { key: 'archive', children: 'Archive project', icon: IconNames.document, iconPosition: 'before' },
+    { key: 'delete', children: 'Delete project', icon: IconNames.trash, iconPosition: 'after', disabled: true },
+  ]} />,
 };
 
 export const WideWithIcons: Story = {
