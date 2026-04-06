@@ -76,7 +76,6 @@
  .button {
    --padding-y: #{$x1 + $x0_5};
    --padding-x: #{$x2};
-   --icon-padding: #{$x1+$x0_5};
    --label-height: #{$x2};
    --letter-spacing: 0.04em;
    --border-radius: var(--buttons-border-radius, #{$x0_5});
@@ -99,7 +98,6 @@
    @include media('>mobile') {
      --padding-y: #{$x2};
      --padding-x: #{$x3};
-     --icon-padding: #{$x2};
    }
  
    // =========================== ELEMENTS ===========================
@@ -124,7 +122,6 @@
    .button-icon,
    [class^="icon-"] {
      transition: all $transitionTime ease-in-out;
-     padding: calc(var(--icon-padding) / 2) 2px calc(var(--icon-padding) / 2) 0 ;
      box-sizing: content-box;
      font-size: var(--label-height);
      line-height: var(--label-height);
@@ -339,7 +336,6 @@
      @include media('>mobile') {
        --padding-y: #{$x1};
        --padding-x: #{$x2};
-       --icon-padding: #{$x2};
      }
    }
  
@@ -348,13 +344,10 @@
    &.size-large {
      --padding-y: #{$x2};
      --padding-x: #{$x3};
-     --icon-padding: #{$x2};
  
      @include media('>mobile') {
        --padding-y: #{$x2_5};
        --padding-x: #{$x4};
-       --icon-padding: #{$x2};
-       --icon-padding: #{$x2_5};
        --letter-spacing: 0.02em;
        --label-height: #{$x2_5};
      }
