@@ -795,7 +795,6 @@ export const InputBase = (props: rcInputBaseProps) => {
 
       // Validate field
       debounce(() => {
-        console.log('VALIDATIIIIIING');
         doValidate(formconfig);
       }, 100);
 

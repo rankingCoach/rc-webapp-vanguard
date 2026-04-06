@@ -3,7 +3,7 @@ import { capitalizeFirstLetter } from '@helpers/string-helpers';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { ErrorsKeys } from '@helpers/validators/valid-input/validate-input-errors';
 import { extractSetErrorsFromConfig } from '@vanguard/Form/FormElement/extract-set-errors-from-config';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export type FormElementChildChange = {
   name: string;
@@ -63,15 +63,15 @@ export const FormElement = (props: FormElementProps) => {
     }
   }, [errorsByDev]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     return () => {
       childRemoved && childRemoved(childConfig);
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     childAdded && childAdded(childConfig);
-  }, [childConfig]);
+  }, []);
 
   const bindStateVars = (childFormConfig: FormConfigElement) => {
     const stringKey = childFormConfig.stateFieldName;

@@ -5,6 +5,7 @@ import { combineReducers } from 'redux';
 import { MiddleWareConfig } from '../../../../main.store.ts';
 
 type State = {
+  aliasField: string;
   textValue: string;
   colorValue: string;
   selectedCMS: string;
@@ -15,6 +16,7 @@ type State = {
   itemErrors: Array<string | undefined>;
 };
 const baseState: State = {
+  aliasField: '',
   textValue: '',
   colorValue: '#3366cc',
   selectedCMS: 'WordPress',

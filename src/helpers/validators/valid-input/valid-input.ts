@@ -324,7 +324,7 @@ export const validInput = (formConfig?: FormConfigElement | null, validateOnlyPo
     formConfig.fieldType === 'InputBase' ||
     formConfig.fieldType === 'ColorPicker'
   ) {
-    const { validatePhone, validatePhoneNumberForCountry, validateEmail, validateHexColor } =
+    const { email, validatePhone, validatePhoneNumberForCountry, validateEmail, validateHexColor } =
       formConfig.validation as FormConfigSpecificValidation;
 
     if (value && validatePhone) {
@@ -339,7 +339,7 @@ export const validInput = (formConfig?: FormConfigElement | null, validateOnlyPo
       }
     }
 
-    if (value && validateEmail) {
+    if (value && (validateEmail || email)) {
       if (!REGEX.email.test(value)) {
         return setFieldValidity(formConfig, false, ErrorsKeys.INVALID_EMAIL, validateOnlyPositive);
       }

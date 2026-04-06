@@ -178,13 +178,16 @@ export class ReduxGenerator<T extends {}> {
       const { el, idx } = payload;
       const keyStr = key as string;
       //@ts-ignore
-      const toModify = state[keyStr][idx];
-      if (toModify) {
-        for (const key in toModify) {
+      const currentValue = state[keyStr][idx];
+      if (Array.isArray(state[keyStr])) {
+        //@ts-ignore
+        state[keyStr][idx] = el as Draft<T[keyof T]>;
+      } else if (currentValue && typeof currentValue === 'object' && el && typeof el === 'object') {
+        for (const key in currentValue) {
           //@ts-ignore
           if (el[key] !== undefined) {
             //@ts-ignore
-            toModify[key] = el[key];
+            currentValue[key] = el[key];
           }
         }
       }

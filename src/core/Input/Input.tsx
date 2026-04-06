@@ -1,4 +1,4 @@
-import { FormFieldType } from '@custom-hooks/useFormConfig';
+import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import { TextFieldProps } from '@mui/material';
 import {
   InputAdornmentProps,
@@ -23,6 +23,7 @@ export type InputProps = {
   isLoading?: boolean;
   loadingText?: string;
   textFieldProps?: TextFieldProps;
+  formConfig?: FormConfigElement;
 } & InputValueProps &
   InputCounterProps &
   InputHighlightsProps &
@@ -32,7 +33,7 @@ export type InputProps = {
   InputAdornmentProps;
 
 export const Input = (props: InputProps) => {
-  const { className, inputClassName, type = 'text', testId } = props;
+  const { className, inputClassName, type = 'text', testId, formConfig, ...rest } = props;
 
   const fieldType: FormFieldType = useMemo(() => (type === 'number' ? 'InputNumber' : 'Input'), [type]);
 
@@ -46,7 +47,8 @@ export const Input = (props: InputProps) => {
         formFieldType={fieldType}
         type={type}
         multiline={false}
-        {...props}
+        {...rest}
+        formconfig={rest.formconfig ?? formConfig}
         className={inputClassName}
       />
     </ComponentContainer>

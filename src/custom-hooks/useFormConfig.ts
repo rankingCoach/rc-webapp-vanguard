@@ -165,28 +165,28 @@ export function useFormConfig<T>(config: Options<T>): {
     // Internal inputs
     //@ts-ignore
     inputs['_addInternalInput'] = (input: FormConfigElement) => {
-      if (input.stateFieldName) {
-        let idx = '';
-        if (input.arrayPosition) {
-          idx = `${input.arrayPosition}`;
-        }
-        //@ts-ignore
-        internalInputs.current[input.stateFieldName + idx] = input;
-        //@ts-ignore
-        inputs[input.stateFieldName + idx] = input;
-      }
-      //@ts-ignore
-      inputs['_removeInternalInput'] = (input: FormConfigElement) => {
         if (input.stateFieldName) {
           let idx = '';
-          if (input.arrayPosition) {
+          if (input.arrayPosition !== undefined) {
             idx = `${input.arrayPosition}`;
           }
           //@ts-ignore
-          delete internalInputs.current[input.stateFieldName + idx];
+          internalInputs.current[input.stateFieldName + idx] = input;
           //@ts-ignore
-          delete inputs[input.stateFieldName + idx];
+          inputs[input.stateFieldName + idx] = input;
         }
+      //@ts-ignore
+        inputs['_removeInternalInput'] = (input: FormConfigElement) => {
+          if (input.stateFieldName) {
+            let idx = '';
+            if (input.arrayPosition !== undefined) {
+              idx = `${input.arrayPosition}`;
+            }
+            //@ts-ignore
+            delete internalInputs.current[input.stateFieldName + idx];
+            //@ts-ignore
+            delete inputs[input.stateFieldName + idx];
+          }
       };
       //@ts-ignore
       inputs['_internalInputs'] = internalInputs;

@@ -38,7 +38,16 @@ export const ChildRemovalValidationRecovery: Story = {
   render: () => {
     const [showInvalidChild, setShowInvalidChild] = React.useState(true);
     const [isValid, setIsValid] = React.useState(true);
+    const [registeredCount, setRegisteredCount] = React.useState(0);
     const formConfig = React.useMemo(() => createManualFormConfig(), []);
+
+    React.useEffect(() => {
+      const timeoutId = window.setTimeout(() => {
+        setRegisteredCount(Object.keys(formConfig._internalInputs.current).length);
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }, [formConfig, isValid, showInvalidChild]);
 
     return (
       <div data-testid="child-removal-story">
@@ -59,7 +68,7 @@ export const ChildRemovalValidationRecovery: Story = {
         </Form>
         <div data-testid="child-removal-debug">
           <span data-testid="child-removal-valid">{isValid ? "true" : "false"}</span>
-          <span data-testid="child-removal-count">{Object.keys(formConfig._internalInputs.current).length}</span>
+          <span data-testid="child-removal-count">{registeredCount}</span>
         </div>
       </div>
     );
@@ -69,6 +78,7 @@ export const ChildRemovalValidationRecovery: Story = {
     const canvas = within(canvasElement);
     const user = userEvent.setup();
 
+    await waitForFormUpdate(50);
     await expect(canvas.getByTestId("child-removal-count")).toHaveTextContent("1");
     await user.click(canvas.getByTestId("toggle-invalid-child"));
     await waitForFormUpdate(200);

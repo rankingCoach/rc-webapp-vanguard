@@ -58,46 +58,10 @@ export const getTestElements = async (
 };
 
 export const getErrorDisplayAfterError = async (canvasElement: HTMLElement): Promise<HTMLElement> => {
-  // Wait for error state to be established before searching for error display
   await new Promise((resolve) => setTimeout(resolve, 300));
 
   const canvas = within(canvasElement);
-
-  // Debug: Log DOM state before attempting to find error element
-  console.log('[getErrorDisplayAfterError] Starting search for error element...');
-
-  const allElements = canvasElement.querySelectorAll('[data-testid]');
-  console.log(
-    '[getErrorDisplayAfterError] Available test IDs:',
-    Array.from(allElements).map((el) => el.getAttribute('data-testid')),
-  );
-
-  // Check if there are any error-related elements
-  const errorElements = canvasElement.querySelectorAll(
-    '.vanguard-input-error-text, [class*="error"], [data-testid*="error"]',
-  );
-  console.log('[getErrorDisplayAfterError] Error-related elements found:', errorElements.length);
-  if (errorElements.length > 0) {
-    Array.from(errorElements).forEach((el, index) => {
-      console.log(`[getErrorDisplayAfterError] Error element ${index}:`, {
-        tagName: el.tagName,
-        className: el.className,
-        testId: el.getAttribute('data-testid'),
-        textContent: el.textContent,
-      });
-    });
-  }
-
-  // Log a portion of the HTML for debugging
-  console.log('[getErrorDisplayAfterError] Container HTML (first 1000 chars):', canvasElement.innerHTML.slice(0, 1000));
-
-  // Try to find the error element with a timeout
-  try {
-    return await canvas.findByTestId('vanguard-input-error-text', {}, { timeout: 2000 });
-  } catch (error) {
-    console.log('[getErrorDisplayAfterError] Error element not found after search');
-    throw error;
-  }
+  return await canvas.findByTestId('vanguard-input-error-text', {}, { timeout: 2000 });
 };
 
 // User interaction helpers
@@ -164,39 +128,25 @@ export const expectErrorToContain = async (
   expectedText: string,
   variables: Record<string, string | number> = {},
 ): Promise<void> => {
-  // Try to find the error element directly using canvas first
   try {
     const errorDisplay = await canvas.findByTestId('vanguard-input-error-text', {}, { timeout: 2000 });
     const actualText = errorDisplay.textContent ?? '';
-    // Debug logs to aid diagnosing failures in CI output
-    console.log('[expectErrorToContain] actual:', actualText);
-    console.log('[expectErrorToContain] expected:', expectedText);
 
-    // If the expected text contains variables, use regex matching
     if (expectedText.includes('%')) {
       const expectedPattern = replaceVariablePatterns(expectedText, variables);
       const regex = new RegExp(expectedPattern, 'i');
-      console.log('[expectErrorToContain] regex:', expectedPattern);
       await expect(actualText).toMatch(regex);
       return;
     }
 
-    // Many validations use translation keys (e.g. "validation_validate-email").
-    // The Text component will translate those keys to human-readable messages.
-    // Accept match if either the raw key OR its translated value appears in the UI.
     try {
       await expect(actualText).toContain(expectedText);
-      // matched raw expected string
     } catch {
-      // try translated value
       try {
-        // Lazy import to avoid cyclical deps in tests
         const { translationService } = await import('@services/translation.service');
         const translated = translationService.get(expectedText, variables as any).value;
-        console.log('[expectErrorToContain] translated:', translated);
         await expect(actualText).toContain(translated);
       } catch (e) {
-        // Re-throw original assertion with more context
         throw new Error(
           `Expected error text to contain "${expectedText}" (or its translation), but got: "${actualText}".\nInner: ${
             (e as Error)?.message || e
@@ -204,8 +154,7 @@ export const expectErrorToContain = async (
         );
       }
     }
-  } catch (findError) {
-    console.log('[expectErrorToContain] Error element not found:', findError);
+  } catch {
     throw new Error('Error element with testId "vanguard-input-error-text" not found');
   }
 };

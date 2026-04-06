@@ -75,6 +75,7 @@ export type FormConfigAutocompleteValidation = {
  * Specific type of value: Phone / Email / HEX Color
  */
 export type FormConfigSpecificValidation = {
+  email?: boolean;
   validatePhone?: boolean;
   validatePhoneNumberForCountry?: CountryCode;
   validateEmail?: boolean;

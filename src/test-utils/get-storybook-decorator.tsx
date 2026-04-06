@@ -5,7 +5,6 @@ import { ModalRoot } from '@vanguard/Modal/ModalRoot/ModalRoot.tsx';
 import { SnackbarRoot } from '@vanguard/SnackbarRoot/SnackbarRoot.tsx';
 import React from 'react';
 import { Provider } from 'react-redux';
-import logger from 'redux-logger';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
@@ -79,7 +78,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(logger),
+    }),
 });
 export const storybookMockStore = store;
 export const storeNonPersist = configureStore({
@@ -87,7 +86,7 @@ export const storeNonPersist = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(logger),
+    }),
 });
 
 export const SbDecorator = (sbArgs: StorybookDecorator, a?: any) => {

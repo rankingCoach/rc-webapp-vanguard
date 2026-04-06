@@ -59,7 +59,7 @@ export const Form = <T,>(props: Props<T>) => {
       formConfig = propsAsAny.formconfig || propsAsAny.formConfig;
     }
 
-    return Object.assign({}, formConfig);
+    return formConfig ? Object.assign({}, formConfig) : null;
   };
 
   const extractFormConfigKey = (
@@ -77,7 +77,8 @@ export const Form = <T,>(props: Props<T>) => {
     let hasError = false;
     if (config && config._internalInputs) {
       for (const key in config._internalInputs.current) {
-        if (!validInput(config._internalInputs.current[key].config)) {
+        const inputConfig = config._internalInputs.current[key]?.config ?? config._internalInputs.current[key];
+        if (inputConfig && !validInput(inputConfig)) {
           hasError = true;
         }
       }
@@ -102,8 +103,27 @@ export const Form = <T,>(props: Props<T>) => {
       };
     });
   };
+  const childAdded = (element: FormConfigElement) => {
+    if (config) {
+      config._addInternalInput && config._addInternalInput(element);
+    }
+
+    setStatus((prev) => {
+      return {
+        isValid: prev.isValid,
+        hasChanges: prev.hasChanges,
+        inputsChanges: prev.inputsChanges,
+        inputsStatus: prev.inputsStatus,
+        currentConfig: element,
+      };
+    });
+  };
 
   const childChange = (childChanges: FormElementChildChange) => {
+    if (!childChanges?.childFormConfig?.stateFieldName) {
+      return;
+    }
+
     // console.log("---------------------------------------");
     // console.log("   field  | ", input.stateFieldName);
     // console.log("is dirty  | ", fieldChanged, input.isDirty);
@@ -152,7 +172,6 @@ export const Form = <T,>(props: Props<T>) => {
         let idx = undefined;
         const childConfig = extractFormConfig(child);
         const formConfigKey = extractFormConfigKey(child);
-        const stringKey = childConfig.stateFieldName;
         const propsAsAny = child?.props as any;
 
         if (!childConfig || !childConfig.stateFieldName || !formConfigKey) {
@@ -164,6 +183,7 @@ export const Form = <T,>(props: Props<T>) => {
           return child;
         }
 
+        const stringKey = childConfig.stateFieldName;
         if (childConfig.isArray && stringKey) {
           //@ts-ignore
           if (idxMap[stringKey] !== undefined) {
@@ -184,11 +204,7 @@ export const Form = <T,>(props: Props<T>) => {
             formConfigKey={formConfigKey}
             formConfig={config}
             idx={idx}
-            childAdded={(element) => {
-              if (config) {
-                config._addInternalInput && config._addInternalInput(element);
-              }
-            }}
+            childAdded={childAdded}
             childRemoved={childRemoved}
           >
             {child}
@@ -202,7 +218,7 @@ export const Form = <T,>(props: Props<T>) => {
    * Return View
    */
   return (
-    <FormConfigProvider formConfig={config || null} parentOnChange={onChange}>
+    <FormConfigProvider formConfig={config || null} parentOnChange={effectiveOnChange}>
       <ComponentContainer className={`Form-container ${className}`}>{childrenWithProps(children)}</ComponentContainer>
     </FormConfigProvider>
   );

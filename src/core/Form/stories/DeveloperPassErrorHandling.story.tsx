@@ -27,10 +27,9 @@ export const DeveloperPassErrorHandling: Story = {
     });
 
     React.useEffect(() => {
-      const secondItemConfig = (formConfig as any).items1;
-      const nextMessage = secondItemConfig?.errors?.[0];
-      setErrorMessage(nextMessage ?? "(empty)");
-    }, [formConfig, isValid]);
+      const configuredError = Array.isArray(formConfig.items?.passError) ? formConfig.items.passError[1] : undefined;
+      setErrorMessage(configuredError ?? "(empty)");
+    }, [formConfig]);
 
     return (
       <div data-testid="developer-pass-error-story">

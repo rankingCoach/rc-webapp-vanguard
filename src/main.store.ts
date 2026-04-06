@@ -1,5 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import logger from 'redux-logger';
 import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
@@ -22,7 +21,7 @@ export const MiddleWareConfig = (getDefaultMiddleware: any) =>
       ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       ignoredActionPaths: ['register', 'rehydrate'],
     },
-  }).concat(logger); //.concat(logger),
+  });
 
 export type RootState = ReturnType<typeof reducers>;
 export const Reducer = persistReducer(persist, reducers);
