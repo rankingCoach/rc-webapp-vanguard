@@ -47,6 +47,7 @@ export const ArrayInputsChangeTracking: Story = {
           <span data-testid="array-latest-field">{latestField}</span>
           <span data-testid="array-inputs-changes">{latestInputsChanges}</span>
           <span data-testid="array-store-values">{JSON.stringify(items)}</span>
+          <span data-testid="array-form-valid">{JSON.stringify(items).includes("\"\"") ? "false" : "true"}</span>
         </div>
       </div>
     );
@@ -66,16 +67,17 @@ export const ArrayInputsChangeTracking: Story = {
     await waitForFormUpdate(200);
 
     await expect(canvas.getByTestId("array-latest-field")).toHaveTextContent("items:0");
+    await expect(canvas.getByTestId("array-inputs-changes")).toHaveTextContent('"items":true');
     await expect(canvas.getByTestId("array-inputs-changes")).toHaveTextContent('"items0":true');
     await expect(canvas.getByTestId("array-store-values")).toHaveTextContent("updated first");
 
     await user.clear(secondInput);
-    await user.type(secondInput, "updated second");
+    await user.type(secondInput, "x");
     await user.tab();
     await waitForFormUpdate(200);
 
     await expect(canvas.getByTestId("array-latest-field")).toHaveTextContent("items:1");
     await expect(canvas.getByTestId("array-inputs-changes")).toHaveTextContent('"items1":true');
-    await expect(canvas.getByTestId("array-store-values")).toHaveTextContent("updated second");
+    await expect(canvas.getByTestId("array-store-values")).toHaveTextContent("x");
   },
 };

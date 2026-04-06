@@ -76,5 +76,11 @@ export const ChildRemovalValidationRecovery: Story = {
     await expect(canvas.getByTestId("removed-placeholder")).toBeInTheDocument();
     await expect(canvas.getByTestId("child-removal-count")).toHaveTextContent("0");
     await expect(canvas.getByTestId("child-removal-valid")).toHaveTextContent("true");
+
+    await user.click(canvas.getByTestId("toggle-invalid-child"));
+    await waitForFormUpdate(200);
+
+    await expect(canvas.getByTestId("removable-invalid-input")).toBeInTheDocument();
+    await expect(canvas.getByTestId("child-removal-count")).toHaveTextContent("1");
   },
 };

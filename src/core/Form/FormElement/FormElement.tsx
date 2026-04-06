@@ -101,21 +101,17 @@ export const FormElement = (props: FormElementProps) => {
       let stateValue = reduxData[stringKey];
 
       if (idx !== undefined) {
-        stateValue = stateValue[idx];
+        stateValue = stateValue?.[idx];
         childFormConfig.arrayPosition = idx;
       }
 
-      if (childFormConfig) {
-        if (childFormConfig.valueMappers?.toPrimitive) {
-          stateValue = childFormConfig.valueMappers.toPrimitive(stateValue);
-        }
+      if (childFormConfig.valueMappers?.toPrimitive) {
+        stateValue = childFormConfig.valueMappers.toPrimitive(stateValue);
       }
 
       childFormConfig.stateValue = stateValue;
       childFormConfig.setStateValue = setStateValue;
       childFormConfig.setStateValueArray = setStateValueArray;
-
-      childFormConfig.setStateValue && childFormConfig.setStateValue(stateValue);
     }
   };
 

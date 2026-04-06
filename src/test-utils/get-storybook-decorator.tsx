@@ -4,6 +4,7 @@ import { ModalProvider } from '@vanguard/Modal/ModalContext.tsx';
 import { ModalRoot } from '@vanguard/Modal/ModalRoot/ModalRoot.tsx';
 import { SnackbarRoot } from '@vanguard/SnackbarRoot/SnackbarRoot.tsx';
 import React from 'react';
+import { Provider } from 'react-redux';
 import logger from 'redux-logger';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -19,6 +20,7 @@ export const removeVerifiedDecorator: Decorator = (storyFn, context) => {
 export type StorybookDecorator = {
   title: string;
   component: React.ReactNode | any;
+  render?: (args: any) => React.ReactNode;
   subcomponents?: Record<string, React.ReactNode>; //ðŸ‘ˆ Adds the ReactNode component as a subcomponent
   extra?: any;
   mocks?: any[];
@@ -89,7 +91,8 @@ export const storeNonPersist = configureStore({
 });
 
 export const SbDecorator = (sbArgs: StorybookDecorator, a?: any) => {
-  const { title, component, subcomponents, extra, mocks, opts } = sbArgs;
+  const { title, component, render, subcomponents, extra, mocks, opts } = sbArgs;
+  const isVitestRun = typeof process !== 'undefined' && process.env.VITEST === 'true';
   if (title.charAt(0) === '.') {
     throw new Error(`${title} is not a valid storybook title`);
   }
@@ -103,10 +106,24 @@ export const SbDecorator = (sbArgs: StorybookDecorator, a?: any) => {
     opts.withRedux = true;
   }
 
+  const renderWithChrome = (Story: any) => (
+    <div
+      className={'react-container'}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Story />
+    </div>
+  );
+
   const toRet = {
     title: title,
     component: component,
     subcomponents: subcomponents,
+    ...(render ? { render } : {}),
     ...extra,
     parameters: {
       ...(opts?.description && {
@@ -127,43 +144,37 @@ export const SbDecorator = (sbArgs: StorybookDecorator, a?: any) => {
     decorators: [
       removeVerifiedDecorator,
       opts?.withRedux
-        ? (Story: any) => (
-            <PersistGates
-              customStore={opts?.customStore ? opts.customStore : store}
-              shouldPersist={opts?.shouldPersist}
-            >
+        ? (Story: any) => {
+            if (isVitestRun) {
+              return <Provider store={opts?.customStore ? opts.customStore : store}>{renderWithChrome(Story)}</Provider>;
+            }
+
+            return (
+              <PersistGates
+                customStore={opts?.customStore ? opts.customStore : store}
+                shouldPersist={opts?.shouldPersist}
+              >
+                <ModalProvider>
+                  <ModalRoot />
+                  <SnackbarRoot />
+                  {renderWithChrome(Story)}
+                </ModalProvider>
+              </PersistGates>
+            );
+          }
+        : (Story: any) => {
+            if (isVitestRun) {
+              return renderWithChrome(Story);
+            }
+
+            return (
               <ModalProvider>
                 <ModalRoot />
                 <SnackbarRoot />
-                <div
-                  className={'react-container'}
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Story />
-                </div>
+                {renderWithChrome(Story)}
               </ModalProvider>
-            </PersistGates>
-          )
-        : (Story: any) => (
-            <ModalProvider>
-              <div
-                className={'react-container'}
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ModalRoot />
-                <SnackbarRoot />
-                <Story />
-              </div>
-            </ModalProvider>
-          ),
+            );
+          },
       // withMock,
     ],
   };
