@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.6.0%0Dv1.5.1#diff) (2026-04-06)
+
+
+### Features
+
+* **Button:** remove icon padding variables ([8bb5528](https://github.com/rankingCoach/rc-webapp-vanguard/commits/8bb55284cf13a3676f7c9a67229b7dc4bbf24e29))
+
 ### [1.5.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.5.1%0Dv1.5.0#diff) (2026-04-03)
 
 ## [1.5.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.5.0%0Dv1.4.2#diff) (2026-04-03)
