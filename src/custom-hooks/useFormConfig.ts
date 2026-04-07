@@ -151,6 +151,10 @@ export function useFormConfig<T>(config: Options<T>): {
       },
       initialValue: reduxData['initialState'] ? reduxData['initialState'][stringKey] : null, // reduxData["initialState"][stringKey]
       getInitialValue: function () {
+        if (this.isArray && this.arrayPosition !== undefined && Array.isArray(this.initialValue)) {
+          return this.initialValue[this.arrayPosition];
+        }
+
         return this.initialValue;
       },
       //
