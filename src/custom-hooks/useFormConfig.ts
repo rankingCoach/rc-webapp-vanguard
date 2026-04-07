@@ -238,9 +238,11 @@ export function useFormConfig<T>(config: Options<T>): {
     const data: T = {} as any;
     for (const key in internalInputs.current) {
       //@ts-ignore
-      if (internalInputs.current[key]?.isDirty) {
+      const input = internalInputs.current[key];
+      //@ts-ignore
+      if (input?.getValue && input?.getInitialValue && input.getValue() != input.getInitialValue()) {
         //@ts-ignore
-        data[key] = internalInputs.current[key]?.getValue?.() as any;
+        data[key] = input.getValue() as any;
       }
     }
     return data;

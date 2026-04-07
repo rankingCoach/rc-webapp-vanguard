@@ -122,9 +122,11 @@ export const FormElement = (props: FormElementProps) => {
       const fieldChanged = childFormConfig.getValue() != childFormConfig.getInitialValue();
       if (fieldChanged) {
         hasChanges = true;
+        childFormConfig.isDirty = true;
         childFormConfig.setIsDirty(true);
       } else {
         hasChanges = false;
+        childFormConfig.isDirty = false;
         childFormConfig.setIsDirty(false);
       }
     }

@@ -339,8 +339,8 @@ export const InputBase = (props: rcInputBaseProps) => {
       formconfig.hasError = hasError;
       const inputElement = formconfig._inputRef?.current;
       if (formFieldType !== 'Autocomplete') {
-        if (formconfig.stateValue && inputElement) {
-          inputElement.value = formconfig?.stateValue;
+        if (inputElement) {
+          inputElement.value = formconfig?.stateValue ?? '';
           if (triggerChangeOnStateFieldChange && onChange) {
             onChange({
               target: {
@@ -350,9 +350,7 @@ export const InputBase = (props: rcInputBaseProps) => {
           }
         }
       }
-      if (formconfig.stateValue) {
-        setLength(formconfig.stateValue.length);
-      }
+      setLength(typeof formconfig.stateValue === 'string' ? formconfig.stateValue.length : 0);
     }
   }, [formconfig?.stateValue]);
 
