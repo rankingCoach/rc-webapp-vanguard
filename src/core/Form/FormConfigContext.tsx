@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
 
-import { FormStatus } from './Form';
+import { FormStatus } from './hooks/form.types';
 
 type ConfigWithInternal<T> = T & any;
 
