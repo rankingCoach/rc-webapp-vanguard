@@ -34,7 +34,7 @@ export type InputProps = {
   InputAdornmentProps;
 
 export const Input = (props: InputProps) => {
-  const resolvedFormConfig = useResolvedFormConfig(props.formconfig ?? props.formConfig);
+  const resolvedFieldConfig = useResolvedFormConfig(props.formconfig ?? props.formConfig);
   const { className, inputClassName, type = 'text', testId, formconfig, formConfig, ...rest } = props;
 
   const fieldType: FormFieldType = useMemo(() => (type === 'number' ? 'InputNumber' : 'Input'), [type]);
@@ -49,8 +49,8 @@ export const Input = (props: InputProps) => {
         formFieldType={fieldType}
         type={type}
         multiline={false}
+        fieldConfig={resolvedFieldConfig}
         {...rest}
-        formconfig={resolvedFormConfig}
         className={inputClassName}
       />
     </ComponentContainer>

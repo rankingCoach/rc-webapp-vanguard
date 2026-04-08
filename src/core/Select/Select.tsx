@@ -125,7 +125,7 @@ export const Select = (props: Props) => {
       <InputBase
         {...inputProps}
         formFieldType={'Select'}
-        formconfig={resolvedFormConfig}
+        fieldConfig={resolvedFormConfig}
         value={innerValue}
         valueAsDefaultValue={valueAsDefaultValue}
         select={true}

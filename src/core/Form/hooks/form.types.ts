@@ -19,6 +19,6 @@ export type RuntimeFieldState = {
   hasError: boolean;
   isDirty: boolean;
   currentValue: any;
+  inputValue: any;
   lastSyncedStateValue: any;
 };
-

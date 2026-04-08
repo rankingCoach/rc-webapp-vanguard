@@ -41,8 +41,10 @@ export type FormConfigElement<T = any> = {
   setStateValue?: any;
   setStateValueArray?: any;
   getValue?: () => any;
+  getInputValue?: () => any;
   initialValue?: any;
   getInitialValue?: () => string;
+  setInputValue?: Dispatch<SetStateAction<any>>;
   validation?: FormConfigValidation;
   errorMatching?: Record<string, any>[];
   serverSideErrorsField?: {

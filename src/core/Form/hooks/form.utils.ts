@@ -81,18 +81,18 @@ export const extractFormConfig = (child: React.ReactElement | string | number | 
   }
 
   const propsAsAny = child?.props as any;
-  return (propsAsAny.formconfig || propsAsAny.formConfig || null) as FormConfigElement | null;
+  return (propsAsAny.fieldConfig || propsAsAny.formconfig || propsAsAny.formConfig || null) as FormConfigElement | null;
 };
 
 export const extractFormConfigKey = (
   child: React.ReactElement | string | number | boolean,
-): 'formconfig' | 'formConfig' | null => {
+): 'fieldConfig' | 'formconfig' | 'formConfig' | null => {
   if (typeof child === 'string' || typeof child === 'number' || typeof child === 'boolean') {
     return null;
   }
 
   const propsAsAny = child?.props as any;
-  return propsAsAny.formconfig ? 'formconfig' : propsAsAny.formConfig ? 'formConfig' : null;
+  return propsAsAny.fieldConfig ? 'fieldConfig' : propsAsAny.formconfig ? 'formconfig' : propsAsAny.formConfig ? 'formConfig' : null;
 };
 
 export const getComponentName = (child: React.ReactElement) => {

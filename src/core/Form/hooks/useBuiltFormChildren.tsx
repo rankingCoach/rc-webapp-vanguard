@@ -69,7 +69,13 @@ export const useBuiltFormChildren = <T,>({
         const runtimeKey = `${runtimeConfig.stateFieldName}${runtimeConfig.arrayPosition ?? ''}`;
         activeInputs[runtimeKey] = runtimeConfig;
 
-        const shouldPreserveControl = propsAsAny.phoneNumberBase !== undefined;
+        const shouldPreserveControl =
+          propsAsAny.phoneNumberBase !== undefined ||
+          runtimeConfig.isArray ||
+          componentName === 'Input' ||
+          componentName === 'CheckBox' ||
+          componentName === 'Select' ||
+          componentName === 'InputBase';
         const injectedConfig = shouldPreserveControl ? runtimeConfig : cloneWithoutFormControl(runtimeConfig);
         const originalOnChange = propsAsAny.onChange;
         const nextProps: Record<string, any> = {
@@ -103,7 +109,7 @@ export const useBuiltFormChildren = <T,>({
           propsAsAny.phoneNumberBase === undefined &&
           (runtimeConfig.stateValue !== undefined || propsAsAny.value !== undefined)
         ) {
-          nextProps.value = runtimeConfig.stateValue ?? propsAsAny.value ?? '';
+          nextProps.value = runtimeConfig.getInputValue?.() ?? runtimeConfig.stateValue ?? propsAsAny.value ?? '';
         }
 
         if (propsAsAny.children) {

@@ -20,6 +20,7 @@ export const useRuntimeConfigRegistry = <T,>() => {
         hasError: !!baseConfig.hasError,
         isDirty: !!baseConfig.isDirty,
         currentValue: undefined,
+        inputValue: undefined,
         lastSyncedStateValue: Symbol('unsynced'),
       } as RuntimeFieldState);
 
@@ -45,6 +46,7 @@ export const useRuntimeConfigRegistry = <T,>() => {
 
     if (fieldState.lastSyncedStateValue !== existing.stateValue) {
       fieldState.currentValue = existing.stateValue;
+      fieldState.inputValue = existing.stateValue;
       fieldState.lastSyncedStateValue = existing.stateValue;
     }
 
@@ -61,8 +63,12 @@ export const useRuntimeConfigRegistry = <T,>() => {
       fieldState.isDirty = typeof nextIsDirty === 'function' ? !!nextIsDirty(fieldState.isDirty as any) : !!nextIsDirty;
       existing.isDirty = fieldState.isDirty;
     };
+    existing.setInputValue = (nextInputValue) => {
+      fieldState.inputValue = typeof nextInputValue === 'function' ? nextInputValue(fieldState.inputValue) : nextInputValue;
+    };
     existing.getInitialValue = () => initialValue as any;
     existing.getValue = () => fieldState.currentValue;
+    existing.getInputValue = () => fieldState.inputValue;
 
     runtimeConfigsRef.current[runtimeKey] = existing;
     return existing;
@@ -74,4 +80,3 @@ export const useRuntimeConfigRegistry = <T,>() => {
     runtimeStateRef,
   };
 };
-

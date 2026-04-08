@@ -43,6 +43,7 @@ export const useFormRuntime = <T,>({ children, config, onChange }: UseFormRuntim
     onValueChange: (runtimeConfig, runtimeKey, args) => {
       const nextValue = readNextValue(runtimeConfig, args);
       runtimeStateRef.current[runtimeKey].currentValue = nextValue;
+      runtimeStateRef.current[runtimeKey].inputValue = nextValue;
       dispatchValueUpdate(runtimeConfig, nextValue);
       updateStatusFromConfig(runtimeConfig, runtimeConfig.validateOn !== 'blur');
     },

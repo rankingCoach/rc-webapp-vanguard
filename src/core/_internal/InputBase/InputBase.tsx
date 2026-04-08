@@ -12,7 +12,6 @@ import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { Skeleton, TextField, TextFieldProps } from '@mui/material';
 import { translationService } from '@services/translation.service';
-import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Link } from '@vanguard/Link/Link';
@@ -142,7 +141,6 @@ export type InputEventsProps = {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export type InputFormConfigProps = {
-  formconfig?: FormConfigElement; // @todo rename to formConfig
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
 };
 
@@ -175,6 +173,7 @@ export type PopoverHighlightType = {
 export type rcInputBaseProps = {
   className?: string;
   formFieldType?: FormFieldType;
+  fieldConfig?: FormConfigElement;
   popoverHighlight?: PopoverHighlightType;
   type?: React.InputHTMLAttributes<unknown>['type']; //text|number|password|etc
   children?: React.ReactNode;
@@ -198,7 +197,6 @@ export type rcInputBaseProps = {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const InputBase = (props: rcInputBaseProps) => {
-  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
   const {
     id,
     className,
@@ -230,7 +228,6 @@ export const InputBase = (props: rcInputBaseProps) => {
     selectDisplayEmpty,
     menuItemHeight = 36,
     maxMenuItemsUntilScroll = 7,
-    formconfig: _formconfig,
     children,
     onFocus,
     onBlur,
@@ -260,7 +257,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     helperLinkHref,
     labelStyle,
   } = props;
-  const formconfig = resolvedFormConfig;
+  const fieldConfig = props.fieldConfig;
 
   let { maxLength } = props;
 
@@ -270,15 +267,10 @@ export const InputBase = (props: rcInputBaseProps) => {
    * Form Config
    * -------
    */
-  // Component Type
-  if (formconfig) {
-    formconfig.fieldType = formFieldType;
-  }
-
   // Input Ref
   let { inputRef } = props;
-  if (formconfig) {
-    inputRef = formconfig._inputRef;
+  if (fieldConfig) {
+    inputRef = fieldConfig._inputRef;
   } else if (!inputRef) {
     inputRef = useRef(null);
   }
@@ -309,59 +301,48 @@ export const InputBase = (props: rcInputBaseProps) => {
     debouncedResizeBackdrop();
   }, [width, debouncedResizeBackdrop]);
 
-  if (formconfig) {
-    if (formconfig?.validation && 'maxLength' in formconfig?.validation) {
-      maxLength = formconfig?.validation?.maxLength;
+  if (fieldConfig) {
+    if (fieldConfig?.validation && 'maxLength' in fieldConfig?.validation) {
+      maxLength = fieldConfig?.validation?.maxLength;
     }
   }
 
   // Required field
   let { required } = props;
-  if (formconfig?.validation?.required === true || formconfig?.validation?.required === false) {
-    required = formconfig?.validation?.required;
+  if (fieldConfig?.validation?.required === true || fieldConfig?.validation?.required === false) {
+    required = fieldConfig?.validation?.required;
   }
 
   // Errors state
-  let [hasError, setHasError] = useState(formconfig?.hasError ?? false);
-  if (formconfig) {
-    hasError = !!formconfig.hasError;
-  }
-  if (formconfig?.setHasError) {
-    setHasError = formconfig.setHasError;
-  }
-  useEffect(() => {
-    if (formconfig) {
-      formconfig.hasError = hasError;
-    }
-  }, [hasError]);
+  const hasError = !!fieldConfig?.hasError;
 
   // Set State Value
   useEffect(() => {
-    if (formconfig) {
-      formconfig.hasError = hasError;
-      const inputElement = formconfig._inputRef?.current;
+    if (fieldConfig) {
+      const inputElement = fieldConfig._inputRef?.current;
       if (formFieldType !== 'Autocomplete') {
         if (inputElement) {
-          inputElement.value = formconfig?.stateValue ?? '';
+          inputElement.value = fieldConfig?.stateValue ?? '';
           if (triggerChangeOnStateFieldChange && onChange) {
             onChange({
               target: {
-                value: formconfig?.stateValue,
+                value: fieldConfig?.stateValue,
               },
             } as any);
           }
         }
       }
-      setLength(typeof formconfig.stateValue === 'string' ? formconfig.stateValue.length : 0);
+      const nextInputValue = fieldConfig.getInputValue?.() ?? fieldConfig.stateValue;
+      setLength(typeof nextInputValue === 'string' ? nextInputValue.length : 0);
     }
-  }, [formconfig?.stateValue]);
+  }, [fieldConfig?.stateValue]);
 
   useEffect(() => {
-    updateBackdrop(formconfig?.stateValue);
-  }, [formconfig?.stateValue, prohibitedWords]);
+    updateBackdrop(fieldConfig?.getInputValue?.() ?? fieldConfig?.stateValue);
+  }, [fieldConfig?.stateValue, prohibitedWords]);
   // Is Valid
-  const doValidate = (formconfig?: FormConfigElement): boolean => {
-    return validInput(formconfig);
+  const doValidate = (fieldConfig?: FormConfigElement): boolean => {
+    return validInput(fieldConfig);
   };
 
   useEffect(() => {
@@ -481,8 +462,8 @@ export const InputBase = (props: rcInputBaseProps) => {
     const textReplacements = {
       field_name: label, // Case text contains field_name
       length: length ? length : '0', // Case text contains current input length
-      ...(formconfig?.validation as any), //Add the keys from the validation to make sure we have them in input
-      ...formconfig?.validation?.replacements, // Error Messages translation variables
+      ...(fieldConfig?.validation as any), //Add the keys from the validation to make sure we have them in input
+      ...fieldConfig?.validation?.replacements, // Error Messages translation variables
       ...replacements, // Info Text translation variables
     };
 
@@ -499,7 +480,7 @@ export const InputBase = (props: rcInputBaseProps) => {
           aria-live="polite"
           aria-atomic="true"
         >
-          {formconfig?.errors ? formconfig?.errors[0] : null}
+          {fieldConfig?.errors ? fieldConfig?.errors[0] : null}
         </Text>
       );
     } else if (infoText) {
@@ -584,7 +565,7 @@ export const InputBase = (props: rcInputBaseProps) => {
       highlightWords.forEach((word) => {
         content = content?.replace(word, `<span class="vanguard-input-mark-green">${word}</span>`);
         if (content?.includes(word) && onHighlightWordFound) {
-          onHighlightWordFound(word, formconfig);
+          onHighlightWordFound(word, fieldConfig);
         }
       });
     }
@@ -593,7 +574,7 @@ export const InputBase = (props: rcInputBaseProps) => {
       prohibitedWords.forEach((word) => {
         content = content?.replace(word, `<span class="vanguard-input-mark-red">${word}</span>`);
         if (content?.includes(word) && onProhibitedWordFound) {
-          onProhibitedWordFound(word, formconfig);
+          onProhibitedWordFound(word, fieldConfig);
         }
       });
     }
@@ -704,7 +685,7 @@ export const InputBase = (props: rcInputBaseProps) => {
       e.preventDefault();
     }
 
-    preventInput(e, formconfig, value as any);
+    preventInput(e, fieldConfig, value as any);
   };
 
   const onInputFn = (e: React.FormEvent<HTMLDivElement>) => {
@@ -725,14 +706,16 @@ export const InputBase = (props: rcInputBaseProps) => {
 
     if (formFieldType === 'Select') {
       valueInChangeFn = e.currentTarget?.value || e.target?.value;
-      if (formconfig?._inputRef?.current) {
-        formconfig._inputRef.current.value = e.target?.value ?? '';
+      if (fieldConfig?._inputRef?.current) {
+        fieldConfig._inputRef.current.value = e.target?.value ?? '';
       }
     }
 
-    if (formconfig) {
+    fieldConfig?.setInputValue?.(valueInChangeFn);
+
+    if (fieldConfig) {
       debounce(() => {
-        doValidate(formconfig);
+        doValidate(fieldConfig);
       }, 100);
     }
 

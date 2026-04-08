@@ -49,7 +49,7 @@ export const PhoneNumberBase = (props: PhoneNumberBaseProps) => {
   return (
     <ComponentContainer className={className}>
       <InputBase
-        formconfig={formConfig}
+        fieldConfig={formConfig}
         testId={testId}
         type={type}
         {...props}
