@@ -243,7 +243,7 @@ export const buildRuntimeBinding = <T,>(params: {
         return false;
       }
 
-      if (runtimeConfig.validation?.validateHexColor) {
+      if ((runtimeConfig.validation as { validateHexColor?: boolean } | undefined)?.validateHexColor) {
         return isValidHexColor(value);
       }
 

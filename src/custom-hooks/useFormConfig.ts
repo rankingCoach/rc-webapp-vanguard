@@ -162,24 +162,23 @@ export function useFormConfig<T>(config: Options<T>): {
     }
 
     nextInputs._internalInputs = internalInputs;
+
+    // Primary runtime registration path: the Form parent (useFormRuntime) calls this once per
+    // render to atomically replace the active inputs registry with the current render's bindings.
+    // This is the authoritative way for the parent to track which fields are currently mounted.
     nextInputs._setInternalInputs = (activeInputs: Record<string, FormConfigElement<T>>) => {
       internalInputs.current = activeInputs;
     };
-    nextInputs._addInternalInput = (input: FormConfigElement<T>) => {
-      if (!input.stateFieldName) {
-        return;
-      }
 
-      const idx = input.arrayPosition !== undefined ? `${input.arrayPosition}` : '';
-      internalInputs.current[input.stateFieldName + idx] = input;
+    // Legacy registration callbacks — kept for API compatibility with manually-constructed
+    // config objects (e.g. test fixtures) but are no longer called by the Form runtime itself.
+    // The Form runtime uses _setInternalInputs for atomic, parent-driven registry replacement.
+    // @deprecated — use _setInternalInputs or rely on the Form runtime's automatic registration.
+    nextInputs._addInternalInput = (_input: FormConfigElement<T>) => {
+      // no-op: registration is now managed exclusively by the parent runtime via _setInternalInputs
     };
-    nextInputs._removeInternalInput = (input: FormConfigElement<T>) => {
-      if (!input.stateFieldName) {
-        return;
-      }
-
-      const idx = input.arrayPosition !== undefined ? `${input.arrayPosition}` : '';
-      delete internalInputs.current[input.stateFieldName + idx];
+    nextInputs._removeInternalInput = (_input: FormConfigElement<T>) => {
+      // no-op: deregistration is now managed exclusively by the parent runtime via _setInternalInputs
     };
 
     return nextInputs;
