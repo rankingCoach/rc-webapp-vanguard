@@ -4,10 +4,10 @@ import { isValidHexColor, normalizeHexColor } from '@helpers/validators/hex-colo
 import { InputEventsProps } from '@vanguard/_internal/InputBase/InputBase';
 import { InputBase } from '@vanguard/_internal/InputBase/InputBase.tsx';
 import { Form, useFormConfigContext } from '@vanguard/Form/Form.tsx';
-import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
+import { useFieldConfigContext } from '@vanguard/Form/FormConfigContext';
 import { Label } from '@vanguard/Label/Label';
 import { TextReplacements } from '@vanguard/Text/Text';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import styles from './ColorPicker.module.scss';
 import { FormConfigHexValidation } from '@helpers/validators/valid-input/validate-input-types';
@@ -38,7 +38,8 @@ export interface ColorPickerProps {
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
-  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
+  const contextFieldConfig = useFieldConfigContext();
+  const resolvedFormConfig = (props.formconfig ?? contextFieldConfig) ?? null;
   const {
     label,
     replacements,
@@ -54,6 +55,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
 
   const [color, setColor] = useState(effectiveColor);
   const [textInputValue, setTextInputValue] = useState(effectiveColor);
+  const lastValidColorRef = useRef(effectiveColor);
+  const isControlledByForm = !!resolvedFormConfig;
 
   // Check if we're inside a Form context
   const context = useFormConfigContext();
@@ -64,6 +67,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     if (externalColor !== undefined) {
       setColor(externalColor);
       setTextInputValue(externalColor);
+      if (isValidHexColor(externalColor)) {
+        lastValidColorRef.current = externalColor;
+      }
     }
   }, [externalColor]);
 
@@ -86,6 +92,25 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     (activeFormConfig.validation as FormConfigHexValidation).validateHexColor = true;
   }
 
+  useEffect(() => {
+    const runtimeInputValue = resolvedFormConfig?.getInputValue?.();
+    const runtimeStateValue = resolvedFormConfig?.stateValue;
+
+    if (typeof runtimeStateValue === 'string' && isValidHexColor(runtimeStateValue)) {
+      setColor(normalizeHexColor(runtimeStateValue));
+      lastValidColorRef.current = normalizeHexColor(runtimeStateValue);
+    }
+
+    if (typeof runtimeInputValue === 'string') {
+      setTextInputValue(runtimeInputValue);
+      return;
+    }
+
+    if (typeof runtimeStateValue === 'string') {
+      setTextInputValue(runtimeStateValue);
+    }
+  }, [resolvedFormConfig?.getInputValue?.(), resolvedFormConfig?.stateValue]);
+
   // Memoize the normalized color for the color picker input
   const normalizedColorForPicker = useMemo(() => {
     return color && isValidHexColor(color) ? normalizeHexColor(color) : '#000000';
@@ -98,10 +123,33 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     [onColorChange],
   );
 
+  const commitValidColor = (nextColor: string) => {
+    const normalizedColor = normalizeHexColor(nextColor);
+
+    if (resolvedFormConfig?.setStateValue) {
+      resolvedFormConfig.setStateValue(normalizedColor);
+    }
+
+    resolvedFormConfig?.setInputValue?.(normalizedColor);
+    if (resolvedFormConfig?.__runtimeValueRef) {
+      resolvedFormConfig.__runtimeValueRef.current = undefined;
+    }
+    resolvedFormConfig?.setIsDirty?.(normalizedColor !== resolvedFormConfig.getInitialValue?.());
+  };
+
+  const syncDraftInputValue = (nextValue: string) => {
+    resolvedFormConfig?.setInputValue?.(nextValue);
+    if (resolvedFormConfig?.__runtimeValueRef) {
+      resolvedFormConfig.__runtimeValueRef.current = nextValue;
+    }
+  };
+
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = event.target.value;
+    const newColor = normalizeHexColor(event.target.value);
     setColor(newColor);
-    setTextInputValue(newColor); // Update text input to match color picker
+    setTextInputValue(newColor);
+    lastValidColorRef.current = newColor;
+    commitValidColor(newColor);
     debouncedColorChange(newColor);
     props.onChange?.(event);
   };
@@ -109,17 +157,44 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
   const handleTextInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const inputValue = event.target.value;
 
-    // Always update the text input value (even if invalid)
     setTextInputValue(inputValue);
 
-    // Only update color picker and trigger callback if it's a valid hex color
+    if (!resolvedFormConfig || !resolvedFormConfig.validation?.validateHexColor) {
+      if (isValidHexColor(inputValue)) {
+        const normalizedColor = normalizeHexColor(inputValue);
+        setColor(normalizedColor);
+        lastValidColorRef.current = normalizedColor;
+        commitValidColor(normalizedColor);
+        debouncedColorChange(normalizedColor);
+      } else {
+        syncDraftInputValue(inputValue);
+      }
+
+      props.onChange?.(event);
+      return;
+    }
+
+    if (inputValue === '') {
+      syncDraftInputValue(inputValue);
+      props.onChange?.(event);
+      return;
+    }
+
     if (isValidHexColor(inputValue)) {
       const normalizedColor = normalizeHexColor(inputValue);
       setColor(normalizedColor);
-      // Use the original input value for the callback, not the normalized one
-      debouncedColorChange(inputValue);
+      lastValidColorRef.current = normalizedColor;
+      commitValidColor(normalizedColor);
+      debouncedColorChange(normalizedColor);
+      props.onChange?.(event);
+      return;
     }
 
+    syncDraftInputValue(inputValue);
+    resolvedFormConfig?.setHasError?.(true);
+    resolvedFormConfig?.setErrors?.([
+      'HEX value is incorrect. If you have problems use the color picker next to this field.' as any,
+    ]);
     props.onChange?.(event);
   };
 
@@ -141,6 +216,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
           />
           <InputBase
             formFieldType={'ColorPicker'}
+            fieldConfig={activeFormConfig}
             value={textInputValue}
             onChange={handleTextInputChange}
             testId={testId ? `${testId}-text` : undefined}

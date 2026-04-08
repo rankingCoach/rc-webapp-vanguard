@@ -3,7 +3,7 @@ import './Slider.scss';
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
 import { Slider as MuiSlider } from '@mui/material';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
-import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
+import { useFieldConfigContext } from '@vanguard/Form/FormConfigContext';
 import React, { MutableRefObject, useEffect, useState } from 'react';
 
 /**
@@ -32,7 +32,8 @@ export interface SliderProps {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const Slider = (props: SliderProps) => {
-  const formconfig = useResolvedFormConfig(props.formconfig);
+  const contextFieldConfig = useFieldConfigContext();
+  const formconfig = contextFieldConfig ?? props.formconfig ?? null;
   const {
     value,
     min,

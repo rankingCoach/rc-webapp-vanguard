@@ -14,7 +14,6 @@ interface Props<T = any> {
   onChange?: (status: FormStatus<T>) => void;
 }
 
-
 export const Form = <T,>(props: Props<T>) => {
   const { className, children, config, onChange, onSubmit } = props;
   const parentContext = useFormConfigContext<T>();

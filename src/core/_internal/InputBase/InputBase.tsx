@@ -696,9 +696,9 @@ export const InputBase = (props: rcInputBaseProps) => {
   };
 
   const onChangeFn = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    onChange && onChange(e);
-
     let valueInChangeFn: any = e.currentTarget?.value ?? '';
+
+    onChange && onChange(e);
 
     if (formFieldType == 'Textarea' && !allowBreakLines) {
       valueInChangeFn = e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, ' ');

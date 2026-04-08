@@ -1,4 +1,4 @@
-import { FormConfigElement } from '@custom-hooks/useFormConfig';
+import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import React from 'react';
 
 export type ConfigWithInternal<T> = T & {
@@ -21,4 +21,18 @@ export type RuntimeFieldState = {
   currentValue: any;
   inputValue: any;
   lastSyncedStateValue: any;
+};
+
+export type RuntimeFieldBinding<T> = {
+  runtimeKey: string;
+  fieldName: string;
+  idx?: number;
+  fieldType: FormFieldType;
+  configKey?: string | null;
+  baseConfig: FormConfigElement<T>;
+  childProps: Record<string, any>;
+  componentName: string | null;
+  preserveControl: boolean;
+  readValue?: (args: any[], runtimeConfig: FormConfigElement<T>) => any;
+  shouldCommitValue?: (value: any, runtimeConfig: FormConfigElement<T>) => boolean;
 };

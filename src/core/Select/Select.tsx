@@ -12,7 +12,7 @@ import {
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
-import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
+import { useFieldConfigContext } from '@vanguard/Form/FormConfigContext';
 import { Render } from '@vanguard/Render/Render';
 import { Text, TextTypes } from '@vanguard/Text/Text';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
@@ -52,6 +52,8 @@ type Props<T extends string = any> = {
   translateOptions?: boolean;
   valueAsDefaultValue?: boolean;
   freeSolo?: boolean; // New prop to enable freeSolo functionality
+  formconfig?: any;
+  name?: string;
 } & InputPopoverProps &
   InputValueProps &
   InputLabelProps &
@@ -62,7 +64,8 @@ type Props<T extends string = any> = {
   };
 export type SelectProps<T extends string = any> = Props<T>;
 export const Select = (props: Props) => {
-  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
+  const contextFieldConfig = useFieldConfigContext();
+  const resolvedFormConfig = contextFieldConfig ?? props.formconfig ?? null;
   const { formconfig, ...inputProps } = props;
   const {
     className,

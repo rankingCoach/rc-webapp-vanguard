@@ -11,7 +11,7 @@ import {
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
-import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
+import { useFieldConfigContext } from '@vanguard/Form/FormConfigContext';
 import React, { useMemo } from 'react';
 
 export type InputProps = {
@@ -25,6 +25,8 @@ export type InputProps = {
   loadingText?: string;
   textFieldProps?: TextFieldProps;
   formConfig?: FormConfigElement;
+  formconfig?: FormConfigElement;
+  name?: string;
 } & InputValueProps &
   InputCounterProps &
   InputHighlightsProps &
@@ -34,8 +36,9 @@ export type InputProps = {
   InputAdornmentProps;
 
 export const Input = (props: InputProps) => {
-  const resolvedFieldConfig = useResolvedFormConfig(props.formconfig ?? props.formConfig);
+  const contextFieldConfig = useFieldConfigContext();
   const { className, inputClassName, type = 'text', testId, formconfig, formConfig, ...rest } = props;
+  const resolvedFieldConfig = contextFieldConfig ?? formconfig ?? formConfig;
 
   const fieldType: FormFieldType = useMemo(() => (type === 'number' ? 'InputNumber' : 'Input'), [type]);
 

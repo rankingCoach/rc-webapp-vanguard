@@ -40,8 +40,3 @@ export const useFormConfigContext = <T = any,>(): FormConfigContextType<T> | nul
 export const useFieldConfigContext = () => {
   return useContext(FieldConfigContext);
 };
-
-export const useResolvedFormConfig = <T = any,>(explicitConfig?: FormConfigElement<T> | null) => {
-  const fieldConfig = useFieldConfigContext();
-  return fieldConfig ?? explicitConfig ?? null;
-};

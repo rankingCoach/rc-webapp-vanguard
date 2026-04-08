@@ -37,8 +37,15 @@ export const FormValidationColorPicker: Story = {
       setCurrentField(status.currentConfig?.stateFieldName || 'null');
       // Track the current input value regardless of validation
       if (status.currentConfig?.stateFieldName === 'colorValue') {
-        const currentValue = status.currentConfig?.getValue?.() || '';
-        setCurrentInputValue(currentValue);
+        const currentInput = status.currentConfig?.getInputValue?.() || '';
+        const currentStoredValue = status.currentConfig?.stateValue || '';
+        console.log('ColorPicker debug values:', {
+          statusFieldType: status.currentConfig?.fieldType,
+          inputValue: currentInput,
+          storedValue: currentStoredValue,
+          runtimeValue: status.currentConfig?.getValue?.(),
+        });
+        setCurrentInputValue(currentInput);
       }
     };
 

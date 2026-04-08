@@ -14,7 +14,7 @@ import {
   InputPopoverProps,
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
-import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
+import { useFieldConfigContext } from '@vanguard/Form/FormConfigContext';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import match from 'autosuggest-highlight/match';
@@ -42,6 +42,8 @@ export type AutocompleteProps = {
   noOptionsComponent?: React.ReactNode;
   autoSelect?: boolean;
   adornment?: React.ReactNode[];
+  formconfig?: any;
+  name?: string;
 } & InputLabelProps &
   InputValueProps &
   InputFormConfigProps &
@@ -67,7 +69,8 @@ export type AutocompleteProps = {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const Autocomplete = (props: AutocompleteProps) => {
-  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
+  const contextFieldConfig = useFieldConfigContext();
+  const resolvedFormConfig = contextFieldConfig ?? props.formconfig ?? null;
   const {
     className,
     id,

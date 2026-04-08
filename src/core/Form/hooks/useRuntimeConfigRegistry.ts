@@ -1,17 +1,15 @@
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
 import { useRef } from 'react';
 
-import { RuntimeFieldState } from './form.types';
+import { RuntimeFieldBinding, RuntimeFieldState } from './form.types';
 import { getArrayAwareValue } from './form.utils';
 
 export const useRuntimeConfigRegistry = <T,>() => {
   const runtimeConfigsRef = useRef<Record<string, FormConfigElement<T>>>({});
   const runtimeStateRef = useRef<Record<string, RuntimeFieldState>>({});
 
-  const getRuntimeConfig = (baseConfig: FormConfigElement<T>, idx?: number) => {
-    const stringKey = baseConfig.stateFieldName as string;
-    const suffix = idx !== undefined ? `${idx}` : '';
-    const runtimeKey = `${stringKey}${suffix}`;
+  const getRuntimeConfig = (binding: RuntimeFieldBinding<T>) => {
+    const { runtimeKey, baseConfig, idx, fieldName, fieldType } = binding;
     const existing = runtimeConfigsRef.current[runtimeKey] ?? ({ ...baseConfig } as FormConfigElement<T>);
     const fieldState =
       runtimeStateRef.current[runtimeKey] ??
@@ -30,6 +28,8 @@ export const useRuntimeConfigRegistry = <T,>() => {
     const initialValue = getArrayAwareValue(baseConfig, baseConfig.initialValue, idx);
 
     Object.assign(existing, baseConfig, {
+      stateFieldName: fieldName,
+      fieldType,
       arrayPosition: idx,
       stateValue,
       initialValue,

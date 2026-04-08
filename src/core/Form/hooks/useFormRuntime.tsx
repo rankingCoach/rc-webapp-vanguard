@@ -40,11 +40,21 @@ export const useFormRuntime = <T,>({ children, config, onChange }: UseFormRuntim
     children,
     config,
     getRuntimeConfig,
-    onValueChange: (runtimeConfig, runtimeKey, args) => {
-      const nextValue = readNextValue(runtimeConfig, args);
-      runtimeStateRef.current[runtimeKey].currentValue = nextValue;
-      runtimeStateRef.current[runtimeKey].inputValue = nextValue;
-      dispatchValueUpdate(runtimeConfig, nextValue);
+    onValueChange: (runtimeConfig, runtimeKey, args, binding) => {
+      const nextValue = binding?.readValue ? binding.readValue(args, runtimeConfig) : readNextValue(runtimeConfig, args);
+      const runtimeState = runtimeStateRef.current[runtimeKey];
+      const previousValue = runtimeConfig.getValue?.();
+      const commitGuard = binding?.shouldCommitValue ?? ((value: any, configValue: FormConfigElement<T>) => shouldDispatchValue(configValue, coerceDispatchValue(configValue, value)));
+      const shouldCommitValue = commitGuard(nextValue, runtimeConfig);
+
+      if (runtimeState) {
+        runtimeState.inputValue = nextValue;
+        runtimeState.currentValue = nextValue;
+      }
+
+      if (shouldCommitValue) {
+        dispatchValueUpdate(runtimeConfig, nextValue);
+      }
       updateStatusFromConfig(runtimeConfig, runtimeConfig.validateOn !== 'blur');
     },
   });
