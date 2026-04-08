@@ -1,7 +1,5 @@
 import './DateRangeInput.scss';
 
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
-import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { InputAdornment } from '@mui/material';
 import { InputBase, rcInputBaseProps } from '@vanguard/_internal/InputBase/InputBase';
 import moment from 'moment';
@@ -28,8 +26,7 @@ export const DateRangeInput = (props: Props) => {
   const { formconfig, inputFormatter } = props;
   const { formatFn, reverseFormatFn } = inputFormatter || {};
   let inputRef = formconfig?._inputRef;
-  const [s, updateState] = useState({});
-  const dispatch = useAppDispatch();
+  const [, updateState] = useState({});
   if (!inputRef) {
     inputRef = useRef(null);
   }
@@ -55,10 +52,10 @@ export const DateRangeInput = (props: Props) => {
           formattedValue = formatFn(formattedValue);
         }
         inputRef.current.value = formattedValue;
-        if (formconfig?.setStateValue) {
-          dispatch(formconfig.setStateValue(formattedValue));
-          validInput(props.formconfig);
-        }
+        props.onChange?.({
+          target: { value: formattedValue },
+          currentTarget: { value: formattedValue },
+        } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>);
       }
     }
   };

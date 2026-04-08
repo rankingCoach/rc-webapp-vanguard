@@ -1,7 +1,6 @@
 import './InputBase.scss';
 
 import { REGEX } from '@config/regex';
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
@@ -712,100 +711,26 @@ export const InputBase = (props: rcInputBaseProps) => {
     onClick && onClick(e);
   };
 
-  const dispatch = useAppDispatch();
-  // const dispatchChange = (formConfig: FormConfigElement, value:any) => {
-  //
-  // }
   const onChangeFn = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange && onChange(e);
 
-    let valueInChangeFn: any;
+    let valueInChangeFn: any = e.currentTarget?.value ?? '';
+
+    if (formFieldType == 'Textarea' && !allowBreakLines) {
+      valueInChangeFn = e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, ' ');
+    }
+
+    if (formFieldType === 'Select') {
+      valueInChangeFn = e.currentTarget?.value || e.target?.value;
+      if (formconfig?._inputRef?.current) {
+        formconfig._inputRef.current.value = e.target?.value ?? '';
+      }
+    }
 
     if (formconfig) {
-      // Dispatch value (no dispatch needed for Autocomplete)
-      // console.log(formconfig.setStateValue);
-
-      if (formconfig.setStateValue) {
-        if (
-          formFieldType == 'InputBase' ||
-          formFieldType == 'Input' ||
-          formFieldType == 'InputNumber' ||
-          formFieldType == 'ColorPicker'
-        ) {
-          valueInChangeFn = e.currentTarget.value;
-          if (formconfig.valueMappers?.toObject) {
-            valueInChangeFn = formconfig.valueMappers.toObject(valueInChangeFn);
-          }
-
-          // // For ColorPicker, only update state if it's a valid hex color
-          // if (formFieldType == "ColorPicker" && !isValidHexColor(valueInChangeFn)) {
-          //   return; // Don't update state for invalid hex colors
-          // }
-
-          if (formconfig.arrayPosition !== undefined && formconfig.setStateValueArray) {
-            dispatch(formconfig.setStateValueArray({ el: valueInChangeFn, idx: formconfig.arrayPosition }));
-          } else {
-            let value = valueInChangeFn;
-            if (formFieldType == 'InputNumber') {
-              value = parseInt(value);
-            }
-            if (formFieldType == 'ColorPicker') {
-              if (isValidHexColor(value)) {
-                dispatch(formconfig.setStateValue(value));
-              }
-            } else {
-              dispatch(formconfig.setStateValue(value));
-            }
-          }
-        }
-        if (formFieldType == 'Textarea') {
-          valueInChangeFn = e.currentTarget.value;
-
-          if (!allowBreakLines) {
-            // remove breaklines if text was pasted
-            valueInChangeFn = e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, ' ');
-            // dispatch(formconfig.setStateValue(e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, " ")));
-          }
-
-          if (formconfig.valueMappers?.toObject) {
-            valueInChangeFn = formconfig.valueMappers.toObject(valueInChangeFn);
-          }
-
-          if (formconfig.arrayPosition !== undefined && formconfig.setStateValueArray) {
-            dispatch(formconfig.setStateValueArray({ el: valueInChangeFn, idx: formconfig.arrayPosition }));
-          } else {
-            dispatch(formconfig.setStateValue(valueInChangeFn));
-          }
-        }
-        if (formFieldType == 'Select') {
-          valueInChangeFn = e.currentTarget?.value || e.target?.value;
-
-          if (formconfig.valueMappers?.toObject) {
-            valueInChangeFn = formconfig.valueMappers.toObject(valueInChangeFn);
-          }
-          if (formconfig.arrayPosition !== undefined && formconfig.setStateValueArray) {
-            dispatch(formconfig.setStateValueArray({ el: valueInChangeFn, idx: formconfig.arrayPosition }));
-          } else {
-            dispatch(formconfig.setStateValue(valueInChangeFn));
-          }
-        }
-      }
-
-      // Validate field
       debounce(() => {
         doValidate(formconfig);
       }, 100);
-
-      // MUI Select updates its native input asynchronously after the change
-      // event, so eagerly sync the DOM ref to prevent getValue() reading
-      // a stale value during change detection.
-      if (formFieldType === 'Select' && formconfig._inputRef?.current) {
-        formconfig._inputRef.current.value = e.target?.value ?? '';
-      }
-      // Form Callback
-      formconfig?._onChange && formconfig?._onChange();
-    } else {
-      valueInChangeFn = e.currentTarget?.value ?? '';
     }
 
     if (valueInChangeFn && typeof valueInChangeFn === 'string') {

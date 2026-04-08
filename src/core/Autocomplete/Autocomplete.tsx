@@ -1,6 +1,5 @@
 import './Autocomplete.scss';
 
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { classNames } from '@helpers/classNames';
 import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason, Chip } from '@mui/material';
 import {
@@ -101,7 +100,6 @@ export const Autocomplete = (props: AutocompleteProps) => {
     ...rest
   } = props;
 
-  const dispatch = useAppDispatch();
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
   const [adornmentIndex, setAdornmentIndex] = useState<number | undefined>(undefined);
@@ -190,13 +188,6 @@ export const Autocomplete = (props: AutocompleteProps) => {
       setAdornmentIndex(Number(nextVal.key));
     } else {
       setAdornmentIndex(undefined);
-    }
-
-    if (formconfig) {
-      // Dispatch value
-      if (formconfig && formconfig.setStateValue) {
-        dispatch(formconfig.setStateValue(nextVal));
-      }
     }
 
     // Callback

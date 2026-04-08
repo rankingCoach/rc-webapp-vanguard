@@ -40,8 +40,6 @@ export { extractErrorScopes } from './core/Form/extract-error-scopes';
 export type { FormStatus } from './core/Form/Form.tsx';
 export { Form } from './core/Form/Form.tsx';
 export { extractSetErrorsFromConfig } from './core/Form/FormElement/extract-set-errors-from-config';
-export type { FormElementChildChange, FormElementProps } from './core/Form/FormElement/FormElement.tsx';
-export { FormElement } from './core/Form/FormElement/FormElement.tsx';
 
 // Input
 export type { InputProps } from './core/Input/Input.tsx';
@@ -171,5 +169,4 @@ export { Accordion } from './core/Accordion/Accordion.tsx';
 // CheckBox
 export type { CheckBoxProps } from './core/CheckBox/CheckBox.tsx';
 export { CheckBox } from './core/CheckBox/CheckBox.tsx';
-
 

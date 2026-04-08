@@ -1,6 +1,5 @@
 import './CheckBox.scss';
 
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { useHover } from '@custom-hooks/use-hover';
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
@@ -77,7 +76,6 @@ export const CheckBox = (props: CheckBoxProps) => {
 
   let { backgroundColor } = props;
 
-  const dispatch = useAppDispatch();
   const ref = useRef(null);
   const [isChecked, setIsChecked] = useState<boolean>(checked);
   const [isHovered, setIsHovered] = useState<boolean | undefined>(hovered);
@@ -161,13 +159,6 @@ export const CheckBox = (props: CheckBoxProps) => {
     if (checkboxRef?.current) {
       checkboxRef.current.checked = nextChecked;
     }
-
-    // Dispatch value to formConfig
-    if (formconfig?.setStateValue) {
-      dispatch(formconfig.setStateValue(nextChecked));
-    }
-
-    formconfig?._onChange?.(e);
 
     // Callback
     onChange && onChange(e);

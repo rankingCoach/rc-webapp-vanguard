@@ -1,7 +1,7 @@
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch.ts';
 import { FormConfigElement, useFormConfig } from '@custom-hooks/useFormConfig';
 import { debounce } from '@helpers/debounce';
 import { isValidHexColor, normalizeHexColor } from '@helpers/validators/hex-color/hex-color';
+import { InputEventsProps } from '@vanguard/_internal/InputBase/InputBase';
 import { InputBase } from '@vanguard/_internal/InputBase/InputBase.tsx';
 import { Form, useFormConfigContext } from '@vanguard/Form/Form.tsx';
 import { Label } from '@vanguard/Label/Label';
@@ -25,6 +25,7 @@ export interface ColorPickerProps {
   replacements?: TextReplacements;
   onColorChange?: (color: string) => void;
   formconfig?: FormConfigElement;
+  onChange?: InputEventsProps['onChange'];
   /**
    * Controls max-width of the ColorPicker container. Accepts CSS length or percentage, e.g. "300px" or "50%".
    */
@@ -46,7 +47,6 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     maxWidth,
     testId,
   } = props;
-  const dispatch = useAppDispatch();
   // Use color prop if provided, fallback to initialColor for backward compatibility
   const effectiveColor = externalColor ?? initialColor ?? '';
 
@@ -96,21 +96,12 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     [onColorChange],
   );
 
-  const debouncedFormConfigDispatch = useCallback(
-    debounce((color: string) => {
-      if (isValidHexColor(color) && formconfig && formconfig.setStateValue) {
-        dispatch(formconfig.setStateValue(color));
-      }
-    }, DEBOUNCE_VALUE_DEFAULT),
-    [dispatch, formconfig],
-  );
-
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = event.target.value;
     setColor(newColor);
     setTextInputValue(newColor); // Update text input to match color picker
     debouncedColorChange(newColor);
-    debouncedFormConfigDispatch(newColor);
+    props.onChange?.(event);
   };
 
   const handleTextInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -125,8 +116,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
       setColor(normalizedColor);
       // Use the original input value for the callback, not the normalized one
       debouncedColorChange(inputValue);
-      debouncedFormConfigDispatch(inputValue);
     }
+
+    props.onChange?.(event);
   };
 
   // If we're not in a Form context, wrap with Form
