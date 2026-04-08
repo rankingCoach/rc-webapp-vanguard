@@ -11,6 +11,7 @@ import {
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import React, { useMemo } from 'react';
 
 export type InputProps = {
@@ -33,7 +34,8 @@ export type InputProps = {
   InputAdornmentProps;
 
 export const Input = (props: InputProps) => {
-  const { className, inputClassName, type = 'text', testId, formConfig, ...rest } = props;
+  const resolvedFormConfig = useResolvedFormConfig(props.formconfig ?? props.formConfig);
+  const { className, inputClassName, type = 'text', testId, formconfig, formConfig, ...rest } = props;
 
   const fieldType: FormFieldType = useMemo(() => (type === 'number' ? 'InputNumber' : 'Input'), [type]);
 
@@ -48,7 +50,7 @@ export const Input = (props: InputProps) => {
         type={type}
         multiline={false}
         {...rest}
-        formconfig={rest.formconfig ?? formConfig}
+        formconfig={resolvedFormConfig}
         className={inputClassName}
       />
     </ComponentContainer>

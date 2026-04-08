@@ -4,6 +4,7 @@ import { isValidHexColor, normalizeHexColor } from '@helpers/validators/hex-colo
 import { InputEventsProps } from '@vanguard/_internal/InputBase/InputBase';
 import { InputBase } from '@vanguard/_internal/InputBase/InputBase.tsx';
 import { Form, useFormConfigContext } from '@vanguard/Form/Form.tsx';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import { Label } from '@vanguard/Label/Label';
 import { TextReplacements } from '@vanguard/Text/Text';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -37,13 +38,14 @@ export interface ColorPickerProps {
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
+  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
   const {
     label,
     replacements,
     onColorChange,
     initialColor,
     color: externalColor,
-    formconfig,
+    formconfig: _formconfig,
     maxWidth,
     testId,
   } = props;
@@ -78,7 +80,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
   });
 
   // Use provided formconfig or internal one
-  const activeFormConfig = formconfig || internalFormConfig.hexColor;
+  const activeFormConfig = resolvedFormConfig || internalFormConfig.hexColor;
 
   if (activeFormConfig?.validation) {
     (activeFormConfig.validation as FormConfigHexValidation).validateHexColor = true;
@@ -141,7 +143,6 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
             formFieldType={'ColorPicker'}
             value={textInputValue}
             onChange={handleTextInputChange}
-            formconfig={activeFormConfig}
             testId={testId ? `${testId}-text` : undefined}
           />
         </div>

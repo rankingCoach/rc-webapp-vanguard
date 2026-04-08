@@ -12,6 +12,7 @@ import {
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import { Render } from '@vanguard/Render/Render';
 import { Text, TextTypes } from '@vanguard/Text/Text';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
@@ -61,6 +62,8 @@ type Props<T extends string = any> = {
   };
 export type SelectProps<T extends string = any> = Props<T>;
 export const Select = (props: Props) => {
+  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
+  const { formconfig, ...inputProps } = props;
   const {
     className,
     options,
@@ -75,7 +78,7 @@ export const Select = (props: Props) => {
     containToSelectWidth = false,
     freeSolo = false,
     customInputRenderer,
-  } = props;
+  } = inputProps;
 
   const [innerValue, setInnerValue] = useState(value);
   const [selectedItemValue, setSelectedItemValue] = useState<SelectOptionProp | null>(null);
@@ -120,8 +123,9 @@ export const Select = (props: Props) => {
   return (
     <ComponentContainer className={classNames(className)} testId={testId} innerRef={selectInputRef}>
       <InputBase
-        {...props}
+        {...inputProps}
         formFieldType={'Select'}
+        formconfig={resolvedFormConfig}
         value={innerValue}
         valueAsDefaultValue={valueAsDefaultValue}
         select={true}

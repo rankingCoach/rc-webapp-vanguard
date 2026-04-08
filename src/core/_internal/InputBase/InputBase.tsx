@@ -12,6 +12,7 @@ import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { Skeleton, TextField, TextFieldProps } from '@mui/material';
 import { translationService } from '@services/translation.service';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Link } from '@vanguard/Link/Link';
@@ -197,6 +198,7 @@ export type rcInputBaseProps = {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const InputBase = (props: rcInputBaseProps) => {
+  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
   const {
     id,
     className,
@@ -228,7 +230,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     selectDisplayEmpty,
     menuItemHeight = 36,
     maxMenuItemsUntilScroll = 7,
-    formconfig,
+    formconfig: _formconfig,
     children,
     onFocus,
     onBlur,
@@ -258,6 +260,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     helperLinkHref,
     labelStyle,
   } = props;
+  const formconfig = resolvedFormConfig;
 
   let { maxLength } = props;
 

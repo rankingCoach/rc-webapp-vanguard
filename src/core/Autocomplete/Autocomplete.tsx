@@ -14,6 +14,7 @@ import {
   InputPopoverProps,
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import match from 'autosuggest-highlight/match';
@@ -66,6 +67,7 @@ export type AutocompleteProps = {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const Autocomplete = (props: AutocompleteProps) => {
+  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
   const {
     className,
     id,
@@ -75,7 +77,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     labelType,
     placeholder,
     inputRef,
-    formconfig,
+    formconfig: _formconfig,
     optionKey,
     options,
     noOptionsText = null,
@@ -99,6 +101,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     adornment,
     ...rest
   } = props;
+  const formconfig = resolvedFormConfig;
 
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
@@ -423,7 +426,6 @@ export const Autocomplete = (props: AutocompleteProps) => {
         renderInput={(params) => {
           return (
             <InputBase
-              formconfig={formconfig}
               inputRef={innerInputRef}
               isLoading={isLoading}
               testId={`${testId}-input`}

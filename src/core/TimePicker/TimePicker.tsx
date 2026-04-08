@@ -5,6 +5,7 @@ import { classNames } from '@helpers/classNames';
 import { formatHours, getHourFormat } from '@helpers/format-utils';
 import { generateHoursList, HourType } from '@helpers/hours-list';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import { Select, SelectOnChange, SelectOptionProps } from '@vanguard/Select/Select';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
@@ -28,6 +29,7 @@ export type TimePickerProps = {
 };
 
 export const TimePicker = (props: TimePickerProps) => {
+  const formconfig = useResolvedFormConfig(props.formconfig);
   const {
     onChange,
     label,
@@ -39,7 +41,7 @@ export const TimePicker = (props: TimePickerProps) => {
     showAmPm,
     id,
     testId,
-    formconfig,
+    formconfig: _formconfig,
     freeSolo,
   } = props;
 
@@ -76,7 +78,6 @@ export const TimePicker = (props: TimePickerProps) => {
         {IconNames.clock}
       </Icon>
       <Select
-        formconfig={formconfig}
         id={id}
         label={label}
         value={valueFormatted}

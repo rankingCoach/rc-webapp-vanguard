@@ -6,6 +6,7 @@ import { classNames } from '@helpers/classNames';
 import { parseCssVariable } from '@helpers/css-variables-parser';
 import { CheckBoxIcon } from '@vanguard/CheckBox/CheckBoxIcon/CheckBoxIcon';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import React, { ChangeEvent, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
 
 import { Text, TextReplacements } from '../Text/Text';
@@ -55,8 +56,9 @@ export interface CheckBoxProps {
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const CheckBox = (props: CheckBoxProps) => {
+  const resolvedFormConfig = useResolvedFormConfig(props.formconfig);
   const {
-    formconfig,
+    formconfig: _formconfig,
     label,
     checked = false,
     hovered,
@@ -73,6 +75,7 @@ export const CheckBox = (props: CheckBoxProps) => {
     _size = 'large',
     _hoverMode = 'border',
   } = props;
+  const formconfig = resolvedFormConfig;
 
   let { backgroundColor } = props;
 

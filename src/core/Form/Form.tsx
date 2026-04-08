@@ -6,7 +6,7 @@ import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { FormConfigProvider, useFormConfigContext } from './FormConfigContext';
+import { FieldConfigProvider, FormConfigProvider, useFormConfigContext } from './FormConfigContext';
 
 type ConfigWithInternal<T> = T & {
   _internalInputs?: React.MutableRefObject<Record<string, FormConfigElement<T>>>;
@@ -36,6 +36,21 @@ type RuntimeFieldState = {
   currentValue: any;
   lastSyncedStateValue: any;
 };
+
+const AUTO_BINDABLE_COMPONENTS = new Set([
+  'Autocomplete',
+  'CheckBox',
+  'ColorPicker',
+  'DatePicker',
+  'DateRangeInput',
+  'Input',
+  'InputBase',
+  'PhoneNumber',
+  'PhoneNumberBase',
+  'Select',
+  'Slider',
+  'TimePicker',
+]);
 
 const shallowEqualRuntimeMaps = (
   left: Record<string, FormConfigElement<any>>,
@@ -111,6 +126,24 @@ const extractFormConfigKey = (
 
   const propsAsAny = child?.props as any;
   return propsAsAny.formconfig ? 'formconfig' : propsAsAny.formConfig ? 'formConfig' : null;
+};
+
+const getComponentName = (child: React.ReactElement) => {
+  const childType = child.type as any;
+
+  if (typeof childType === 'string') {
+    return childType;
+  }
+
+  return childType?.displayName ?? childType?.name ?? null;
+};
+
+const getConfigEntries = (config?: ConfigWithInternal<any>) => {
+  if (!config) {
+    return [];
+  }
+
+  return Object.entries(config).filter(([key]) => !key.startsWith('_'));
 };
 
 const getArrayAwareValue = (config: FormConfigElement, value: any, idx?: number) => {
@@ -318,6 +351,8 @@ export const Form = <T,>(props: Props<T>) => {
   const buildChildren = (childNodes: React.ReactNode) => {
     const idxMap: Record<string, number> = {};
     const activeInputs: Record<string, FormConfigElement<T>> = {};
+    const configEntries = getConfigEntries(config);
+    let autoConfigIndex = 0;
 
     const mapChildren = (nodes: React.ReactNode): React.ReactNode =>
       React.Children.map(nodes, (child) => {
@@ -325,11 +360,20 @@ export const Form = <T,>(props: Props<T>) => {
           return child;
         }
 
-        const childConfig = extractFormConfig(child);
+        let childConfig = extractFormConfig(child);
         const formConfigKey = extractFormConfigKey(child);
         const propsAsAny = child.props as any;
+        const componentName = getComponentName(child);
 
-        if (!childConfig?.stateFieldName || !formConfigKey) {
+        if (!childConfig && componentName && AUTO_BINDABLE_COMPONENTS.has(componentName)) {
+          const nextEntry = configEntries[autoConfigIndex];
+          if (nextEntry) {
+            autoConfigIndex += 1;
+            childConfig = nextEntry[1] as FormConfigElement<T>;
+          }
+        }
+
+        if (!childConfig?.stateFieldName) {
           if (!propsAsAny.children) {
             return child;
           }
@@ -352,7 +396,6 @@ export const Form = <T,>(props: Props<T>) => {
         const injectedConfig = shouldPreserveControl ? runtimeConfig : cloneWithoutFormControl(runtimeConfig);
         const originalOnChange = propsAsAny.onChange;
         const nextProps: Record<string, any> = {
-          [formConfigKey]: injectedConfig,
           onChange: (...args: any[]) => {
             const nextValue = readNextValue(runtimeConfig, args);
             runtimeStateRef.current[runtimeKey].currentValue = nextValue;
@@ -378,6 +421,10 @@ export const Form = <T,>(props: Props<T>) => {
           delete nextProps.onChange;
         }
 
+        if (formConfigKey && !AUTO_BINDABLE_COMPONENTS.has(componentName ?? '')) {
+          nextProps[formConfigKey] = injectedConfig;
+        }
+
         if (runtimeConfig.fieldType === 'Checkbox') {
           nextProps.checked = !!(runtimeConfig.stateValue ?? propsAsAny.checked);
         } else if (
@@ -392,7 +439,11 @@ export const Form = <T,>(props: Props<T>) => {
           nextProps.children = mapChildren(propsAsAny.children);
         }
 
-        return React.cloneElement(child, nextProps);
+        return (
+          <FieldConfigProvider key={child.key ?? runtimeKey} fieldConfig={injectedConfig}>
+            {React.cloneElement(child, nextProps)}
+          </FieldConfigProvider>
+        );
       });
 
     return {

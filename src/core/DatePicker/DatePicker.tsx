@@ -34,7 +34,6 @@ export const DatePicker = (props: DatePickerProps) => {
     value = null,
     label,
     required,
-    formconfig,
     minDate,
     maxDate,
     disablePast,
@@ -126,7 +125,6 @@ export const DatePicker = (props: DatePickerProps) => {
             delete controlledParams.InputProps; // remove adornment
             return (
               <Input
-                formconfig={formconfig}
                 textFieldProps={controlledParams}
                 disabled={params.disabled}
                 required={required}

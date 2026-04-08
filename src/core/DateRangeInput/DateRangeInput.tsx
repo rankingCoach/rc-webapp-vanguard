@@ -2,6 +2,7 @@ import './DateRangeInput.scss';
 
 import { InputAdornment } from '@mui/material';
 import { InputBase, rcInputBaseProps } from '@vanguard/_internal/InputBase/InputBase';
+import { useResolvedFormConfig } from '@vanguard/Form/FormConfigContext';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -23,7 +24,8 @@ type Props = {
 } & rcInputBaseProps;
 
 export const DateRangeInput = (props: Props) => {
-  const { formconfig, inputFormatter } = props;
+  const formconfig = useResolvedFormConfig(props.formconfig);
+  const { inputFormatter } = props;
   const { formatFn, reverseFormatFn } = inputFormatter || {};
   let inputRef = formconfig?._inputRef;
   const [, updateState] = useState({});
@@ -101,7 +103,6 @@ export const DateRangeInput = (props: Props) => {
     <ComponentContainer className={'DateRangeInput-container'}>
       <InputBase
         inputRef={inputRef}
-        formconfig={formconfig}
         textFieldProps={{
           InputProps: {
             endAdornment: (
