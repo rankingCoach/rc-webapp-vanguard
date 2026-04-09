@@ -245,6 +245,15 @@ export { AiGlow } from './core/AiGlow';
 export type { ArcGaugeProps } from './core/ArcGauge';
 export { ArcGauge } from './core/ArcGauge';
 
+// BenchmarkGauge
+export type {
+  BenchmarkGaugeLegendInteraction,
+  BenchmarkGaugeMarkerType,
+  BenchmarkGaugeProps,
+  MarkerRenderContext,
+} from './core/BenchmarkGauge';
+export { BenchmarkGauge } from './core/BenchmarkGauge';
+
 // ActionBar
 export type { ActionBarProps } from './core/ActionBar';
 export type { ActionBarFooterButton, ActionBarFooterProps } from './core/ActionBar';

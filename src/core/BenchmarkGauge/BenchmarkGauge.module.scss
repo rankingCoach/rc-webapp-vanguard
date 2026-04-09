@@ -1,0 +1,223 @@
+@import "@styles/spacings";
+@import "@styles/media-mixins";
+
+// Root layout, track bar, progress layers, legend, and inside track labels.
+//
+// CSS variables:
+//   --benchmark-gauge-label-gap              Gap between legend/labels and the track.
+//   --benchmark-gauge-gradient-horizontal    Default horizontal track gradient (red → green).
+//   --benchmark-gauge-gradient-vertical      Default vertical track gradient (green → red, bottom → top).
+//   --benchmark-gauge-track-padding          Padding on the track wrapper — provides room for overflowing pins.
+//   --benchmark-gauge-track-height           Track bar height (horizontal) or width (vertical).
+//   --benchmark-gauge-track-radius           Track bar border radius.
+//   --benchmark-gauge-track-inactive-opacity Opacity of the ghost layer in progress mode.
+//   --benchmark-gauge-legend-width           Min-width of the legend container in vertical mode.
+//   --benchmark-gauge-legend-highlight-radius Border radius of legend item shells.
+//   --benchmark-gauge-legend-transition      Opacity transition used by legend highlight and dim.
+//   --benchmark-gauge-legend-dim-opacity     Opacity of non-highlighted legend items.
+//   --benchmark-gauge-label-inset            Distance of inside track labels from the track edges.
+
+// ─── Root layout ─────────────────────────────────────────────────────────────
+// Horizontal: stacks legend above track. Vertical: reverses to legend-right.
+// Default gradients are defined here as overridable custom properties.
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--benchmark-gauge-label-gap, $x1);
+  width: 100%;
+  --benchmark-gauge-gradient-horizontal: linear-gradient(
+                  90deg,
+                  #FF4747 4.56%,
+                  #FF8947 19.33%,
+                  #FF9F47 34.6%,
+                  #FFC247 49.88%,
+                  #90CC19 66.68%,
+                  #7ED212 81.44%,
+                  #1BA138 99.77%
+  );
+  --benchmark-gauge-gradient-vertical: linear-gradient(
+                  0deg,
+                  #FF4747 4.56%,
+                  #FF8947 19.33%,
+                  #FF9F47 34.6%,
+                  #FFC247 49.88%,
+                  #90CC19 66.68%,
+                  #7ED212 81.44%,
+                  #1BA138 99.77%
+  );
+}
+
+// Vertical mode: legend moves to the right, component shrinks to fit-content width.
+.rootVertical {
+  flex-direction: row-reverse;
+  width: fit-content;
+  height: 100%;
+}
+
+// ─── Track wrapper ────────────────────────────────────────────────────────────
+// Holds the gradient bar and absolutely-positioned markers. Padding creates
+// breathing room so pins that overflow the bar edges are not clipped.
+.trackWrapper {
+  position: relative;
+  flex: 1;
+  padding-top: var(--benchmark-gauge-track-padding, $x0);
+  padding-bottom: var(--benchmark-gauge-track-padding, $x0);
+}
+
+.rootVertical .trackWrapper {
+  flex: 1;
+  padding: 0 var(--benchmark-gauge-track-padding, $x0);
+}
+
+// ─── Track bar ────────────────────────────────────────────────────────────────
+.trackBar {
+  position: relative;
+  width: 100%;
+  height: var(--benchmark-gauge-track-height, $x5);
+  border-radius: var(--benchmark-gauge-track-radius, $x9 + $x2 + $x0_25);
+  background: var(--benchmark-gauge-gradient-horizontal);
+  overflow: visible;
+}
+
+.rootVertical .trackBar {
+  width: var(--benchmark-gauge-track-height, $x5);
+  height: 100%;
+  background: var(--benchmark-gauge-gradient-vertical);
+}
+
+// ─── Progress layers ──────────────────────────────────────────────────────────
+// In progress mode the track bar background is cleared and replaced by two layers:
+//   Ghost — full-width gradient at reduced opacity.
+//   Fill  — same gradient clipped to the progress marker's position (clip-path set inline).
+
+// Progress mode: strip the default background so the two layers render cleanly.
+.trackBarProgress {
+  background: none;
+}
+
+.rootVertical .trackBarProgress {
+  background: none;
+}
+
+// Ghost layer: full-width, always visible at reduced opacity.
+.trackGhost {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--benchmark-gauge-gradient-horizontal);
+  opacity: var(--benchmark-gauge-track-inactive-opacity, 0.3);
+}
+
+.rootVertical .trackGhost {
+  background: var(--benchmark-gauge-gradient-vertical);
+}
+
+// Applies the gradient to the fill layer element.
+.trackGradient {
+  background: var(--benchmark-gauge-gradient-horizontal);
+}
+
+.rootVertical .trackGradient {
+  background: var(--benchmark-gauge-gradient-vertical);
+}
+
+// Fill layer container: clips to the progress marker position via inline clip-path.
+.trackFill {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+// ─── Legend ───────────────────────────────────────────────────────────────────
+// Flex container for legend items. Stacks horizontally (wraps to column on mobile)
+// or column-reverse in vertical mode so items align with their track markers.
+.legend {
+  position: relative;
+  width: 100%;
+  display: flex;
+  gap: $x1;
+
+  @include media("<=mobile") {
+    flex-direction: column;
+  }
+  }
+
+.rootVertical .legend {
+  height: 100%;
+  width: auto;
+  min-width: var(--benchmark-gauge-legend-width, $x3 * 5);
+  flex-direction: column-reverse;
+}
+
+// ─── Legend item shell ─────────────────────────────────────────────────────────
+// Interactive container owned by the core. The wrapper provides only the inner content.
+// Background is set via --_legend-item-bg (driven by marker.legendBackgroundColor).
+.legendItem {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--benchmark-gauge-legend-highlight-radius, $x1);
+  background: var(--_legend-item-bg, #fff);
+  transition: opacity var(--benchmark-gauge-legend-transition, 0.15s ease);
+}
+
+// Highlighted: fade the overlay in — no shell background change.
+.legendItemHighlighted::after {
+  opacity: 1;
+}
+
+// Dimmed: applied to non-highlighted items when another is active.
+.legendItemDimmed {
+  opacity: var(--benchmark-gauge-legend-dim-opacity, 0.4);
+}
+
+.rootVertical .legendItem {
+  height: 100%;
+}
+
+// ─── Labels ───────────────────────────────────────────────────────────────────
+// Labels overlaid on the track bar at each end. Semi-transparent dark pill.
+// Inset from the edge by --benchmark-gauge-label-inset; repositioned for vertical mode.
+.label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  padding: $x0_5 $x1;
+  border-radius: $x9;
+  background: rgba(4, 5, 6, 0.2);
+}
+
+.labelStart {
+  left: var(--benchmark-gauge-label-inset, $x1);
+}
+
+.labelEnd {
+  right: var(--benchmark-gauge-label-inset, $x1);
+}
+
+.rootVertical .label {
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rootVertical .labelStart {
+  bottom: var(--benchmark-gauge-label-inset, $x1);
+  left: 50%;
+}
+
+.rootVertical .labelEnd {
+  top: var(--benchmark-gauge-label-inset, $x1);
+  left: 50%;
+  right: auto;
+}
