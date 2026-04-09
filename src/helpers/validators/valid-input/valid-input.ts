@@ -90,7 +90,8 @@ export const validInput = (formConfig?: FormConfigElement | null, validateOnlyPo
         notIn = notIn?.value;
       }
 
-      if (notIn.length && notIn.find((e) => e === value)) {
+      const normalizedValue = value === '' || value === undefined ? value : Number(value);
+      if (notIn.length && notIn.find((e) => e === normalizedValue)) {
         return setFieldValidity(formConfig, false, ErrorsKeys.NOT_IN_ARRAY, validateOnlyPositive);
       }
     }
@@ -253,7 +254,8 @@ export const validInput = (formConfig?: FormConfigElement | null, validateOnlyPo
     }
 
     if (rootDomain) {
-      const match = value.match(REGEX.domain);
+      const normalizedValue = typeof value === 'string' ? value : '';
+      const match = normalizedValue.match(REGEX.domain);
       let rootDomainValue = '';
       let rootDomainErrorMsg: CustomErrorsKeys | undefined = undefined;
       if (typeof rootDomain === 'string') {

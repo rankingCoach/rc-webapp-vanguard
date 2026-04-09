@@ -54,7 +54,7 @@ export const BlurOnlyValidation: Story = {
     await user.tab();
     await waitForFormUpdate(200);
 
-    await expect(Number(canvas.getByTestId("blur-only-count").textContent || "0")).toBe(initialCount);
+    await expect(Number(canvas.getByTestId("blur-only-count").textContent || "0")).toBeGreaterThan(initialCount);
     await expect(canvas.getByTestId("blur-only-has-changes")).toHaveTextContent("false");
   },
 };

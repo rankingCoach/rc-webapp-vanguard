@@ -23,6 +23,12 @@ type UseBuiltFormChildrenParams<T> = {
     args: any[],
     binding: RuntimeFieldBinding<T>,
   ) => void;
+  onFieldBlur: (
+    runtimeConfig: FormConfigElement<T>,
+    runtimeKey: string,
+    args: any[],
+    binding: RuntimeFieldBinding<T>,
+  ) => void;
 };
 
 export const useBuiltFormChildren = <T,>({
@@ -30,6 +36,7 @@ export const useBuiltFormChildren = <T,>({
   config,
   getRuntimeConfig,
   onValueChange,
+  onFieldBlur,
 }: UseBuiltFormChildrenParams<T>) => {
   return useMemo(() => {
     // Array-field index tracking: keyed by field name so each repeated field gets its own counter
@@ -56,6 +63,7 @@ export const useBuiltFormChildren = <T,>({
       binding: RuntimeFieldBinding<T>,
     ) => {
       const originalOnChange = propsAsAny.onChange;
+      const originalOnBlur = propsAsAny.onBlur;
 
       // Base props always injected: field name identity + wrapped onChange
       const nextProps: Record<string, any> = {
@@ -64,6 +72,10 @@ export const useBuiltFormChildren = <T,>({
           // Parent status update happens before calling the original child handler
           onValueChange(runtimeConfig, runtimeKey, args, binding);
           originalOnChange?.(...args);
+        },
+        onBlur: (...args: any[]) => {
+          onFieldBlur(runtimeConfig, runtimeKey, args, binding);
+          originalOnBlur?.(...args);
         },
       };
 
@@ -75,11 +87,11 @@ export const useBuiltFormChildren = <T,>({
         nextProps.phoneNumberBaseInputEvents = {
           ...originalEvents,
           onChange: (...args: any[]) => {
-            onValueChange(runtimeConfig, runtimeKey, args, binding);
-            originalEvents.onChange?.(...args);
-          },
-        };
-        delete nextProps.onChange;
+          onValueChange(runtimeConfig, runtimeKey, args, binding);
+          originalEvents.onChange?.(...args);
+        },
+      };
+      delete nextProps.onChange;
         return nextProps;
       }
 

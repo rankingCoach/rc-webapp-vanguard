@@ -14,6 +14,8 @@ type State = {
   phoneNumber: string;
   items: string[];
   itemErrors: Array<string | undefined>;
+  customInput: string;
+  customCheckbox: boolean;
 };
 const baseState: State = {
   aliasField: '',
@@ -25,6 +27,8 @@ const baseState: State = {
   phoneNumber: '9876543210',
   items: ['first item', 'second item'],
   itemErrors: [undefined, undefined],
+  customInput: '',
+  customCheckbox: false,
 };
 
 const initialState = withInitialState(baseState);

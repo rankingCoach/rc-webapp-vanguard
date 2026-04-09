@@ -105,6 +105,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     ...rest
   } = props;
   const formconfig = resolvedFormConfig;
+  const normalizedOptions = options ?? [];
 
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
@@ -139,15 +140,22 @@ export const Autocomplete = (props: AutocompleteProps) => {
     }
   }, [formconfig]);
 
-  const [val, setVal] = useState((value ?? multiple) ? [] : null); //Autocompletes's Value
+  const getNormalizedValue = (nextValue: any) => {
+    if (multiple) {
+      return Array.isArray(nextValue) ? nextValue : [];
+    }
+    return nextValue ?? null;
+  };
+
+  const [val, setVal] = useState(getNormalizedValue(value)); // Autocomplete's value
   useEffect(() => {
     if (formconfig) {
       setTimeout(() => {
-        setVal(formconfig?.stateValue);
+        setVal(getNormalizedValue(formconfig?.stateValue));
         setAdornmentIndex(Number(formconfig?.stateValue?.key));
       }, 0);
     }
-  }, [formconfig?.stateValue]);
+  }, [formconfig?.stateValue, multiple]);
 
   const ShowAdornment = (index?: number): React.ReactNode | null => {
     if (!adornment || index === undefined) return null;
@@ -415,11 +423,11 @@ export const Autocomplete = (props: AutocompleteProps) => {
         autoComplete={autoComplete}
         autoSelect={autoSelect}
         multiple={multiple}
-        options={options}
+        options={normalizedOptions}
         noOptionsText={noOptionsText}
         renderTags={renderTags}
         renderOption={renderOption}
-        ListboxComponent={options.length === 0 ? EmptyListComponent : undefined}
+        ListboxComponent={normalizedOptions.length === 0 ? EmptyListComponent : undefined}
         isOptionEqualToValue={isOptionEqualToValue}
         getOptionLabel={getOptionLabel}
         onChange={onAutocompleteChangeFn}

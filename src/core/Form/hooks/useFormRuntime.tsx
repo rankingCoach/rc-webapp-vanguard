@@ -57,6 +57,11 @@ export const useFormRuntime = <T,>({ children, config, onChange }: UseFormRuntim
       }
       updateStatusFromConfig(runtimeConfig, runtimeConfig.validateOn !== 'blur');
     },
+    onFieldBlur: (runtimeConfig) => {
+      if (runtimeConfig.validateOn === 'blur') {
+        updateStatusFromConfig(runtimeConfig, true);
+      }
+    },
   });
 
   useEffect(() => {
