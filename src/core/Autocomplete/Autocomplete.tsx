@@ -194,6 +194,13 @@ export const Autocomplete = (props: AutocompleteProps) => {
     reason?: AutocompleteChangeReason,
     details?: any,
   ) => {
+    // Synchronously update internal `val` so that MUI always computes the correct accumulated
+    // array for subsequent selections in multiple mode. Without this, MUI uses the stale `val`
+    // (which only updates after the async Redux round-trip + setTimeout in the useEffect below),
+    // causing each selection to overwrite instead of append: MUI computes [...val, newOption]
+    // and if `val` is still the pre-selection state it produces the wrong array.
+    setVal(getNormalizedValue(nextVal));
+
     if (restrictToOptions && innerInputRef && innerInputRef.current && typeof nextVal === 'string') {
       innerInputRef.current.value = nextVal;
     }
