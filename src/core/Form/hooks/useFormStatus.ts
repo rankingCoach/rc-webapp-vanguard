@@ -1,6 +1,6 @@
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FormStatus } from './form.types';
 import { createStatusEntries, hasConfiguredPassError, shallowEqualBooleanRecord, shouldKeepStatusKey } from './form.utils';
@@ -29,7 +29,7 @@ export const useFormStatus = <T,>({ onChange }: UseFormStatusParams<T>) => {
     onChangeRef.current?.(status as any);
   }, [status]);
 
-  const updateStatusFromConfig = (runtimeConfig: FormConfigElement<T>, shouldCommitErrors: boolean) => {
+  const updateStatusFromConfig = useCallback((runtimeConfig: FormConfigElement<T>, shouldCommitErrors: boolean) => {
     const stringKey = runtimeConfig.stateFieldName as string;
     const idx = runtimeConfig.arrayPosition !== undefined ? `${runtimeConfig.arrayPosition}` : '';
     const changeKey = `${stringKey}${idx}`;
@@ -63,9 +63,11 @@ export const useFormStatus = <T,>({ onChange }: UseFormStatusParams<T>) => {
       latestStatusRef.current = nextStatus as any;
       return nextStatus as any;
     });
-  };
+  // updateStatusFromConfig only closes over stable refs (latestStatusRef, setStatus) and
+  // imported pure utilities — no reactive deps needed.
+  }, []);
 
-  const syncDerivedStatus = (config: any, activeInputs: Record<string, FormConfigElement<T>>) => {
+  const syncDerivedStatus = useCallback((config: any, activeInputs: Record<string, FormConfigElement<T>>) => {
     if (!config) {
       return;
     }
@@ -135,7 +137,9 @@ export const useFormStatus = <T,>({ onChange }: UseFormStatusParams<T>) => {
 
     latestStatusRef.current = nextStatus as any;
     setStatus(nextStatus as any);
-  };
+  // syncDerivedStatus only closes over stable refs (latestStatusRef, setStatus) and
+  // imported pure utilities — no reactive deps needed.
+  }, []);
 
   return {
     latestStatusRef,

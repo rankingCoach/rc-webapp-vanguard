@@ -18,7 +18,7 @@ import { Link } from '@vanguard/Link/Link';
 import { Popover } from '@vanguard/Popover/Popover';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
-import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, MutableRefObject, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Props: Value
@@ -278,14 +278,23 @@ export const InputBase = (props: rcInputBaseProps) => {
   // Length field
   const [length, setLength] = useState((value && typeof value === 'string' && value.length) ?? 0);
 
-  const resizeBackdrop = () => {
+  // Hoisted early so resizeBackdrop (useCallback below) can close over stable values.
+  // The duplicate declarations further down in the "UI: Highlights" section are removed.
+  const useBackdrop = !!(highlightLengthExceeded || highlightWords || highlightUrl || prohibitedWords);
+  const backDropRef = useRef<HTMLDivElement>(null);
+
+  // useCallback so the debounce wrapper created below is not thrown away and re-created
+  // on every render (which would mean the debounce never actually fires).
+  const resizeBackdrop = useCallback(() => {
     if (useBackdrop && backDropRef && backDropRef.current && inputRef && inputRef.current) {
       backDropRef.current.style.height = `${inputRef.current.getBoundingClientRect().height.toString()}px`;
       backDropRef.current.style.width = `${inputRef.current.getBoundingClientRect().width.toString()}px`;
       backDropRef.current.scrollTop = inputRef.current.scrollTop;
       backDropRef.current.scrollLeft = inputRef.current.scrollLeft;
     }
-  };
+  // backDropRef and inputRef are refs — their .current changes without triggering re-renders,
+  // so we only need useBackdrop in the dep array.
+  }, [useBackdrop, backDropRef, inputRef]);
 
   const debouncedResizeBackdrop = React.useMemo(() => debounce(resizeBackdrop, 100), [resizeBackdrop]);
 
@@ -547,8 +556,7 @@ export const InputBase = (props: rcInputBaseProps) => {
    * UI: Highlights
    * -------
    */
-  const useBackdrop = highlightLengthExceeded || highlightWords || highlightUrl || prohibitedWords;
-  const backDropRef = useRef<HTMLDivElement>(null);
+  // useBackdrop and backDropRef are declared early (before resizeBackdrop useCallback above).
   const [backdrop, setBackdrop] = useState<{ __html: string }>({ __html: '' });
   const updateBackdrop = (content: string) => {
     if (!useBackdrop) {

@@ -301,15 +301,17 @@ export const FormValidInputValidationMatrix: Story = {
       },
     });
 
+    const handleFormChange = React.useCallback((status: Parameters<NonNullable<React.ComponentProps<typeof Form>["onChange"]>>[0]) => {
+      setIsValid(status.isValid);
+      setCurrentField(status.currentConfig?.stateFieldName ?? "null");
+      setInputsStatus(JSON.stringify(status.inputsStatus));
+    }, []);
+
     return (
       <div data-testid="valid-input-form-story" style={{ padding: "20px" }}>
         <Form
           config={formConfig}
-          onChange={(status) => {
-            setIsValid(status.isValid);
-            setCurrentField(status.currentConfig?.stateFieldName ?? "null");
-            setInputsStatus(JSON.stringify(status.inputsStatus));
-          }}
+          onChange={handleFormChange}
         >
           <div style={{ display: "grid", gap: "12px", maxWidth: "760px" }}>
             <Input label="Required input" testId="validation-required" formconfig={formConfig.requiredText} />

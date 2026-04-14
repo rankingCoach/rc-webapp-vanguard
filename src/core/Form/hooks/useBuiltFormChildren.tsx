@@ -236,5 +236,5 @@ export const useBuiltFormChildren = <T,>({
       activeInputs,
       children: mapChildren(children),
     };
-  }, [children, config, getRuntimeConfig, onValueChange]);
+  }, [children, config, getRuntimeConfig, onValueChange, onFieldBlur]);
 };

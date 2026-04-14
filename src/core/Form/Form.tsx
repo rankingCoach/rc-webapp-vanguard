@@ -1,6 +1,6 @@
 import './Form.scss';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { FormConfigProvider, useFormConfigContext } from './FormConfigContext';
 import { ConfigWithInternal, FormStatus } from './hooks/form.types';
@@ -20,7 +20,7 @@ export const Form = <T,>(props: Props<T>) => {
   const effectiveOnChange = parentContext?.parentOnChange || onChange;
   const { builtChildren } = useFormRuntime({ children, config, onChange: effectiveOnChange });
 
-  const submitAction = async () => {
+  const submitAction = useCallback(async () => {
     onSubmit?.(
       config?._internalInputs
         ? (Object.fromEntries(
@@ -28,7 +28,7 @@ export const Form = <T,>(props: Props<T>) => {
           ) as T)
         : ({} as T),
     );
-  };
+  }, [onSubmit, config]);
 
   const classes = `Form-container ${className ?? ''}`.trim();
   const isRootForm = !parentContext;
