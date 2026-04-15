@@ -1,13 +1,9 @@
 @import "@styles/spacings";
 @import "@styles/media-mixins";
 
-// Styles for one absolutely-positioned marker: container, default circle pin,
-// highlighted content slot, and anchored content card positioning.
-//
 // CSS variables:
 //   --benchmark-gauge-marker-dim-opacity  Opacity of dimmed (non-highlighted) markers.
 //   --benchmark-gauge-legend-transition   Transition used for the dim opacity animation.
-//   --benchmark-gauge-pin-size            Size (width and height) of the default circle pin.
 //   --benchmark-gauge-connector-gap       Gap between the pin and anchored content card.
 
 // ─── Marker container ─────────────────────────────────────────────────────────
@@ -36,67 +32,6 @@
   transition: opacity var(--benchmark-gauge-legend-transition, 0.15s ease);
 }
 
-// ─── Pin wrapper ──────────────────────────────────────────────────────────────
-// Centered flex container around the pin. Reset styles ensure no browser defaults
-// interfere when the wrapper is used as a focus target.
-.pinWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-  border: none;
-  background: transparent;
-  padding: 0;
-}
-
-// ─── Default pin ─────────────────────────────────────────────────────────────
-// Circular pin rendered when no custom `renderPin` is provided.
-// Size and background are set by component props; transitions animate on highlight.
-.defaultPin {
-  display: flex;
-  width: var(--benchmark-gauge-pin-size, $x2);
-  height: var(--benchmark-gauge-pin-size, $x2);
-  border-radius: 50%;
-  border: $x0_5 solid var(--n000);
-  transition:
-          width 0.18s ease,
-          height 0.18s ease,
-          background-color 0.2s ease;
-  align-items: center;
-  justify-content: center;
-  transform-origin: center;
-  box-sizing: content-box;
-}
-
-// Grown state: applied when `growHighlightedMarker` is true and the legend item is highlighted.
-.defaultPinGrown {
-  width: calc(var(--benchmark-gauge-pin-size, $x2) * 2);
-  height: calc(var(--benchmark-gauge-pin-size, $x2) * 2);
-  border: $x0_25 + $x0_125 solid var(--n000);
-}
-
-// ─── Highlighted content ─────────────────────────────────────────────────────
-// Animated slot for content shown while the marker is highlighted.
-// Always in the DOM — opacity and scale transitions drive visibility so animations
-// fire on every state change without mount/unmount timing issues.
-.highlightedContent {
-  opacity: 0;
-  transition: opacity 0.15s ease 0.05s, transform 0.15s ease 0.05s;
-  transform: scale(0.5);
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-// Visible state: applied when the corresponding legend item is highlighted.
-.highlightedContentVisible {
-  opacity: 1;
-  transform: scale(1);
-  transition-delay: 0.16s;
-}
-
 // ─── Content anchor ───────────────────────────────────────────────────────────
 // Positions the anchored content card relative to the pin.
 // Direction (above/below/left/right) is determined by contentSide and orientation.
@@ -110,13 +45,13 @@
 }
 
 // Below the pin (horizontal) or to the right (vertical).
-.contentAnchor--end {
+.contentAnchorEnd {
   top: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
   flex-direction: column;
 }
 
 // Above the pin (horizontal) or to the left (vertical).
-.contentAnchor--start {
+.contentAnchorStart {
   bottom: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
   flex-direction: column-reverse;
 }
@@ -127,13 +62,13 @@
   top: 50%;
 }
 
-.vertical .contentAnchor--end {
+.vertical .contentAnchorEnd {
   left: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
   bottom: auto;
   flex-direction: row;
 }
 
-.vertical .contentAnchor--start {
+.vertical .contentAnchorStart {
   right: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
   bottom: auto;
   flex-direction: row-reverse;

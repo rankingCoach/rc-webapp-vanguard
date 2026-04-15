@@ -1,9 +1,11 @@
 import { classNames } from '@helpers/classNames';
+import { Render } from '@vanguard/Render';
 import React, { CSSProperties } from 'react';
 
 import { BenchmarkGaugeMarkerType, MarkerRenderContext } from '../types';
 import { markerPosition, valueToPercent } from '../utils';
 import styles from './BenchmarkGaugeMarker.module.scss';
+import { BenchmarkGaugePin } from './BenchmarkGaugePin/BenchmarkGaugePin.tsx';
 
 interface BenchmarkGaugeMarkerProps {
   marker: BenchmarkGaugeMarkerType;
@@ -53,26 +55,6 @@ export const BenchmarkGaugeMarker = (props: BenchmarkGaugeMarkerProps) => {
     ? { bottom: markerPosition(percent) }
     : { left: markerPosition(percent) };
 
-  // marker
-  const pinEl = (
-    <div className={classNames(styles.pinWrapper)}>
-      {marker.renderPin ? (
-        marker.renderPin(ctx)
-      ) : (
-        <div
-          className={classNames(styles.defaultPin, growHighlightedMarker && isHighlighted && styles.defaultPinGrown)}
-          style={{ background: resolvedColor }}
-        >
-          {marker.renderHighlightedContent && (
-            <div className={classNames(styles.highlightedContent, isHighlighted && styles.highlightedContentVisible)}>
-              {marker.renderHighlightedContent(ctx)}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
   /**
    * Return View
    */
@@ -81,13 +63,24 @@ export const BenchmarkGaugeMarker = (props: BenchmarkGaugeMarkerProps) => {
       className={classNames(styles.marker, isVertical && styles.vertical, isDimmed && styles.dimmed)}
       style={positionStyle}
     >
-      {pinEl}
+      <BenchmarkGaugePin
+        marker={marker}
+        ctx={ctx}
+        resolvedColor={resolvedColor}
+        isHighlighted={isHighlighted}
+        growHighlightedMarker={growHighlightedMarker}
+      />
 
-      {marker.renderContent && (
-        <div className={classNames(styles.contentAnchor, styles[`contentAnchor--${resolvedSide(marker.contentSide)}`])}>
-          <div className={styles.contentShell}>{marker.renderContent(ctx)}</div>
+      <Render if={!!marker.renderContent}>
+        <div
+          className={classNames(
+            styles.contentAnchor,
+            resolvedSide(marker.contentSide) === 'start' ? styles.contentAnchorStart : styles.contentAnchorEnd,
+          )}
+        >
+          <div className={styles.contentShell}>{marker.renderContent?.(ctx)}</div>
         </div>
-      )}
+      </Render>
     </div>
   );
 };
