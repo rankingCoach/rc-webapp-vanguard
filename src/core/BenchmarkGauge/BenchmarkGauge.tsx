@@ -94,7 +94,7 @@ export const BenchmarkGauge = (props: BenchmarkGaugeProps) => {
                   isHighlighted && styles.legendItemHighlighted,
                   isDimmed && dimsItems && styles.legendItemDimmed,
                 )}
-                style={{ '--_legend-item-bg': marker.legendBackgroundColor ?? '#fff' } as React.CSSProperties}
+                style={{ '--legend-item-bg': marker.legendBackgroundColor ?? '#fff' } as React.CSSProperties}
                 onMouseEnter={hoverHighlights ? () => setHighlightedId(marker.id) : undefined}
                 onMouseLeave={hoverHighlights ? () => setHighlightedId(undefined) : undefined}
               >
