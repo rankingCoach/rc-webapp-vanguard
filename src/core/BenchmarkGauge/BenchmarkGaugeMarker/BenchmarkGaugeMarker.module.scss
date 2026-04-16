@@ -1,0 +1,81 @@
+@import "@styles/spacings";
+@import "@styles/media-mixins";
+
+// CSS variables:
+//   --benchmark-gauge-marker-dim-opacity  Opacity of dimmed (non-highlighted) markers.
+//   --benchmark-gauge-legend-transition   Transition used for the dim opacity animation.
+//   --benchmark-gauge-connector-gap       Gap between the pin and anchored content card.
+
+// ─── Marker container ─────────────────────────────────────────────────────────
+// Absolutely positioned and centered on the track at the marker's computed value.
+.marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Vertical mode: anchors by bottom instead of left.
+.vertical {
+  top: auto;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+}
+
+// Dimmed: applied when another marker is highlighted.
+.dimmed {
+  opacity: var(--benchmark-gauge-marker-dim-opacity, 0.4);
+  transition: opacity var(--benchmark-gauge-legend-transition, 0.15s ease);
+}
+
+// ─── Content anchor ───────────────────────────────────────────────────────────
+// Positions the anchored content card relative to the pin.
+// Direction (above/below/left/right) is determined by contentSide and orientation.
+.contentAnchor {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+// Below the pin (horizontal) or to the right (vertical).
+.contentAnchorEnd {
+  top: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
+  flex-direction: column;
+}
+
+// Above the pin (horizontal) or to the left (vertical).
+.contentAnchorStart {
+  bottom: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
+  flex-direction: column-reverse;
+}
+
+.vertical .contentAnchor {
+  left: auto;
+  transform: translateY(-50%);
+  top: 50%;
+}
+
+.vertical .contentAnchorEnd {
+  left: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
+  bottom: auto;
+  flex-direction: row;
+}
+
+.vertical .contentAnchorStart {
+  right: calc(100% + var(--benchmark-gauge-connector-gap, $x2));
+  bottom: auto;
+  flex-direction: row-reverse;
+}
+
+// ─── Content shell ────────────────────────────────────────────────────────────
+// Prevents content from stretching to fill the anchor flex container.
+.contentShell {
+  flex-shrink: 0;
+}
