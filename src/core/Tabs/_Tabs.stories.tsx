@@ -388,3 +388,27 @@ export const ManyTabs: Story = {
     await expect(tabs).toHaveLength(10);
   },
 };
+
+export const ManyTabsSmall: Story = {
+  name: "Scrollable: Many Tabs Small",
+  render: () => (
+    <TabsDemo
+      tabs={Array.from({ length: 10 }, (_, i) => ({
+        label: `Tab ${i + 1}`,
+        component: (
+          <div style={{ padding: "24px" }}>
+            <h3>Content for Tab {i + 1}</h3>
+          </div>
+        ),
+        value: i,
+      }))}
+      tabConfig={{ tabHeight: "small" }}
+      wrapperStyle={{ width: "500px" }}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tabs = canvas.getAllByRole("tab");
+    await expect(tabs).toHaveLength(10);
+  },
+};

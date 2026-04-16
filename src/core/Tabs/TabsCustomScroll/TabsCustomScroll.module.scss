@@ -9,7 +9,7 @@
   box-shadow: -$x0_25 0 $x0_25 rgba(4, 5, 6, 0.03), -$x0_5 0 $x1 rgba(4, 5, 6, 0.05), -$x1 0 $x3 rgba(4, 5, 6, 0.08);
   border-radius: $x6 0 0 $x6;
   position: absolute;
-  top: 12%;
+  top: 50%;
   border: $x0_5 solid var(--n000);
   border-right: none;
   background-color: var(--n100);
@@ -31,11 +31,11 @@
 
   &.right {
     right: 0;
-    transform: translateX(0);
+    transform: translateY(-50%);
     opacity: 1;
 
     &.hidden {
-      transform: translateX(150%);
+      transform: translateY(-50%) translateX(150%);
       opacity: 0;
       pointer-events: none;
     }
@@ -44,11 +44,11 @@
   &.left {
     left: 0;
     // rotate(180deg) flips local X axis, so translateX(150%) in rotated space = visually slides left
-    transform: rotate(180deg);
+    transform: translateY(-50%) rotate(180deg);
     opacity: 1;
 
     &.hidden {
-      transform: translateX(-150%) rotate(180deg);
+      transform: translateY(-50%) translateX(-150%) rotate(180deg);
       opacity: 0;
       pointer-events: none;
     }
