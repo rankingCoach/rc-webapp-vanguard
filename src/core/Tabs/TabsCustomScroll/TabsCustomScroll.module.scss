@@ -12,16 +12,46 @@
   top: 12%;
   border: $x0_5 solid var(--n000);
   border-right: none;
-  background-color: var(--n200);
-  z-index: 9999;
+  background-color: var(--n100);
+  z-index: 999;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--n200);
+
+    svg path {
+      fill: var(--n500);
+    }
+  }
+
+  &:active {
+    background-color: var(--n300);
+  }
 
   &.right {
     right: 0;
+    transform: translateX(0);
+    opacity: 1;
+
+    &.hidden {
+      transform: translateX(150%);
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 
   &.left {
     left: 0;
+    // rotate(180deg) flips local X axis, so translateX(150%) in rotated space = visually slides left
     transform: rotate(180deg);
+    opacity: 1;
+
+    &.hidden {
+      transform: translateX(-150%) rotate(180deg);
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 }
 
