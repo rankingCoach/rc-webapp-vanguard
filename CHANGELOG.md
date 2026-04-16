@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.8.0%0Dv1.7.0#diff) (2026-04-16)
+
+
+### Features
+
+* **avatar:** add user icon and related stories ([a44be00](https://github.com/rankingCoach/rc-webapp-vanguard/commits/a44be00cb4b7af55fdf48cab82c425695ac5655d))
+* **icon:** add new active icons and update icon names ([3c5a116](https://github.com/rankingCoach/rc-webapp-vanguard/commits/3c5a11645254406be29e31712f316ea93ac1a679))
+* **menu:** add menu component with selectable items and active icon support ([6507c8d](https://github.com/rankingCoach/rc-webapp-vanguard/commits/6507c8d598064855c1d8437037b2283f550d6518))
+* **tabs:** enhance TabsCustomScroll with hover and active states, improve accessibility ([6fd28ad](https://github.com/rankingCoach/rc-webapp-vanguard/commits/6fd28ad5c64f6b612fc10c84e2c2c61c71233622))
+* **tabs:** update Tabs layout and add ManyTabsSmall story for better demo ([05d6535](https://github.com/rankingCoach/rc-webapp-vanguard/commits/05d65353fa5dd5586b4d30aabb957a26b227e65c))
+
 ## [1.7.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.7.0%0Dv1.6.0#diff) (2026-04-16)
 
 
