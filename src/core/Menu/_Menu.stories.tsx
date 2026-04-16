@@ -42,6 +42,19 @@ const ControlledMenu = (props: Partial<MenuProps>) => {
 
 // --- Base ---
 
+export const WithSelectedItem: Story = {
+  render: () => (
+    <ControlledMenu
+      items={[
+        { key: 'edit', children: 'Edit', icon: IconNames.edit, iconPosition: 'before' },
+        { key: 'document', children: 'Document', icon: IconNames.document, iconPosition: 'before', selected: true, useActiveIcon: true },
+        { key: 'delete', children: 'Delete', icon: IconNames.trash, iconPosition: 'before', disabled: true },
+        { key: 'archive', children: 'Archive', icon: IconNames.save, iconPosition: 'before' },
+      ]}
+    />
+  ),
+};
+
 export const WithItems: Story = {
   render: () => <ControlledMenu />,
 };
