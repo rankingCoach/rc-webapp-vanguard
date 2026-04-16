@@ -15,17 +15,17 @@ export interface TabsCustomScrollProps {
 export const TabsCustomScroll = (props: TabsCustomScrollProps) => {
   const { direction, onClick, disabled, testId } = props;
 
-  if (disabled) {
-    return null;
-  }
-
   return (
     <div
-      onClick={onClick}
-      className={classNames(styles.customScrollButtonWrapper, direction === 'right' ? styles.right : styles.left)}
+      onClick={!disabled ? onClick : undefined}
+      className={classNames(
+        styles.customScrollButtonWrapper,
+        direction === 'right' ? styles.right : styles.left,
+        disabled && styles.hidden,
+      )}
       data-testid={testId}
     >
-      <Icon color={'var(--n700)'} type={IconSize.small}>
+      <Icon color={'var(--n400)'} type={IconSize.small}>
         {IconNames.caretLeft}
       </Icon>
     </div>

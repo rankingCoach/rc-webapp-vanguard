@@ -6,4 +6,10 @@
    > div > div {
      gap: $x0_25;
    }
+
+  :global(.MuiTabs-scrollableX) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }

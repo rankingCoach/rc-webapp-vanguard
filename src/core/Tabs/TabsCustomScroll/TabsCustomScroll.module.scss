@@ -9,19 +9,49 @@
   box-shadow: -$x0_25 0 $x0_25 rgba(4, 5, 6, 0.03), -$x0_5 0 $x1 rgba(4, 5, 6, 0.05), -$x1 0 $x3 rgba(4, 5, 6, 0.08);
   border-radius: $x6 0 0 $x6;
   position: absolute;
-  top: 12%;
+  top: 50%;
   border: $x0_5 solid var(--n000);
   border-right: none;
-  background-color: var(--n200);
-  z-index: 9999;
+  background-color: var(--n100);
+  z-index: 999;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--n200);
+
+    svg path {
+      fill: var(--n500);
+    }
+  }
+
+  &:active {
+    background-color: var(--n300);
+  }
 
   &.right {
     right: 0;
+    transform: translateY(-50%);
+    opacity: 1;
+
+    &.hidden {
+      transform: translateY(-50%) translateX(150%);
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 
   &.left {
     left: 0;
-    transform: rotate(180deg);
+    // rotate(180deg) flips local X axis, so translateX(150%) in rotated space = visually slides left
+    transform: translateY(-50%) rotate(180deg);
+    opacity: 1;
+
+    &.hidden {
+      transform: translateY(-50%) translateX(-150%) rotate(180deg);
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 }
 

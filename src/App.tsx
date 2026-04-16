@@ -7,8 +7,10 @@ import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContai
 import { CreditCard, CreditCardType } from '@vanguard/CreditCard/CreditCard';
 import { EditModal } from '@vanguard/CustomModals/EditModal/EditModal.tsx';
 import { Form } from '@vanguard/Form/Form.tsx';
+import { IconNames } from '@vanguard/Icon/IconNames';
 import { Input } from '@vanguard/Input/Input.tsx';
 import { LottieAnimationLoader } from '@vanguard/LottieAnimationLoader/LottieAnimationLoader.tsx';
+import { Menu, MenuItemConfig } from '@vanguard/Menu/Menu';
 import { ModalProvider } from '@vanguard/Modal/ModalContext.tsx';
 import { ModalResponse } from '@vanguard/Modal/ModalResponse.ts';
 import { ModalRoot, StandardModalProps } from '@vanguard/Modal/ModalRoot/ModalRoot.tsx';
@@ -21,7 +23,7 @@ import { TagList } from '@vanguard/TagList/TagList.tsx';
 import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text.tsx';
 import { TogglerWithText, TogglerWithTextProps } from '@vanguard/TogglerWithText/TogglerWithText.tsx';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -75,9 +77,9 @@ export const BODY_SCROLL_UP_IN: number = 1000 * ANIMATION_SPEED_MODIFIER;
 export const BODY_AFTER_SCROLL_UP_TRANSITION_DELAY: number = 50 * ANIMATION_SPEED_MODIFIER;
 export const FADE_BACK_IN_AFTER_SCROLL_UP: number = 500 * ANIMATION_SPEED_MODIFIER;
 
-function App(): JSX.Element {
-  const ToggleWithNode = (props: TogglerWithTextProps): JSX.Element => {
-    const Left = (): JSX.Element => {
+export const App = () => {
+  const ToggleWithNode = (props: TogglerWithTextProps): React.ReactElement => {
+    const Left = (): React.ReactElement => {
       return (
         <div className={classNames(dFlex, alignItemsCenter, gap1)}>
           <Text>Annual</Text>
@@ -100,7 +102,7 @@ function App(): JSX.Element {
     );
   };
 
-  const CustomEditModal = (props: StandardModalProps<null>): JSX.Element => {
+  const CustomEditModal = (props: StandardModalProps<null>): React.ReactElement => {
     const { close } = props;
     return (
       <EditModal
@@ -129,6 +131,31 @@ function App(): JSX.Element {
       />,
     );
   };
+
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [selectedMenuKey, setSelectedMenuKey] = useState<string>('document');
+
+  const menuItems: MenuItemConfig[] = (
+    [
+      { key: 'edit', children: 'Edit', icon: IconNames.edit, iconPosition: 'before' },
+      {
+        key: 'document',
+        children: 'Document',
+        icon: IconNames.document,
+        iconPosition: 'before',
+        useActiveIcon: 'document' === selectedMenuKey,
+      },
+      { key: 'share', children: 'Share', icon: IconNames.share, iconPosition: 'before' },
+      { key: 'delete', children: 'Delete', icon: IconNames.trash, iconPosition: 'before', disabled: true },
+    ] as MenuItemConfig[]
+  ).map((item) => ({
+    ...item,
+    selected: item.key === selectedMenuKey,
+    onClick: () => {
+      setSelectedMenuKey(item.key as string);
+      setMenuAnchorEl(null);
+    },
+  })) as MenuItemConfig[];
 
   const isGenerating = true;
 
@@ -250,6 +277,16 @@ function App(): JSX.Element {
             <CreditCard type={CreditCardType.Visa} disabled={false} small={true} />
           </ComponentContainer>
 
+          <ComponentContainer>
+            <Button onClick={(e) => setMenuAnchorEl(e.currentTarget as HTMLElement)}>Open Menu</Button>
+            <Menu
+              anchorEl={menuAnchorEl}
+              open={Boolean(menuAnchorEl)}
+              onClose={() => setMenuAnchorEl(null)}
+              items={menuItems}
+            />
+          </ComponentContainer>
+
           <SearchableSelect
             options={[
               { value: 1, title: 'A', key: 1 },
@@ -268,6 +305,6 @@ function App(): JSX.Element {
       </PersistGate>
     </Provider>
   );
-}
+};
 
 export default App;

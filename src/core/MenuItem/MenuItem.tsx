@@ -13,6 +13,7 @@ export type MenuItemProps = {
   icon?: IconNames;
   iconProps?: Omit<IconProps, 'children'>;
   iconPosition?: MenuItemIconPosition;
+  useActiveIcon?: boolean;
 } & Omit<MuiMenuItemProps, 'className'>;
 
 export const MenuItem = ({
@@ -23,11 +24,19 @@ export const MenuItem = ({
   icon,
   iconProps,
   iconPosition = 'before',
+  useActiveIcon = false,
   ...rest
 }: MenuItemProps) => {
   const text = typeof children === 'string' ? <Text type={textType}>{children}</Text> : children;
 
-  const iconEl = icon ? <Icon {...iconProps}>{icon}</Icon> : null;
+  const isSelected = rest.selected;
+  const resolvedIcon = icon && useActiveIcon ? (`${icon}-active` as IconNames) : icon;
+  const iconColor = isSelected ? 'var(--fn-fg-cta)' : undefined;
+  const iconEl = resolvedIcon ? (
+    <Icon color={iconColor} {...iconProps}>
+      {resolvedIcon}
+    </Icon>
+  ) : null;
 
   const content = iconEl ? (
     <div
