@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.7.0%0Dv1.6.0#diff) (2026-04-16)
+
+
+### Features
+
+* **benchmark-gauge:** add benchmark gauge ([94fda01](https://github.com/rankingCoach/rc-webapp-vanguard/commits/94fda013b6fc4a73a3d18ccf5da958799543fcc0)), closes [#VAN-46](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-46)
+
+
+### Bug Fixes
+
+* **benchmark-gauge:** replace the hardcoded label pill background to var color ([e4d5b21](https://github.com/rankingCoach/rc-webapp-vanguard/commits/e4d5b21ccb62ee8ceec61bf8df327287e234765f))
+* **benchmark-gauge:** set marker box sizing ([5a31eb2](https://github.com/rankingCoach/rc-webapp-vanguard/commits/5a31eb22f24578601f33a79acb868041a2bce975))
+
 ## [1.6.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.6.0%0Dv1.5.1#diff) (2026-04-06)
 
 
