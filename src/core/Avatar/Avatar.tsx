@@ -25,17 +25,10 @@ type BaseAvatarProps = {
   clearIcon?: string;
 };
 
-type AvatarPropsWithIcon = BaseAvatarProps & {
-  image?: null;
+export type AvatarProps = BaseAvatarProps & {
   icon?: AvatarIcon | string;
-};
-
-type AvatarPropsWithImage = BaseAvatarProps & {
-  icon?: null;
   image?: string;
 };
-
-export type AvatarProps = AvatarPropsWithIcon | AvatarPropsWithImage;
 
 export const Avatar = (props: AvatarProps) => {
   const {
@@ -49,8 +42,7 @@ export const Avatar = (props: AvatarProps) => {
     greyScale = false,
     clearIcon,
   } = props;
-  const { icon = '' } = props as AvatarPropsWithIcon;
-  const { image } = props as AvatarPropsWithImage;
+  const { icon = '', image } = props;
   const SvgName = `${AvatarIconMap[icon]}`;
   const showNotifications = hasNotifications && size !== 'small';
   let { SvgIcon, loading, error } = useDynamicImport(`avatarIcons/listings/${SvgName}.svg`, {

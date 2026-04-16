@@ -10,6 +10,8 @@ import { WithNotifications as _WithNotifications } from "./stories/WithNotificat
 import { WithBgColor as _WithBgColor } from "./stories/WithBgColor.story";
 import { WithTranslate as _WithTranslate } from "./stories/WithTranslate.story";
 import { SizesAndVariations as _SizesAndVariations } from "./stories/SizesAndVariations.story";
+import { WithUserIcon as _WithUserIcon } from "./stories/WithUserIcon.story";
+import { WithIconThenImage as _WithIconThenImage } from "./stories/WithIconThenImage.story";
 
 export const Default: Story = { ..._Default };
 export const WithImage: Story = { ..._WithImage };
@@ -20,6 +22,8 @@ export const WithNotifications: Story = { ..._WithNotifications };
 export const WithBgColor: Story = { ..._WithBgColor };
 export const WithTranslate: Story = { ..._WithTranslate };
 export const SizesAndVariations: Story = { ..._SizesAndVariations };
+export const WithUserIcon: Story = { ..._WithUserIcon };
+export const WithIconThenImage: Story = { ..._WithIconThenImage };
 
 export default {
   ...SbDecorator({
