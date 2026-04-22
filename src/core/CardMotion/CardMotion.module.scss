@@ -1,0 +1,70 @@
+.glowShell {
+  transform-origin: top;
+  animation:
+    cmo-card-glow-visual var(--card-motion-duration) var(--card-motion-ease) var(--card-motion-delay) both,
+    cmo-card-glow-transform var(--card-motion-duration) var(--card-motion-ease) var(--card-motion-delay) backwards,
+    cmo-card-radius-shrink var(--card-motion-duration) ease-out var(--card-motion-delay) both;
+}
+
+.contentIn {
+  animation: cmo-card-content-in var(--card-motion-content-duration) ease-out var(--card-motion-content-delay) backwards;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+@keyframes cmo-card-glow-visual {
+  from {
+    background: rgba(243, 244, 246, var(--card-motion-glow-alpha-from));
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, calc(0.95 * var(--card-motion-glow-alpha-from))),
+      0 14px 40px rgba(255, 255, 255, calc(0.55 * var(--card-motion-glow-alpha-from)));
+    filter: brightness(var(--card-motion-brightness-from));
+  }
+
+  to {
+    background: transparent;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0),
+      0 14px 40px rgba(255, 255, 255, 0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes cmo-card-glow-transform {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) skewX(var(--card-motion-skew-x-from)) skewY(var(--card-motion-skew-y-from))
+      translate3d(0, var(--card-motion-y-from), 0) scale(var(--card-motion-scale-from));
+  }
+
+  to {
+    opacity: 1;
+    transform: perspective(1000px) skewX(0deg) skewY(0deg) translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes cmo-card-radius-shrink {
+  from {
+    border-radius: var(--card-motion-radius-from);
+  }
+
+  to {
+    border-radius: var(--card-motion-radius-to);
+  }
+}
+
+@keyframes cmo-card-content-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(0, 8px, 0);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}

@@ -217,6 +217,10 @@ export { LottieBase } from './core/LottieAnimationLoader';
 export type { SlideTransitionProps } from './core/SlideTransition';
 export { SlideTransition } from './core/SlideTransition';
 
+// CardMotion
+export type { CardMotionProps } from './core/CardMotion';
+export { CardMotion } from './core/CardMotion';
+
 // OnboardingWelcomeAnimation
 export type { OnboardingWelcomeAnimationProps } from './common/OnboardingWelcomeAnimation/OnboardingWelcomeAnimation.tsx';
 export { OnboardingWelcomeAnimation } from './common/OnboardingWelcomeAnimation/OnboardingWelcomeAnimation.tsx';
