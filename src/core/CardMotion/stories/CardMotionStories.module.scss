@@ -1,0 +1,82 @@
+@import '@styles/spacings';
+
+.cardSurface {
+  padding: $x3;
+  border: $x0_125 solid var(--n200);
+  border-radius: $x2 + $x0_25;
+}
+
+.contentPadding {
+  padding: $x3;
+}
+
+.glowRoot {
+  min-height: 17.5 * $x1;
+}
+
+.group {
+  display: grid;
+  gap: $x2;
+  grid-template-columns: repeat(auto-fit, minmax(27.5 * $x1, 1fr));
+  align-items: start;
+}
+
+.groupCardSurface {
+  min-height: 18.5 * $x1;
+}
+
+.groupCardContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: $x1;
+  min-height: 100%;
+  padding: $x3;
+}
+
+.groupCardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: $x0_5;
+}
+
+.groupCardTitle {
+  color: var(--n900);
+  display: block;
+  line-height: 1.2;
+}
+
+.groupCardDescription {
+  color: var(--n500);
+  display: block;
+  line-height: 1.4;
+}
+
+.surfaceNeutral {
+  background: var(--n000);
+}
+
+.surfaceWarm {
+  background: var(--n100);
+  border-color: var(--p100);
+}
+
+.surfaceInfo {
+  background: var(--i100);
+  border-color: var(--i500);
+}
+
+.surfaceAccent {
+  background: var(--p100);
+  border-color: var(--p500);
+}
+
+.surfaceGlow {
+  background: var(--n900);
+  border-color: var(--n200);
+}
+
+.surfaceGlowGroup {
+  background: var(--n000);
+  border-color: var(--n200);
+}
