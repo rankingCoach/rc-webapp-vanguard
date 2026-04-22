@@ -54,6 +54,7 @@ export interface CardMotionHoverAnimation {
 
 export interface CardMotionProps {
   delay: number;
+  className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
   hoverable?: boolean;

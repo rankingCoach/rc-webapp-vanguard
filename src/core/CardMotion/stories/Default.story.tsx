@@ -1,5 +1,6 @@
 import React from 'react';
 
+import styles from './CardMotionStories.module.scss';
 import { Story } from './_CardMotion.default';
 
 export const Default: Story = {
@@ -11,9 +12,7 @@ export const Default: Story = {
       duration: 0.24,
     },
     children: (
-      <div style={{ padding: 24, borderRadius: 18, background: '#ffffff', border: '1px solid #d7dce3' }}>
-        Default card content
-      </div>
+      <div className={`${styles.cardSurface} ${styles.surfaceNeutral}`}>Default card content</div>
     ),
   },
 };

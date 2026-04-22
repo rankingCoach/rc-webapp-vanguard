@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { CardMotion } from '../CardMotion';
+import styles from './CardMotionStories.module.scss';
 import { Story } from './_CardMotion.default';
 
 const cards = [
@@ -16,13 +17,7 @@ export const StaggeredGlowGroup: Story = {
     let delayIdx = 0;
 
     return (
-      <div
-        style={{
-          display: 'grid',
-          gap: 16,
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        }}
-      >
+      <div className={styles.group}>
         {cards.map((label, cardIndex) => (
           <CardMotion
             key={label}
@@ -30,17 +25,16 @@ export const StaggeredGlowGroup: Story = {
             glowIn={true}
             hoverable={true}
             index={cardIndex + 1}
-            style={{
-              minHeight: 148,
-              padding: 24,
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
-            }}
+            className={`${styles.cardSurface} ${styles.groupCardSurface} ${styles.surfaceGlowGroup}`}
           >
-            <>
-              <strong>{label}</strong>
-              <span>Brief-style staggered glow entry with delayed content resolve.</span>
-            </>
+            <div className={styles.groupCardContent}>
+              <div className={styles.groupCardHeader}>
+                <strong className={styles.groupCardTitle}>{label}</strong>
+                <span className={styles.groupCardDescription}>
+                  Brief-style staggered glow entry with delayed content resolve.
+                </span>
+              </div>
+            </div>
           </CardMotion>
         ))}
       </div>

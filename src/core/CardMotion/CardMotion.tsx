@@ -7,6 +7,7 @@ import { CardMotionProps } from './CardMotion.types';
 
 export function CardMotion({
   delay,
+  className,
   style,
   children,
   hoverable = false,
@@ -92,6 +93,7 @@ export function CardMotion({
 
   return transitions((transitionStyle) => (
     <animated.div
+      className={presetConfig.kind === 'spring' ? className : undefined}
       onMouseEnter={hoverable || hoverAnimation ? () => setIsHovered(true) : undefined}
       onMouseLeave={hoverable || hoverAnimation ? () => setIsHovered(false) : undefined}
       style={{
@@ -106,7 +108,7 @@ export function CardMotion({
       }}
     >
       {presetConfig.kind === 'glow-shell' ? (
-        <div className={styles.glowShell} style={presetConfig.shellStyle} data-card-motion-index={index}>
+        <div className={className ? `${styles.glowShell} ${className}` : styles.glowShell} style={presetConfig.shellStyle} data-card-motion-index={index}>
           <div className={styles.contentIn} style={presetConfig.contentStyle}>
             {children}
           </div>

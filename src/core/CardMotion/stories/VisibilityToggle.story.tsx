@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { CardMotion } from '../CardMotion';
+import styles from './CardMotionStories.module.scss';
 import { Story } from './_CardMotion.default';
 
 export const VisibilityToggle: Story = {
@@ -27,9 +28,7 @@ export const VisibilityToggle: Story = {
           duration: 0.22,
         }}
       >
-        <div style={{ padding: 24, borderRadius: 18, background: '#f5f3ff', border: '1px solid #c4b5fd' }}>
-          Visibility-driven leave animation
-        </div>
+        <div className={`${styles.cardSurface} ${styles.surfaceAccent}`}>Visibility-driven leave animation</div>
       </CardMotion>
     );
   },

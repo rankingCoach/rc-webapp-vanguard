@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { CARD_MOTION_SIZES } from './CardMotion.constants';
 import { CardMotionAnimation, CardMotionEntryPreset, EntryPresetConfig, MotionPhase } from './CardMotion.types';
 
 export const SPRING_EASE_CSS =
@@ -7,7 +8,7 @@ export const SPRING_EASE_CSS =
 
 export const GENERIC_ENTRY: MotionPhase = {
   opacity: 0,
-  y: 20,
+  y: CARD_MOTION_SIZES.genericEntryOffsetY,
   scale: 1,
   blur: 0,
   duration: 0.32,
@@ -16,22 +17,22 @@ export const GENERIC_ENTRY: MotionPhase = {
 
 export const GENERIC_LEAVE: MotionPhase = {
   opacity: 0,
-  y: 12,
+  y: CARD_MOTION_SIZES.genericLeaveOffsetY,
   scale: 0.985,
-  blur: 2,
+  blur: CARD_MOTION_SIZES.genericLeaveBlur,
   duration: 0.2,
   delay: 0,
 };
 
 export const GLOW_ENTRY_DEFAULTS = {
-  y: -8,
-  scale: 0.7,
-  skewX: 4,
-  skewY: 8,
+  y: CARD_MOTION_SIZES.glowEntryOffsetY,
+  scale: CARD_MOTION_SIZES.glowEntryScale,
+  skewX: CARD_MOTION_SIZES.glowEntrySkewX,
+  skewY: CARD_MOTION_SIZES.glowEntrySkewY,
   brightness: 1.08,
   glowAlpha: 1,
-  radiusFrom: 24,
-  radiusTo: 12,
+  radiusFrom: CARD_MOTION_SIZES.glowEntryRadiusFrom,
+  radiusTo: CARD_MOTION_SIZES.glowEntryRadiusTo,
   duration: 1,
   delay: 0,
   contentDelay: 0.25,
@@ -39,7 +40,7 @@ export const GLOW_ENTRY_DEFAULTS = {
 };
 
 export const HOVER_DEFAULTS = {
-  y: -4,
+  y: CARD_MOTION_SIZES.hoverLiftY,
   scale: 1,
   tension: 400,
   friction: 40,
@@ -65,8 +66,8 @@ export const getGlowSkewValues = (index?: number) => {
   const factor = 1 / Math.max(1, index);
 
   return {
-    skewX: 8 * factor,
-    skewY: 12 * factor,
+    skewX: CARD_MOTION_SIZES.glowMaxSkewX * factor,
+    skewY: CARD_MOTION_SIZES.glowMaxSkewY * factor,
   };
 };
 
@@ -131,6 +132,12 @@ export const getEntryPresetConfig = (
         '--card-motion-radius-to': `${glowEntry.radiusTo}px`,
         '--card-motion-brightness-from': glowEntry.brightness,
         '--card-motion-glow-alpha-from': glowEntry.glowAlpha,
+        '--card-motion-shadow-inset-width': `${CARD_MOTION_SIZES.glowShadowInsetWidth}px`,
+        '--card-motion-shadow-offset-y': `${CARD_MOTION_SIZES.glowShadowOffsetY}px`,
+        '--card-motion-shadow-blur': `${CARD_MOTION_SIZES.glowShadowBlur}px`,
+        '--card-motion-perspective': `${CARD_MOTION_SIZES.transformPerspective}px`,
+        '--card-motion-content-blur-from': `${CARD_MOTION_SIZES.contentBlurFrom}px`,
+        '--card-motion-content-y-from': `${CARD_MOTION_SIZES.contentOffsetY}px`,
       } as React.CSSProperties,
       contentStyle: {
         animationDelay: `${delay + glowEntry.contentDelay}s`,

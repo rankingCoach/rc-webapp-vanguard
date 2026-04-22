@@ -31,7 +31,7 @@ describe('CardMotion component tests', () => {
 
   test('should strip inline background from the animated card when glowIn is enabled', () => {
     render(
-      <CardMotion delay={0} glowIn={true} style={{ background: 'rgb(255, 0, 0)', padding: 12 }}>
+      <CardMotion delay={0} glowIn={true} style={{ background: 'var(--p500)', padding: 12 }}>
         <div>Glow card</div>
       </CardMotion>,
     );
@@ -40,7 +40,7 @@ describe('CardMotion component tests', () => {
     const contentWrapper = textNode.parentElement as HTMLElement;
     const animatedCard = contentWrapper.parentElement as HTMLElement;
 
-    expect(animatedCard.style.background).not.toContain('255, 0, 0');
+    expect(animatedCard.style.background).not.toContain('--p500');
     expect(animatedCard.style.padding).toBe('12px');
     expect(contentWrapper.className).toBeTruthy();
   });

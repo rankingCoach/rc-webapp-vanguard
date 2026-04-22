@@ -1,5 +1,6 @@
 import React from 'react';
 
+import styles from './CardMotionStories.module.scss';
 import { Story } from './_CardMotion.default';
 
 export const CustomMotion: Story = {
@@ -21,10 +22,6 @@ export const CustomMotion: Story = {
       blur: 2,
       duration: 0.18,
     },
-    children: (
-      <div style={{ padding: 24, borderRadius: 18, background: '#eef6ff', border: '1px solid #93c5fd' }}>
-        Custom entry, leave, and hover motion
-      </div>
-    ),
+    children: <div className={`${styles.cardSurface} ${styles.surfaceInfo}`}>Custom entry, leave, and hover motion</div>,
   },
 };
