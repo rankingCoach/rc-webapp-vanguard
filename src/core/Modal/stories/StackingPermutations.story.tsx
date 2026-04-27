@@ -46,13 +46,13 @@ const renderOpener = ({ animA, animB, fullA = true, fullB = true }: StackOpts) =
   const openA = () =>
     ModalService.open(
       <StackModal id={'A'} fullscreen={fullA} close={() => {}}>
-        <Button onClick={openB}>Open Modal B ({animB})</Button>
+        <Button onClick={openB}>{`Open Modal B (${animB})`}</Button>
       </StackModal>,
       { animation: animA, fullscreen: fullA },
     );
 
   return (
-    <Button onClick={openA}>Open Modal A ({animA})</Button>
+    <Button onClick={openA}>{`Open Modal A (${animA})`}</Button>
   );
 };
 
