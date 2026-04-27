@@ -53,3 +53,5 @@ dist-wordpress/.version
 .env
 .env.local
 .env.*.local
+
+.claude/
