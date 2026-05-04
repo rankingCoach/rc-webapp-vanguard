@@ -19,6 +19,6 @@ export const REGEX = {
   excessiveCapitalisation: /\b(?:\w*[A-Z]){2}\w*\b/,
   at: /@/g,
   domain: /^(?:https?:\/\/)?(?:www\.)?([^\/]+)/i,
-  path: /\//g,
+  path: /[^a-zA-Z0-9_\-À-ɏḀ-ỿ ]/g,
   fullStopMark: /\./g,
 };
