@@ -106,6 +106,10 @@ export { ModalService } from './core/Modal/ModalService.tsx';
 export type { PageSectionLoadingProps } from './common/PageSectionLoading/PageSectionLoading.tsx';
 export { PageSectionLoading } from './common/PageSectionLoading/PageSectionLoading.tsx';
 
+// PageSection
+export type { PageSectionProps, PageSectionWithTitle, PageSectionWithoutTitle } from './core/PageSection';
+export { PageSection, PageSectionBackground, PageSectionRoundedEdges } from './core/PageSection';
+
 // Popover
 export type { PopoverPosition, PopoverProps, PopoverTheme } from './core/Popover/Popover.tsx';
 export { Popover } from './core/Popover/Popover.tsx';
