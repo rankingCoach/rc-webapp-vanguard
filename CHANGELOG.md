@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.9.0%0Dv1.8.0#diff) (2026-05-08)
+
+
+### Features
+
+* **card-motion:** add configurable entry/leave/hover motion with layered glow-in preset ([ed6e969](https://github.com/rankingCoach/rc-webapp-vanguard/commits/ed6e969a0cd5528ce4126a80cab4074734c8495d))
+* **card-motion:** extract motion constants, centralize styles, and enhance animation flexibility ([821b92d](https://github.com/rankingCoach/rc-webapp-vanguard/commits/821b92d0ae39e6d53ec3907f8e03983107f5aaf1))
+
+
+### Bug Fixes
+
+* **modal:** stack modals by open order across animation groups ([855be87](https://github.com/rankingCoach/rc-webapp-vanguard/commits/855be87482866800a4bba2a3ed68fd0b10cab171))
+
 ## [1.8.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.8.0%0Dv1.7.0#diff) (2026-04-16)
 
 
