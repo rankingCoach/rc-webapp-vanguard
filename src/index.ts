@@ -580,6 +580,10 @@ export { SearchableSelect } from './core/SearchableSelect';
 export type { SliderProps } from './core/Slider';
 export { Slider } from './core/Slider';
 
+//SlideCarousel
+export type { SlideCarouselProps } from './core/SlideCarousel';
+export { SlideCarousel } from './core/SlideCarousel';
+
 // SmallLoader
 export type { SmallLoaderProps } from './core/SmallLoader';
 export { SmallLoader } from './core/SmallLoader';
