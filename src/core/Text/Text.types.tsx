@@ -54,6 +54,10 @@ type BaseProps = {
   isBlurred?: boolean;
   allowNewLines?: boolean;
   animateWords?: TextAnimationProps;
+  highlightWords?: string[];
+  highlightColor?: string;
+  highlightMode?: 'background' | 'text' | 'bold';
+  highlightCaseInsensitive?: boolean;
 };
 
 type SeeMoreProps =
