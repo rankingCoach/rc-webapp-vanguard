@@ -26,7 +26,6 @@ export function Slide({ n, bg }: { n: number; bg: string }) {
         fontSize: '24px',
         fontWeight: 600,
         borderRadius: '8px',
-        marginRight: 8,
       }}
     >
       Slide {n}

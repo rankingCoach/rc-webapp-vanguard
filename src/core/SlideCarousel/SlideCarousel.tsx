@@ -12,6 +12,8 @@ import styles from './SlideCarousel.module.scss';
 export type SlideCarouselArrowPlacement = 'overlay' | 'outside';
 export type SlideCarouselBulletPlacement = 'overlayBottom' | 'below';
 
+const SLIDE_GAP_PX = 16;
+
 export interface SliderProps {
   activeIndex?: number;
   initialIndex?: number; // @todo when this is set, skip the entry animation when opening at the N-th slide
@@ -59,6 +61,8 @@ export const SlideCarousel: React.FunctionComponent<SliderProps> = ({
 
   const slides = children || [];
   const length = slides.length;
+  const slideGap = length > 1 ? SLIDE_GAP_PX : 0;
+  const slideWidth = `calc((100% - ${slideGap * Math.max(slidesAtOnce - 1, 0)}px) / ${slidesAtOnce})`;
 
   const { gestureBinds, maxSlide, nextSlide, previousSlide, slide, trackStyle, updateSlide } = useCarouselMovement({
     activeIndex,
@@ -67,6 +71,7 @@ export const SlideCarousel: React.FunctionComponent<SliderProps> = ({
     length,
     onSlideChange,
     setSlideCustom,
+    slideGap,
     slidesAtOnce,
     slidesToSlide,
     viewportRef,
@@ -167,12 +172,16 @@ export const SlideCarousel: React.FunctionComponent<SliderProps> = ({
           {renderOverlayBullets()}
 
           <div className={styles.slideCarouselViewport} ref={viewportRef}>
-            <animated.div {...gestureBinds()} className={styles.slideCarouselTrack} style={trackStyle}>
+            <animated.div
+              {...gestureBinds()}
+              className={styles.slideCarouselTrack}
+              style={{ ...trackStyle, gap: `${slideGap}px` }}
+            >
               {slides.map((child, index) => (
                 <div
                   key={index}
                   className={classNames(styles.slideCarouselSlide, 'slider__slide')}
-                  style={{ flex: `0 0 ${100 / slidesAtOnce}%` }}
+                  style={{ flex: `0 0 ${slideWidth}` }}
                 >
                   {child}
                 </div>

@@ -9,6 +9,7 @@ interface UseCarouselMovementArgs {
   length: number;
   onSlideChange: (slide: number) => void;
   setSlideCustom?: (slide: number) => number;
+  slideGap: number;
   slidesAtOnce: number;
   slidesToSlide: number;
   viewportRef: RefObject<HTMLDivElement>;
@@ -31,6 +32,7 @@ export const useCarouselMovement = ({
   length,
   onSlideChange,
   setSlideCustom,
+  slideGap,
   slidesAtOnce,
   slidesToSlide,
   viewportRef,
@@ -38,7 +40,8 @@ export const useCarouselMovement = ({
   const maxSlide = getMaxSlide(length, slidesAtOnce);
   const getSlideWidth = () => {
     const viewportWidth = viewportRef.current?.getBoundingClientRect().width ?? 0;
-    return viewportWidth / slidesAtOnce;
+    const totalGapWidth = slideGap * Math.max(slidesAtOnce - 1, 0);
+    return (viewportWidth - totalGapWidth) / slidesAtOnce;
   };
 
   const resolveSlideIndex = (index: number) => {
@@ -67,11 +70,12 @@ export const useCarouselMovement = ({
 
   const moveTrackToSlide = (targetSlide: number, immediate = false) => {
     const slideWidth = getSlideWidth();
+    const slideOffset = slideWidth + slideGap;
 
-    if (slideWidth === 0) return;
+    if (slideWidth <= 0) return;
 
     trackApi.start({
-      x: -targetSlide * slideWidth,
+      x: -targetSlide * slideOffset,
       immediate,
     });
   };
@@ -90,18 +94,24 @@ export const useCarouselMovement = ({
     {
       onDrag: ({ down, movement: [xDelta], direction: [xDirection], cancel, active, last }) => {
         const slideWidth = getSlideWidth();
+        const slideOffset = slideWidth + slideGap;
 
-        if (slideWidth === 0) return;
+        if (slideWidth <= 0) return;
 
         const currentSlide = slideRef.current;
-        const currentTrackX = -currentSlide * slideWidth;
-        const passedDragThreshold = down && Math.abs(xDelta) > slideWidth / 2;
+        const currentTrackX = -currentSlide * slideOffset;
+        const passedDragThreshold = down && Math.abs(xDelta) > slideOffset / 2;
 
         if (passedDragThreshold) {
+          const targetSlide = getDraggedSlide(currentSlide, xDirection);
           cancel?.();
 
           if (active) {
-            updateSlide(getDraggedSlide(currentSlide, xDirection));
+            if (targetSlide === currentSlide) {
+              moveTrackToSlide(currentSlide);
+            } else {
+              updateSlide(targetSlide);
+            }
           }
 
           return;
