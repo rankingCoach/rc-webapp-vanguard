@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.10.0%0Dv1.9.0#diff) (2026-05-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **TextHighlighted:** The TextHighlighted component has been removed as its functionality
+has been integrated directly into the Text component. This reduces
+code duplication and simplifies the component API by consolidating
+text highlighting features into a single component.
+
+### Features
+
+* **text:** add highlight option to Text component ([fd328f2](https://github.com/rankingCoach/rc-webapp-vanguard/commits/fd328f20e2a3acaa39fb3ba52c25ec69024cb4bb)), closes [#VAN-45](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-45)
+
+
+### Bug Fixes
+
+* **regex:** update path regex to exclude special characters ([8a329ba](https://github.com/rankingCoach/rc-webapp-vanguard/commits/8a329bad3d75528219ac26835e8977ad1368a674)), closes [#VAN-50](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-50)
+
+
+* **TextHighlighted:** remove TextHighlighted component after merging into Text ([9725f83](https://github.com/rankingCoach/rc-webapp-vanguard/commits/9725f833991179e36b672693d8d8e7c7ef089f67)), closes [#VAN-45](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-45)
+
 ## [1.9.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.9.0%0Dv1.8.0#diff) (2026-05-08)
 
 
