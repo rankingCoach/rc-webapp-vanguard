@@ -1,5 +1,5 @@
 import React from "react";
-import { fn, userEvent, within, expect, screen } from "storybook/test";
+import { fn, userEvent, within, expect, screen, waitFor } from "storybook/test";
 import { ModalService } from "@vanguard/Modal/ModalService";
 import { Modal } from "@vanguard/Modal/Modal";
 import { Button } from "@vanguard/Button/Button";
@@ -42,21 +42,27 @@ export const CloseViaCallbacks: Story = {
     const modal = canvas.getByTestId('callback-modal');
     await userEvent.click(modal);
 
-    // Modal should close due to outside click
-    await expect(screen.queryByText('Test Modal - Callbacks')).not.toBeInTheDocument();
+    // Modal should close due to outside click (close is async via setTimeout + exit animation)
+    await waitFor(() =>
+      expect(screen.queryByText('Test Modal - Callbacks')).not.toBeInTheDocument()
+    );
 
     // Reopen modal
     await userEvent.click(openButton);
 
     // Modal should open
-    await expect(screen.getByText('Test Modal - Callbacks')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText('Test Modal - Callbacks')).toBeInTheDocument()
+    );
 
     // Click on content (inside modal content)
-    const modalContent = canvas.getByText('onContentClick: Enabled');
+    const modalContent = screen.getByText('onContentClick: Enabled');
     await userEvent.click(modalContent);
 
     // Modal should close due to content click
-    await expect(screen.queryByText('Test Modal - Callbacks')).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Test Modal - Callbacks')).not.toBeInTheDocument()
+    );
   },
   render: (args) => {
     const openModal = () => {

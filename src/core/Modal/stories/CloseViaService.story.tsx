@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fn, userEvent, within, expect, screen } from "storybook/test";
+import { fn, userEvent, within, expect, screen, waitFor } from "storybook/test";
 import { ModalService } from "@vanguard/Modal/ModalService";
 import { Modal } from "@vanguard/Modal/Modal";
 import { Button } from "@vanguard/Button/Button";
@@ -62,8 +62,10 @@ export const CloseViaService: Story = {
     const closeButton = canvas.getByRole('button', { name: /close via service/i });
     await userEvent.click(closeButton);
 
-    // Verify modal is closed
-    await expect(screen.queryByText('Test Modal - Close via Service')).not.toBeInTheDocument();
+    // Verify modal is closed (closeEv is async via setTimeout + exit animation)
+    await waitFor(() =>
+      expect(screen.queryByText('Test Modal - Close via Service')).not.toBeInTheDocument()
+    );
   },
   render: (args) => <ModalTestComponent />,
 };

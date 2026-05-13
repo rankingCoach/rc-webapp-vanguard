@@ -14,6 +14,19 @@ import { CloseListeners as _CloseListeners } from "./stories/CloseListeners.stor
 import { TwoModalsOverlapping as _TwoModalsOverlapping } from "./stories/TwoModalsOverlapping.story";
 import { TwoModalsOverlappingDifferentAnimations as _TwoModalsOverlappingDifferentAnimations } from "./stories/TwoModalsOverlappingDifferentAnimations.story";
 import {
+  ModalStackingPopover as _ModalStackingPopover,
+  PopoverNoModalBaseline as _PopoverNoModalBaseline,
+  MultiplePopoversInSameModal as _MultiplePopoversInSameModal,
+  PopoverAboveThreeDeepStack as _PopoverAboveThreeDeepStack,
+  NewModalCoversStalePopover as _NewModalCoversStalePopover,
+} from "./stories/ModalStackingPopover.story";
+import {
+  TopmostModalZIndex as _TopmostModalZIndex,
+  TopmostUnaffectedByBottomClose as _TopmostUnaffectedByBottomClose,
+  DeepStackTearDown as _DeepStackTearDown,
+  TrackedModalsCountedSame as _TrackedModalsCountedSame,
+} from "./stories/TopmostModalZIndex.story";
+import {
   StackGrowGrow as _StackGrowGrow,
   StackSlideSlide as _StackSlideSlide,
   StackPopPop as _StackPopPop,
@@ -40,6 +53,15 @@ export const CloseWithResponseData: Story = { ..._CloseWithResponseData };
 export const CloseListeners: Story = { ..._CloseListeners };
 export const TwoModalsOverlapping: Story = { ..._TwoModalsOverlapping };
 export const TwoModalsOverlappingDifferentAnimations: Story = { ..._TwoModalsOverlappingDifferentAnimations };
+export const ModalStackingPopover: Story = { ..._ModalStackingPopover };
+export const PopoverNoModalBaseline: Story = { ..._PopoverNoModalBaseline };
+export const MultiplePopoversInSameModal: Story = { ..._MultiplePopoversInSameModal };
+export const PopoverAboveThreeDeepStack: Story = { ..._PopoverAboveThreeDeepStack };
+export const NewModalCoversStalePopover: Story = { ..._NewModalCoversStalePopover };
+export const TopmostModalZIndex: Story = { ..._TopmostModalZIndex };
+export const TopmostUnaffectedByBottomClose: Story = { ..._TopmostUnaffectedByBottomClose };
+export const DeepStackTearDown: Story = { ..._DeepStackTearDown };
+export const TrackedModalsCountedSame: Story = { ..._TrackedModalsCountedSame };
 export const StackGrowGrow: Story = { ..._StackGrowGrow };
 export const StackSlideSlide: Story = { ..._StackSlideSlide };
 export const StackPopPop: Story = { ..._StackPopPop };

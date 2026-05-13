@@ -1,5 +1,5 @@
 import React from "react";
-import { fn, userEvent, within, expect, screen } from "storybook/test";
+import { fn, userEvent, within, expect, screen, waitFor } from "storybook/test";
 import { ModalService } from "@vanguard/Modal/ModalService";
 import { Modal } from "@vanguard/Modal/Modal";
 import { Button } from "@vanguard/Button/Button";
@@ -36,8 +36,10 @@ export const CloseViaOutsideClick: Story = {
     const modal = canvas.getByTestId('outside-click-modal');
     await userEvent.click(modal);
 
-    // Verify modal is closed
-    await expect(screen.queryByText('Test Modal - Outside Click')).not.toBeInTheDocument();
+    // Verify modal is closed (close is async via setTimeout + exit animation)
+    await waitFor(() =>
+      expect(screen.queryByText('Test Modal - Outside Click')).not.toBeInTheDocument()
+    );
   },
   render: (args) => {
     const openModal = () => {
