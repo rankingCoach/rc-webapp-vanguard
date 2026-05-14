@@ -1,5 +1,5 @@
 import React from "react";
-import { fn, userEvent, within, expect } from "storybook/test";
+import { fn, userEvent, within, expect, waitFor } from "storybook/test";
 import { ModalService } from "@vanguard/Modal/ModalService";
 import { Modal } from "@vanguard/Modal/Modal";
 import { Button } from "@vanguard/Button/Button";
@@ -54,8 +54,10 @@ export const CloseWithResponseData: Story = {
     const confirmButton = canvas.getByRole('button', { name: /confirm/i });
     await userEvent.click(confirmButton);
 
-    // Verify modal is closed and response is logged
-    await expect(canvas.queryByText('Response Modal')).not.toBeInTheDocument();
+    // Verify modal is closed and response is logged (close is async)
+    await waitFor(() =>
+      expect(canvas.queryByText('Response Modal')).not.toBeInTheDocument()
+    );
 
     // Check if response was captured (would be in console/state in real app)
     await expect(canvas.getByText(/Action: confirm/)).toBeInTheDocument();

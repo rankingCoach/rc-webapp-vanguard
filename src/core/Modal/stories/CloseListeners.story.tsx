@@ -1,5 +1,5 @@
 import React from "react";
-import { fn, userEvent, within, expect, screen } from "storybook/test";
+import { fn, userEvent, within, expect, screen, waitFor } from "storybook/test";
 import { ModalService } from "@vanguard/Modal/ModalService";
 import { Modal } from "@vanguard/Modal/Modal";
 import { Button } from "@vanguard/Button/Button";
@@ -40,11 +40,15 @@ export const CloseListeners: Story = {
     const closeButton = canvas.getByTestId('modal-close-header-cta');
     await userEvent.click(closeButton);
 
-    // Verify modal is closed
-    await expect(screen.queryByText('Listener Modal')).not.toBeInTheDocument();
+    // Verify modal is closed (close is async via setTimeout + exit animation)
+    await waitFor(() =>
+      expect(screen.queryByText('Listener Modal')).not.toBeInTheDocument()
+    );
 
     // Verify listener was called (check for logged message)
-    await expect(canvas.getByText(/Listener called/)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(canvas.getByText(/Listener called/)).toBeInTheDocument()
+    );
   },
   render: (args) => {
     const [listenerCalls, setListenerCalls] = React.useState<string[]>([]);

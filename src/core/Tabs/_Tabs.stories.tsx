@@ -112,7 +112,7 @@ export const HighlightTheme: Story = {
     const tabs = canvas.getAllByRole("tab");
     await expect(tabs).toHaveLength(3);
     await userEvent.click(tabs[1]);
-    await expect(canvas.getByText("Negative keywords")).toBeInTheDocument();
+    await expect(canvas.getByRole("heading", { name: "Negative keywords" })).toBeInTheDocument();
   },
 };
 
@@ -124,7 +124,7 @@ export const UnderlineTheme: Story = {
     const tabs = canvas.getAllByRole("tab");
     await expect(tabs).toHaveLength(3);
     await userEvent.click(tabs[2]);
-    await expect(canvas.getByText("Brand keywords")).toBeInTheDocument();
+    await expect(canvas.getByRole("heading", { name: "Brand keywords" })).toBeInTheDocument();
   },
 };
 
@@ -147,7 +147,7 @@ export const SmallHeight: Story = {
     const tabs = canvas.getAllByRole("tab");
     await expect(tabs).toHaveLength(3);
     await userEvent.click(tabs[1]);
-    await expect(canvas.getByText("Negative keywords")).toBeInTheDocument();
+    await expect(canvas.getByRole("heading", { name: "Negative keywords" })).toBeInTheDocument();
   },
 };
 
@@ -291,7 +291,7 @@ export const CompactVariant: Story = {
     const tabs = canvas.getAllByRole("tab");
     await expect(tabs).toHaveLength(3);
     await userEvent.click(tabs[1]);
-    await expect(canvas.getByText("Negative keywords")).toBeInTheDocument();
+    await expect(canvas.getByRole("heading", { name: "Negative keywords" })).toBeInTheDocument();
   },
 };
 
@@ -312,7 +312,7 @@ export const UnderlineCompact: Story = {
     const tabs = canvas.getAllByRole("tab");
     await expect(tabs).toHaveLength(3);
     await userEvent.click(tabs[2]);
-    await expect(canvas.getByText("Brand keywords")).toBeInTheDocument();
+    await expect(canvas.getByRole("heading", { name: "Brand keywords" })).toBeInTheDocument();
   },
 };
 
