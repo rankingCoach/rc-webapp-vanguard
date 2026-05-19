@@ -63,7 +63,9 @@ export const PhotoCarouselModal = (props: Props) => {
                       videoURL = el.publicUrl ?? '';
                     }
 
-                    return <video src={videoURL} width={'100%'} height={'100%'} controls />;
+                    return (
+                      <video src={videoURL} width={'100%'} height={'100%'} controls className={styles.carouselVideo} />
+                    );
                   }
 
                   const url = el.publicThumbnailUrl ?? el.publicUrl ?? el.mediaItemContent?.base64EncodedContent;

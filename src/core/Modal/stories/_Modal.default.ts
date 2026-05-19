@@ -10,6 +10,8 @@ export const closeAllModals = async () => {
   ModalService.closeLoadingModal();
   ModalService.closeConfirmModal();
   ModalService.closeErrorModal();
+  // Close any untracked modals opened via ModalService.open()
+  ModalService.closeAllModals();
 
   // Small delay to ensure cleanup
   await new Promise((resolve) => setTimeout(resolve, 100));

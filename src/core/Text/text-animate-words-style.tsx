@@ -1,4 +1,4 @@
-import { sanitizeHTML } from '@helpers/sanitize-html.tsx';
+import { sanitizeHTMLToReactNode } from '@helpers/sanitize-html.tsx';
 import { animated, useSpring } from '@react-spring/web';
 import React from 'react';
 
@@ -25,7 +25,7 @@ const AnimatedWord = ({ word, delay, duration }: { word: string; delay: number; 
     delay,
   });
 
-  return <animated.span style={{ marginRight: 4, ...props }}>{sanitizeHTML(word).children}</animated.span>;
+  return <animated.span style={{ marginRight: 4, ...props }}>{sanitizeHTMLToReactNode(word).children}</animated.span>;
 };
 
 export const applyWordAnimation = (text: React.ReactNode, animation?: TextAnimationProps) => {

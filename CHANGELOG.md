@@ -2,6 +2,106 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.10.0%0Dv1.9.0#diff) (2026-05-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **TextHighlighted:** The TextHighlighted component has been removed as its functionality
+has been integrated directly into the Text component. This reduces
+code duplication and simplifies the component API by consolidating
+text highlighting features into a single component.
+
+### Features
+
+* **text:** add highlight option to Text component ([fd328f2](https://github.com/rankingCoach/rc-webapp-vanguard/commits/fd328f20e2a3acaa39fb3ba52c25ec69024cb4bb)), closes [#VAN-45](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-45)
+
+
+### Bug Fixes
+
+* **regex:** update path regex to exclude special characters ([8a329ba](https://github.com/rankingCoach/rc-webapp-vanguard/commits/8a329bad3d75528219ac26835e8977ad1368a674)), closes [#VAN-50](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-50)
+
+
+* **TextHighlighted:** remove TextHighlighted component after merging into Text ([9725f83](https://github.com/rankingCoach/rc-webapp-vanguard/commits/9725f833991179e36b672693d8d8e7c7ef089f67)), closes [#VAN-45](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-45)
+
+## [1.9.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.9.0%0Dv1.8.0#diff) (2026-05-08)
+
+
+### Features
+
+* **card-motion:** add configurable entry/leave/hover motion with layered glow-in preset ([ed6e969](https://github.com/rankingCoach/rc-webapp-vanguard/commits/ed6e969a0cd5528ce4126a80cab4074734c8495d))
+* **card-motion:** extract motion constants, centralize styles, and enhance animation flexibility ([821b92d](https://github.com/rankingCoach/rc-webapp-vanguard/commits/821b92d0ae39e6d53ec3907f8e03983107f5aaf1))
+
+
+### Bug Fixes
+
+* **modal:** stack modals by open order across animation groups ([855be87](https://github.com/rankingCoach/rc-webapp-vanguard/commits/855be87482866800a4bba2a3ed68fd0b10cab171))
+
+## [1.8.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.8.0%0Dv1.7.0#diff) (2026-04-16)
+
+
+### Features
+
+* **avatar:** add user icon and related stories ([a44be00](https://github.com/rankingCoach/rc-webapp-vanguard/commits/a44be00cb4b7af55fdf48cab82c425695ac5655d))
+* **icon:** add new active icons and update icon names ([3c5a116](https://github.com/rankingCoach/rc-webapp-vanguard/commits/3c5a11645254406be29e31712f316ea93ac1a679))
+* **menu:** add menu component with selectable items and active icon support ([6507c8d](https://github.com/rankingCoach/rc-webapp-vanguard/commits/6507c8d598064855c1d8437037b2283f550d6518))
+* **tabs:** enhance TabsCustomScroll with hover and active states, improve accessibility ([6fd28ad](https://github.com/rankingCoach/rc-webapp-vanguard/commits/6fd28ad5c64f6b612fc10c84e2c2c61c71233622))
+* **tabs:** update Tabs layout and add ManyTabsSmall story for better demo ([05d6535](https://github.com/rankingCoach/rc-webapp-vanguard/commits/05d65353fa5dd5586b4d30aabb957a26b227e65c))
+
+## [1.7.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.7.0%0Dv1.6.0#diff) (2026-04-16)
+
+
+### Features
+
+* **benchmark-gauge:** add benchmark gauge ([94fda01](https://github.com/rankingCoach/rc-webapp-vanguard/commits/94fda013b6fc4a73a3d18ccf5da958799543fcc0)), closes [#VAN-46](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-46)
+
+
+### Bug Fixes
+
+* **benchmark-gauge:** replace the hardcoded label pill background to var color ([e4d5b21](https://github.com/rankingCoach/rc-webapp-vanguard/commits/e4d5b21ccb62ee8ceec61bf8df327287e234765f))
+* **benchmark-gauge:** set marker box sizing ([5a31eb2](https://github.com/rankingCoach/rc-webapp-vanguard/commits/5a31eb22f24578601f33a79acb868041a2bce975))
+
+## [1.6.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.6.0%0Dv1.5.1#diff) (2026-04-06)
+
+
+### Features
+
+* **Button:** remove icon padding variables ([8bb5528](https://github.com/rankingCoach/rc-webapp-vanguard/commits/8bb55284cf13a3676f7c9a67229b7dc4bbf24e29))
+
+### [1.5.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.5.1%0Dv1.5.0#diff) (2026-04-03)
+
+## [1.5.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.5.0%0Dv1.4.2#diff) (2026-04-03)
+
+
+### Features
+
+* **Menu:** implement Menu and MenuItem components ([8a4dc03](https://github.com/rankingCoach/rc-webapp-vanguard/commits/8a4dc037f820eb8d22ee7dd15d4c469b9e437d4e))
+
+### [1.4.2](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.2%0Dv1.4.1#diff) (2026-04-03)
+
+
+### Bug Fixes
+
+* **inputbase:** sync Select input ref before change detection ([7d12147](https://github.com/rankingCoach/rc-webapp-vanguard/commits/7d12147a75e7a8ea2f028dd9fd8eac090ff2d61b)), closes [#VAN-40](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-40)
+
+### [1.4.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.1%0Dv1.4.0#diff) (2026-03-31)
+
+## [1.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.4.0%0Dv1.3.1#diff) (2026-03-26)
+
+
+### Features
+
+* add vanguard mcp ([f92d5c0](https://github.com/rankingCoach/rc-webapp-vanguard/commits/f92d5c0700180916748ff24753005a075b5c00cf))
+* enhance Button and PageSection components with additional recommendations ([7de103d](https://github.com/rankingCoach/rc-webapp-vanguard/commits/7de103d1789d5b1c7a85e074668af399d4b7f660))
+* **sanitize-html:** add allowed classes option ([46aec18](https://github.com/rankingCoach/rc-webapp-vanguard/commits/46aec18838693e05c51b6a795d1d5f9d716e4a3c))
+* **sanitize-html:** export package through vanguard ([37ec741](https://github.com/rankingCoach/rc-webapp-vanguard/commits/37ec741a6aa02f422c7f10b5412e3158dacfc53e)), closes [#VAN-42](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-42)
+* **sanitize-html:** implement custom HTML sanitizer ([ce9188a](https://github.com/rankingCoach/rc-webapp-vanguard/commits/ce9188adac72b4f1514f676e29142b8887c3a131)), closes [#VAN-42](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-42)
+
+
+### Bug Fixes
+
+* **TextHighlighted:** html sanitization ([9ede274](https://github.com/rankingCoach/rc-webapp-vanguard/commits/9ede2743cbe97276e824ba7832e174c2e6caffe1))
+
 ### [1.3.1](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.3.1%0Dv1.3.0#diff) (2026-03-24)
 
 ## [1.3.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.3.0%0Dv1.2.0#diff) (2026-03-24)

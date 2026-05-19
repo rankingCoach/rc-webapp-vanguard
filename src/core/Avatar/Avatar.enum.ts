@@ -449,4 +449,6 @@ export const AvatarIconMap: Record<string, string> = {
   // Social media networks
   youtube: 'youtube',
   pinterest: 'pinterest',
+  // Generic icons
+  user: 'user',
 } as const;

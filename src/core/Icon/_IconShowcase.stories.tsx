@@ -32,7 +32,7 @@ const IconStory = (props: IconProps) => {
   delete props.style;
   return (
     <div className={classNames(dFlex, flexWrap, alignItemsCenter)}>
-      {IconNamesArr.map((icnName) => {
+      {[...IconNamesArr].sort().map((icnName) => {
         return (
           <React.Fragment key={icnName}>
             <div className={classNames(dFlexColumn, mb2, p1)}>

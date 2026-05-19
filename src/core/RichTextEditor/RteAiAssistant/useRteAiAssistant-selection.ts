@@ -1,3 +1,4 @@
+import { sanitizeHtml } from '@helpers/sanitize-html';
 import { $isCodeHighlightNode } from '@lexical/code';
 import { $generateHtmlFromNodes } from '@lexical/html';
 import { $isLinkNode } from '@lexical/link';
@@ -13,7 +14,6 @@ import {
 } from 'lexical';
 import { getDOMRangeRect, getSelectedNode } from 'lexical-toolkit';
 import { useCallback, useEffect, useState } from 'react';
-import sanitizeHtml from 'sanitize-html';
 
 type UseAiAssistantSelectionParams = { anchorElem: HTMLElement; editor: LexicalEditor };
 

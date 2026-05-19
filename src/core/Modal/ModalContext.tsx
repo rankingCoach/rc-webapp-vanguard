@@ -15,6 +15,7 @@ interface ModalContextType {
   modalRootState: ModalRootState;
   addModal: (modalId: string, animation: ModalTransition, component: any) => void;
   removeModal: (modalId: string) => void;
+  getModalOrder: (modalId: string) => number;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -34,6 +35,8 @@ interface ModalProviderProps {
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   // Use a ref to store components to avoid circular reference serialization issues
   const modalsRef = useRef<Map<string, any>>(new Map());
+  const orderRef = useRef<Map<string, number>>(new Map());
+  const orderCounterRef = useRef<number>(0);
   const [modalRootState, setModalRootState] = useState<ModalRootState>({
     growModals: [],
     slideModals: [],
@@ -44,8 +47,16 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     return modalsRef.current.get(modalId);
   }, []);
 
+  const getModalOrder = useCallback((modalId: string) => {
+    return orderRef.current.get(modalId) ?? 0;
+  }, []);
+
   const addModal = useCallback((modalId: string, animation: ModalTransition, component: any) => {
     modalsRef.current.set(modalId, component);
+    if (!orderRef.current.has(modalId)) {
+      orderCounterRef.current += 1;
+      orderRef.current.set(modalId, orderCounterRef.current);
+    }
 
     setModalRootState((prev) => {
       const newState = { ...prev };
@@ -78,6 +89,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const removeModal = useCallback((modalId: string) => {
     modalsRef.current.delete(modalId);
+    orderRef.current.delete(modalId);
 
     setModalRootState((prev) => ({
       growModals: prev.growModals.filter((id) => id !== modalId),
@@ -91,6 +103,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     modalRootState,
     addModal,
     removeModal,
+    getModalOrder,
   };
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;

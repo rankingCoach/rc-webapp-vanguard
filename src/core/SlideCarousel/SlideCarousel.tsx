@@ -1,18 +1,22 @@
-import { dFlex } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { useGesture } from '@use-gesture/react';
-import React, { useEffect, useRef, useState } from 'react';
-import { animated, useSprings } from 'react-spring';
+import { ComponentContainer } from '@vanguard/ComponentContainer';
+import React, { useRef } from 'react';
+import { animated } from 'react-spring';
 
-import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Arrow, ArrowComponentType, ArrowStyle } from './Arrow/Arrow';
 import { Bullet, BulletComponentType, BulletStyle } from './Bullet/Bullet';
 import { Bullets, BulletsComponentType } from './Bullets/Bullets';
+import { useCarouselMovement } from './hooks/use-carousel-movement.ts';
 import styles from './SlideCarousel.module.scss';
+
+export type SlideCarouselArrowPlacement = 'overlay' | 'outside';
+export type SlideCarouselBulletPlacement = 'overlayBottom' | 'below';
+
+const SLIDE_GAP_PX = 16;
 
 export interface SliderProps {
   activeIndex?: number;
-  initialIndex?: number; // @todo make that when This is set - we do not animate when opening carousel on N-th image
+  initialIndex?: number; // @todo when this is set, skip the entry animation when opening at the N-th slide
   ArrowComponent?: ArrowComponentType;
   arrowStyle?: ArrowStyle;
   auto?: number;
@@ -26,9 +30,11 @@ export interface SliderProps {
   setSlideCustom?: (slide: number) => number;
   slidesAtOnce?: number;
   slidesToSlide?: number;
+  /** Merged onto outer container; consumer-owned sizing escape hatch. */
+  className?: string;
+  arrowPlacement?: SlideCarouselArrowPlacement;
+  bulletPlacement?: SlideCarouselBulletPlacement;
 }
-
-const clamp = (input: number, lower: number, upper: number) => Math.min(Math.max(input, lower), upper);
 
 export const SlideCarousel: React.FunctionComponent<SliderProps> = ({
   activeIndex = 0,
@@ -46,184 +52,148 @@ export const SlideCarousel: React.FunctionComponent<SliderProps> = ({
   setSlideCustom = undefined,
   slidesAtOnce = 1,
   slidesToSlide = 1,
+  className,
+  arrowPlacement = 'overlay',
+  bulletPlacement = 'overlayBottom',
 }) => {
   const sliderRef = useRef<HTMLDivElement>(null);
-  const [slide, setSlideOriginal] = useState(0);
-  const setSlide = setSlideCustom ? (index: number) => setSlideOriginal(setSlideCustom(index)) : setSlideOriginal;
-  const [isDragging, setDragging] = useState(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
-  if (!children) {
-    children = [];
-  }
+  const slides = children || [];
+  const length = slides.length;
+  const slideGap = length > 1 ? SLIDE_GAP_PX : 0;
+  const slideWidth = `calc((100% - ${slideGap * Math.max(slidesAtOnce - 1, 0)}px) / ${slidesAtOnce})`;
 
-  // Initialize slides with spring
-  const [springProps, springPropsRef] = useSprings(children?.length || 0, (index) => ({
-    offset: index,
-  }));
+  const { gestureBinds, maxSlide, nextSlide, previousSlide, slide, trackStyle, updateSlide } = useCarouselMovement({
+    activeIndex,
+    auto,
+    initialIndex,
+    length,
+    onSlideChange,
+    setSlideCustom,
+    slideGap,
+    slidesAtOnce,
+    slidesToSlide,
+    viewportRef,
+  });
 
-  // Bindings to set on the element
-  const gestureBinds = useGesture(
-    {
-      onDrag: ({ down, movement: [xDelta], direction: [xDir], cancel, first, active }) => {
-        if (first) {
-          setDragging(true);
-        }
-        if (sliderRef && sliderRef.current && sliderRef.current.parentElement) {
-          const { width } = sliderRef.current.parentElement.getBoundingClientRect();
+  const renderBullets = () => {
+    const bullets = [];
 
-          if (down && Math.abs(xDelta) > width / 2) {
-            if (cancel) cancel();
-            if (active) {
-              setSlide(clamp(slide + (xDir > 0 ? -1 : 1), 0, (children?.length || 0) - slidesAtOnce));
-            }
-          }
-
-          springPropsRef
-            .update((index) => ({
-              offset: (active && down ? xDelta : 0) / width + (index - slide),
-            }))
-            .start();
-        }
-      },
-      onClick: () => {
-        if (isDragging) {
-          setDragging(false);
-          return;
-        }
-        clickOnSlide(slide);
-      },
-    },
-    {
-      drag: {
-        delay: 200,
-      },
-    },
-  );
-
-  // Triggered on slide change
-  useEffect(() => {
-    springPropsRef.update((index) => ({ offset: index - slide })).start();
-    onSlideChange(slide);
-  }, [slide, springPropsRef, onSlideChange]);
-
-  // Effect for autosliding
-  useEffect(() => {
-    let interval: number;
-
-    if (auto > 0) {
-      interval = window.setInterval(() => {
-        const targetIndex = (slide + 1) % (children?.length || 0);
-        setSlide(targetIndex);
-      }, auto);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [auto, children?.length || 0, slide]);
-
-  // Jump to slide index when prop changes
-  useEffect(() => {
-    setSlide(activeIndex % (children?.length || 0));
-  }, [activeIndex, children?.length || 0]);
-
-  // Sets pointer events none to every child and preserves styles
-  const childs = children?.map((child, index) => (
-    <div className={styles.slideCarouselSlide} key={index}>
-      {child}
-    </div>
-  ));
-
-  // Calls onClick on the current slide
-  const clickOnSlide = (slideIndex: number) => {
-    childs[slideIndex].props.children.props.onClick && childs[slideIndex].props.children.props.onClick();
-  };
-
-  const goToFirstSlide = () => {
-    setSlide(0);
-  };
-
-  const goToLastSlide = () => {
-    setSlide((children?.length || 0) - slidesAtOnce);
-  };
-
-  const nextSlide = () => {
-    const reachedLastSlide = slide === (children?.length || 0) - slidesAtOnce;
-    const nextSlideExists = slide + (slidesAtOnce - 1) + slidesToSlide < (children?.length || 0) - 1;
-    if (reachedLastSlide) {
-      goToFirstSlide();
-    } else if (!nextSlideExists) {
-      goToLastSlide();
-    } else {
-      setSlide(slide + slidesToSlide);
-    }
-  };
-
-  const previousSlide = () => {
-    if (slide === 0) {
-      goToLastSlide();
-    } else if (slide - slidesToSlide <= 0) {
-      goToFirstSlide();
-    } else {
-      setSlide(slide - slidesToSlide);
-    }
-  };
-
-  const bullets = () => {
-    const arr = [];
-    for (let index = 0; index <= (children?.length || 0) - slidesAtOnce; index++) {
-      arr.push(
-        <BulletComponent key={index} isActive={index === slide} onClick={() => setSlide(index)} style={bulletStyle} />,
+    for (let index = 0; index <= maxSlide; index++) {
+      bullets.push(
+        <BulletComponent
+          key={index}
+          isActive={index === slide}
+          onClick={() => updateSlide(index)}
+          style={bulletStyle}
+        />,
       );
     }
 
-    return arr;
+    return bullets;
+  };
+
+  const renderOverlayArrows = () => {
+    if (!hasArrows || arrowPlacement !== 'overlay') {
+      return null;
+    }
+
+    return (
+      <React.Fragment>
+        <ArrowComponent
+          className={classNames(styles.slideCarouselArrow, styles.arrowLeft)}
+          style={arrowStyle}
+          direction="left"
+          onClick={previousSlide}
+        />
+        <ArrowComponent
+          className={classNames(styles.slideCarouselArrow, styles.arrowRight)}
+          style={arrowStyle}
+          direction="right"
+          onClick={nextSlide}
+        />
+      </React.Fragment>
+    );
+  };
+
+  const renderOutsideLeftArrow = () => {
+    if (!hasArrows || arrowPlacement !== 'outside') {
+      return null;
+    }
+
+    return <ArrowComponent style={arrowStyle} direction="left" onClick={previousSlide} />;
+  };
+
+  const renderOutsideRightArrow = () => {
+    if (!hasArrows || arrowPlacement !== 'outside') {
+      return null;
+    }
+
+    return <ArrowComponent style={arrowStyle} direction="right" onClick={nextSlide} />;
+  };
+
+  const renderOverlayBullets = () => {
+    if (!hasBullets || bulletPlacement !== 'overlayBottom') {
+      return null;
+    }
+
+    return (
+      <BulletsComponent placement="overlayBottom">
+        <ul className={styles.slideCarouselBullets}>{renderBullets()}</ul>
+      </BulletsComponent>
+    );
+  };
+
+  const renderBelowBullets = () => {
+    if (!hasBullets || bulletPlacement !== 'below') {
+      return null;
+    }
+
+    return (
+      <BulletsComponent placement="below">
+        <ul className={styles.slideCarouselBullets}>{renderBullets()}</ul>
+      </BulletsComponent>
+    );
   };
 
   return (
-    <ComponentContainer className={styles.SlideCarouselContainer} innerRef={sliderRef}>
-      <div className={styles.slideCarousel}>
-        {hasArrows && (
-          <React.Fragment>
-            <ArrowComponent
-              className={classNames(styles.slideCarouselArrow, styles.arrowLeft, dFlex)}
-              style={arrowStyle}
-              direction="left"
-              onClick={previousSlide}
-            />
-            <ArrowComponent
-              className={classNames(styles.slideCarouselArrow, styles.arrowRight)}
-              style={arrowStyle}
-              direction="right"
-              onClick={nextSlide}
-            />
-          </React.Fragment>
+    <ComponentContainer className={classNames(styles.SlideCarouselContainer, className)} innerRef={sliderRef}>
+      <div
+        className={classNames(
+          styles.carouselMain,
+          arrowPlacement === 'outside' ? styles.carouselMainOutsideArrows : undefined,
         )}
+      >
+        {renderOutsideLeftArrow()}
 
-        {hasBullets && (
-          <BulletsComponent>
-            <ul className={styles.slideCarouselBullets}>{bullets()}</ul>
-          </BulletsComponent>
-        )}
+        <div className={styles.slideCarousel}>
+          {renderOverlayArrows()}
+          {renderOverlayBullets()}
 
-        {springProps.map(({ offset }, index) => (
-          <animated.div
-            {...gestureBinds()}
-            key={index}
-            className="slider__slide"
-            style={{
-              transform: offset?.to((offsetX) => `translate3d(${offsetX * 100}%, 0, 0)`),
-              position: 'absolute',
-              width: `${100 / slidesAtOnce}%`,
-              height: '100%',
-              willChange: 'transform',
-              touchAction: 'none',
-            }}
-          >
-            {childs[index]}
-          </animated.div>
-        ))}
+          <div className={styles.slideCarouselViewport} ref={viewportRef}>
+            <animated.div
+              {...gestureBinds()}
+              className={styles.slideCarouselTrack}
+              style={{ ...trackStyle, gap: `${slideGap}px` }}
+            >
+              {slides.map((child, index) => (
+                <div
+                  key={index}
+                  className={classNames(styles.slideCarouselSlide, 'slider__slide')}
+                  style={{ flex: `0 0 ${slideWidth}` }}
+                >
+                  {child}
+                </div>
+              ))}
+            </animated.div>
+          </div>
+        </div>
+
+        {renderOutsideRightArrow()}
       </div>
+
+      {renderBelowBullets()}
     </ComponentContainer>
   );
 };

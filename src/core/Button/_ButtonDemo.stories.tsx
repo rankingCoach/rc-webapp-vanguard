@@ -69,6 +69,14 @@ export const ButtonDemoPrimaryRound: ButtonStory = {
   render: ButtonsDemoRendering,
 };
 
+export const ButtonDemoMutedRound: ButtonStory = {
+  args: {
+    type: ButtonTypes.muted,
+    shape: "round",
+  },
+  render: ButtonsDemoRendering,
+};
+
 export const ButtonAI: ButtonStory = {
   args: {
     type: ButtonTypes.shimmer,

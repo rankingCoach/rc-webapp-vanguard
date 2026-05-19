@@ -13,7 +13,7 @@ interface Props {
 
 export const ModalTransition = (props: Props) => {
   const { modalsList, animation } = props;
-  const { getModal } = useModalContext();
+  const { getModal, getModalOrder } = useModalContext();
 
   let transition: TransitionPropertiesType;
   let animationDuration: number;
@@ -75,10 +75,14 @@ export const ModalTransition = (props: Props) => {
    */
   return transition((animationProps, modalId: string) => {
     const modalComponent = getModal(modalId);
+    const order = getModalOrder(modalId);
     return (
       modalId &&
       modalComponent && (
-        <animated.div style={{ opacity: animationProps.bgOpacity }} className={'modalRoot'}>
+        <animated.div
+          style={{ opacity: animationProps.bgOpacity, zIndex: 1100 + order }}
+          className={'modalRoot'}
+        >
           <animated.div
             style={{ transform: animationProps.transform, opacity: animationProps.opacity }}
             className={'modalRoot-container'}
