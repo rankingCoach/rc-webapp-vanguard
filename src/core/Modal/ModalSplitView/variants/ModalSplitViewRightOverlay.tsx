@@ -47,7 +47,7 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
     ? {
         right: 0,
         width: '100%',
-        bottom: bottomMargin ?? 0,
+        bottom: bottomMargin ?? '0',
         height: bottomMargin ? `calc(100vh - ${bottomMargin})` : '100vh',
         ...secondElementSpring,
       }
