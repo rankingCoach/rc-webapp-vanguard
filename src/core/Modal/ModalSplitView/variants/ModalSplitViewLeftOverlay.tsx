@@ -18,12 +18,12 @@ export const ModalSplitViewLeftOverlay = (props: ModalSplitViewLeftOverlayProps)
   const width = useWindowResize();
 
   const isOpen = autoCloseWidth < width && isContracted;
-  const firstElementSlidingProps: any = useSpring({
+  const firstElementSlidingProps = useSpring({
     width: isOpen ? firstElement?.contractedWidth : firstElement?.fullWidth,
     backgroundColor: firstElement?.backgroundColor ? firstElement?.backgroundColor : 'var(--n000)',
   });
 
-  const secondElementOpacityProps: any = useSpring({
+  const secondElementOpacityProps = useSpring({
     opacity: isContracted ? 1 : 0,
   });
 

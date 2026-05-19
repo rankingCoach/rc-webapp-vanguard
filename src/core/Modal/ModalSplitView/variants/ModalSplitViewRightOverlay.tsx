@@ -27,16 +27,16 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
       ? firstElement?.contractedWidth
       : firstElement?.fullWidth;
 
-  const firstElementSlidingProps: any = useSpring({
+  const firstElementSlidingProps = useSpring({
     width: leftWidth,
     backgroundColor: firstElement?.backgroundColor ? firstElement?.backgroundColor : 'var(--n000)',
   });
 
-  const secondElementLeftOverlayProps: any = useSpring({
+  const secondElementLeftOverlayProps = useSpring({
     opacity: isContracted ? 1 : 0,
   });
 
-  const secondElementOverlayProps: any = useSpring({
+  const secondElementOverlayProps = useSpring({
     transform: isContracted ? 'translateX(0%)' : 'translateX(100%)',
     opacity: isContracted ? 1 : 0,
   });
@@ -47,7 +47,7 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
     isMobile && bottomMargin ? 'SplitView-right-component--with-bottom-margin' : undefined,
   );
 
-  const rightStyle: any = isMobile
+  const rightStyle = isMobile
     ? {
         right: 0,
         width: '100%',
