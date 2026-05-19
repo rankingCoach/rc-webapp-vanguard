@@ -26,4 +26,14 @@
   overflow-y: auto;
   z-index: 2;
   background-color: var(--fn-bg-var);
+
+  &--overlay {
+    z-index: 4;
+    box-shadow: -8px 0 24px rgba(4, 5, 6, 0.08), -4px 0 8px rgba(4, 5, 6, 0.05), -2px 0 2px rgba(4, 5, 6, 0.03);
+  }
+
+  &--with-bottom-margin {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 }
