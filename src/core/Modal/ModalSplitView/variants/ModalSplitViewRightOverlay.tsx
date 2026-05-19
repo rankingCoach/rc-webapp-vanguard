@@ -32,13 +32,9 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
     backgroundColor: firstElement?.backgroundColor ? firstElement?.backgroundColor : 'var(--n000)',
   });
 
-  const secondElementLeftOverlayProps = useSpring({
+  const secondElementSpring = useSpring({
     opacity: isContracted ? 1 : 0,
-  });
-
-  const secondElementOverlayProps = useSpring({
-    transform: isContracted ? 'translateX(0%)' : 'translateX(100%)',
-    opacity: isContracted ? 1 : 0,
+    transform: isMobile && !isContracted ? 'translateX(100%)' : 'translateX(0%)',
   });
 
   const rightClassName = classNames(
@@ -53,12 +49,12 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
         width: '100%',
         bottom: bottomMargin ?? 0,
         height: bottomMargin ? `calc(100vh - ${bottomMargin})` : '100vh',
-        ...secondElementOverlayProps,
+        ...secondElementSpring,
       }
     : {
         left: firstElement?.contractedWidth,
         width: secondElement?.fullWidth,
-        ...secondElementLeftOverlayProps,
+        opacity: secondElementSpring.opacity,
       };
 
   return (
