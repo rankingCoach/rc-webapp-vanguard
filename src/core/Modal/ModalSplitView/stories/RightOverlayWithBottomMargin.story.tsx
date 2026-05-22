@@ -1,17 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ModalSplitView } from '@vanguard/Modal/ModalSplitView/ModalSplitView';
 import { Story } from './_ModalSplitView.default';
 import { splitViewElements } from './splitViewElements';
+import { useToggleContracted } from './useToggleContracted';
 
 const RightOverlayWithBottomMarginDemo = () => {
-  const [contracted, setContracted] = useState(false);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setContracted((prev) => !prev);
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
+  const contracted = useToggleContracted();
 
   return (
     <div style={{ width: '90vw', height: '90vh' }}>
@@ -19,7 +13,6 @@ const RightOverlayWithBottomMarginDemo = () => {
         isContracted={contracted}
         collapseMode="right-overlay"
         bottomMargin="48px"
-        autoCloseWidth={99999}
         elements={splitViewElements}
       />
     </div>

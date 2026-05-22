@@ -151,7 +151,7 @@ describe('ModalSplitView', () => {
       expect(right.style.height).toBe('calc(100vh - 150px)');
     });
 
-    test('overlay activates regardless of isContracted (style still applied)', () => {
+    test('overlay class is driven by viewport, not isContracted', () => {
       const { container } = render(
         <ModalSplitView isContracted={false} collapseMode="right-overlay" autoCloseWidth={850} elements={elements} />,
       );
