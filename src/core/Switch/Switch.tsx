@@ -4,8 +4,6 @@ import { alignItemsCenter, dFlex, justifyContentCenter } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { LoadingBoolean } from '@models/common/LoadingBoolean';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
-import { Icon, IconSize } from '@vanguard/Icon/Icon';
-import { IconNames } from '@vanguard/Icon/IconNames';
 import React, { ChangeEventHandler } from 'react';
 
 import { FontWeights, Text, TextReplacements, TextTypes } from '../Text/Text';
@@ -104,9 +102,7 @@ export const Switch = (props: SwitchProps) => {
           />
         ) : (
           <div className={classNames(`vanguard-switch-${size}`, dFlex, justifyContentCenter, alignItemsCenter)}>
-            <Icon type={IconSize.large} className={'loader-spinner'}>
-              {IconNames.save}
-            </Icon>
+            <div className={'loader-spinner'} />
           </div>
         )}
 

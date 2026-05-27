@@ -1,4 +1,5 @@
 @import "./src/styles/spacings";
+@import "./src/styles/mixins";
 
 .vanguard-switch {
   display: flex;
@@ -150,5 +151,9 @@
    */
   .vanguard-switch-label-readonly {
     pointer-events: none;
+  }
+
+  .loader-spinner {
+    @include loaderSpinner();
   }
 }
