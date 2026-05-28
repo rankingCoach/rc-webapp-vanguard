@@ -1,6 +1,5 @@
 import './Switch.scss';
 
-import { alignItemsCenter, dFlex, justifyContentCenter } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { LoadingBoolean } from '@models/common/LoadingBoolean';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
@@ -101,7 +100,7 @@ export const Switch = (props: SwitchProps) => {
             disabled={disabled}
           />
         ) : (
-          <div className={classNames(`vanguard-switch-${size}`, dFlex, justifyContentCenter, alignItemsCenter)}>
+          <div className={classNames(`vanguard-switch-${size}`, 'loader-container')}>
             <div className={'loader-spinner'} />
           </div>
         )}

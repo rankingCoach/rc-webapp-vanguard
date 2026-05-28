@@ -153,6 +153,12 @@
     pointer-events: none;
   }
 
+  .loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .loader-spinner {
     @include loaderSpinner();
   }
