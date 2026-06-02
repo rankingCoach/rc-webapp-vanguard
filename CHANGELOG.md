@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.10.0...v1.11.0) (2026-06-02)
+
+
+### Features
+
+* add beta release script to package json ([85de033](https://github.com/rankingCoach/rc-webapp-vanguard/commit/85de033b1ca0d0f9b13622ad7f4e0ab351a46b52)), closes [#BUF-3601](https://github.com/rankingCoach/rc-webapp-vanguard/issues/BUF-3601)
+* add commitlint and regular release config ([ba196da](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ba196dad2623980fd35765cf42d49c06d1066f5f)), closes [#VAN-36](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-36)
+* **error-boundary:** include trimmed error message in logs ([1ad6681](https://github.com/rankingCoach/rc-webapp-vanguard/commit/1ad66817719b413d8ec7812ba120d00c9ed8038b))
+
+
+### Bug Fixes
+
+* **switch:** display loading spinner instead of save icon ([379d128](https://github.com/rankingCoach/rc-webapp-vanguard/commit/379d128de93325cc19e01c051c1b3bb0ec0df552))
+
 ## [1.10.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.10.0%0Dv1.9.0#diff) (2026-05-11)
 
 
