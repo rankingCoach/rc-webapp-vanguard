@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.11.0...v1.12.0) (2026-06-02)
+
+
+### Features
+
+* **infra:** add pnpm ([cc9e5dc](https://github.com/rankingCoach/rc-webapp-vanguard/commit/cc9e5dc7bd0616b5e54f3d57b100a2d32f504b3f))
+
 ## [1.11.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.10.0...v1.11.0) (2026-06-02)
 
 
