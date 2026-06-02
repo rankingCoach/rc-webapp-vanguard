@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-provider",
+  "kind": "component",
+  "summary": "React provider that supplies modal state and helpers to descendant components via context.",
+  "keywords": ["provider", "context", "modal", "state", "provider", "hook"],
+  "tags": ["modals", "context", "state"]
+}

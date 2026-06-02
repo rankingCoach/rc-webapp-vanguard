@@ -1,0 +1,7 @@
+{
+  "id": "component:avatar-checkbox",
+  "kind": "component",
+  "summary": "Checkbox variant rendered as an avatar allowing selection of users or visual items.",
+  "keywords": ["avatar", "checkbox", "select", "user", "avatar-checkbox"],
+  "tags": ["avatars", "forms", "ui"]
+}

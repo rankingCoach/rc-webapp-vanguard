@@ -1,0 +1,7 @@
+{
+  "id": "component:form",
+  "kind": "component",
+  "summary": "Form wrapper managing validation, submission and error handling for controlled forms.",
+  "keywords": ["form", "submission", "validation", "errors", "fields", "component", "state"],
+  "tags": ["forms", "core", "ui"]
+}

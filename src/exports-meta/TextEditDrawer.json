@@ -1,0 +1,7 @@
+{
+  "id": "component:text-edit-drawer",
+  "kind": "component",
+  "summary": "Drawer UI for editing large text fields with controls for save/cancel and validation.",
+  "keywords": ["drawer", "text-edit", "editor", "textarea", "save", "cancel"],
+  "tags": ["drawers", "editor", "ui"]
+}

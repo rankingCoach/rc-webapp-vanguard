@@ -1,0 +1,7 @@
+{
+  "id": "component:progress-circle",
+  "kind": "component",
+  "summary": "Circular progress indicator for showing indeterminate or percentage-based progress.",
+  "keywords": ["progress", "circle", "spinner", "indicator", "loading"],
+  "tags": ["progress", "ui", "feedback"]
+}

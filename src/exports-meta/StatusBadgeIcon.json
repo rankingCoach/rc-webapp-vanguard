@@ -1,0 +1,7 @@
+{
+  "id": "component:status-badge-icon",
+  "kind": "component",
+  "summary": "Icon variant used inside `StatusBadge` for visual status representation.",
+  "keywords": ["status", "icon", "badge", "indicator", "visual"],
+  "tags": ["icons", "status", "ui"]
+}

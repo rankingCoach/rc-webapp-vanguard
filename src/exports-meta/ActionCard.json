@@ -1,0 +1,7 @@
+{
+  "id": "component:action-card",
+  "kind": "component",
+  "summary": "Card component that groups primary content with actionable controls and metadata.",
+  "keywords": ["card", "action", "panel", "controls", "metadata"],
+  "tags": ["cards", "actions", "ui"]
+}

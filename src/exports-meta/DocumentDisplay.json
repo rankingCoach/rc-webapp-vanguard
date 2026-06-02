@@ -1,0 +1,7 @@
+{
+  "id": "component:document-display",
+  "kind": "component",
+  "summary": "Component that previews documents (PDF, images) with optional download and view controls.",
+  "keywords": ["document", "preview", "pdf", "display", "viewer", "media"],
+  "tags": ["documents", "preview", "ui"]
+}

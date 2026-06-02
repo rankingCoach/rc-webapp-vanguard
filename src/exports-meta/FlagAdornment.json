@@ -1,0 +1,7 @@
+{
+  "id": "component:flag-adornment",
+  "kind": "component",
+  "summary": "Adornment component that shows a flag or country indicator beside inputs or avatars.",
+  "keywords": ["flag", "adornment", "country", "input", "icon", "indicator"],
+  "tags": ["adornments", "ui", "flags"]
+}

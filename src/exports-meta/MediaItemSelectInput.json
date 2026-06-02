@@ -1,0 +1,7 @@
+{
+  "id": "component:media-item-select-input",
+  "kind": "component",
+  "summary": "Form input for selecting media items (images/videos) with preview and selection controls.",
+  "keywords": ["media", "select", "image", "video", "picker", "input", "preview"],
+  "tags": ["forms", "media", "ui"]
+}

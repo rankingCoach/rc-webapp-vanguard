@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-footer",
+  "kind": "component",
+  "summary": "Footer area for modals to host actions such as confirm, cancel or secondary buttons.",
+  "keywords": ["modal", "footer", "actions", "buttons", "confirm", "cancel"],
+  "tags": ["modals", "actions", "ui"]
+}

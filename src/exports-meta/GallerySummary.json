@@ -1,0 +1,7 @@
+{
+  "id": "component:gallery-summary",
+  "kind": "component",
+  "summary": "Compact summary view of gallery statistics and quick actions (counts, add, edit).",
+  "keywords": ["gallery", "summary", "count", "actions", "media", "overview"],
+  "tags": ["media", "summary", "ui"]
+}

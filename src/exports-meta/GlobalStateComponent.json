@@ -1,0 +1,7 @@
+{
+  "id": "component:global-state-component",
+  "kind": "component",
+  "summary": "Component that exposes and syncs global application state for mounting single-instance behaviors.",
+  "keywords": ["global", "state", "component", "singleton", "store", "sync"],
+  "tags": ["state", "global", "helpers"]
+}

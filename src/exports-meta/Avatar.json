@@ -1,0 +1,7 @@
+{
+  "id": "component:avatar",
+  "kind": "component",
+  "summary": "User avatar component that displays images, initials or icon placeholders with sizing options.",
+  "keywords": ["avatar", "user", "profile", "image", "initials", "placeholder"],
+  "tags": ["avatars", "ui", "media"]
+}

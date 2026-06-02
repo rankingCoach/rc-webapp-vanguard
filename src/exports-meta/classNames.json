@@ -1,0 +1,7 @@
+{
+  "id": "helper:class-names",
+  "kind": "helper",
+  "summary": "Utility that merges conditional class names into a single class string for components.",
+  "keywords": ["class", "classnames", "css", "utility", "helpers", "styles"],
+  "tags": ["helpers", "styles", "utilities"]
+}

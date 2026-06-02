@@ -1,6 +1,16 @@
-.BulletsContainer{
+@import '@styles/spacings';
+
+.BulletsContainer {
   position: absolute;
   bottom: 0;
   width: 100%;
   z-index: 1;
+}
+
+// Modifier for placement='below'. Cancels the absolute positioning so the
+// element sits in normal flow as a sibling of the carousel.
+.BulletsContainerBelow {
+  position: static;
+  bottom: auto;
+  margin-top: $x2;
 }

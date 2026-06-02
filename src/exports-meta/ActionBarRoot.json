@@ -1,0 +1,7 @@
+{
+  "id": "component:action-bar-root",
+  "kind": "component",
+  "summary": "Root container that manages layout and stacking for `ActionBar` instances.",
+  "keywords": ["action-bar", "root", "container", "layout", "stack"],
+  "tags": ["actions", "layout", "ui"]
+}

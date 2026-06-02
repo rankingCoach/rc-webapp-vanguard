@@ -1,0 +1,7 @@
+{
+  "id": "component:quote-container",
+  "kind": "component",
+  "summary": "Stylized container for highlighted quotations or testimonial content.",
+  "keywords": ["quote", "container", "testimonial", "blockquote", "highlight"],
+  "tags": ["content", "layout", "ui"]
+}

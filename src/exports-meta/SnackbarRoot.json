@@ -1,0 +1,7 @@
+{
+  "id": "component:snackbar-root",
+  "kind": "component",
+  "summary": "Root container that mounts snackbars and manages stacking and dismissal behavior.",
+  "keywords": ["snackbar", "root", "container", "toast", "stack", "dismiss"],
+  "tags": ["notifications", "root", "ui"]
+}

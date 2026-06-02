@@ -1,0 +1,7 @@
+{
+  "id": "component:google-maps-marker-default",
+  "kind": "component",
+  "summary": "Default marker implementation used when no custom marker is provided.",
+  "keywords": ["marker", "default", "google-maps", "pin", "fallback"],
+  "tags": ["maps", "markers", "ui"]
+}

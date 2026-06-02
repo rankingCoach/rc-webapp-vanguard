@@ -1,0 +1,7 @@
+{
+  "id": "component:rc-error-boundary",
+  "kind": "component",
+  "summary": "Error boundary component that catches render errors and provides reporting helpers.",
+  "keywords": ["error", "boundary", "fallback", "reporting", "react"],
+  "tags": ["errors", "stability", "helpers"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:imask-input",
+  "kind": "component",
+  "summary": "Masked input supporting formatted entries (dates, credit cards, phone numbers).",
+  "keywords": ["mask", "input", "format", "imask", "credit-card", "date", "phone", "form"],
+  "tags": ["forms", "input", "mask", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:accordion",
+  "kind": "component",
+  "summary": "Collapsible panel component for hiding and revealing content sections with animation.",
+  "keywords": ["accordion", "collapse", "panel", "toggle", "expand", "collapse"],
+  "tags": ["navigation", "ui", "interactive"]
+}

@@ -1,5 +1,8 @@
 
 .ArrowContainer{
+  display: flex;
+  align-items: center;
+
   .SlideCarouselArrow{
     background: rgba(var(--n000-rgb), 0.5);
     border-radius: 50%;

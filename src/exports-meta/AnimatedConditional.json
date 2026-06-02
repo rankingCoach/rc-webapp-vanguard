@@ -1,0 +1,7 @@
+{
+  "id": "helper:animated-conditional",
+  "kind": "helper",
+  "summary": "Utility that renders children with conditional animations based on state changes.",
+  "keywords": ["animation", "conditional", "transition", "motion", "helper", "toggle"],
+  "tags": ["animation", "transitions", "ui"]
+}

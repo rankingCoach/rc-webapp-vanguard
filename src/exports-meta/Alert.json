@@ -1,0 +1,7 @@
+{
+  "id": "component:alert",
+  "kind": "component",
+  "summary": "Alert component for displaying prominent messages (success, warning, error, info) with optional actions.",
+  "keywords": ["alert", "message", "error", "warning", "success", "info"],
+  "tags": ["alerts", "notifications", "ui"]
+}

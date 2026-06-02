@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-header",
+  "kind": "component",
+  "summary": "Header element for modals typically containing the title and optional close control.",
+  "keywords": ["modal", "header", "title", "close", "dialog"],
+  "tags": ["modals", "header", "ui"]
+}

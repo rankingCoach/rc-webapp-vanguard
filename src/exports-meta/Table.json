@@ -1,0 +1,7 @@
+{
+  "id": "component:table",
+  "kind": "component",
+  "summary": "Configurable data table component with headers, footers, custom cell renderers and actions.",
+  "keywords": ["table", "data", "grid", "columns", "cells", "render"],
+  "tags": ["table", "data", "ui"]
+}

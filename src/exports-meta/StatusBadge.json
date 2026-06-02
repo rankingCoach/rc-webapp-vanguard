@@ -1,0 +1,7 @@
+{
+  "id": "component:status-badge",
+  "kind": "component",
+  "summary": "Small badge indicating status, review or boost states with optional icon and color variants.",
+  "keywords": ["status", "badge", "indicator", "status-badge", "review", "status"],
+  "tags": ["labels", "status", "ui"]
+}

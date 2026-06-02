@@ -1,0 +1,7 @@
+{
+  "id": "component:select-input",
+  "kind": "component",
+  "summary": "Select input component specialized for file/media selection with UI for choosing items.",
+  "keywords": ["select", "input", "media", "file", "picker", "dropdown"],
+  "tags": ["forms", "media", "ui"]
+}

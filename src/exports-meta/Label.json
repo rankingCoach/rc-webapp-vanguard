@@ -1,0 +1,7 @@
+{
+  "id": "component:label",
+  "kind": "component",
+  "summary": "Text label for forms and UI elements providing concise contextual captions.",
+  "keywords": ["label", "form", "caption", "field", "text", "ui"],
+  "tags": ["forms", "typography", "ui"]
+}

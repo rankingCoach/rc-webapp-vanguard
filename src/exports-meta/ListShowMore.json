@@ -1,0 +1,7 @@
+{
+  "id": "component:list-show-more",
+  "kind": "component",
+  "summary": "List variant that supports expanding or loading more items with a show-more control.",
+  "keywords": ["list", "show-more", "load-more", "pagination", "expand", "lazy"],
+  "tags": ["lists", "ui", "performance"]
+}

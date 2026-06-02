@@ -1,0 +1,7 @@
+{
+  "id": "component:lottie-animation-loader",
+  "kind": "component",
+  "summary": "Loader that handles Lottie animations and exposes hooks for interactivity and events.",
+  "keywords": ["lottie", "animation", "loader", "interactivity", "animation-loader"],
+  "tags": ["animations", "media", "ui"]
+}

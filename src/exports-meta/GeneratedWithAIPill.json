@@ -1,0 +1,7 @@
+{
+  "id": "component:generated-with-ai-pill",
+  "kind": "component",
+  "summary": "Small UI pill indicating content was generated with AI, for transparency badges.",
+  "keywords": ["pill", "badge", "ai", "generated", "label", "indicator"],
+  "tags": ["labels", "ai", "ui"]
+}

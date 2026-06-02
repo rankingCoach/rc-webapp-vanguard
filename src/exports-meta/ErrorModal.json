@@ -1,0 +1,7 @@
+{
+  "id": "component:error-modal",
+  "kind": "component",
+  "summary": "Modal used to surface errors and failure states with optional retry or support actions.",
+  "keywords": ["modal", "error", "failure", "alert", "retry", "dialog"],
+  "tags": ["modals", "errors", "ui"]
+}

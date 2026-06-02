@@ -1,0 +1,7 @@
+{
+  "id": "component:toggle-button-group",
+  "kind": "component",
+  "summary": "Group component managing multiple toggle buttons and their selection state.",
+  "keywords": ["toggle", "group", "buttons", "selection", "control"],
+  "tags": ["controls", "input", "ui"]
+}

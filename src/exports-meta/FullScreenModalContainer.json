@@ -1,0 +1,7 @@
+{
+  "id": "component:full-screen-modal-container",
+  "kind": "component",
+  "summary": "Container to host full screen modals, managing layout and close behavior.",
+  "keywords": ["modal", "fullscreen", "container", "dialog", "layout", "overlay"],
+  "tags": ["modals", "layout", "ui"]
+}

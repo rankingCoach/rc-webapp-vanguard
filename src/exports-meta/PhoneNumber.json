@@ -1,0 +1,5 @@
+{
+  "id": "component:phone-number",
+  "kind": "component",
+  "summary": "Phone number display and input helper that formats and validates international numbers."
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:slide-transition",
+  "kind": "component",
+  "summary": "Transition component that animates children with slide-in / slide-out movements.",
+  "keywords": ["transition", "slide", "animation", "enter", "exit", "motion"],
+  "tags": ["transitions", "animation", "ui"]
+}

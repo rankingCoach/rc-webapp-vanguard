@@ -1,0 +1,7 @@
+{
+  "id": "component:loader",
+  "kind": "component",
+  "summary": "Indeterminate spinner and loader used for async operations across the app.",
+  "keywords": ["loader", "spinner", "loading", "progress", "async"],
+  "tags": ["loading", "ui"]
+}

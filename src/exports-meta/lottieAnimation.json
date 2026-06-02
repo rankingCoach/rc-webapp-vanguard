@@ -1,0 +1,7 @@
+{
+  "id": "constant:lottie-animation",
+  "kind": "constant",
+  "summary": "Backward compatibility export (dummy) representing the lottie animation value.",
+  "keywords": ["lottie", "animation", "legacy", "compatibility"],
+  "tags": ["animations", "compatibility", "constants"]
+}

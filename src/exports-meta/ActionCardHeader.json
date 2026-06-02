@@ -1,0 +1,7 @@
+{
+  "id": "component:action-card-header",
+  "kind": "component",
+  "summary": "Header section for `ActionCard` that contains title, subtitle and optional controls.",
+  "keywords": ["card", "header", "title", "subtitle", "controls"],
+  "tags": ["cards", "ui"]
+}

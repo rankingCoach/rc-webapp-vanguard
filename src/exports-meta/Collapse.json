@@ -1,0 +1,7 @@
+{
+  "id": "component:collapse",
+  "kind": "component",
+  "summary": "Collapsible container to hide or reveal content with animation and controlled height.",
+  "keywords": ["collapse", "accordion", "toggle", "hide", "show", "expand"],
+  "tags": ["layout", "transitions", "ui"]
+}

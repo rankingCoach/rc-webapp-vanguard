@@ -1,0 +1,7 @@
+{
+  "id": "helper:snackbar-service",
+  "kind": "helper",
+  "summary": "Imperative service to show and manage snackbars programmatically from anywhere in the app.",
+  "keywords": ["snackbar", "service", "toast", "show", "dismiss", "api"],
+  "tags": ["notifications", "service", "helpers"]
+}

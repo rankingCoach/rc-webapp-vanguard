@@ -1,0 +1,7 @@
+{
+  "id": "component:rc-nav-link",
+  "kind": "component",
+  "summary": "Navigation link component that handles active state and routing-friendly behavior.",
+  "keywords": ["nav", "link", "router", "active", "navigation", "menu"],
+  "tags": ["navigation", "links", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:toolbar",
+  "kind": "component",
+  "summary": "Horizontal toolbar for grouping actions, filters and controls in a compact row.",
+  "keywords": ["toolbar", "actions", "controls", "filters", "group"],
+  "tags": ["navigation", "controls", "ui"]
+}

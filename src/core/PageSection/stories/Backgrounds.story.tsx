@@ -31,11 +31,11 @@ export const Backgrounds: Story = {
       </PageSection>
 
       <PageSection
-        testId="PS_BG_GradientRc"
-        title="RankingCoach gradient"
-        background={PageSectionBackground.gradientRc}
+        testId="PS_BG_GradientPrimaryMesh"
+        title="Primary mesh gradient"
+        background={PageSectionBackground.gradientPrimaryMesh}
       >
-        <div>Gradient RC content</div>
+        <div>Gradient Primary Mesh content</div>
       </PageSection>
 
       <PageSection
@@ -61,7 +61,7 @@ export const Backgrounds: Story = {
     await expect(canvas.getByTestId('PS_BG_Functional').className).toContain('functionalBg');
     await expect(canvas.getByTestId('PS_BG_Frosted').className).toContain('frostedGlass');
     await expect(canvas.getByTestId('PS_BG_Transparent').className).toContain('transparent');
-    await expect(canvas.getByTestId('PS_BG_GradientRc').className).toContain('gradientRc');
+    await expect(canvas.getByTestId('PS_BG_GradientPrimaryMesh').className).toContain('gradientPrimaryMesh');
     await expect(canvas.getByTestId('PS_BG_GradientBgVarTop').className).toContain('gradientBgVarTop');
     await expect(canvas.getByTestId('PS_BG_GradientBgVarBottom').className).toContain('gradientBgVarBottom');
   },

@@ -1,0 +1,7 @@
+{
+  "id": "component:edit-modal",
+  "kind": "component",
+  "summary": "Reusable modal tailored for editing a resource with form controls and actions.",
+  "keywords": ["modal", "edit", "form", "update", "dialog", "save", "cancel"],
+  "tags": ["modals", "forms", "ui"]
+}

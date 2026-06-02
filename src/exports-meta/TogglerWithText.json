@@ -1,0 +1,7 @@
+{
+  "id": "component:toggler-with-text",
+  "kind": "component",
+  "summary": "Toggle control with descriptive text options for boolean or dual-state choices.",
+  "keywords": ["toggle", "toggler", "switch", "text", "binary", "ui"],
+  "tags": ["forms", "input", "ui"]
+}

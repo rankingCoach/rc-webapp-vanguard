@@ -1,0 +1,7 @@
+{
+  "id": "component:img-loader",
+  "kind": "component",
+  "summary": "Image loader that handles lazy loading, placeholders and retry/fallback behavior.",
+  "keywords": ["image", "loader", "lazy", "placeholder", "fallback", "progressive"],
+  "tags": ["images", "loading", "performance"]
+}

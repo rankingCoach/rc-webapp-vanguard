@@ -1,0 +1,7 @@
+{
+  "id": "component:autocomplete",
+  "kind": "component",
+  "summary": "Input with suggestion dropdown supporting keyboard navigation and async sources.",
+  "keywords": ["autocomplete", "suggestions", "input", "dropdown", "keyboard", "async"],
+  "tags": ["forms", "input", "ui"]
+}

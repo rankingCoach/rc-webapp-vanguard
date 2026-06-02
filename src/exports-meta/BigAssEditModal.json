@@ -1,0 +1,7 @@
+{
+  "id": "component:big-ass-edit-modal",
+  "kind": "component",
+  "summary": "Large edit modal for complex or bulk editing tasks with advanced controls.",
+  "keywords": ["modal", "edit", "bulk", "large", "editor", "dialog", "form"],
+  "tags": ["modals", "editor", "ui"]
+}

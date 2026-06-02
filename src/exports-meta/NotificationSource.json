@@ -1,0 +1,7 @@
+{
+  "id": "component:notification-source",
+  "kind": "component",
+  "summary": "Provides contextual source information and rendering for notifications (system, user, social).",
+  "keywords": ["notification", "source", "origin", "system", "user", "context"],
+  "tags": ["notifications", "context", "ui"]
+}

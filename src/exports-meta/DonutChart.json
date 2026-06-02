@@ -1,0 +1,7 @@
+{
+  "id": "component:donut-chart",
+  "kind": "component",
+  "summary": "Donut chart visualization for showing proportions with legends and tooltips.",
+  "keywords": ["donut", "chart", "pie", "visualization", "legend", "tooltip"],
+  "tags": ["charts", "visuals", "data"]
+}

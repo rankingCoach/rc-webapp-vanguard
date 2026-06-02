@@ -1,0 +1,7 @@
+{
+  "id": "helper:action-bar-service",
+  "kind": "helper",
+  "summary": "Service to configure and control the global `ActionBar` (set footer, messages, visibility).",
+  "keywords": ["action-bar", "service", "footer", "control", "imperative"],
+  "tags": ["actions", "service", "helpers"]
+}

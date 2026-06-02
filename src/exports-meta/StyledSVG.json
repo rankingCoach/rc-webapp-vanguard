@@ -1,0 +1,7 @@
+{
+  "id": "component:styled-svg",
+  "kind": "component",
+  "summary": "Wrapper component for SVGs applying consistent theming, sizing and accessibility attributes.",
+  "keywords": ["svg", "styled", "icon", "accessibility", "visual", "graphics"],
+  "tags": ["svg", "visuals", "ui"]
+}

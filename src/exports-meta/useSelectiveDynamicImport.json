@@ -1,0 +1,7 @@
+{
+  "id": "hook:use-selective-dynamic-import",
+  "kind": "hook",
+  "summary": "Hook to selectively import modules based on runtime conditions, optimizing bundle size.",
+  "keywords": ["selective", "dynamic", "import", "hook", "lazy", "performance"],
+  "tags": ["hooks", "performance", "code-splitting"]
+}

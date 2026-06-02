@@ -1,0 +1,7 @@
+{
+  "id": "component:google-maps",
+  "kind": "component",
+  "summary": "Wrapper component for rendering Google Maps instances with markers, overlays and utility methods.",
+  "keywords": ["google", "maps", "map", "marker", "overlay", "geo", "location"],
+  "tags": ["maps", "google-maps", "ui"]
+}

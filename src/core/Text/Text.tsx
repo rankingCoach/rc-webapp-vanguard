@@ -2,7 +2,7 @@ import './Text.scss';
 
 import { classNames } from '@helpers/classNames';
 import { parseCssVariable } from '@helpers/css-variables-parser';
-import { sanitizeHTML } from '@helpers/sanitize-html';
+import { sanitizeHTMLToReactNode } from '@helpers/sanitize-html';
 import { translationHelper } from '@helpers/translation-helper';
 import { translationService } from '@services/translation.service';
 import { rcWindow } from '@stores/window.store';
@@ -13,6 +13,7 @@ import { TextWrapBalancer } from '@vanguard/Text/TextWrapBalancer/TextWrapBalanc
 import parse from 'html-react-parser';
 import * as React from 'react';
 import { JSX, useMemo, useState } from 'react';
+import { renderToString } from 'react-dom/server';
 
 import { childrenAsText } from './child-to-text';
 
@@ -84,6 +85,10 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     ellipsis,
     allowNewLines = false,
     animateWords = undefined,
+    highlightWords,
+    highlightColor,
+    highlightMode = 'background',
+    highlightCaseInsensitive = false,
     ...rest
   } = props;
 
@@ -144,6 +149,28 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
   translated = translate
     ? parse(translationData.value, { htmlparser2: { lowerCaseTags: false } })
     : translationService.justReplace(toTranslate, replacements);
+
+  if (typeof translated === 'string' && highlightWords?.length) {
+    const spanStyle = {
+      backgroundColor: highlightMode === 'background' ? highlightColor : undefined,
+      color: highlightMode === 'text' ? highlightColor : undefined,
+      fontWeight: highlightMode === 'bold' ? ('bold' as const) : undefined,
+    };
+
+    highlightWords.forEach((word) => {
+      if (highlightCaseInsensitive) {
+        const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        const matches = (translated as string).match(regex);
+        if (matches) {
+          matches.forEach((match) => {
+            translated = (translated as string).replace(match, renderToString(<span style={spanStyle}>{match}</span>));
+          });
+        }
+      } else {
+        translated = (translated as string).replace(word, renderToString(<span style={spanStyle}>{word}</span>));
+      }
+    });
+  }
 
   useMemo(() => {
     if (translate) {
@@ -303,14 +330,14 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     }
 
     if (typeof translated === 'string') {
-      const content: any = sanitizeHTML(translated as string);
+      const content: any = sanitizeHTMLToReactNode(translated as string);
       if (typeof seeMore === 'boolean' && seeMore) {
         const seeMoreText = expanded ? boldAndTranslated('See Less') : boldAndTranslated('See More');
         const truncatedText = expanded ? translated : `${translated.slice(0, maxChar)}...`;
         if (showSeeMore) {
           content.children = (
             <>
-              {sanitizeHTML(truncatedText).children} <a onClick={toggleExpanded}>{seeMoreText}</a>
+              {sanitizeHTMLToReactNode(truncatedText).children} <a onClick={toggleExpanded}>{seeMoreText}</a>
             </>
           );
         }
@@ -324,7 +351,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
         if (seeMore) {
           content.children = (
             <span className={'see-more'} style={{ WebkitLineClamp: maxLines }}>
-              {sanitizeHTML(translated).children}
+              {sanitizeHTMLToReactNode(translated).children}
               {translated.length > 100 && (
                 <span className={'see-more-content'}>
                   {
@@ -348,7 +375,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
           if (seeMore) {
             content.children = (
               <span onClick={toggleExpanded}>
-                {sanitizeHTML(translated).children}{' '}
+                {sanitizeHTMLToReactNode(translated).children}{' '}
                 {
                   // @ts-ignore
                   seeMoreVisible && seeMore.seeLessContent

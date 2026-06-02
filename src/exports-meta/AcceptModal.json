@@ -1,0 +1,7 @@
+{
+  "id": "component:accept-modal",
+  "kind": "component",
+  "summary": "Standard accept confirmation modal with primary/secondary actions.",
+  "keywords": ["modal", "accept", "confirm", "dialog", "action"],
+  "tags": ["modals", "standard", "ui"]
+}

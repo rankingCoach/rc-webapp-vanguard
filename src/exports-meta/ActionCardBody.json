@@ -1,0 +1,7 @@
+{
+  "id": "component:action-card-body",
+  "kind": "component",
+  "summary": "Main content area of an `ActionCard` used to render title, description and content.",
+  "keywords": ["card", "body", "content", "description", "panel"],
+  "tags": ["cards", "ui"]
+}

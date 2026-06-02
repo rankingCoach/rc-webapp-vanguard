@@ -1,0 +1,7 @@
+{
+  "id": "component:modal-root",
+  "kind": "component",
+  "summary": "Top-level modal root that mounts portal content and manages stacking and focus trapping.",
+  "keywords": ["modal", "root", "portal", "focus", "trap", "stack"],
+  "tags": ["modals", "portal", "accessibility"]
+}

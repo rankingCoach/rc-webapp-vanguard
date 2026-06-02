@@ -1,0 +1,7 @@
+{
+  "id": "component:content-placeholder",
+  "kind": "component",
+  "summary": "Generic content placeholder used for notifications and content blocks to indicate loading or empty states.",
+  "keywords": ["placeholder", "content", "notification", "skeleton", "empty"],
+  "tags": ["placeholders", "ui", "loading"]
+}

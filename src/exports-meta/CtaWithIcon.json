@@ -1,0 +1,7 @@
+{
+  "id": "component:cta-with-icon",
+  "kind": "component",
+  "summary": "Call-to-action component combining an icon with text, for inline or block actions.",
+  "keywords": ["cta", "button", "icon", "call-to-action", "action"],
+  "tags": ["actions", "ui", "components"]
+}

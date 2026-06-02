@@ -1,0 +1,7 @@
+{
+  "id": "component:document-upload",
+  "kind": "component",
+  "summary": "Upload control for documents supporting validation, progress and previews.",
+  "keywords": ["document", "upload", "pdf", "validation", "progress", "file"],
+  "tags": ["documents", "upload", "ui"]
+}

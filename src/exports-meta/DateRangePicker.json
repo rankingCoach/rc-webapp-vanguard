@@ -1,0 +1,7 @@
+{
+  "id": "component:date-range-picker",
+  "kind": "component",
+  "summary": "Full-featured date range picker with presets, multiple ranges and comparison helpers.",
+  "keywords": ["date", "range", "picker", "calendar", "presets", "selection"],
+  "tags": ["forms", "date", "ui"]
+}

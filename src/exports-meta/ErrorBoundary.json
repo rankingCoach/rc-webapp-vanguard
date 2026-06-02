@@ -1,0 +1,7 @@
+{
+  "id": "component:error-boundary",
+  "kind": "component",
+  "summary": "Error boundary component that catches rendering errors and provides fallback UI and reporting.",
+  "keywords": ["error", "boundary", "fallback", "report", "react", "crash"],
+  "tags": ["errors", "stability", "ui"]
+}

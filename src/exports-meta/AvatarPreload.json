@@ -1,0 +1,7 @@
+{
+  "id": "component:avatar-preload",
+  "kind": "component",
+  "summary": "Preloads avatar images/icons to avoid visual flicker and improve perceived performance.",
+  "keywords": ["avatar", "preload", "image", "performance", "cache", "placeholder"],
+  "tags": ["avatars", "performance", "ui"]
+}

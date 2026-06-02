@@ -1,0 +1,7 @@
+{
+  "id": "helper:modal-service",
+  "kind": "helper",
+  "summary": "Programmatic service to open, close or manage modals outside of React component tree.",
+  "keywords": ["modal", "service", "open", "close", "programmatic", "imperative"],
+  "tags": ["modals", "helpers", "service"]
+}

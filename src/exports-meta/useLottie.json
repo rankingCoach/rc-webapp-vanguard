@@ -1,0 +1,7 @@
+{
+  "id": "hook:use-lottie",
+  "kind": "hook",
+  "summary": "Hook that provides Lottie animation controls and lifecycle helpers for animated components.",
+  "keywords": ["lottie", "hook", "animation", "controls", "play", "pause", "interactivity"],
+  "tags": ["animations", "hooks", "lottie"]
+}

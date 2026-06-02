@@ -1,0 +1,7 @@
+{
+  "id": "component:text-highlighted",
+  "kind": "component",
+  "summary": "Text component that highlights matched substrings or search terms with configurable styles.",
+  "keywords": ["highlight", "text", "search", "match", "emphasis", "highlighter"],
+  "tags": ["typography", "highlight", "ui"]
+}

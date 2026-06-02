@@ -1,0 +1,7 @@
+{
+  "id": "component:loading-modal",
+  "kind": "component",
+  "summary": "Modal variant that displays a loading indicator and message during long operations.",
+  "keywords": ["modal", "loading", "spinner", "progress", "overlay"],
+  "tags": ["modals", "loading", "ui"]
+}

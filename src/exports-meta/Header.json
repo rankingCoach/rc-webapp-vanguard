@@ -1,0 +1,7 @@
+{
+  "id": "component:header",
+  "kind": "component",
+  "summary": "Top-level header component with site branding, navigation and optional actions.",
+  "keywords": ["header", "navigation", "brand", "topbar", "site", "layout"],
+  "tags": ["layout", "navigation", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:snackbar",
+  "kind": "component",
+  "summary": "Transient notification (snackbar/toast) component for short messages and actions.",
+  "keywords": ["snackbar", "toast", "notification", "temporary", "message", "action"],
+  "tags": ["notifications", "ui"]
+}

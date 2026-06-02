@@ -1,0 +1,7 @@
+{
+  "id": "component:star",
+  "kind": "component",
+  "summary": "Single star icon component used in rating UIs and visual displays.",
+  "keywords": ["star", "rating", "icon", "visual", "score"],
+  "tags": ["ratings", "icons", "ui"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:svg-image",
+  "kind": "component",
+  "summary": "Renders SVG images with optional sizing and accessibility attributes.",
+  "keywords": ["svg", "image", "svg-image", "icon", "accessibility", "visual"],
+  "tags": ["images", "svg", "ui"]
+}

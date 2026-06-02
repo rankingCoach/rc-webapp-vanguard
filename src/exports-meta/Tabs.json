@@ -1,0 +1,7 @@
+{
+  "id": "component:tabs",
+  "kind": "component",
+  "summary": "Tabs control to partition content into labeled panels with keyboard and accessibility support.",
+  "keywords": ["tabs", "navigation", "panels", "keyboard", "accessibility", "ui"],
+  "tags": ["navigation", "ui", "core"]
+}

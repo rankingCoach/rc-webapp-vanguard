@@ -1,0 +1,7 @@
+{
+  "id": "component:icon-button",
+  "kind": "component",
+  "summary": "Button component primarily for icon actions; supports accessible labels and variants.",
+  "keywords": ["icon", "button", "cta", "action", "tooltip", "accessible"],
+  "tags": ["buttons", "icons", "ui"]
+}

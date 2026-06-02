@@ -1,0 +1,7 @@
+{
+  "id": "component:area-chart",
+  "kind": "component",
+  "summary": "Area chart for visualizing time-series or stacked area datasets with axes and legends.",
+  "keywords": ["area-chart", "chart", "time-series", "visualization", "legend"],
+  "tags": ["charts", "visuals", "data"]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "component:action-card-info",
+  "kind": "component",
+  "summary": "Supplementary information block for `ActionCard` used to display metadata like timestamps or statuses.",
+  "keywords": ["card", "info", "metadata", "status", "timestamp", "details"],
+  "tags": ["cards", "metadata", "ui"]
+}

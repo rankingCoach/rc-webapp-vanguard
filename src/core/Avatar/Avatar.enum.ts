@@ -416,6 +416,15 @@ export const AvatarIconMap: Record<string, string> = {
   laposte: 'laposte',
   leshoraires: 'leshoraires',
   snapchat: 'snapchat',
+  aranyoldalak: 'aranyoldalak',
+  horaire: 'horaire',
+  najisto: 'najisto',
+  hours: 'hours',
+  openingtimes: 'hours',
+  openuren: 'hours',
+  thepinkpagesdirectory: 'thepinkpagesdirectory',
+  torget: 'torget',
+  twisper: 'twisper',
 
   all_directories_icon: 'placeholder_directories',
   placeholder_directories: 'placeholder_directories',
@@ -440,4 +449,6 @@ export const AvatarIconMap: Record<string, string> = {
   // Social media networks
   youtube: 'youtube',
   pinterest: 'pinterest',
+  // Generic icons
+  user: 'user',
 } as const;
