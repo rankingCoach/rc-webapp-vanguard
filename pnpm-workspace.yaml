@@ -1,0 +1,13 @@
+# Flat, npm-style node_modules. This repo relies on undeclared (phantom)
+# dependencies and on @reduxjs/toolkit emitting portable .d.ts files; pnpm's
+# default isolated layout breaks both. Hoisting mirrors npm's behavior.
+nodeLinker: hoisted
+
+# Dependency build scripts pnpm is allowed to run (it blocks them by default).
+# Managed by `pnpm approve-builds`; without these, install fails with
+# ERR_PNPM_IGNORED_BUILDS (exit 1).
+allowBuilds:
+  '@swc/core': true
+  core-js-pure: true
+  esbuild: true
+  unrs-resolver: true
