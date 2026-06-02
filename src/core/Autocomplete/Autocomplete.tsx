@@ -192,6 +192,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
       setAdornmentIndex(undefined);
     }
 
+    setVal(nextVal as any);
+
     if (formconfig) {
       // Dispatch value
       if (formconfig && formconfig.setStateValue) {
@@ -364,7 +366,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
       }
     }
 
-    const valueTitle = value;
+    let valueTitle = value;
     if (typeof value === 'object') {
       const valueObj: Record<string, any> = value as unknown as object;
       if (valueObj && optionKey) {
@@ -372,7 +374,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
           console.warn("Autocomplete: 'optionKey' doesn't match value's properties!", optionKey);
         }
 
-        optionTitle = valueObj[optionKey];
+        valueTitle = valueObj[optionKey];
       }
     }
 
