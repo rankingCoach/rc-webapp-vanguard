@@ -23,7 +23,9 @@ export type GoogleMapsProps = {
   testId?: string;
   onLoad?: ((map: google.maps.Map) => void | Promise<void>) | undefined;
   mapId?: boolean | string;
-} & GoogleMapProps;
+  // `styles` and `mapId` are controlled by the `theme` and `mapId` props above
+  options?: Omit<google.maps.MapOptions, 'styles' | 'mapId'>;
+} & Omit<GoogleMapProps, 'mapContainerStyle' | 'options'>;
 
 const DEFAULT_MAP_ID = 'fb831772aadb7781';
 
