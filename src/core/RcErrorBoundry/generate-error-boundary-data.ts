@@ -36,6 +36,7 @@ export const generateErrorBoundaryData = (
         {
           info: errorInfo,
           error: error?.name,
+          message: error?.message?.slice(0, 100),
           href: window.location.href,
           host: window.location.host,
           pathname: window.location.pathname,
