@@ -62,6 +62,12 @@ export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
           invisible: !!hideBackdrop,
         },
         style: zIndex !== undefined ? { zIndex } : undefined,
+        // The drawer is a side panel, not a blocking dialog — we layer modals
+        // and popovers on top of it. MUI's default FocusTrap yanks focus back
+        // into the drawer whenever an input on a higher overlay receives it,
+        // which makes those inputs untypable. Turn enforcement off so focus
+        // can rest where the user puts it.
+        disableEnforceFocus: true,
       }}
       onClose={(event, reason) =>
         onClose &&

@@ -51,6 +51,14 @@ export const FullscreenModalDrawerModal: Story = {
     const top = topmostElAt(topBody);
     await expect(top && topModalRoot.contains(top)).toBe(true);
 
+    // Typing must reach the input on the topmost modal. Without the drawer's
+    // FocusTrap disabled this fails — the trap yanks focus back into the
+    // drawer the moment it moves to a sibling overlay.
+    const nameInput = within(topBody).getByPlaceholderText('Enter your name');
+    await userEvent.click(nameInput);
+    await userEvent.type(nameInput, 'Vanguard');
+    await waitFor(() => expect(nameInput).toHaveValue('Vanguard'));
+
     await closeAllOverlays();
   },
   render: () => {
