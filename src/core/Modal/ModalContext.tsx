@@ -1,7 +1,7 @@
+import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 
 import { ModalTransition } from './ModalRoot/ModalTransition/ModalTransition';
-import { ModalService } from './ModalService';
 
 export type ModalState = Record<string, any>;
 
@@ -47,7 +47,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   }, []);
 
   const getModalOrder = useCallback((modalId: string) => {
-    return ModalService.getModalOrder(modalId);
+    return OverlayStackingService.getOrder(modalId);
   }, []);
 
   const addModal = useCallback((modalId: string, animation: ModalTransition, component: any) => {

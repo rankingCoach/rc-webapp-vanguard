@@ -28,7 +28,13 @@ export interface DrawerProps extends AllowedDrawerProps {
   //TODO Implement me
   outOfTheWay?: number | false; // Accepts percentage (0-100) or false
   onClose?: (e?: ModalResponse<DrawerCloseResponse>) => void;
-  zIndex?: number; // Control the z-index of the drawer
+  /**
+   * @deprecated Layering is managed by OverlayStackingService — drawers
+   * auto-stack against modals and popovers through a shared ledger. Passing
+   * a fixed value here forces the drawer onto a static layer and breaks the
+   * stacking guarantees. Leave it unset.
+   */
+  zIndex?: number;
 }
 
 export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
@@ -62,6 +68,12 @@ export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
           invisible: !!hideBackdrop,
         },
         style: zIndex !== undefined ? { zIndex } : undefined,
+        // The drawer is a side panel, not a blocking dialog — we layer modals
+        // and popovers on top of it. MUI's default FocusTrap yanks focus back
+        // into the drawer whenever an input on a higher overlay receives it,
+        // which makes those inputs untypable. Turn enforcement off so focus
+        // can rest where the user puts it.
+        disableEnforceFocus: true,
       }}
       onClose={(event, reason) =>
         onClose &&

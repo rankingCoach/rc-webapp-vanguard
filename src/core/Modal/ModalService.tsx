@@ -10,6 +10,7 @@ import { ModalFooterAction, SubButtonProps } from '@vanguard/Modal/ModalFooter/M
 import { ModalHeader, ModalType } from '@vanguard/Modal/Modalheader/ModalHeader';
 import { StandardModalProps } from '@vanguard/Modal/ModalRoot/ModalRoot';
 import { ModalTransition } from '@vanguard/Modal/ModalRoot/ModalTransition/ModalTransition';
+import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Render } from '@vanguard/Render/Render';
 import { AcceptModal } from '@vanguard/StandardModals/AcceptModal/AcceptModal';
 import { ErrorModal } from '@vanguard/StandardModals/ErrorModal/ErrorModal';
@@ -112,7 +113,6 @@ const WrapperModal = <ResponseModel,>(
  * Modal Service Class
  * ---------------------------------------------------------------------------------------------------------------------
  */
-export const MODAL_BASE_Z_INDEX = 1100;
 
 class ModalServiceClass {
   private loadingModalId: null | string;
@@ -120,8 +120,6 @@ class ModalServiceClass {
   private errorModalId: null | string;
   private modalCloseListeners: Map<string, { cbs: ((resp?: ModalResponse<any>) => void)[]; data: any }>;
   private modalComponents: Map<string, any>;
-  private modalOrder: Map<string, number>;
-  private popoverOrder: Map<string, number>;
 
   constructor() {
     this.loadingModalId = null;
@@ -129,8 +127,6 @@ class ModalServiceClass {
     this.errorModalId = null;
     this.modalCloseListeners = new Map();
     this.modalComponents = new Map();
-    this.modalOrder = new Map();
-    this.popoverOrder = new Map();
   }
 
   on(event: any, callback: (details: any) => any) {
@@ -156,7 +152,7 @@ class ModalServiceClass {
 
   removeModalComponent(id: string) {
     this.modalComponents.delete(id);
-    this.modalOrder.delete(id);
+    OverlayStackingService.unregister(id);
   }
 
   openConfirmModal(options: OpenConfirmModalOptions): string;
@@ -416,62 +412,6 @@ class ModalServiceClass {
     });
   }
 
-  /**
-   * Highest order across modals AND popovers — used internally when assigning
-   * the next slot so modals/popovers never tie or interleave wrongly.
-   */
-  private getCurrentMaxOrder(): number {
-    let maxOrder = 0;
-    this.modalOrder.forEach((order) => {
-      if (order > maxOrder) maxOrder = order;
-    });
-    this.popoverOrder.forEach((order) => {
-      if (order > maxOrder) maxOrder = order;
-    });
-    return maxOrder;
-  }
-
-  private getMaxModalOrder(): number {
-    let maxOrder = 0;
-    this.modalOrder.forEach((order) => {
-      if (order > maxOrder) maxOrder = order;
-    });
-    return maxOrder;
-  }
-
-  /**
-   * Z-index of the topmost mounted modal, or MODAL_BASE_Z_INDEX (the stacking
-   * floor) when no modal is open. Popovers are excluded — this reports modal
-   * stacking only. Mirrors ModalTransition's formula: BASE + order.
-   */
-  getTopmostModalZIndex(): number {
-    return MODAL_BASE_Z_INDEX + this.getMaxModalOrder();
-  }
-
-  /**
-   * Single source of truth for a modal's stack order. ModalContext delegates
-   * to this so the dropdown and ModalTransition cannot drift apart.
-   */
-  getModalOrder(id: string): number {
-    return this.modalOrder.get(id) ?? 0;
-  }
-
-  /**
-   * Register a popover (e.g. DropdownMenu) into the shared stacking ledger.
-   * Returns its z-index so the caller can position itself. Modals opened
-   * after this call will land above the popover; closing the popover with
-   * `unregisterPopover` frees the slot.
-   */
-  registerPopover(id: string): number {
-    const order = this.getCurrentMaxOrder() + 1;
-    this.popoverOrder.set(id, order);
-    return MODAL_BASE_Z_INDEX + order;
-  }
-
-  unregisterPopover(id: string) {
-    this.popoverOrder.delete(id);
-  }
-
   /** Test-only: wipe internal state. Not for production code paths. */
   __resetForTests() {
     this.loadingModalId = null;
@@ -479,8 +419,7 @@ class ModalServiceClass {
     this.errorModalId = null;
     this.modalCloseListeners.clear();
     this.modalComponents.clear();
-    this.modalOrder.clear();
-    this.popoverOrder.clear();
+    OverlayStackingService.__resetForTests();
   }
 
   open<ResponseModel>(component: ComponentWithId, opts?: ModalOpts) {
@@ -548,9 +487,7 @@ class ModalServiceClass {
       modalId: id,
     });
 
-    // Assign order = (current topmost order) + 1, so closing modals frees their slots
-    // and the counter naturally returns to 1 when all modals close.
-    this.modalOrder.set(id, this.getCurrentMaxOrder() + 1);
+    OverlayStackingService.register(id, 'modal');
 
     pubSubService.$pub(PUB_SUB_EVENTS.reactModalOpen, {
       modalId: id,

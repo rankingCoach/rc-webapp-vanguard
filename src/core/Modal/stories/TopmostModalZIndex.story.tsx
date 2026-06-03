@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { userEvent, within, expect, screen } from 'storybook/test';
-import { MODAL_BASE_Z_INDEX, ModalService } from '@vanguard/Modal/ModalService';
+import { ModalService } from '@vanguard/Modal/ModalService';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Modal } from '@vanguard/Modal/Modal';
 import { Button } from '@vanguard/Button/Button';
 import { ModalHeader } from '@vanguard/Modal/Modalheader/ModalHeader';
@@ -15,7 +16,7 @@ const SampleModal = ({ id, close }: { id: string; close: () => void }) => {
   );
 };
 
-const getModalIds = () => Array.from((ModalService as any).modalOrder.keys()) as string[];
+const getModalIds = () => Array.from((ModalService as any).modalComponents.keys()) as string[];
 
 const Panel = () => {
   const [, force] = useState(0);
@@ -50,7 +51,7 @@ const Panel = () => {
     refresh();
   };
 
-  const z = ModalService.getTopmostModalZIndex();
+  const z = OverlayStackingService.getTopmostZIndex('modal');
   const count = getModalIds().length;
 
   return (
@@ -87,23 +88,23 @@ export const TopmostModalZIndex: Story = {
     await closeAllModals();
     const { openBtn, closeTopBtn, closeAllBtn } = getControls(canvasElement);
 
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX);
 
     await userEvent.click(openBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 1);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 1);
 
     await userEvent.click(openBtn);
     await userEvent.click(openBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 3);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 3);
 
     await userEvent.click(closeTopBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 2);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 2);
 
     await userEvent.click(closeAllBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX);
 
     await userEvent.click(openBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 1);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 1);
 
     await closeAllModals();
   },
@@ -121,13 +122,13 @@ export const TopmostUnaffectedByBottomClose: Story = {
     await userEvent.click(openBtn); // order 1
     await userEvent.click(openBtn); // order 2
     await userEvent.click(openBtn); // order 3
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 3);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 3);
 
     await userEvent.click(closeBottomBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 3);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 3);
 
     await userEvent.click(openBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 4);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 4);
 
     await closeAllModals();
   },
@@ -142,13 +143,13 @@ export const DeepStackTearDown: Story = {
     const { openBtn, closeTopBtn } = getControls(canvasElement);
 
     for (let i = 0; i < 10; i++) await userEvent.click(openBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 10);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 10);
 
     for (let i = 10; i >= 1; i--) {
-      await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + i);
+      await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + i);
       await userEvent.click(closeTopBtn);
     }
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX);
 
     await closeAllModals();
   },
@@ -163,17 +164,17 @@ export const TrackedModalsCountedSame: Story = {
     const { openBtn } = getControls(canvasElement);
 
     await userEvent.click(openBtn);
-    await expect(readZ()).toBe(MODAL_BASE_Z_INDEX + 1);
+    await expect(readZ()).toBe(OVERLAY_BASE_Z_INDEX + 1);
 
     // Open a confirm modal directly via the service
     ModalService.openConfirmModal({ closeFn: () => {}, message: 'Confirm body' });
     // Wait for the open pub/sub round-trip
     await new Promise((resolve) => setTimeout(resolve, 50));
-    await expect(ModalService.getTopmostModalZIndex()).toBe(MODAL_BASE_Z_INDEX + 2);
+    await expect(OverlayStackingService.getTopmostZIndex('modal')).toBe(OVERLAY_BASE_Z_INDEX + 2);
 
     ModalService.closeConfirmModal();
     await new Promise((resolve) => setTimeout(resolve, 50));
-    await expect(ModalService.getTopmostModalZIndex()).toBe(MODAL_BASE_Z_INDEX + 1);
+    await expect(OverlayStackingService.getTopmostZIndex('modal')).toBe(OVERLAY_BASE_Z_INDEX + 1);
 
     await closeAllModals();
   },
