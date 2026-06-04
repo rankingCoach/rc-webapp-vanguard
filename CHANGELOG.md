@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.3](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.2...v1.12.3) (2026-06-04)
+
+
+### Bug Fixes
+
+* remove SearchableSelect component from wordpress exports ([191575d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/191575d20f954a43256fca7ee379e6ee40aa840d))
+
+### [1.12.2-testare.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.1...v1.12.2-testare.0) (2026-06-03)
+
 ### [1.12.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.1...v1.12.2) (2026-06-03)
 
 
