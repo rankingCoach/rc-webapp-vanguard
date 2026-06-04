@@ -4,7 +4,7 @@ import { ClickAwayListener, Fade, MenuItem, MenuList, Popper as MuiPopper } from
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconProps } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
-import { MODAL_BASE_Z_INDEX, ModalService } from '@vanguard/Modal/ModalService';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Text } from '@vanguard/Text/Text';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
 
@@ -50,16 +50,16 @@ export const DropdownMenu = (props: DropdownMenuProps) => {
   // currently mounted. A modal that opens AFTER us will land above our slot
   // (correct UX: the new modal should cover the stale popover).
   const popoverIdRef = useRef<string>(`dropdown-${uuidv4()}`);
-  const [zIndex, setZIndex] = useState(MODAL_BASE_Z_INDEX);
+  const [zIndex, setZIndex] = useState(OVERLAY_BASE_Z_INDEX);
 
   useEffect(() => {
     if (!isOpen) {
-      setZIndex(MODAL_BASE_Z_INDEX);
+      setZIndex(OVERLAY_BASE_Z_INDEX);
       return;
     }
     const id = popoverIdRef.current;
-    setZIndex(ModalService.registerPopover(id));
-    return () => ModalService.unregisterPopover(id);
+    setZIndex(OverlayStackingService.register(id, 'popover'));
+    return () => OverlayStackingService.unregister(id);
   }, [isOpen]);
 
   /**

@@ -6,7 +6,7 @@
   padding: 8px;
   filter: drop-shadow(0px 12px 40px rgba(4, 5, 6, 0.025)) drop-shadow(0px 8px 14px rgba(4, 5, 6, 0.05))
     drop-shadow(0px 4px 4px rgba(4, 5, 6, 0.08));
-  // Inner-stacking only — overall popper z-index is set inline from MODAL_BASE_Z_INDEX (ModalService.tsx).
+  // Inner-stacking only — overall popper z-index is set inline from OVERLAY_BASE_Z_INDEX (OverlayStackingService).
   z-index: 1100;
 }
 
