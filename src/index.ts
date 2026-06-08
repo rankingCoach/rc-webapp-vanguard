@@ -463,6 +463,9 @@ export type { GoogleMapsProps } from './core/GoogleMaps';
 export type { GoogleMapsCircleProps } from './core/GoogleMaps';
 export type { GoogleMapsMarkerProps } from './core/GoogleMaps';
 export type { GoogleMapsMarkerDefaultProps } from './core/GoogleMaps';
+export type { AdvancedMarkerProps } from './core/GoogleMaps';
+export type { GoogleMapsAdvancedMarkerProps } from './core/GoogleMaps';
+export type { GoogleMapsAdvancedMarkerContentProps } from './core/GoogleMaps';
 export { panToOffset } from './core/GoogleMaps';
 export { GoogleMaps } from './core/GoogleMaps';
 export { GoogleMapsCircle } from './core/GoogleMaps';
@@ -470,6 +473,9 @@ export { MarkerF } from './core/GoogleMaps';
 export { GoogleMapsMarker } from './core/GoogleMaps';
 export { GoogleMapsMarkerDefault } from './core/GoogleMaps';
 export { defaultGoogleMarker, defaultMarkerIcon } from './core/GoogleMaps';
+export { AdvancedMarkerF, AdvancedMarker } from './core/GoogleMaps';
+export { GoogleMapsAdvancedMarker } from './core/GoogleMaps';
+export { GoogleMapsAdvancedMarkerContent } from './core/GoogleMaps';
 
 // IconButton
 export type { IconButtonProps } from './core/IconButton';

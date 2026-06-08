@@ -9,3 +9,9 @@ export { defaultGoogleMarker, defaultMarkerIcon } from './GoogleMapsMarker/icons
 export type { GoogleMapsMarkerDefaultProps } from './GoogleMapsMarkerDefault/GoogleMapsMarkerDefault';
 export { GoogleMapsMarkerDefault } from './GoogleMapsMarkerDefault/GoogleMapsMarkerDefault';
 export { MarkerF } from '@react-google-maps/api';
+export { MarkerF as AdvancedMarkerF, Marker as AdvancedMarker } from './GoogleMapsMarker/AdvancedMarker';
+export type { MarkerProps as AdvancedMarkerProps } from './GoogleMapsMarker/AdvancedMarker';
+export type { GoogleMapsAdvancedMarkerProps } from './GoogleMapsAdvancedMarker/GoogleMapsAdvancedMarker';
+export { GoogleMapsAdvancedMarker } from './GoogleMapsAdvancedMarker/GoogleMapsAdvancedMarker';
+export type { GoogleMapsAdvancedMarkerContentProps } from './GoogleMapsAdvancedMarker/GoogleMapsAdvancedMarkerContent';
+export { GoogleMapsAdvancedMarkerContent } from './GoogleMapsAdvancedMarker/GoogleMapsAdvancedMarkerContent';
