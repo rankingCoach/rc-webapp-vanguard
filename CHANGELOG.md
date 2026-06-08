@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.3...v1.13.0) (2026-06-08)
+
+
+### Features
+
+* **GoogleMaps:** add support for advanced markers ([1041e3a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/1041e3a676d11ca1c08fef6684e1dbde2101054c)), closes [#VAN-38](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-38)
+* **GoogleMaps:** extend options props with additional exclusions ([696ad4a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/696ad4abb313cd2c2dce80688826f0e6699339c7)), closes [#VAN-38](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-38)
+* **GoogleMaps:** use hook for map context and ensure availability ([ffb62d0](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ffb62d092ac8253ce435e14b32a3d1d1ea68c62f)), closes [#VAN-38](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-38)
+
+
+### Bug Fixes
+
+* **autocomplete:** fix value accumulation and duplicate prevention in multiple mode ([9f7aac0](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9f7aac0bd682a862062fb6ca46f1bee6882d8d29)), closes [#VAN-57](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-57)
+
 ### [1.12.3](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.2...v1.12.3) (2026-06-04)
 
 
