@@ -1,5 +1,5 @@
 import React from "react";
-import { fn, userEvent, within, expect, screen } from "storybook/test";
+import { fn, userEvent, within, expect, screen, waitFor } from "storybook/test";
 import { ModalService } from "@vanguard/Modal/ModalService";
 import { Modal } from "@vanguard/Modal/Modal";
 import { Button } from "@vanguard/Button/Button";
@@ -47,17 +47,20 @@ export const MultipleModalsClosing: Story = {
     const closeFirstButton = canvas.getAllByTestId('modal-close-header-cta')[0];
     await userEvent.click(closeFirstButton);
 
-    // Verify first modal is closed, second remains
-    await expect(screen.queryByText('Modal 1')).not.toBeInTheDocument();
+    // Verify first modal is closed, second remains (close is async via setTimeout + exit animation)
+    await waitFor(() =>
+      expect(screen.queryByText('Modal 1')).not.toBeInTheDocument()
+    );
     await expect(screen.getByText('Modal 2')).toBeInTheDocument();
 
     // Close second modal
     const closeSecondButton = canvas.getByTestId('modal-close-header-cta');
     await userEvent.click(closeSecondButton);
 
-    // Verify both modals are closed
-    await expect(screen.queryByText('Modal 1')).not.toBeInTheDocument();
-    await expect(screen.queryByText('Modal 2')).not.toBeInTheDocument();
+    // Verify second modal is also closed (Modal 1 already closed above).
+    await waitFor(() =>
+      expect(screen.queryByText('Modal 2')).not.toBeInTheDocument()
+    );
   },
   render: (args) => {
     const openModal = (id: string) => {

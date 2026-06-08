@@ -1,10 +1,12 @@
 import { classNames } from '@helpers/classNames';
+import { uuidv4 } from '@helpers/generate-uid';
 import { ClickAwayListener, Fade, MenuItem, MenuList, Popper as MuiPopper } from '@mui/material';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconProps } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Text } from '@vanguard/Text/Text';
-import React, { RefObject, useState } from 'react';
+import React, { RefObject, useEffect, useRef, useState } from 'react';
 
 import styles from './DropdownMenu.module.scss';
 
@@ -43,6 +45,22 @@ export interface DropdownMenuProps {
 export const DropdownMenu = (props: DropdownMenuProps) => {
   const { anchorEl, isOpen, toggleIsOpen, items, hideOnItemClick = true, placement = 'bottom' } = props;
   const [arrowRef, setArrowRef] = useState<null | HTMLDivElement>(null);
+
+  // Register with the shared stacking ledger on open so we sit above all modals
+  // currently mounted. A modal that opens AFTER us will land above our slot
+  // (correct UX: the new modal should cover the stale popover).
+  const popoverIdRef = useRef<string>(`dropdown-${uuidv4()}`);
+  const [zIndex, setZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setZIndex(OVERLAY_BASE_Z_INDEX);
+      return;
+    }
+    const id = popoverIdRef.current;
+    setZIndex(OverlayStackingService.register(id, 'popover'));
+    return () => OverlayStackingService.unregister(id);
+  }, [isOpen]);
 
   /**
    * Function: handle List Key Down
@@ -84,7 +102,7 @@ export const DropdownMenu = (props: DropdownMenuProps) => {
     <ComponentContainer>
       <MuiPopper
         style={{
-          zIndex: 1100,
+          zIndex,
         }}
         role={undefined}
         open={isOpen}

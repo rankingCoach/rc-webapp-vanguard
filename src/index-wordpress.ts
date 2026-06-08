@@ -56,10 +56,6 @@ export type { SelectOnChange, SelectOptionProp, SelectOptionProps, SelectProps }
 export type { SelectOptionsComponentProps } from './core/Select/Select.tsx';
 export { Select } from './core/Select/Select.tsx';
 
-// SearchableSelect
-export type { SearchableSelectProps } from './core/SearchableSelect/SearchableSelect.tsx';
-export { SearchableSelect } from './core/SearchableSelect/SearchableSelect.tsx';
-
 
 // Tabs
 export type { TabProps } from './core/Tabs/Tab/Tab.tsx';

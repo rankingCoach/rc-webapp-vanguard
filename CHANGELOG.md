@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.3](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.2...v1.12.3) (2026-06-04)
+
+
+### Bug Fixes
+
+* remove SearchableSelect component from wordpress exports ([191575d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/191575d20f954a43256fca7ee379e6ee40aa840d))
+
+### [1.12.2-testare.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.1...v1.12.2-testare.0) (2026-06-03)
+
+### [1.12.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.1...v1.12.2) (2026-06-03)
+
+
+### Bug Fixes
+
+* **drawer:** disable focus trap so inputs on stacked overlays are typable ([7d0f1c9](https://github.com/rankingCoach/rc-webapp-vanguard/commit/7d0f1c9b9b84326d963759e82842d0ef46753965))
+
+### [1.12.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.0...v1.12.1) (2026-06-03)
+
+## [1.12.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.11.0...v1.12.0) (2026-06-02)
+
+
+### Features
+
+* **infra:** add pnpm ([cc9e5dc](https://github.com/rankingCoach/rc-webapp-vanguard/commit/cc9e5dc7bd0616b5e54f3d57b100a2d32f504b3f))
+
+## [1.11.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.10.0...v1.11.0) (2026-06-02)
+
+
+### Features
+
+* add beta release script to package json ([85de033](https://github.com/rankingCoach/rc-webapp-vanguard/commit/85de033b1ca0d0f9b13622ad7f4e0ab351a46b52)), closes [#BUF-3601](https://github.com/rankingCoach/rc-webapp-vanguard/issues/BUF-3601)
+* add commitlint and regular release config ([ba196da](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ba196dad2623980fd35765cf42d49c06d1066f5f)), closes [#VAN-36](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-36)
+* **error-boundary:** include trimmed error message in logs ([1ad6681](https://github.com/rankingCoach/rc-webapp-vanguard/commit/1ad66817719b413d8ec7812ba120d00c9ed8038b))
+
+
+### Bug Fixes
+
+* **switch:** display loading spinner instead of save icon ([379d128](https://github.com/rankingCoach/rc-webapp-vanguard/commit/379d128de93325cc19e01c051c1b3bb0ec0df552))
+
 ## [1.10.0](https://github.com/rankingCoach/rc-webapp-vanguard/branches/compare/v1.10.0%0Dv1.9.0#diff) (2026-05-11)
 
 

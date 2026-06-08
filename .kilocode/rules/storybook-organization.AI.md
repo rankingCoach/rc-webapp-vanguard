@@ -29,7 +29,7 @@ import { expect } from "@storybook/jest";
 ✅ All story filenames MUST start with _.
 
 HOW TO RUN TESTS :
-npx vitest run --project storybook {PATH_TO_STORY}
+pnpm exec vitest run --project storybook {PATH_TO_STORY}
 
 ✅ Story decorators MUST use spread operator:
 ...SbDecorator({

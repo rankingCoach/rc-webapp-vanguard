@@ -48,16 +48,16 @@ A comprehensive React component library optimized for performance and flexibilit
 ## Build & Installation
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Build library
-npm run build-lib
+pnpm run build-lib
 
 # Development mode
-npm run dev
+pnpm run dev
 
 # Run Storybook
-npm run storybook
+pnpm run storybook
 ```
 
 ## Testing
@@ -68,7 +68,7 @@ npm run storybook
 **Run Command**:
 ```bash
 # Run tests with coverage and UI
-npm run test:w:c
+pnpm run test:w:c
 ```
 
 ## Storybook
@@ -76,7 +76,7 @@ npm run test:w:c
 **Stories Pattern**: `src/core/**/_*.stories.@(js|jsx|mjs|ts|tsx)`
 **Run Command**:
 ```bash
-npm run storybook
+pnpm run storybook
 ```
 
 ## Package Distribution
@@ -94,13 +94,13 @@ npm run storybook
 **CLI Commands**:
 ```bash
 # List all available components and assets
-npx vanguard list
+pnpm exec vanguard list
 
 # Show current status and configuration
-npx vanguard status
+pnpm exec vanguard status
 
 # Force rebuild the library
-npx vanguard rebuild
+pnpm exec vanguard rebuild
 ```
 
 ## Build Configuration

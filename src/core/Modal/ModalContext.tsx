@@ -1,3 +1,4 @@
+import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 
 import { ModalTransition } from './ModalRoot/ModalTransition/ModalTransition';
@@ -35,8 +36,6 @@ interface ModalProviderProps {
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   // Use a ref to store components to avoid circular reference serialization issues
   const modalsRef = useRef<Map<string, any>>(new Map());
-  const orderRef = useRef<Map<string, number>>(new Map());
-  const orderCounterRef = useRef<number>(0);
   const [modalRootState, setModalRootState] = useState<ModalRootState>({
     growModals: [],
     slideModals: [],
@@ -48,15 +47,11 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   }, []);
 
   const getModalOrder = useCallback((modalId: string) => {
-    return orderRef.current.get(modalId) ?? 0;
+    return OverlayStackingService.getOrder(modalId);
   }, []);
 
   const addModal = useCallback((modalId: string, animation: ModalTransition, component: any) => {
     modalsRef.current.set(modalId, component);
-    if (!orderRef.current.has(modalId)) {
-      orderCounterRef.current += 1;
-      orderRef.current.set(modalId, orderCounterRef.current);
-    }
 
     setModalRootState((prev) => {
       const newState = { ...prev };
@@ -89,7 +84,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const removeModal = useCallback((modalId: string) => {
     modalsRef.current.delete(modalId);
-    orderRef.current.delete(modalId);
 
     setModalRootState((prev) => ({
       growModals: prev.growModals.filter((id) => id !== modalId),

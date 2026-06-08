@@ -10,6 +10,7 @@ import { ModalFooterAction, SubButtonProps } from '@vanguard/Modal/ModalFooter/M
 import { ModalHeader, ModalType } from '@vanguard/Modal/Modalheader/ModalHeader';
 import { StandardModalProps } from '@vanguard/Modal/ModalRoot/ModalRoot';
 import { ModalTransition } from '@vanguard/Modal/ModalRoot/ModalTransition/ModalTransition';
+import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Render } from '@vanguard/Render/Render';
 import { AcceptModal } from '@vanguard/StandardModals/AcceptModal/AcceptModal';
 import { ErrorModal } from '@vanguard/StandardModals/ErrorModal/ErrorModal';
@@ -112,6 +113,7 @@ const WrapperModal = <ResponseModel,>(
  * Modal Service Class
  * ---------------------------------------------------------------------------------------------------------------------
  */
+
 class ModalServiceClass {
   private loadingModalId: null | string;
   private confirmModalId: null | string;
@@ -150,6 +152,7 @@ class ModalServiceClass {
 
   removeModalComponent(id: string) {
     this.modalComponents.delete(id);
+    OverlayStackingService.unregister(id);
   }
 
   openConfirmModal(options: OpenConfirmModalOptions): string;
@@ -409,6 +412,16 @@ class ModalServiceClass {
     });
   }
 
+  /** Test-only: wipe internal state. Not for production code paths. */
+  __resetForTests() {
+    this.loadingModalId = null;
+    this.confirmModalId = null;
+    this.errorModalId = null;
+    this.modalCloseListeners.clear();
+    this.modalComponents.clear();
+    OverlayStackingService.__resetForTests();
+  }
+
   open<ResponseModel>(component: ComponentWithId, opts?: ModalOpts) {
     let id = uuidv4();
     const instance = PublicWidgetData.getInstance();
@@ -473,6 +486,8 @@ class ModalServiceClass {
       },
       modalId: id,
     });
+
+    OverlayStackingService.register(id, 'modal');
 
     pubSubService.$pub(PUB_SUB_EVENTS.reactModalOpen, {
       modalId: id,

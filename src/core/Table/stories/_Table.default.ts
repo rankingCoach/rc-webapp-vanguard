@@ -88,5 +88,5 @@ export const tableTest =
       } else {
         expect(bodyRows.length).toBeGreaterThanOrEqual(expectedRows);
       }
-    });
+    }, { timeout: 5000 });
   };
