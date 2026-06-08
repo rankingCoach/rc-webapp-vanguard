@@ -443,8 +443,10 @@ class ModalServiceClass {
 
     const thisComponent = { ...component };
 
-    const closeFn = (r: ModalResponse<ResponseModel>) => {
-      thisComponent.props.close && thisComponent.props.close(r);
+    const closeFn = (r?: ModalResponse<ResponseModel>) => {
+      if (thisComponent.props.close) {
+        thisComponent.props.close(r ?? ({ isOk: false } as ModalResponse<ResponseModel>));
+      }
       this.closeEv(id, r);
     };
 

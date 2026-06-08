@@ -6,12 +6,12 @@ import { userEvent, within } from 'storybook/test';
 
 const OpenLoadingModalComponent = () => {
   const openLoadingModal = () => {
-    ModalService.openLoadingModal(
-      testTitle,
-      testMessage,
-      testLoadingAnimation,
-      testHeaderTitle,
-    );
+    ModalService.openLoadingModal({
+      title: testTitle,
+      message: testMessage,
+      loadingAnimation: testLoadingAnimation,
+      headerTitle: testHeaderTitle,
+    });
   };
 
   return (

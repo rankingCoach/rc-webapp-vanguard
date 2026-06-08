@@ -6,18 +6,18 @@ import { userEvent, within } from 'storybook/test';
 
 const OpenConfirmModalComponent = () => {
   const openConfirmModal = () => {
-    ModalService.openConfirmModal(
-      testCloseFn,
-      testTitle,
-      testMessage,
-      testPositiveCta,
-      testNegativeCta,
-      testHeaderType,
-      testPositiveIconLeft,
-      testReplacements,
-      testHideHeaderCloseBtn,
-      testCustomNegativeFn,
-    );
+    ModalService.openConfirmModal({
+      closeFn: testCloseFn,
+      title: testTitle,
+      message: testMessage,
+      positiveCtaText: testPositiveCta,
+      negativeCtaText: testNegativeCta,
+      headerType: testHeaderType,
+      positiveIconLeft: testPositiveIconLeft,
+      replacements: testReplacements,
+      hideHeaderCloseBtn: testHideHeaderCloseBtn,
+      customNegativeFn: testCustomNegativeFn,
+    });
   };
 
   return (
