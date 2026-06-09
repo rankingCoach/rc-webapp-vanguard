@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.13.0...v1.14.0) (2026-06-09)
+
+
+### Features
+
+* **DocumentUpload:** refactor to use MediaItemSelectInput and introduce new file validators/processors ([aa28e2d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/aa28e2d699b385622dfb543ca201395c875916aa)), closes [#VAN-41](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-41)
+* **ModalService:** add stories for header-close modals with response handling ([a671fdf](https://github.com/rankingCoach/rc-webapp-vanguard/commit/a671fdf58debd0ec527d747e25f9341cfd90f421)), closes [#VAN-59](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-59)
+
 ## [1.13.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.12.3...v1.13.0) (2026-06-08)
 
 
