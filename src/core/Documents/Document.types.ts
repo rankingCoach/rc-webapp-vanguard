@@ -18,6 +18,7 @@ export enum ContentType {
   VIDEO_MP4 = 'video/mp4',
   UNKNOWN = 'unknown',
   APPLICATION_PDF = 'application/pdf',
+  TEXT_CSV = 'text/csv',
 }
 
 export type MediaItemFileType = `${ContentType}`;
