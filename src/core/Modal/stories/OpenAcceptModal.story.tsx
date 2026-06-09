@@ -6,15 +6,15 @@ import { userEvent, within } from 'storybook/test';
 
 const OpenAcceptModalComponent = () => {
   const openAcceptModal = () => {
-    ModalService.openAcceptModal(
-      testCloseFn,
-      testTitle,
-      testMessage,
-      testHeaderType,
-      testPositiveCta,
-      testReplacements,
-      testHideHeaderCloseBtn,
-    );
+    ModalService.openAcceptModal({
+      closeFn: testCloseFn,
+      title: testTitle,
+      message: testMessage,
+      headerType: testHeaderType,
+      positiveCtaText: testPositiveCta,
+      replacements: testReplacements,
+      hideHeaderCloseBtn: testHideHeaderCloseBtn,
+    });
   };
 
   return (

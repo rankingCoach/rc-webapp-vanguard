@@ -5,6 +5,7 @@ import modalDescription from "./Modal.description.md?raw";
 import { Story } from "./stories/_Modal.default";
 import { ModalStory as _ModalStory } from "./stories/ModalStory.story";
 import { CloseViaService as _CloseViaService } from "./stories/CloseViaService.story";
+import { CloseViaHeaderButtonWithResponse as _CloseViaHeaderButtonWithResponse } from "./stories/CloseViaHeaderButtonWithResponse.story";
 import { CloseViaHeaderButton as _CloseViaHeaderButton } from "./stories/CloseViaHeaderButton.story";
 import { CloseViaOutsideClick as _CloseViaOutsideClick } from "./stories/CloseViaOutsideClick.story";
 import { CloseViaCallbacks as _CloseViaCallbacks } from "./stories/CloseViaCallbacks.story";
@@ -45,6 +46,7 @@ import {
 
 export const ModalStory: Story = { ..._ModalStory };
 export const CloseViaService: Story = { ..._CloseViaService };
+export const CloseViaHeaderButtonWithResponse: Story = { ..._CloseViaHeaderButtonWithResponse };
 export const CloseViaHeaderButton: Story = { ..._CloseViaHeaderButton };
 export const CloseViaOutsideClick: Story = { ..._CloseViaOutsideClick };
 export const CloseViaCallbacks: Story = { ..._CloseViaCallbacks };
