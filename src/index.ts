@@ -434,7 +434,6 @@ export { MediaItemSelectInput } from './core/FileSelect';
 export { ImageCompressorTransformer } from './core/FileSelect';
 export { ImageCropperTransformer } from './core/FileSelect';
 export { MediaItemTransformer } from './core/FileSelect';
-export { SelectInput } from './core/FileSelect';
 export { POST_VIDEO_VALIDATION_REQUIREMENTS } from './core/FileSelect';
 export { DocumentContentProcessor } from './core/FileSelect';
 export { CsvContentValidator } from './core/FileSelect';
