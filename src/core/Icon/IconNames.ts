@@ -138,6 +138,7 @@ export enum IconNames {
   email = 'email',
   fax = 'fax',
   generate = 'generate',
+  generateActive = 'generate-active',
   minimize = 'minimize',
   maximize = 'maximize',
   messageBad = 'message-bad',
