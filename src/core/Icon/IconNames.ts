@@ -52,6 +52,7 @@ export enum IconNames {
   share = 'share',
   edit = 'edit',
   mobile = 'mobile',
+  mobileActive = 'mobile-active',
   browser = 'browser',
   browserActive = 'browser-active',
   manageProjects = 'manage-projects',
