@@ -35,7 +35,7 @@
     "release-beta-dry-run": "standard-version --prerelease beta --dry-run",
     "publish-tags": "git push --follow-tags origin master",
     "publish-beta": "pnpm publish --tag beta",
-    "deploy-package": "if [ \"$(git branch --show-current)\" = \"master\" ]; then git push --follow-tags origin master && pnpm publish; else git push --follow-tags origin HEAD && pnpm publish --tag \"$(git branch --show-current)\"; fi",
+    "deploy-package": "if [ \"$(git branch --show-current)\" = \"master\" ]; then git push --follow-tags origin master && pnpm publish; else git push --follow-tags origin HEAD && pnpm publish --no-git-checks --tag \"$(git branch --show-current)\"; fi",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "serve-storybook": "pnpm run build-storybook && cd storybook-static && python3 -m http.server 8080",
