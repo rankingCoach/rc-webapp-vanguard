@@ -22,7 +22,7 @@
     "build-lib": "vite build --config vite.config.lib.ts && node scripts/fix-dynamic-imports.js && echo 'default' > dist/.version",
     "build-wordpress": "vite build --config vite.config.wordpress.ts && node scripts/fix-dynamic-imports.js ; mv dist-wordpress/types/src/index-wordpress.d.ts dist-wordpress/types/index.d.ts ; echo 'wp' > dist-wordpress/.version && node scripts/cleanup-wordpress-assets.js",
     "build-wordpress-no-clean": "vite build --config vite.config.wordpress.ts",
-    "postinstall": "pnpm vanguard:clean-assets",
+    "postinstall": "node scripts/clean-assets-based-on-vanguardrc.js",
     "build:analyze": "pnpm run build-lib && echo '📊 Bundle analysis saved to dist/bundle-analysis.html'",
     "build-app": "tsgo --project tsconfig.app.json && vite build --config vite.config.app.ts",
     "generate-dts": "vite build --config vite.config.lib.ts",
