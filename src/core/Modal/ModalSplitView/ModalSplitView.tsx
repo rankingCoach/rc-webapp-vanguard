@@ -15,7 +15,7 @@ export type SplitViewElement =
   | null
   | undefined;
 
-export type ModalSplitViewCollapseMode = 'left-overlay' | 'right-overlay';
+export type ModalSplitViewCollapseMode = 'left-overlay' | 'right-overlay' | null;
 
 interface ModalSplitViewProps {
   elements: [SplitViewElement, SplitViewElement];
@@ -26,13 +26,7 @@ interface ModalSplitViewProps {
 }
 
 export const ModalSplitView = (props: ModalSplitViewProps) => {
-  const {
-    elements,
-    isContracted,
-    autoCloseWidth = -1,
-    collapseMode = 'left-overlay',
-    bottomMargin,
-  } = props;
+  const { elements, isContracted, autoCloseWidth = -1, collapseMode = 'left-overlay', bottomMargin } = props;
 
   if (collapseMode === 'right-overlay') {
     return (
@@ -45,11 +39,5 @@ export const ModalSplitView = (props: ModalSplitViewProps) => {
     );
   }
 
-  return (
-    <ModalSplitViewLeftOverlay
-      elements={elements}
-      isContracted={isContracted}
-      autoCloseWidth={autoCloseWidth}
-    />
-  );
+  return <ModalSplitViewLeftOverlay elements={elements} isContracted={isContracted} autoCloseWidth={autoCloseWidth} />;
 };
