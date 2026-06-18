@@ -57,3 +57,8 @@ dist-wordpress/.version
 .env.*.local
 
 .claude/
+
+# Code review artifacts
+codereview_FE.md
+codereview_BE.md
+codereview.md

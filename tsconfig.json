@@ -39,6 +39,9 @@
         "./src/models",
         "./src/models/*"
       ],
+      "@test-utils/test-utils": [
+        "./test-utils/test-utils"
+      ],
       "@test-utils/*": [
         "./src/test-utils",
         "./src/test-utils/*"
