@@ -15,7 +15,7 @@ export type SplitViewElement =
   | null
   | undefined;
 
-export type ModalSplitViewCollapseMode = 'left-overlay' | 'right-overlay' | null;
+export type ModalSplitViewCollapseMode = 'left-overlay' | 'right-overlay';
 
 interface ModalSplitViewProps {
   elements: [SplitViewElement, SplitViewElement];
