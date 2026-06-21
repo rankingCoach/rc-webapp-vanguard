@@ -84,6 +84,7 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
         <Select
           data-testid={'vanguard-searchable-select-input'}
           MenuProps={{
+            className: classNames('vanguard-searchable-select'),
             anchorEl: inputRef.current,
             // Disables auto focus on MenuItems and allows TextField to be in focus
             autoFocus: false,
