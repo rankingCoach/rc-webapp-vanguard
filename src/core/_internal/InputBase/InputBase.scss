@@ -118,6 +118,7 @@
     .MuiOutlinedInput-input {
       padding: 12px 18px;
       z-index: 1;
+      color: var(--fn-fg);
     }
 
     // makes borders for inputs
@@ -256,6 +257,7 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
+    color: var(--fn-fg);
   }
 
   /**
