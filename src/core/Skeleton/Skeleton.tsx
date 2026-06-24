@@ -47,15 +47,15 @@ export const Skeleton = (props: SkeletonProps) => {
       transform: 'translate(-100%,0)',
       background:
         color === 'light'
-          ? 'linear-gradient(45deg, var(--n200) 45%, var(--n100) 55%, var(--n200) 65%)'
-          : 'linear-gradient(45deg, var(--n400) 45%, var(--n300) 55%, var(--n400) 65%)',
+          ? 'linear-gradient(45deg, var(--fn-bg-hov-n-gl) 45%, var(--fn-bg-var) 55%, var(--fn-bg-hov-n-gl) 65%)'
+          : 'linear-gradient(45deg, var(--fn-bg-disabled) 45%, var(--fn-bg-hov-n-gl) 55%, var(--fn-bg-disabled) 65%)',
     },
     to: {
       transform: 'translate(30%,0)',
       background:
         color === 'light'
-          ? 'linear-gradient(45deg, var(--n200) 45%, var(--n100) 55%, var(--n200) 65%)'
-          : 'linear-gradient(45deg, var(--n400) 45%, var(--n300) 55%, var(--n400) 65%)',
+          ? 'linear-gradient(45deg, var(--fn-bg-hov-n-gl) 45%, var(--fn-bg-var) 55%, var(--fn-bg-hov-n-gl) 65%)'
+          : 'linear-gradient(45deg, var(--fn-bg-disabled) 45%, var(--fn-bg-hov-n-gl) 55%, var(--fn-bg-disabled) 65%)',
     },
     config: {
       duration: 1500,
@@ -66,7 +66,7 @@ export const Skeleton = (props: SkeletonProps) => {
    * Without animation
    */
   const bgStyleNoAnimation = {
-    background: color === 'light' ? 'var(--n200)' : 'var(--n400)',
+    background: color === 'light' ? 'var(--fn-bg-hov-n-gl)' : 'var(--fn-bg-disabled)',
   };
 
   /**
@@ -78,7 +78,7 @@ export const Skeleton = (props: SkeletonProps) => {
       testId={testId}
       className={classNames(styles.container, className ?? '')}
       style={{
-        backgroundColor: color === 'light' ? 'var(--n200)' : 'var(--n400)',
+        backgroundColor: color === 'light' ? 'var(--fn-bg-hov-n-gl)' : 'var(--fn-bg-disabled)',
         width: type === SkeletonTypes.fill ? '100%' : width,
         height: type === SkeletonTypes.fill ? '100%' : height,
         borderRadius: type === SkeletonTypes.circle ? '50%' : borderRadius,
