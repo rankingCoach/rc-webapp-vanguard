@@ -7,7 +7,7 @@
     &:focus-visible,
     &:visited {
       fieldset {
-        background-color: var(--n000);
+        background-color: var(--fn-bg);
       }
     }
 
@@ -54,7 +54,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: var(--n300);
+      background: rgba(var(--fn-bg-dark-rgb), 0.3);
       border-radius: 4px;
     }
 
@@ -81,9 +81,9 @@
     .vanguard-searchable-select-input-menu-list-footer {
       padding: 8px 16px;
       margin-top: 8px;
-      border-top: 1px solid var(--n200);
+      border-top: 1px solid var(--fn-divider-gl);
       border-radius: 0 0 4px 4px;
-      background: #FFFFFF;
+      background: var(--fn-bg-surface);
       position: sticky;
       bottom: 0;
     }
@@ -93,18 +93,18 @@
       font-weight: 400;
       font-size: 16px;
       line-height: 28px;
-      color: var(--n700);
-      background: #FFFFFF;
+      color: var(--fn-fg);
+      background: var(--fn-bg-surface);
       word-break: break-word;
       white-space: normal;
 
       &:hover {
-        background: var(--n100);
+        background: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
         border-radius: 8px;
       }
 
       &.Mui-selected {
-        color: var(--p500);
+        color: var(--fn-fg-cta);
       }
     }
   }

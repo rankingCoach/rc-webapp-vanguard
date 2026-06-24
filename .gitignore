@@ -40,7 +40,6 @@ coverage/
 # Vanguard configuration (user-specific)
 .vanguardrc
 .zencoder
-.claude
 /dist-wordpress/
 
 # Dynamic import analysis output files
@@ -56,7 +55,8 @@ dist-wordpress/.version
 .env.local
 .env.*.local
 
-.claude/
+.claude/*
+!.claude/agents/
 
 # Code review artifacts
 codereview_FE.md

@@ -35,7 +35,7 @@
    */
   .tag-btn-delete {
     border-radius: 50%;
-    background-color: var(--n000);
+    background-color: var(--fn-bg);
     border: unset;
 
     width: 20px;
@@ -49,25 +49,25 @@
     cursor: pointer;
 
     &:hover {
-      background-color: var(--n500);
+      background-color: var(--fn-bg-hov-n-gl);
       border: unset;
 
       svg {
-        color: var(--n000);
-        fill: var(--n000);
+        color: var(--fn-fg-on-dark);
+        fill: var(--fn-fg-on-dark);
       }
     }
 
     svg {
-      color: var(--n500);
-      fill: var(--n500);
+      color: var(--fn-fg-light);
+      fill: var(--fn-fg-light);
       transition: all 0.2s;
     }
   }
 
   .chip {
     padding: 4px 6px;
-    background: #FFFFFF;
+    background: var(--fn-bg-surface);
     border-radius: 120px;
     opacity: 0.5;
 

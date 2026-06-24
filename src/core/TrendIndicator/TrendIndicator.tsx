@@ -5,7 +5,7 @@ import styles from './TrendIndicator.module.scss';
 import { formatMagnitude, getTrend } from './trend';
 
 /** Semantic outcome of a trend after applying `higherIsBetter`. */
-type TrendOutcome = { stable: true } | { stable: false; improved: boolean };
+type TrendOutcome = { stable: boolean; improved: boolean };
 
 const COLOR_BY_OUTCOME = {
   improved: '--s400',
@@ -15,7 +15,7 @@ const COLOR_BY_OUTCOME = {
 
 const resolveOutcome = (current: number, previous: number | undefined, higherIsBetter: boolean): TrendOutcome => {
   const raw = getTrend(current, previous);
-  if (raw === 'stable') return { stable: true };
+  if (raw === 'stable') return { stable: true, improved: false };
   const improved = higherIsBetter ? raw === 'up' : raw === 'down';
   return { stable: false, improved };
 };

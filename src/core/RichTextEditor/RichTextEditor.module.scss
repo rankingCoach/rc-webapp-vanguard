@@ -25,19 +25,19 @@ $PADDING_X: 24px;
 
   border-width: 1px;
   border-style: solid;
-  border-color: var(--n300);
+  border-color: var(--fn-brd-gl);
   border-radius: 4px;
   background-color: var(--n000);
   transition: all 0.25s ease-in-out;
 
   &:hover {
-    border-color: var(--p500);
+    border-color: var(--fn-fg-cta);
     &.disabled {
-      border-color: var(--n300);
+      border-color: var(--fn-brd-gl);
     }
   }
   &.focused {
-    border-color: var(--p400);
+    border-color: var(--fn-bg-cta);
   }
   &.error {
     border-color: var(--e500);
@@ -45,9 +45,9 @@ $PADDING_X: 24px;
   &.disabled {
     cursor: not-allowed;
     pointer-events: none;
-    border-color: var(--n300);
-    background: var(--n200);
-    background-color: var(--n200);
+    border-color: var(--fn-brd-gl);
+    background: var(--fn-bg-disabled);
+    background-color: var(--fn-bg-disabled);
   }
 }
 
@@ -73,7 +73,7 @@ $PADDING_X: 24px;
   position: absolute;
   top: 3px;
   left: $PADDING_X + 1;
-  color: var(--n400);
+  color: var(--fn-fg-lightest);
 }
 
 .toolbar {

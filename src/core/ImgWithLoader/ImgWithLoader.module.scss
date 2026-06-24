@@ -11,7 +11,7 @@
     .media-type-info {
         position: absolute;
         width: 100%;
-        background: linear-gradient(180deg, rgba(42, 53, 70, 0.00) 21.79%, #171D26 126.79%);
+        background: linear-gradient(180deg, rgba(var(--fn-fg-rgb), 0) 21.79%, var(--fn-bg-dark) 126.79%);
         bottom: 0;
         left: 0;
         height: $x5;

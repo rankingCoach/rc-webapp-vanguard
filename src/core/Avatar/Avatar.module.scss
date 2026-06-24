@@ -12,13 +12,13 @@
   padding: 8px 7.5px;
   width: 40px;
   height: 40px;
-  border: 1px solid var(--n100);
+  border: 1px solid var(--fn-brd-gl);
 
   &:hover,
   &:active,
   &:focus,
   &:target {
-    border-color: var(--p500);
+    border-color: var(--fn-fg-cta);
   }
 }
 
@@ -30,7 +30,7 @@
   &:active,
   &:focus,
   &:target {
-    border-color: var(--n100) !important;
+    border-color: var(--fn-brd-gl) !important;
   }
 }
 
@@ -49,7 +49,7 @@
   right: 0;
   width: 12px;
   height: 12px;
-  background: #ff1f69; /* todo: replace with variable from semanticColors/nav/side/notif/bg after sideNav is merged into A23-98 */
+  background: var(--a3500); /* todo: replace with variable from semanticColors/nav/side/notif/bg after sideNav is merged into A23-98 */
   border-radius: 16px;
 }
 

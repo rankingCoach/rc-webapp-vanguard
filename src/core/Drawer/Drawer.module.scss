@@ -14,7 +14,7 @@
   position: sticky;
   top: 0;
   z-index: 2; // keep above scrolling content
-  background-color: var(--drawer-header-bg, #fff); // fallback ensures header isn't transparent over content
+  background-color: var(--drawer-header-bg, var(--fn-bg-surface)); // fallback ensures header isn't transparent over content
 }
 
 .headerContainer {

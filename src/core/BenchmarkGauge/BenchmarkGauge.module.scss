@@ -166,7 +166,7 @@
   width: 100%;
   height: 100%;
   border-radius: var(--benchmark-gauge-legend-highlight-radius, $x1);
-  background: var(--legend-item-bg, #fff);
+  background: var(--legend-item-bg, var(--fn-bg));
   transition: opacity var(--benchmark-gauge-legend-transition, 0.15s ease);
 }
 
@@ -194,7 +194,7 @@
   pointer-events: none;
   padding: $x0_5 $x1;
   border-radius: $x9;
-  background: rgba(var(--n900-rgb), 0.2);
+  background: rgba(var(--fn-shadow-rgb), 0.8);
 }
 
 .labelStart {

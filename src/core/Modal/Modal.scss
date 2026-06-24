@@ -3,9 +3,9 @@
  * Variables
  */
 :root {
-  --shadow-small: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-large: 0px 12px 40px rgba(4, 5, 6, 0.0239911), 0px 8px 14px rgba(4, 5, 6, 0.05), 0px 4px 4px rgba(4, 5, 6, 0.08);
+  --shadow-small: 0 1px 3px 0 rgba(var(--fn-shadow-rgb), 0.1), 0 1px 2px 0 rgba(var(--fn-shadow-rgb), 0.06);
+  --shadow-medium: 0 4px 6px -1px rgba(var(--fn-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--fn-shadow-rgb), 0.06);
+  --shadow-large: 0px 12px 40px rgba(var(--fn-shadow-rgb), 0.0239911), 0px 8px 14px rgba(var(--fn-shadow-rgb), 0.05), 0px 4px 4px rgba(var(--fn-shadow-rgb), 0.08);
 }
 
 /**
@@ -38,7 +38,7 @@
     border: none;
 
     border-radius: 8px;
-    background: var(--n000);
+    background: var(--fn-bg-surface);
     box-shadow: var(--shadow-large);
 
     display: flex;
@@ -68,7 +68,7 @@
     .modal-content {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
-      background: var(--n000);
+      background: var(--fn-bg-surface);
       box-shadow: var(--shadow-large);
     }
   }

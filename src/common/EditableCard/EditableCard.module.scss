@@ -62,7 +62,7 @@
 
     &:hover {
       &::before {
-        background-color: var(--n100);
+        background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
         transform: scale(1);
         transition: 150ms ease-in all;
       }

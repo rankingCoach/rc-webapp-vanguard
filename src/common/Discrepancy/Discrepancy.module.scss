@@ -3,7 +3,7 @@
 
 .header-middle-line-horizontal {
   position: relative;
-  border-bottom: $x0_125 solid var(--n200);
+  border-bottom: $x0_125 solid var(--fn-divider-gl);
   align-self: stretch;
   display: flex;
   justify-content: center;
@@ -15,5 +15,5 @@
   padding-right: $x1;
   position: absolute;
   top: calc(50% - $x6 / 2);
-  background: var(--n000);
+  background: var(--fn-bg);
 }

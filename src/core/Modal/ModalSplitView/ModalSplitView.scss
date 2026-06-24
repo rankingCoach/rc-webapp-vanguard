@@ -1,5 +1,5 @@
 .SplitView-left-component {
-  box-shadow: 8px 0 24px rgba(4, 5, 6, 0.08), 4px 0 8px rgba(4, 5, 6, 0.05), 2px 0 2px rgba(4, 5, 6, 0.03);
+  box-shadow: 8px 0 24px rgba(var(--fn-shadow-rgb), 0.08), 4px 0 8px rgba(var(--fn-shadow-rgb), 0.05), 2px 0 2px rgba(var(--fn-shadow-rgb), 0.03);
   position: relative;
   height: 100vh;
   overflow: hidden;
@@ -11,7 +11,7 @@
   }
 
   .modal-footer {
-    background-color: rgba(var(--n000-rgb), 0.8);
+    background-color: rgba(var(--fn-bg-rgb), 0.8);
     bottom: 0;
     position: absolute !important;
     width: 100% !important;
@@ -29,7 +29,7 @@
 
   &--overlay {
     z-index: 4;
-    box-shadow: -8px 0 24px rgba(4, 5, 6, 0.08), -4px 0 8px rgba(4, 5, 6, 0.05), -2px 0 2px rgba(4, 5, 6, 0.03);
+    box-shadow: -8px 0 24px rgba(var(--fn-shadow-rgb), 0.08), -4px 0 8px rgba(var(--fn-shadow-rgb), 0.05), -2px 0 2px rgba(var(--fn-shadow-rgb), 0.03);
   }
 
   &--with-bottom-margin {

@@ -15,17 +15,17 @@
   border-radius: 2px;
   cursor: pointer;
   background: transparent;
-  color: var(--n500);
+  color: var(--fn-fg-light);
   transition: all 0.2s ease-in-out;
   font-weight: normal;
 
   &.disabled {
-    color: var(--n200);
+    color: var(--fn-fg-lightest);
     pointer-events: none;
     cursor: not-allowed;
   }
   &.active {
-    background: var(--n200);
+    background: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
   }
 }
 
@@ -45,5 +45,5 @@
 .divider {
   height: 20px;
   width: 1px;
-  background-color: var(--n200);
+  background-color: var(--fn-divider-gl);
 }

@@ -18,7 +18,7 @@
    * -------------------------------------------------------------------------------------------------------------------
    */
   .MuiInputLabel-root {
-    color: var(--n500);
+    color: var(--fn-fg-light);
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
@@ -31,14 +31,14 @@
       font-weight: 500;
       line-height: 18px;
       transform: translate(12px, -10px) scale(0.875);
-      background: var(--white);
+      background: var(--fn-bg);
       border-radius: 2px;
       padding: 2px 6px;
       box-sizing: border-box;
     }
 
     &.Mui-focused {
-      color: var(--p500);
+      color: var(--fn-fg-cta);
 
       &.Mui-error {
         color: var(--e500);
@@ -46,11 +46,11 @@
     }
 
     &.Mui-error {
-      color: var(--n500);
+      color: var(--fn-fg-light);
     }
 
     &.Mui-disabled {
-      color: var(--n500);
+      color: var(--fn-fg-light);
     }
   }
 
@@ -62,7 +62,7 @@
     line-height: 18px;
     margin-left: 8px;
     margin-right: 2px;
-    color: var(--n400);
+    color: var(--fn-fg-lightest);
   }
 
   // custom styles for inputs without floating label
@@ -71,7 +71,7 @@
     margin-top: 0;
 
     .MuiInputLabel-root {
-      color: var(--n700);
+      color: var(--fn-fg);
       font-size: 16px;
       line-height: 18px;
       font-weight: 500;
@@ -113,7 +113,7 @@
     word-wrap: break-word;
     word-break: break-word;
     transition: all 0.2s ease-in-out;
-    background: var(--white);
+    background: var(--fn-bg);
 
     .MuiOutlinedInput-input {
       padding: 12px 18px;
@@ -128,18 +128,18 @@
       font-size: 14px;
       border-width: 1px;
       border-style: solid;
-      border-color: var(--n300);
+      border-color: var(--fn-brd-gl);
       z-index: 0;
     }
 
     &:hover {
       fieldset {
-        border-color: var(--p500);
+        border-color: var(--fn-fg-cta);
       }
 
       &.Mui-disabled {
         fieldset {
-          border-color: var(--n300);
+          border-color: var(--fn-brd-gl);
         }
       }
     }
@@ -147,7 +147,7 @@
     &.Mui-focused {
       fieldset {
         border-width: 1px;
-        border-color: var(--p400);
+        border-color: var(--fn-bg-cta);
       }
     }
 
@@ -161,8 +161,8 @@
     &.Mui-disabled {
       fieldset {
         border-width: 1px;
-        border-color: var(--n300);
-        background: var(--n200);
+        border-color: var(--fn-brd-gl);
+        background: var(--fn-bg-disabled);
       }
     }
   }
@@ -206,7 +206,7 @@
         padding: 3px;
         color: transparent;
 
-        background-color: var(--p100);
+        background-color: var(--i100);
       }
     }
   }
@@ -220,7 +220,7 @@
   .MuiOutlinedInput-root {
     .MuiOutlinedInput-input {
       &::placeholder {
-        color: var(--n400) !important;
+        color: var(--fn-fg-lightest) !important;
       }
     }
   }
@@ -272,7 +272,7 @@
       flex-direction: column;
       width: 100%;
       padding: 8px 14px 0;
-      color: var(--n500);
+      color: var(--fn-fg-light);
 
       .vanguard-input-bottom-container-line {
         display: flex;

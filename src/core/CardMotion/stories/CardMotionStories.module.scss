@@ -2,7 +2,7 @@
 
 .cardSurface {
   padding: $x3;
-  border: $x0_125 solid var(--n200);
+  border: $x0_125 solid var(--fn-brd-gl);
   border-radius: $x2 + $x0_25;
 }
 
@@ -41,24 +41,24 @@
 }
 
 .groupCardTitle {
-  color: var(--n900);
+  color: var(--fn-fg);
   display: block;
   line-height: 1.2;
 }
 
 .groupCardDescription {
-  color: var(--n500);
+  color: var(--fn-fg-light);
   display: block;
   line-height: 1.4;
 }
 
 .surfaceNeutral {
-  background: var(--n000);
+  background: var(--fn-bg);
 }
 
 .surfaceWarm {
-  background: var(--n100);
-  border-color: var(--p100);
+  background: var(--fn-bg-var);
+  border-color: var(--i100);
 }
 
 .surfaceInfo {
@@ -67,16 +67,16 @@
 }
 
 .surfaceAccent {
-  background: var(--p100);
-  border-color: var(--p500);
+  background: var(--i100);
+  border-color: var(--i400);
 }
 
 .surfaceGlow {
   background: var(--n900);
-  border-color: var(--n200);
+  border-color: var(--fn-brd-gl);
 }
 
 .surfaceGlowGroup {
-  background: var(--n000);
-  border-color: var(--n200);
+  background: var(--fn-bg);
+  border-color: var(--fn-brd-gl);
 }

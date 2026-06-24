@@ -1,3 +1,4 @@
+/* palette generator functions split into individual partials for clarity */
 /*
 The purpose of this file is to implement all modifier functions in it so the main file is clean
 **/
@@ -10,193 +11,235 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 
 :root {
-    --white: #ffffff;
+    --white: white;
     --white-rgb: 255, 255, 255;
-    --black: #040506;
-    --black-rgb: 4, 5, 6;
-    --brand-color: hsl(217deg, 100%, 50%);
+    --black: #01040b;
+    --black-rgb: 1, 4, 11;
+    --brand-color: #0062ff;
     --brand-color-rgb: 0, 98, 255;
-    --p500: hsl(217deg, 100%, 50%);
+    --color-primary-lightness-multiplier: 1;
+    --p500: #0062ff;
     --p500-rgb: 0, 98, 255;
-    --i500: hsl(217deg, 100%, 50%);
+    --color-base-primary: #0062ff;
+    --color-base-primary-rgb: 0, 98, 255;
+    --i500: #0062ff;
     --i500-rgb: 0, 98, 255;
-    --n500: hsl(217deg, 25%, 42%);
+    --color-base-info: #0062ff;
+    --color-base-info-rgb: 0, 98, 255;
+    --n500: #506586;
     --n500-rgb: 80, 101, 134;
-    --s500: hsl(133deg, 71%, 37%);
+    --color-base-neutral: #506586;
+    --color-base-neutral-rgb: 80, 101, 134;
+    --s500: #1ba138;
     --s500-rgb: 27, 161, 56;
-    --e500: hsl(4deg, 90%, 58%);
+    --color-base-success: #1ba138;
+    --color-base-success-rgb: 27, 161, 56;
+    --e500: #f44034;
     --e500-rgb: 244, 64, 52;
-    --w500: hsl(33deg, 91%, 45%);
+    --color-base-error: #f44034;
+    --color-base-error-rgb: 244, 64, 52;
+    --w500: #db7d0a;
     --w500-rgb: 219, 125, 10;
-    --a1-500: hsl(247deg, 67%, 48%);
+    --color-base-warning: #db7d0a;
+    --color-base-warning-rgb: 219, 125, 10;
+    --a1-500: #3c28cc;
     --a1-500-rgb: 60, 40, 204;
-    --a2-500: hsl(40deg, 100%, 74%);
+    --color-base-a1: #3c28cc;
+    --color-base-a1-rgb: 60, 40, 204;
+    --a2-500: #ffd37a;
     --a2-500-rgb: 255, 211, 122;
-    --a3-500: hsl(339deg, 100%, 56%);
+    --color-base-a2: #ffd37a;
+    --color-base-a2-rgb: 255, 211, 122;
+    --a3-500: #ff1f6d;
     --a3-500-rgb: 255, 31, 109;
-    --post-base-color: #0E549B;
+    --color-base-a3: #ff1f6d;
+    --color-base-a3-rgb: 255, 31, 109;
+    --a4-500: #399d8b;
+    --a4-500-rgb: 57, 157, 139;
+    --color-base-a4: #399d8b;
+    --color-base-a4-rgb: 57, 157, 139;
+    --base-op: #1036a8;
+    --base-op-rgb: 16, 54, 168;
+    --base-bm: #6f42c1;
+    --base-bm-rgb: 111, 66, 193;
+    --base-seo: #059669;
+    --base-seo-rgb: 5, 150, 105;
+    --base-wr: #ffc420;
+    --base-wr-rgb: 255, 196, 32;
+    --base-eng: #078688;
+    --base-eng-rgb: 7, 134, 136;
+    --base-ads: #b81450;
+    --base-ads-rgb: 184, 20, 80;
+    --ado-face-gradient-start: #00495d;
+    --ado-face-gradient-start-rgb: 0, 73, 93;
+    --ado-face-gradient-end: #12ffff;
+    --ado-face-gradient-end-rgb: 18, 255, 255;
+    --ado-face-feature: white;
+    --ado-face-feature-rgb: 255, 255, 255;
+    --ado-face-bubble-bg: rgba(0, 73, 93, 0.8);
+    --post-base-color: #0e549b;
     --post-base-color-rgb: 14, 84, 155;
     --event-base-color: #5b0297;
     --event-base-color-rgb: 91, 2, 151;
     --draft-base-color: #1a1919;
     --draft-base-color-rgb: 26, 25, 25;
-    --boost-base-color: hsl(349deg, 77%, 48%);
+    --boost-base-color: #d91c3f;
     --boost-base-color-rgb: 217, 28, 63;
-    --email-brand: hsl(217deg, 100%, 50%);
+    --email-brand: #0062ff;
     --email-brand-rgb: 0, 98, 255;
-    --email-fn-cta-lightest: #e6efff;
-    --email-fn-cta-lightest-rgb: 230, 239, 255;
-    --email-fn-cta-light: #66a1ff;
-    --email-fn-cta-light-rgb: 102, 161, 255;
-    --email-fn-cta: hsl(217deg, 100%, 50%);
+    --email-fn-cta-lightest: #f1f9ff;
+    --email-fn-cta-lightest-rgb: 241, 249, 255;
+    --email-fn-cta-light: #6db3ff;
+    --email-fn-cta-light-rgb: 109, 179, 255;
+    --email-fn-cta: #0062ff;
     --email-fn-cta-rgb: 0, 98, 255;
-    --email-fn-cta-dark: #003b99;
-    --email-fn-cta-dark-rgb: 0, 59, 153;
-    --email-fn-bg: #FFFFFF;
+    --email-fn-cta-dark: #00369e;
+    --email-fn-cta-dark-rgb: 0, 54, 158;
+    --email-fn-bg: white;
     --email-fn-bg-rgb: 255, 255, 255;
-    --email-fn-bg-var: #f5f7f9;
-    --email-fn-bg-var-rgb: 245, 247, 249;
-    --email-fn-fg: #2a3546;
-    --email-fn-fg-rgb: 42, 53, 70;
-    --email-fn-fg-on-cta: #FFFFFF;
+    --email-fn-bg-var: #f6f9fc;
+    --email-fn-bg-var-rgb: 246, 249, 252;
+    --email-fn-fg: #263349;
+    --email-fn-fg-rgb: 38, 51, 73;
+    --email-fn-fg-on-cta: white;
     --email-fn-fg-on-cta-rgb: 255, 255, 255;
-    --email-fn-fg-light: hsl(217deg, 25%, 42%);
+    --email-fn-fg-light: #506586;
     --email-fn-fg-light-rgb: 80, 101, 134;
-    --email-fn-fg-lightest: #8698b6;
-    --email-fn-fg-lightest-rgb: 134, 152, 182;
-    --email-fn-brd: #b6c1d3;
-    --email-fn-brd-rgb: 182, 193, 211;
-    --email-fn-divider: #e6e9f0;
-    --email-fn-divider-rgb: 230, 233, 240;
-    --email-background: #f5f7f9;
-    --email-background-rgb: 245, 247, 249;
-    --email-content-background: #f5f7f9;
-    --email-content-background-rgb: 245, 247, 249;
+    --email-fn-fg-lightest: #869cc0;
+    --email-fn-fg-lightest-rgb: 134, 156, 192;
+    --email-fn-brd: #b9c5d8;
+    --email-fn-brd-rgb: 185, 197, 216;
+    --email-fn-divider: #e6eaf0;
+    --email-fn-divider-rgb: 230, 234, 240;
+    --email-background: #f6f9fc;
+    --email-background-rgb: 246, 249, 252;
+    --email-content-background: #f6f9fc;
+    --email-content-background-rgb: 246, 249, 252;
     --email-content-padding: 0px 4px;
-    --email-warning-lightest: #fce6c9;
-    --email-warning-lightest-rgb: 252, 230, 201;
-    --email-warning-dark: hsl(33deg, 91%, 45%);
+    --email-warning-lightest: #fff1e3;
+    --email-warning-lightest-rgb: 255, 241, 227;
+    --email-warning-dark: #db7d0a;
     --email-warning-dark-rgb: 219, 125, 10;
-    --email-warning-darkest: #7a2706;
-    --email-warning-darkest-rgb: 122, 39, 6;
-    --email-error-lightest: #ffeceb;
-    --email-error-lightest-rgb: 255, 236, 235;
-    --email-error-dark: hsl(4deg, 90%, 58%);
+    --email-warning-darkest: #661b00;
+    --email-warning-darkest-rgb: 102, 27, 0;
+    --email-error-lightest: #ffece6;
+    --email-error-lightest-rgb: 255, 236, 230;
+    --email-error-dark: #f44034;
     --email-error-dark-rgb: 244, 64, 52;
-    --email-error-darkest: #b8150a;
-    --email-error-darkest-rgb: 184, 21, 10;
-    --email-success-lightest: #e9fbed;
-    --email-success-lightest-rgb: 233, 251, 237;
-    --email-success-light: #21c445;
-    --email-success-light-rgb: 33, 196, 69;
-    --email-success-dark: hsl(133deg, 71%, 37%);
+    --email-error-darkest: #651913;
+    --email-error-darkest-rgb: 101, 25, 19;
+    --email-success-lightest: #e8fce8;
+    --email-success-lightest-rgb: 232, 252, 232;
+    --email-success-light: #36c34f;
+    --email-success-light-rgb: 54, 195, 79;
+    --email-success-dark: #1ba138;
     --email-success-dark-rgb: 27, 161, 56;
-    --email-success-darkest: #0d4a1a;
-    --email-success-darkest-rgb: 13, 74, 26;
-    --email-info-lightest: #e6efff;
-    --email-info-lightest-rgb: 230, 239, 255;
-    --email-info-dark: hsl(217deg, 100%, 50%);
+    --email-success-darkest: #0f4418;
+    --email-success-darkest-rgb: 15, 68, 24;
+    --email-info-lightest: #e5f6ff;
+    --email-info-lightest-rgb: 229, 246, 255;
+    --email-info-dark: #0062ff;
     --email-info-dark-rgb: 0, 98, 255;
-    --email-info-darkest: #001433;
-    --email-info-darkest-rgb: 0, 20, 51;
-    --email-ai-light: #e8e5fa;
-    --email-ai-light-rgb: 232, 229, 250;
-    --email-ai-dark: hsl(247deg, 67%, 48%);
-    --email-ai-dark-rgb: 60, 40, 204;
-    --email-acc02-darkest: #ffb114;
-    --email-acc02-darkest-rgb: 255, 177, 20;
+    --email-info-darkest: #0e3376;
+    --email-info-darkest-rgb: 14, 51, 118;
+    --email-ai-light: #f5f8ff;
+    --email-ai-light-rgb: 245, 248, 255;
+    --email-ai-dark: #3920c8;
+    --email-ai-dark-rgb: 57, 32, 200;
+    --email-acc02-darkest: #ffc22b;
+    --email-acc02-darkest-rgb: 255, 194, 43;
     --email-header-version: 1;
     --email-header-gradient-version: none;
     --email-header-theme-mode: light;
     --email-header-additional-information: date;
-    --email-header-fn-fg: #2a3546;
-    --email-header-fn-fg-rgb: 42, 53, 70;
-    --email-header-fn-bg: #f5f7f9;
-    --email-header-fn-bg-rgb: 245, 247, 249;
+    --email-header-fn-fg: #263349;
+    --email-header-fn-fg-rgb: 38, 51, 73;
+    --email-header-fn-bg: #f6f9fc;
+    --email-header-fn-bg-rgb: 246, 249, 252;
     --email-footer-version: 1;
     --email-footer-theme-mode: light;
     --email-footer-display-logo: bottom;
-    --email-footer-fg-main: #2a3546;
-    --email-footer-fg-main-rgb: 42, 53, 70;
-    --email-footer-bg-main: #FFFFFF;
+    --email-footer-fg-main: #263349;
+    --email-footer-fg-main-rgb: 38, 51, 73;
+    --email-footer-bg-main: white;
     --email-footer-bg-main-rgb: 255, 255, 255;
-    --email-footer-fg-light-main: hsl(217deg, 25%, 42%);
+    --email-footer-fg-light-main: #506586;
     --email-footer-fg-light-main-rgb: 80, 101, 134;
-    --email-footer-fg-lightest-main: #8698b6;
-    --email-footer-fg-lightest-main-rgb: 134, 152, 182;
-    --email-footer-bg-accent: hsl(217deg, 100%, 50%);
+    --email-footer-fg-lightest-main: #869cc0;
+    --email-footer-fg-lightest-main-rgb: 134, 156, 192;
+    --email-footer-bg-accent: #0062ff;
     --email-footer-bg-accent-rgb: 0, 98, 255;
-    --email-footer-fg-on-bg-accent: #FFFFFF;
+    --email-footer-fg-on-bg-accent: white;
     --email-footer-fg-on-bg-accent-rgb: 255, 255, 255;
-    --email-footer-bg-accent2: #f5f7f9;
-    --email-footer-bg-accent2-rgb: 245, 247, 249;
-    --email-footer-fg-on-bg-accent2: hsl(217deg, 25%, 42%);
+    --email-footer-bg-accent2: #f6f9fc;
+    --email-footer-bg-accent2-rgb: 246, 249, 252;
+    --email-footer-fg-on-bg-accent2: #506586;
     --email-footer-fg-on-bg-accent2-rgb: 80, 101, 134;
-    --email-footer-cta-fg-on-bg-accent2: hsl(217deg, 100%, 50%);
+    --email-footer-cta-fg-on-bg-accent2: #0062ff;
     --email-footer-cta-fg-on-bg-accent2-rgb: 0, 98, 255;
-    --email-button-primary-bg: hsl(217deg, 100%, 50%);
+    --email-button-primary-bg: #0062ff;
     --email-button-primary-bg-rgb: 0, 98, 255;
-    --email-button-primary-fg: #FFFFFF;
+    --email-button-primary-fg: white;
     --email-button-primary-fg-rgb: 255, 255, 255;
-    --email-button-primary-border: hsl(217deg, 100%, 50%);
+    --email-button-primary-border: #0062ff;
     --email-button-primary-border-rgb: 0, 98, 255;
-    --email-button-default-bg: #FFFFFF;
+    --email-button-default-bg: white;
     --email-button-default-bg-rgb: 255, 255, 255;
-    --email-button-default-fg: hsl(217deg, 100%, 50%);
+    --email-button-default-fg: #0062ff;
     --email-button-default-fg-rgb: 0, 98, 255;
-    --email-button-default-border: #FFFFFF;
+    --email-button-default-border: white;
     --email-button-default-border-rgb: 255, 255, 255;
     --email-button-border-radius: 4px;
-    --review-booster-pm-1-text: #FFFFFF;
+    --review-booster-pm-1-text: white;
     --review-booster-pm-1-text-rgb: 255, 255, 255;
-    --review-booster-pm-1-background: rgba(4, 5, 6, 0.7);
-    --review-booster-pm-1-qr-code: #000;
+    --review-booster-pm-1-background: rgba(1, 4, 11, 0.7);
+    --review-booster-pm-1-qr-code: black;
     --review-booster-pm-1-qr-code-rgb: 0, 0, 0;
-    --review-booster-pm-2-text: #2a3546;
-    --review-booster-pm-2-text-rgb: 42, 53, 70;
-    --review-booster-pm-2-background: #FFFFFF;
+    --review-booster-pm-2-text: #263349;
+    --review-booster-pm-2-text-rgb: 38, 51, 73;
+    --review-booster-pm-2-background: white;
     --review-booster-pm-2-background-rgb: 255, 255, 255;
-    --review-booster-pm-2-stroke: linear-gradient(133.06deg, #e6efff 0%, #99c0ff 100%);
-    --review-booster-pm-2-qr-code: #000;
+    --review-booster-pm-2-stroke: linear-gradient(133.06deg, #f1f9ff 0%, #b8d9ff 100%);
+    --review-booster-pm-2-qr-code: black;
     --review-booster-pm-2-qr-code-rgb: 0, 0, 0;
-    --heading-typeface: 'Roboto', sans-serif;
-    --heading-color: #2a3546;
-    --heading-color-rgb: 42, 53, 70;
-    --text-typeface: 'Roboto', sans-serif;
-    --text-color: #2a3546;
-    --text-color-rgb: 42, 53, 70;
-    --em-color: hsl(217deg, 100%, 50%);
+    --heading-typeface: 'Inter', sans-serif;
+    --heading-color: #263349;
+    --heading-color-rgb: 38, 51, 73;
+    --text-typeface: 'Inter', sans-serif;
+    --text-color: #263349;
+    --text-color-rgb: 38, 51, 73;
+    --em-color: #0062ff;
     --em-color-rgb: 0, 98, 255;
-    --header-color: #FFFFFF;
+    --header-color: white;
     --header-color-rgb: 255, 255, 255;
     --header-opacity: 0.8;
-    --header-button-secondary-text-color: #2a3546;
-    --header-button-secondary-text-color-rgb: 42, 53, 70;
-    --header-button-secondary-background-color: #FFFFFF;
+    --header-button-secondary-text-color: #263349;
+    --header-button-secondary-text-color-rgb: 38, 51, 73;
+    --header-button-secondary-background-color: white;
     --header-button-secondary-background-color-rgb: 255, 255, 255;
-    --header-button-secondary-border-color: #b6c1d3;
-    --header-button-secondary-border-color-rgb: 182, 193, 211;
-    --header-button-secondary-hover-text-color: hsl(217deg, 100%, 50%);
+    --header-button-secondary-border-color: #b9c5d8;
+    --header-button-secondary-border-color-rgb: 185, 197, 216;
+    --header-button-secondary-hover-text-color: #0062ff;
     --header-button-secondary-hover-text-color-rgb: 0, 98, 255;
-    --header-button-secondary-hover-background-color: #f5f7f9;
-    --header-button-secondary-hover-background-color-rgb: 245, 247, 249;
-    --header-button-secondary-hover-border-color: #b6c1d3;
-    --header-button-secondary-hover-border-color-rgb: 182, 193, 211;
-    --header-button-secondary-disabled-text-color: #2a3546;
-    --header-button-secondary-disabled-text-color-rgb: 42, 53, 70;
-    --header-button-secondary-disabled-background-color: #FFFFFF;
+    --header-button-secondary-hover-background-color: #f6f9fc;
+    --header-button-secondary-hover-background-color-rgb: 246, 249, 252;
+    --header-button-secondary-hover-border-color: #b9c5d8;
+    --header-button-secondary-hover-border-color-rgb: 185, 197, 216;
+    --header-button-secondary-disabled-text-color: #263349;
+    --header-button-secondary-disabled-text-color-rgb: 38, 51, 73;
+    --header-button-secondary-disabled-background-color: white;
     --header-button-secondary-disabled-background-color-rgb: 255, 255, 255;
-    --header-button-secondary-disabled-border-color: #b6c1d3;
-    --header-button-secondary-disabled-border-color-rgb: 182, 193, 211;
-    --header-button-secondary-focus-text-color: #2a3546;
-    --header-button-secondary-focus-text-color-rgb: 42, 53, 70;
-    --header-button-secondary-focus-background-color: #FFFFFF;
+    --header-button-secondary-disabled-border-color: #b9c5d8;
+    --header-button-secondary-disabled-border-color-rgb: 185, 197, 216;
+    --header-button-secondary-focus-text-color: #263349;
+    --header-button-secondary-focus-text-color-rgb: 38, 51, 73;
+    --header-button-secondary-focus-background-color: white;
     --header-button-secondary-focus-background-color-rgb: 255, 255, 255;
-    --header-button-secondary-focus-border-color: #b6c1d3;
-    --header-button-secondary-focus-border-color-rgb: 182, 193, 211;
-    --header-button-secondary-focus-box-shadow-color: #99c0ff;
-    --header-button-secondary-focus-box-shadow-color-rgb: 153, 192, 255;
-    --header-button-secondary-ripple-color: hsl(217deg, 100%, 50%);
+    --header-button-secondary-focus-border-color: #b9c5d8;
+    --header-button-secondary-focus-border-color-rgb: 185, 197, 216;
+    --header-button-secondary-focus-box-shadow-color: #b8d9ff;
+    --header-button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
+    --header-button-secondary-ripple-color: #0062ff;
     --header-button-secondary-ripple-color-rgb: 0, 98, 255;
     --header-logo: url("/jump/img/logo_new_layout.svg");
     --header-logo-mobile: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
@@ -209,35 +252,59 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --header-logo-vision-adcoach: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-listingcoach: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-social: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-listingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-adcoach-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-listingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+    --header-logo-vision-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+    --header-logo-adcoach-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-adcoach-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-easylisting: url("/jump/img/logo_new_layout.svg");
     --header-logo-vision-easylisting-adcoach: url("/jump/img/logo_new_layout.svg");
@@ -296,200 +363,247 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --header-height-mobile: 54px;
     --heading-weight-bold: 700;
     --heading-V700-weight-autogen: 700;
-    --heading-V700-src-autogen: "/vanguard/assets/fonts/Roboto-Bold.ttf";
+    --heading-V700-src-autogen: "/vanguard/assets/fonts/Inter-Bold.woff2";
     --heading-weight-medium: 500;
     --heading-V500-weight-autogen: 500;
-    --heading-V500-src-autogen: "/vanguard/assets/fonts/Roboto-Medium.ttf";
+    --heading-V500-src-autogen: "/vanguard/assets/fonts/Inter-Medium.woff2";
     --heading-weight-regular: 400;
     --heading-V400-weight-autogen: 400;
-    --heading-V400-src-autogen: "/vanguard/assets/fonts/Roboto-Regular.ttf";
+    --heading-V400-src-autogen: "/vanguard/assets/fonts/Inter-Regular.woff2";
     --theme-weight-bold: 700;
     --V700-weight-autogen: 700;
-    --V700-src-autogen: "/vanguard/assets/fonts/Roboto-Bold.ttf";
+    --V700-src-autogen: "/vanguard/assets/fonts/Inter-Bold.woff2";
     --theme-weight-medium: 500;
     --V500-weight-autogen: 500;
-    --V500-src-autogen: "/vanguard/assets/fonts/Roboto-Medium.ttf";
+    --V500-src-autogen: "/vanguard/assets/fonts/Inter-Medium.woff2";
     --theme-weight-regular: 400;
     --V400-weight-autogen: 400;
-    --V400-src-autogen: "/vanguard/assets/fonts/Roboto-Regular.ttf";
-    --font-name: "Roboto";
-    --theme-typeface: 'Roboto', sans-serif;
-    --heading-font-name: "Roboto";
-    --buttons-typeface: 'Roboto', sans-serif;
+    --V400-src-autogen: "/vanguard/assets/fonts/Inter-Regular.woff2";
+    --font-name: "Inter";
+    --theme-typeface: 'Inter', sans-serif;
+    --heading-font-name: "Inter";
+    --buttons-typeface: 'Inter', sans-serif;
     --buttons-border-radius: 4px;
-    --button-default-text-color: hsl(217deg, 100%, 50%);
+    --button-default-text-color: #0062ff;
     --button-default-text-color-rgb: 0, 98, 255;
-    --button-default-background-color: #FFFFFF;
+    --button-default-background-color: white;
     --button-default-background-color-rgb: 255, 255, 255;
-    --button-default-hover-text-color: #003b99;
-    --button-default-hover-text-color-rgb: 0, 59, 153;
-    --button-default-hover-background-color: #f5f7f9;
-    --button-default-hover-background-color-rgb: 245, 247, 249;
-    --button-default-disabled-text-color: #2a3546;
-    --button-default-disabled-text-color-rgb: 42, 53, 70;
-    --button-default-disabled-background-color: transparent;
-    --button-default-focus-text-color: hsl(217deg, 100%, 50%);
+    --button-default-hover-text-color: #00369e;
+    --button-default-hover-text-color-rgb: 0, 54, 158;
+    --button-default-hover-background-color: #f6f9fc;
+    --button-default-hover-background-color-rgb: 246, 249, 252;
+    --button-default-disabled-text-color: #263349;
+    --button-default-disabled-text-color-rgb: 38, 51, 73;
+    --button-default-disabled-background-color: rgba(0, 0, 0, 0);
+    --button-default-disabled-background-color-rgb: 0, 0, 0;
+    --button-default-focus-text-color: #0062ff;
     --button-default-focus-text-color-rgb: 0, 98, 255;
-    --button-default-focus-background-color: transparent;
-    --button-default-focus-box-shadow-color: #99c0ff;
-    --button-default-focus-box-shadow-color-rgb: 153, 192, 255;
-    --button-default-ripple-color: hsl(217deg, 100%, 50%);
+    --button-default-focus-background-color: rgba(0, 0, 0, 0);
+    --button-default-focus-background-color-rgb: 0, 0, 0;
+    --button-default-focus-box-shadow-color: #b8d9ff;
+    --button-default-focus-box-shadow-color-rgb: 184, 217, 255;
+    --button-default-ripple-color: #0062ff;
     --button-default-ripple-color-rgb: 0, 98, 255;
-    --button-primary-text-color: #FFFFFF;
+    --button-primary-text-color: white;
     --button-primary-text-color-rgb: 255, 255, 255;
-    --button-primary-background-color: hsl(217deg, 100%, 50%);
+    --button-primary-background-color: #0062ff;
     --button-primary-background-color-rgb: 0, 98, 255;
-    --button-primary-hover-text-color: #FFFFFF;
+    --button-primary-hover-text-color: white;
     --button-primary-hover-text-color-rgb: 255, 255, 255;
-    --button-primary-hover-background-color: #004ecc;
-    --button-primary-hover-background-color-rgb: 0, 78, 204;
-    --button-primary-disabled-text-color: #FFFFFF;
+    --button-primary-hover-background-color: #0e52ca;
+    --button-primary-hover-background-color-rgb: 14, 82, 202;
+    --button-primary-disabled-text-color: white;
     --button-primary-disabled-text-color-rgb: 255, 255, 255;
-    --button-primary-disabled-background-color: #8698b6;
-    --button-primary-disabled-background-color-rgb: 134, 152, 182;
-    --button-primary-focus-text-color: #FFFFFF;
+    --button-primary-disabled-background-color: #869cc0;
+    --button-primary-disabled-background-color-rgb: 134, 156, 192;
+    --button-primary-focus-text-color: white;
     --button-primary-focus-text-color-rgb: 255, 255, 255;
-    --button-primary-focus-background-color: hsl(217deg, 100%, 50%);
+    --button-primary-focus-background-color: #0062ff;
     --button-primary-focus-background-color-rgb: 0, 98, 255;
-    --button-primary-focus-box-shadow-color: #99c0ff;
-    --button-primary-focus-box-shadow-color-rgb: 153, 192, 255;
-    --button-primary-ripple-color: #99c0ff;
-    --button-primary-ripple-color-rgb: 153, 192, 255;
-    --button-secondary-text-color: #2a3546;
-    --button-secondary-text-color-rgb: 42, 53, 70;
-    --button-secondary-no-border-text-color: hsl(217deg, 25%, 42%);
+    --button-primary-focus-box-shadow-color: #b8d9ff;
+    --button-primary-focus-box-shadow-color-rgb: 184, 217, 255;
+    --button-primary-ripple-color: #b8d9ff;
+    --button-primary-ripple-color-rgb: 184, 217, 255;
+    --button-secondary-text-color: #263349;
+    --button-secondary-text-color-rgb: 38, 51, 73;
+    --button-secondary-no-border-text-color: #506586;
     --button-secondary-no-border-text-color-rgb: 80, 101, 134;
-    --button-secondary-background-color: #FFFFFF;
+    --button-secondary-background-color: white;
     --button-secondary-background-color-rgb: 255, 255, 255;
-    --button-secondary-border-color: #b6c1d3;
-    --button-secondary-border-color-rgb: 182, 193, 211;
-    --button-secondary-hover-text-color: hsl(217deg, 100%, 50%);
+    --button-secondary-border-color: #b9c5d8;
+    --button-secondary-border-color-rgb: 185, 197, 216;
+    --button-secondary-hover-text-color: #0062ff;
     --button-secondary-hover-text-color-rgb: 0, 98, 255;
-    --button-secondary-hover-background-color: #f5f7f9;
-    --button-secondary-hover-background-color-rgb: 245, 247, 249;
-    --button-secondary-hover-border-color: #b6c1d3;
-    --button-secondary-hover-border-color-rgb: 182, 193, 211;
-    --button-secondary-disabled-text-color: #2a3546;
-    --button-secondary-disabled-text-color-rgb: 42, 53, 70;
-    --button-secondary-disabled-background-color: #FFFFFF;
+    --button-secondary-hover-background-color: #f6f9fc;
+    --button-secondary-hover-background-color-rgb: 246, 249, 252;
+    --button-secondary-hover-border-color: #b9c5d8;
+    --button-secondary-hover-border-color-rgb: 185, 197, 216;
+    --button-secondary-disabled-text-color: #263349;
+    --button-secondary-disabled-text-color-rgb: 38, 51, 73;
+    --button-secondary-disabled-background-color: white;
     --button-secondary-disabled-background-color-rgb: 255, 255, 255;
-    --button-secondary-disabled-border-color: #b6c1d3;
-    --button-secondary-disabled-border-color-rgb: 182, 193, 211;
-    --button-secondary-focus-text-color: #2a3546;
-    --button-secondary-focus-text-color-rgb: 42, 53, 70;
-    --button-secondary-focus-background-color: #FFFFFF;
+    --button-secondary-disabled-border-color: #b9c5d8;
+    --button-secondary-disabled-border-color-rgb: 185, 197, 216;
+    --button-secondary-focus-text-color: #263349;
+    --button-secondary-focus-text-color-rgb: 38, 51, 73;
+    --button-secondary-focus-background-color: white;
     --button-secondary-focus-background-color-rgb: 255, 255, 255;
-    --button-secondary-focus-border-color: #b6c1d3;
-    --button-secondary-focus-border-color-rgb: 182, 193, 211;
-    --button-secondary-focus-box-shadow-color: #99c0ff;
-    --button-secondary-focus-box-shadow-color-rgb: 153, 192, 255;
-    --button-secondary-ripple-color: hsl(217deg, 100%, 50%);
+    --button-secondary-focus-border-color: #b9c5d8;
+    --button-secondary-focus-border-color-rgb: 185, 197, 216;
+    --button-secondary-focus-box-shadow-color: #b8d9ff;
+    --button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
+    --button-secondary-ripple-color: #0062ff;
     --button-secondary-ripple-color-rgb: 0, 98, 255;
-    --button-shimmer-text-color: #FFFFFF;
+    --button-shimmer-text-color: white;
     --button-shimmer-text-color-rgb: 255, 255, 255;
-    --button-shimmer-background-color: hsl(247deg, 67%, 48%);
-    --button-shimmer-background-color-rgb: 60, 40, 204;
-    --button-shimmer-hover-text-color: #FFFFFF;
+    --button-shimmer-background-color: #3920c8;
+    --button-shimmer-background-color-rgb: 57, 32, 200;
+    --button-shimmer-hover-text-color: white;
     --button-shimmer-hover-text-color-rgb: 255, 255, 255;
-    --button-shimmer-hover-background-color: #231877;
-    --button-shimmer-hover-background-color-rgb: 35, 24, 119;
-    --button-shimmer-disabled-text-color: #FFFFFF;
+    --button-shimmer-hover-background-color: #21008d;
+    --button-shimmer-hover-background-color-rgb: 33, 0, 141;
+    --button-shimmer-disabled-text-color: white;
     --button-shimmer-disabled-text-color-rgb: 255, 255, 255;
-    --button-shimmer-disabled-background-color: #8698b6;
-    --button-shimmer-disabled-background-color-rgb: 134, 152, 182;
-    --button-shimmer-focus-text-color: #FFFFFF;
+    --button-shimmer-disabled-background-color: #869cc0;
+    --button-shimmer-disabled-background-color-rgb: 134, 156, 192;
+    --button-shimmer-focus-text-color: white;
     --button-shimmer-focus-text-color-rgb: 255, 255, 255;
-    --button-shimmer-focus-background-color: hsl(217deg, 100%, 50%);
+    --button-shimmer-focus-background-color: #0062ff;
     --button-shimmer-focus-background-color-rgb: 0, 98, 255;
-    --button-shimmer-focus-box-shadow-color: #99c0ff;
-    --button-shimmer-focus-box-shadow-color-rgb: 153, 192, 255;
-    --button-shimmer-ripple-color: #99c0ff;
-    --button-shimmer-ripple-color-rgb: 153, 192, 255;
-    /* muted button */
-    --button-muted-text-color: var(--fn-fg);
-    --button-muted-hover-text-color: var(--button-muted-text-color);
-    --button-muted-disabled-text-color: var(--button-muted-text-color);
-    --button-muted-background-color: RGBA(from var(--n900) R G B / 0.02);
-    --button-muted-hover-background-color: RGBA(from var(--n900) R G B / 0.02);
-    --button-muted-disabled-background-color: RGBA(from var(--n900) R G B / 0.02);
+    --button-shimmer-focus-box-shadow-color: #b8d9ff;
+    --button-shimmer-focus-box-shadow-color-rgb: 184, 217, 255;
+    --button-shimmer-ripple-color: #b8d9ff;
+    --button-shimmer-ripple-color-rgb: 184, 217, 255;
+    --button-muted-text-color: #263349;
+    --button-muted-text-color-rgb: 38, 51, 73;
+    --button-muted-background-color: rgba(1, 4, 11, 0.02);
+    --button-muted-hover-text-color: #263349;
+    --button-muted-hover-text-color-rgb: 38, 51, 73;
+    --button-muted-disabled-text-color: #263349;
+    --button-muted-disabled-text-color-rgb: 38, 51, 73;
+    --button-muted-hover-background-color: rgba(1, 4, 11, 0.02);
+    --button-muted-disabled-background-color: rgba(1, 4, 11, 0.02);
     --button-muted-focus-box-shadow-color: #99c0ff;
     --button-muted-focus-box-shadow-color-rgb: 153, 192, 255;
-    /* inverted muted button */
-    --button-muted-inverted-text-color: var(--fn-fg-on-dark);
-    --button-muted-inverted-hover-text-color: var(--button-muted-inverted-text-color);
-    --button-muted-inverted-disabled-text-color: var(--button-muted-inverted-text-color);
-    --button-muted-inverted-background-color: RGBA(from var(--n000) R G B / 0.1);
-    --button-muted-inverted-hover-background-color: RGBA(from var(--n000) R G B / 0.1);
-    --button-muted-inverted-disabled-background-color: RGBA(from var(--n000) R G B / 0.1);
-    --button-muted-inverted-focus-box-shadow-color: var(--button-muted-focus-box-shadow-color);
-    --button-muted-inverted-focus-box-shadow-color-rgb: var(--button-muted-focus-box-shadow-color-rgb);
+    --button-muted-inverted-text-color: white;
+    --button-muted-inverted-text-color-rgb: 255, 255, 255;
+    --button-muted-inverted-background-color: rgba(255, 255, 255, 0.1);
+    --button-muted-inverted-hover-text-color: white;
+    --button-muted-inverted-hover-text-color-rgb: 255, 255, 255;
+    --button-muted-inverted-disabled-text-color: white;
+    --button-muted-inverted-disabled-text-color-rgb: 255, 255, 255;
+    --button-muted-inverted-hover-background-color: rgba(255, 255, 255, 0.1);
+    --button-muted-inverted-disabled-background-color: rgba(255, 255, 255, 0.1);
+    --button-muted-inverted-focus-box-shadow-color: #99c0ff;
+    --button-muted-inverted-focus-box-shadow-color-rgb: 153, 192, 255;
     --icon-font-family: rc-Icons;
-    --fn-bg: #FFFFFF;
+    --nav-side-fg: #506586;
+    --nav-side-fg-rgb: 80, 101, 134;
+    --nav-side-bg: rgba(255, 255, 255, 0);
+    --nav-side-fg-hover: #263349;
+    --nav-side-fg-hover-rgb: 38, 51, 73;
+    --nav-side-bg-hover: rgba(0, 98, 255, 0.05);
+    --nav-side-fg-selected: #00369e;
+    --nav-side-fg-selected-rgb: 0, 54, 158;
+    --nav-side-collapse-fg: #263349;
+    --nav-side-collapse-fg-rgb: 38, 51, 73;
+    --nav-side-collapse-bg-hover: rgba(80, 101, 134, 0.1);
+    --nav-side-notif-bg-tasks: #93a1ff;
+    --nav-side-notif-bg-tasks-rgb: 147, 161, 255;
+    --nav-side-notif-bg: #f50065;
+    --nav-side-notif-bg-rgb: 245, 0, 101;
+    --nav-side-notif-fg: white;
+    --nav-side-notif-fg-rgb: 255, 255, 255;
+    --nav-side-powered-by-display: none;
+    --nav-side-powered-by-max-height: unset;
+    --fn-bg: white;
     --fn-bg-rgb: 255, 255, 255;
-    --fn-bg-var: #f5f7f9;
-    --fn-bg-var-rgb: 245, 247, 249;
-    --fn-bg-surface: #FFFFFF;
+    --fn-bg-var: #f6f9fc;
+    --fn-bg-var-rgb: 246, 249, 252;
+    --fn-bg-surface: white;
     --fn-bg-surface-rgb: 255, 255, 255;
-    --fn-bg-cta: hsl(217deg, 100%, 50%);
+    --fn-bg-cta: #0062ff;
     --fn-bg-cta-rgb: 0, 98, 255;
-    --fn-fg-cta: hsl(217deg, 100%, 50%);
+    --fn-fg-cta: #0062ff;
     --fn-fg-cta-rgb: 0, 98, 255;
-    --fn-fg-cta-hov: #003b99;
-    --fn-fg-cta-hov-rgb: 0, 59, 153;
-    --fn-bg-cta-fg: #FFFFFF;
+    --fn-fg-cta-hov: #00369e;
+    --fn-fg-cta-hov-rgb: 0, 54, 158;
+    --fn-bg-cta-fg: white;
     --fn-bg-cta-fg-rgb: 255, 255, 255;
     --fn-bg-cta-fg-hov: rgba(255, 255, 255, 0.7);
-    --fn-fg: #2a3546;
-    --fn-fg-rgb: 42, 53, 70;
-    --fn-fg-light: hsl(217deg, 25%, 42%);
+    --fn-fg: #263349;
+    --fn-fg-rgb: 38, 51, 73;
+    --fn-fg-light: #506586;
     --fn-fg-light-rgb: 80, 101, 134;
-    --fn-fg-lightest: #8698b6;
-    --fn-fg-lightest-rgb: 134, 152, 182;
-    --fn-fg-on-dark: #FFFFFF;
-    --fn-brd-gl: #b6c1d3;
-    --fn-brd-gl-rgb: 182, 193, 211;
-    --fn-divider-gl: #e6e9f0;
-    --fn-divider-gl-rgb: 230, 233, 240;
-    --fn-bg-hov-n-gl: #b6c1d3;
-    --fn-bg-hov-n-gl-rgb: 182, 193, 211;
-    --fn-bg-hov-p-gl: #99c0ff;
-    --fn-bg-hov-p-gl-rgb: 153, 192, 255;
-    --sc-charts-01: hsl(217deg, 100%, 50%);
+    --fn-fg-lightest: #869cc0;
+    --fn-fg-lightest-rgb: 134, 156, 192;
+    --fn-fg-on-dark: white;
+    --fn-fg-on-dark-rgb: 255, 255, 255;
+    --fn-brd-gl: #b9c5d8;
+    --fn-brd-gl-rgb: 185, 197, 216;
+    --fn-divider-gl: #e6eaf0;
+    --fn-divider-gl-rgb: 230, 234, 240;
+    --fn-bg-hov-n-gl: #b9c5d8;
+    --fn-bg-hov-n-gl-rgb: 185, 197, 216;
+    --fn-bg-hov-p-gl: #b8d9ff;
+    --fn-bg-hov-p-gl-rgb: 184, 217, 255;
+    --fn-bg-frost: rgba(255, 255, 255, 0.3);
+    --fn-bg-cta-hov: #00369e;
+    --fn-bg-cta-hov-rgb: 0, 54, 158;
+    --fn-bg-disabled: #869cc0;
+    --fn-bg-disabled-rgb: 134, 156, 192;
+    --fn-fg-on-dark-hov: rgba(255, 255, 255, 0.7);
+    --fn-fg-on-dark-light: #b9c5d8;
+    --fn-fg-on-dark-light-rgb: 185, 197, 216;
+    --fn-fg-on-dark-lightest: #c5cedd;
+    --fn-fg-on-dark-lightest-rgb: 197, 206, 221;
+    --fn-bg-on-dark: white;
+    --fn-bg-on-dark-rgb: 255, 255, 255;
+    --fn-bg-on-dark-hover: rgba(255, 255, 255, 0.7);
+    --fn-bg-hov-i-gl: white;
+    --fn-bg-hov-i-gl-rgb: 255, 255, 255;
+    --fn-bg-dark: #01040b;
+    --fn-bg-dark-rgb: 1, 4, 11;
+    --fn-shadow: #01040b;
+    --fn-shadow-rgb: 1, 4, 11;
+    --fn-bg-rating-stars: #ffc22b;
+    --fn-bg-rating-stars-rgb: 255, 194, 43;
+    --sc-charts-01: #0062ff;
     --sc-charts-01-rgb: 0, 98, 255;
     --sc-charts-01-op10: rgba(0, 98, 255, 0.1);
     --sc-charts-01-op50: rgba(0, 98, 255, 0.5);
-    --sc-charts-02: #ffb114;
-    --sc-charts-02-rgb: 255, 177, 20;
-    --sc-charts-02-op10: rgba(255, 177, 20, 0.1);
-    --sc-charts-02-op50: rgba(255, 177, 20, 0.5);
-    --sc-charts-03: #21c445;
-    --sc-charts-03-rgb: 33, 196, 69;
-    --sc-charts-03-op10: rgba(33, 196, 69, 0.1);
-    --sc-charts-04: hsl(339deg, 100%, 56%);
-    --sc-charts-04-rgb: 255, 31, 109;
-    --sc-charts-04-op10: rgba(255, 31, 109, 0.1);
-    --sc-charts-05: #004ecc;
-    --sc-charts-05-rgb: 0, 78, 204;
-    --sc-charts-05-op10: rgba(0, 78, 204, 0.1);
-    --sc-charts-06: #3381ff;
-    --sc-charts-06-rgb: 51, 129, 255;
-    --sc-charts-06-op10: rgba(51, 129, 255, 0.1);
-    --sc-charts-07: #99c0ff;
-    --sc-charts-07-rgb: 153, 192, 255;
-    --sc-charts-07-op10: rgba(153, 192, 255, 0.1);
-    --sc-charts-08: #231877;
-    --sc-charts-08-rgb: 35, 24, 119;
-    --sc-charts-08-op10: rgba(35, 24, 119, 0.1);
-    --sc-charts-09: hsl(247deg, 67%, 48%);
-    --sc-charts-09-rgb: 60, 40, 204;
-    --sc-charts-09-op10: rgba(60, 40, 204, 0.1);
-    --sc-charts-10: #8377e4;
-    --sc-charts-10-rgb: 131, 119, 228;
-    --sc-charts-10-op10: rgba(131, 119, 228, 0.1);
-    --sc-charts-11: hsl(4deg, 90%, 58%);
+    --sc-charts-02: #ffc22b;
+    --sc-charts-02-rgb: 255, 194, 43;
+    --sc-charts-02-op10: rgba(255, 194, 43, 0.1);
+    --sc-charts-02-op50: rgba(255, 194, 43, 0.5);
+    --sc-charts-03: #36c34f;
+    --sc-charts-03-rgb: 54, 195, 79;
+    --sc-charts-03-op10: rgba(54, 195, 79, 0.1);
+    --sc-charts-04: #f50065;
+    --sc-charts-04-rgb: 245, 0, 101;
+    --sc-charts-04-op10: rgba(245, 0, 101, 0.1);
+    --sc-charts-05: #0e52ca;
+    --sc-charts-05-rgb: 14, 82, 202;
+    --sc-charts-05-op10: rgba(14, 82, 202, 0.1);
+    --sc-charts-06: #358cff;
+    --sc-charts-06-rgb: 53, 140, 255;
+    --sc-charts-06-op10: rgba(53, 140, 255, 0.1);
+    --sc-charts-07: #b8d9ff;
+    --sc-charts-07-rgb: 184, 217, 255;
+    --sc-charts-07-op10: rgba(184, 217, 255, 0.1);
+    --sc-charts-08: #21008d;
+    --sc-charts-08-rgb: 33, 0, 141;
+    --sc-charts-08-op10: rgba(33, 0, 141, 0.1);
+    --sc-charts-09: #3920c8;
+    --sc-charts-09-rgb: 57, 32, 200;
+    --sc-charts-09-op10: rgba(57, 32, 200, 0.1);
+    --sc-charts-10: #93a1ff;
+    --sc-charts-10-rgb: 147, 161, 255;
+    --sc-charts-10-op10: rgba(147, 161, 255, 0.1);
+    --sc-charts-11: #f44034;
     --sc-charts-11-rgb: 244, 64, 52;
     --sc-charts-11-op10: rgba(244, 64, 52, 0.1);
-    --ai-base-color: hsl(217deg, 100%, 50%);
+    --ai-base-color: #0062ff;
     --ai-base-color-rgb: 0, 98, 255;
     --header-logo-mobile-vision: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
     --header-logo-mobile-adcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
@@ -503,114 +617,296 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --header-logo-mobile-adcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
     --header-logo-mobile-listingcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
     --header-logo-mobile-360: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --p100: #e6efff;
-    --p100-rgb: 230, 239, 255;
-    --p200: #99c0ff;
-    --p200-rgb: 153, 192, 255;
-    --p300: #66a1ff;
-    --p300-rgb: 102, 161, 255;
-    --p400: #3381ff;
-    --p400-rgb: 51, 129, 255;
-    --p600: #004ecc;
-    --p600-rgb: 0, 78, 204;
-    --p700: #003b99;
-    --p700-rgb: 0, 59, 153;
-    --p800: #002766;
-    --p800-rgb: 0, 39, 102;
-    --p900: #001433;
-    --p900-rgb: 0, 20, 51;
-    --i100: #e6efff;
-    --i100-rgb: 230, 239, 255;
-    --i400: #3381ff;
-    --i400-rgb: 51, 129, 255;
-    --i900: #001433;
-    --i900-rgb: 0, 20, 51;
-    --n000: #FFFFFF;
+    --p100: #f1f9ff;
+    --p100-rgb: 241, 249, 255;
+    --p200: #b8d9ff;
+    --p200-rgb: 184, 217, 255;
+    --p300: #6db3ff;
+    --p300-rgb: 109, 179, 255;
+    --p400: #358cff;
+    --p400-rgb: 53, 140, 255;
+    --p600: #0e52ca;
+    --p600-rgb: 14, 82, 202;
+    --p700: #00369e;
+    --p700-rgb: 0, 54, 158;
+    --p800: #001a5e;
+    --p800-rgb: 0, 26, 94;
+    --p900: #000335;
+    --p900-rgb: 0, 3, 53;
+    --i100: #e5f6ff;
+    --i100-rgb: 229, 246, 255;
+    --i400: #3696ff;
+    --i400-rgb: 54, 150, 255;
+    --i900: #0e3376;
+    --i900-rgb: 14, 51, 118;
+    --n000: white;
     --n000-rgb: 255, 255, 255;
-    --n100: #f5f7f9;
-    --n100-rgb: 245, 247, 249;
-    --n200: #e6e9f0;
-    --n200-rgb: 230, 233, 240;
-    --n300: #b6c1d3;
-    --n300-rgb: 182, 193, 211;
-    --n400: #8698b6;
-    --n400-rgb: 134, 152, 182;
-    --n600: #3d4d66;
-    --n600-rgb: 61, 77, 102;
-    --n700: #2a3546;
-    --n700-rgb: 42, 53, 70;
-    --n800: #171d26;
-    --n800-rgb: 23, 29, 38;
-    --n900: #040506;
-    --n900-rgb: 4, 5, 6;
-    --s100: #e9fbed;
-    --s100-rgb: 233, 251, 237;
-    --s400: #21c445;
-    --s400-rgb: 33, 196, 69;
-    --s900: #0d4a1a;
-    --s900-rgb: 13, 74, 26;
-    --w100: #fce6c9;
-    --w100-rgb: 252, 230, 201;
-    --w400: #f59b2e;
-    --w400-rgb: 245, 155, 46;
-    --w900: #7a2706;
-    --w900-rgb: 122, 39, 6;
-    --e100: #ffeceb;
-    --e100-rgb: 255, 236, 235;
-    --e400: #ff675c;
-    --e400-rgb: 255, 103, 92;
-    --e900: #b8150a;
-    --e900-rgb: 184, 21, 10;
-    --a1100: #e8e5fa;
-    --a1100-rgb: 232, 229, 250;
-    --a1300: #8377e4;
-    --a1300-rgb: 131, 119, 228;
-    --a1500: hsl(247deg, 67%, 48%);
-    --a1500-rgb: 60, 40, 204;
-    --a1900: #231877;
-    --a1900-rgb: 35, 24, 119;
-    --a2100: #fff5e0;
-    --a2100-rgb: 255, 245, 224;
-    --a2400: #ffe4ad;
-    --a2400-rgb: 255, 228, 173;
-    --a2500: hsl(40deg, 100%, 74%);
-    --a2500-rgb: 255, 211, 122;
-    --a2900: #ffb114;
-    --a2900-rgb: 255, 177, 20;
-    --a3100: #ffe0eb;
-    --a3100-rgb: 255, 224, 235;
-    --a3300: #ff85af;
-    --a3300-rgb: 255, 133, 175;
-    --a3400: #ff528e;
-    --a3400-rgb: 255, 82, 142;
-    --a3500: hsl(339deg, 100%, 56%);
-    --a3500-rgb: 255, 31, 109;
-    --a3900: #eb0052;
-    --a3900-rgb: 235, 0, 82;
-    --post100: hsl(210.2127659574deg, 83.4319526627%, 93%);
+    --n100: #f6f9fc;
+    --n100-rgb: 246, 249, 252;
+    --n200: #e6eaf0;
+    --n200-rgb: 230, 234, 240;
+    --n300: #b9c5d8;
+    --n300-rgb: 185, 197, 216;
+    --n400: #869cc0;
+    --n400-rgb: 134, 156, 192;
+    --n600: #41506a;
+    --n600-rgb: 65, 80, 106;
+    --n700: #263349;
+    --n700-rgb: 38, 51, 73;
+    --n800: #18212f;
+    --n800-rgb: 24, 33, 47;
+    --n900: #01040b;
+    --n900-rgb: 1, 4, 11;
+    --s100: #e8fce8;
+    --s100-rgb: 232, 252, 232;
+    --s400: #36c34f;
+    --s400-rgb: 54, 195, 79;
+    --s900: #0f4418;
+    --s900-rgb: 15, 68, 24;
+    --w100: #fff1e3;
+    --w100-rgb: 255, 241, 227;
+    --w400: #ef8700;
+    --w400-rgb: 239, 135, 0;
+    --w900: #661b00;
+    --w900-rgb: 102, 27, 0;
+    --e100: #ffece6;
+    --e100-rgb: 255, 236, 230;
+    --e400: #ff5242;
+    --e400-rgb: 255, 82, 66;
+    --e900: #651913;
+    --e900-rgb: 101, 25, 19;
+    --a1100: #f5f8ff;
+    --a1100-rgb: 245, 248, 255;
+    --a1300: #93a1ff;
+    --a1300-rgb: 147, 161, 255;
+    --a1500: #3920c8;
+    --a1500-rgb: 57, 32, 200;
+    --a1900: #21008d;
+    --a1900-rgb: 33, 0, 141;
+    --a2100: #fff7e7;
+    --a2100-rgb: 255, 247, 231;
+    --a2300: #ffe7ab;
+    --a2300-rgb: 255, 231, 171;
+    --a2400: #ffdb88;
+    --a2400-rgb: 255, 219, 136;
+    --a2500: #ffcf5e;
+    --a2500-rgb: 255, 207, 94;
+    --a2900: #ffc22b;
+    --a2900-rgb: 255, 194, 43;
+    --a3100: #fff3f5;
+    --a3100-rgb: 255, 243, 245;
+    --a3300: #ff5b94;
+    --a3300-rgb: 255, 91, 148;
+    --a3400: #ff397c;
+    --a3400-rgb: 255, 57, 124;
+    --a3500: #f50065;
+    --a3500-rgb: 245, 0, 101;
+    --a3900: #da0051;
+    --a3900-rgb: 218, 0, 81;
+    --a4100: #f3faf8;
+    --a4100-rgb: 243, 250, 248;
+    --a4300: #6accb8;
+    --a4300-rgb: 106, 204, 184;
+    --a4500: #329987;
+    --a4500-rgb: 50, 153, 135;
+    --a4900: #128472;
+    --a4900-rgb: 18, 132, 114;
+    --seo50: #e9fff6;
+    --seo50-rgb: 233, 255, 246;
+    --seo100: #ddffed;
+    --seo100-rgb: 221, 255, 237;
+    --seo200: #c2f6dc;
+    --seo200-rgb: 194, 246, 220;
+    --seo300: #69cfa2;
+    --seo300-rgb: 105, 207, 162;
+    --seo400: #00b16d;
+    --seo400-rgb: 0, 177, 109;
+    --seo500: #005732;
+    --seo500-rgb: 0, 87, 50;
+    --seo600: #004b28;
+    --seo600-rgb: 0, 75, 40;
+    --seo700: #003b20;
+    --seo700-rgb: 0, 59, 32;
+    --seo800: #142620;
+    --seo800-rgb: 20, 38, 32;
+    --seo-accent50: #fff4f2;
+    --seo-accent50-rgb: 255, 244, 242;
+    --seo-accent200: #c6fba2;
+    --seo-accent200-rgb: 198, 251, 162;
+    --seo-accent400: #9dcf78;
+    --seo-accent400-rgb: 157, 207, 120;
+    --seo-accent600: #8dbf69;
+    --seo-accent600-rgb: 141, 191, 105;
+    --seo-accent800: #52812a;
+    --seo-accent800-rgb: 82, 129, 42;
+    --wr50: #fffadc;
+    --wr50-rgb: 255, 250, 220;
+    --wr100: #fff3cb;
+    --wr100-rgb: 255, 243, 203;
+    --wr200: #ffe4a7;
+    --wr200-rgb: 255, 228, 167;
+    --wr300: #e3ae20;
+    --wr300-rgb: 227, 174, 32;
+    --wr400: #d27800;
+    --wr400-rgb: 210, 120, 0;
+    --wr500: #6a3800;
+    --wr500-rgb: 106, 56, 0;
+    --wr600: #5d2e00;
+    --wr600-rgb: 93, 46, 0;
+    --wr700: #482500;
+    --wr700-rgb: 72, 37, 0;
+    --wr800: #27220e;
+    --wr800-rgb: 39, 34, 14;
+    --wr-accent50: #fff5ff;
+    --wr-accent50-rgb: 255, 245, 255;
+    --wr-accent200: #ffc770;
+    --wr-accent200-rgb: 255, 199, 112;
+    --wr-accent400: #ff9d42;
+    --wr-accent400-rgb: 255, 157, 66;
+    --wr-accent600: #fc8d2e;
+    --wr-accent600-rgb: 252, 141, 46;
+    --wr-accent800: #b84e00;
+    --wr-accent800-rgb: 184, 78, 0;
+    --ads50: #ffeff5;
+    --ads50-rgb: 255, 239, 245;
+    --ads100: #ffe4ed;
+    --ads100-rgb: 255, 228, 237;
+    --ads200: #ffcddb;
+    --ads200-rgb: 255, 205, 219;
+    --ads300: #ff81a2;
+    --ads300-rgb: 255, 129, 162;
+    --ads400: #ff006d;
+    --ads400-rgb: 255, 0, 109;
+    --ads500: #8b0032;
+    --ads500-rgb: 139, 0, 50;
+    --ads600: #7b0029;
+    --ads600-rgb: 123, 0, 41;
+    --ads700: #5f0021;
+    --ads700-rgb: 95, 0, 33;
+    --ads800: #321a1a;
+    --ads800-rgb: 50, 26, 26;
+    --ads-accent50: #dbffff;
+    --ads-accent50-rgb: 219, 255, 255;
+    --ads-accent200: #ffb1ff;
+    --ads-accent200-rgb: 255, 177, 255;
+    --ads-accent400: #ff87e8;
+    --ads-accent400-rgb: 255, 135, 232;
+    --ads-accent600: #f976d8;
+    --ads-accent600-rgb: 249, 118, 216;
+    --ads-accent800: #b43598;
+    --ads-accent800-rgb: 180, 53, 152;
+    --op50: #ecfcff;
+    --op50-rgb: 236, 252, 255;
+    --op100: #e1f6ff;
+    --op100-rgb: 225, 246, 255;
+    --op200: #c9e8ff;
+    --op200-rgb: 201, 232, 255;
+    --op300: #80b3ff;
+    --op300-rgb: 128, 179, 255;
+    --op400: #3478ff;
+    --op400-rgb: 52, 120, 255;
+    --op500: #1237a1;
+    --op500-rgb: 18, 55, 161;
+    --op600: #0b2c90;
+    --op600-rgb: 11, 44, 144;
+    --op700: #0b256e;
+    --op700-rgb: 11, 37, 110;
+    --op800: #1c2034;
+    --op800-rgb: 28, 32, 52;
+    --op-accent50: #f5ffe0;
+    --op-accent50-rgb: 245, 255, 224;
+    --op-accent200: #34faff;
+    --op-accent200-rgb: 52, 250, 255;
+    --op-accent400: #00ceff;
+    --op-accent400-rgb: 0, 206, 255;
+    --op-accent600: #00bdff;
+    --op-accent600-rgb: 0, 189, 255;
+    --op-accent800: #007dcc;
+    --op-accent800-rgb: 0, 125, 204;
+    --eng50: #eaffff;
+    --eng50-rgb: 234, 255, 255;
+    --eng100: #defcfc;
+    --eng100-rgb: 222, 252, 252;
+    --eng200: #c4f2f2;
+    --eng200-rgb: 196, 242, 242;
+    --eng300: #6fc9ca;
+    --eng300-rgb: 111, 201, 202;
+    --eng400: #00a8ac;
+    --eng400-rgb: 0, 168, 172;
+    --eng500: #005355;
+    --eng500-rgb: 0, 83, 85;
+    --eng600: #004749;
+    --eng600-rgb: 0, 71, 73;
+    --eng700: #003739;
+    --eng700-rgb: 0, 55, 57;
+    --eng800: #172426;
+    --eng800-rgb: 23, 36, 38;
+    --eng-accent50: #fff8ed;
+    --eng-accent50-rgb: 255, 248, 237;
+    --eng-accent200: #a9fdda;
+    --eng-accent200-rgb: 169, 253, 218;
+    --eng-accent400: #7fd2b1;
+    --eng-accent400-rgb: 127, 210, 177;
+    --eng-accent600: #6fc1a1;
+    --eng-accent600-rgb: 111, 193, 161;
+    --eng-accent800: #2d8365;
+    --eng-accent800-rgb: 45, 131, 101;
+    --bm50: #fdf6ff;
+    --bm50-rgb: 253, 246, 255;
+    --bm100: #f7eeff;
+    --bm100-rgb: 247, 238, 255;
+    --bm200: #ecdcff;
+    --bm200-rgb: 236, 220, 255;
+    --bm300: #c09eff;
+    --bm300-rgb: 192, 158, 255;
+    --bm400: #a351ff;
+    --bm400-rgb: 163, 81, 255;
+    --bm500: #502197;
+    --bm500-rgb: 80, 33, 151;
+    --bm600: #451587;
+    --bm600-rgb: 69, 21, 135;
+    --bm700: #351567;
+    --bm700-rgb: 53, 21, 103;
+    --bm800: #261d30;
+    --bm800-rgb: 38, 29, 48;
+    --bm-accent50: #e4ffee;
+    --bm-accent50-rgb: 228, 255, 238;
+    --bm-accent200: #aae3ff;
+    --bm-accent200-rgb: 170, 227, 255;
+    --bm-accent400: #81b8ff;
+    --bm-accent400-rgb: 129, 184, 255;
+    --bm-accent600: #72a7ff;
+    --bm-accent600-rgb: 114, 167, 255;
+    --bm-accent800: #3a67de;
+    --bm-accent800-rgb: 58, 103, 222;
+    --post100: #deedfc;
     --post100-rgb: 222, 237, 252;
-    --post600: hsl(210.2127659574deg, 83.4319526627%, 40%);
+    --post600: #1165bb;
     --post600-rgb: 17, 101, 187;
-    --post900: hsl(210.2127659574deg, 83.4319526627%, 10%);
+    --post900: #04192f;
     --post900-rgb: 4, 25, 47;
-    --event100: hsl(275.8389261745deg, 97.385620915%, 93%);
+    --event100: #f1dcff;
     --event100-rgb: 241, 220, 255;
-    --event600: hsl(275.8389261745deg, 97.385620915%, 40%);
+    --event600: #7903c9;
     --event600-rgb: 121, 3, 201;
-    --event900: hsl(275.8389261745deg, 97.385620915%, 10%);
+    --event900: #1e0132;
     --event900-rgb: 30, 1, 50;
-    --boost100: hsl(349deg, 77%, 93%);
+    --boost100: #fbdfe4;
     --boost100-rgb: 251, 223, 228;
-    --boost600: hsl(349deg, 77%, 40%);
+    --boost600: #b51734;
     --boost600-rgb: 181, 23, 52;
-    --boost900: hsl(349deg, 77%, 10%);
+    --boost900: #2d060d;
     --boost900-rgb: 45, 6, 13;
-    --draft100: hsl(0deg, 1.9607843137%, 93%);
+    --draft100: #eeeded;
     --draft100-rgb: 238, 237, 237;
-    --draft600: hsl(0deg, 1.9607843137%, 40%);
+    --draft600: #686464;
     --draft600-rgb: 104, 100, 100;
-    --draft900: hsl(0deg, 1.9607843137%, 10%);
+    --draft900: #1a1919;
     --draft900-rgb: 26, 25, 25;
+    --brand-light: #2d84ff;
+    --brand-light-rgb: 45, 132, 255;
+    --brand-dark: #0029ca;
+    --brand-dark-rgb: 0, 41, 202;
 }
 :root .bg-color-white {
     background-color: var(--white);
@@ -636,11 +932,23 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-p500 {
     color: var(--p500);
 }
+:root .bg-color-color-base-primary {
+    background-color: var(--color-base-primary);
+}
+:root .color-color-base-primary {
+    color: var(--color-base-primary);
+}
 :root .bg-color-i500 {
     background-color: var(--i500);
 }
 :root .color-i500 {
     color: var(--i500);
+}
+:root .bg-color-color-base-info {
+    background-color: var(--color-base-info);
+}
+:root .color-color-base-info {
+    color: var(--color-base-info);
 }
 :root .bg-color-n500 {
     background-color: var(--n500);
@@ -648,11 +956,23 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-n500 {
     color: var(--n500);
 }
+:root .bg-color-color-base-neutral {
+    background-color: var(--color-base-neutral);
+}
+:root .color-color-base-neutral {
+    color: var(--color-base-neutral);
+}
 :root .bg-color-s500 {
     background-color: var(--s500);
 }
 :root .color-s500 {
     color: var(--s500);
+}
+:root .bg-color-color-base-success {
+    background-color: var(--color-base-success);
+}
+:root .color-color-base-success {
+    color: var(--color-base-success);
 }
 :root .bg-color-e500 {
     background-color: var(--e500);
@@ -660,11 +980,23 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-e500 {
     color: var(--e500);
 }
+:root .bg-color-color-base-error {
+    background-color: var(--color-base-error);
+}
+:root .color-color-base-error {
+    color: var(--color-base-error);
+}
 :root .bg-color-w500 {
     background-color: var(--w500);
 }
 :root .color-w500 {
     color: var(--w500);
+}
+:root .bg-color-color-base-warning {
+    background-color: var(--color-base-warning);
+}
+:root .color-color-base-warning {
+    color: var(--color-base-warning);
 }
 :root .bg-color-a1-500 {
     background-color: var(--a1-500);
@@ -672,17 +1004,101 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-a1-500 {
     color: var(--a1-500);
 }
+:root .bg-color-color-base-a1 {
+    background-color: var(--color-base-a1);
+}
+:root .color-color-base-a1 {
+    color: var(--color-base-a1);
+}
 :root .bg-color-a2-500 {
     background-color: var(--a2-500);
 }
 :root .color-a2-500 {
     color: var(--a2-500);
 }
+:root .bg-color-color-base-a2 {
+    background-color: var(--color-base-a2);
+}
+:root .color-color-base-a2 {
+    color: var(--color-base-a2);
+}
 :root .bg-color-a3-500 {
     background-color: var(--a3-500);
 }
 :root .color-a3-500 {
     color: var(--a3-500);
+}
+:root .bg-color-color-base-a3 {
+    background-color: var(--color-base-a3);
+}
+:root .color-color-base-a3 {
+    color: var(--color-base-a3);
+}
+:root .bg-color-a4-500 {
+    background-color: var(--a4-500);
+}
+:root .color-a4-500 {
+    color: var(--a4-500);
+}
+:root .bg-color-color-base-a4 {
+    background-color: var(--color-base-a4);
+}
+:root .color-color-base-a4 {
+    color: var(--color-base-a4);
+}
+:root .bg-color-base-op {
+    background-color: var(--base-op);
+}
+:root .color-base-op {
+    color: var(--base-op);
+}
+:root .bg-color-base-bm {
+    background-color: var(--base-bm);
+}
+:root .color-base-bm {
+    color: var(--base-bm);
+}
+:root .bg-color-base-seo {
+    background-color: var(--base-seo);
+}
+:root .color-base-seo {
+    color: var(--base-seo);
+}
+:root .bg-color-base-wr {
+    background-color: var(--base-wr);
+}
+:root .color-base-wr {
+    color: var(--base-wr);
+}
+:root .bg-color-base-eng {
+    background-color: var(--base-eng);
+}
+:root .color-base-eng {
+    color: var(--base-eng);
+}
+:root .bg-color-base-ads {
+    background-color: var(--base-ads);
+}
+:root .color-base-ads {
+    color: var(--base-ads);
+}
+:root .bg-color-ado-face-gradient-start {
+    background-color: var(--ado-face-gradient-start);
+}
+:root .color-ado-face-gradient-start {
+    color: var(--ado-face-gradient-start);
+}
+:root .bg-color-ado-face-gradient-end {
+    background-color: var(--ado-face-gradient-end);
+}
+:root .color-ado-face-gradient-end {
+    color: var(--ado-face-gradient-end);
+}
+:root .bg-color-ado-face-feature {
+    background-color: var(--ado-face-feature);
+}
+:root .color-ado-face-feature {
+    color: var(--ado-face-feature);
 }
 :root .bg-color-post-base-color {
     background-color: var(--post-base-color);
@@ -1164,11 +1580,23 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-default-disabled-text-color {
     color: var(--button-default-disabled-text-color);
 }
+:root .bg-color-button-default-disabled-background-color {
+    background-color: var(--button-default-disabled-background-color);
+}
+:root .color-button-default-disabled-background-color {
+    color: var(--button-default-disabled-background-color);
+}
 :root .bg-color-button-default-focus-text-color {
     background-color: var(--button-default-focus-text-color);
 }
 :root .color-button-default-focus-text-color {
     color: var(--button-default-focus-text-color);
+}
+:root .bg-color-button-default-focus-background-color {
+    background-color: var(--button-default-focus-background-color);
+}
+:root .color-button-default-focus-background-color {
+    color: var(--button-default-focus-background-color);
 }
 :root .bg-color-button-default-focus-box-shadow-color {
     background-color: var(--button-default-focus-box-shadow-color);
@@ -1392,6 +1820,96 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-shimmer-ripple-color {
     color: var(--button-shimmer-ripple-color);
 }
+:root .bg-color-button-muted-text-color {
+    background-color: var(--button-muted-text-color);
+}
+:root .color-button-muted-text-color {
+    color: var(--button-muted-text-color);
+}
+:root .bg-color-button-muted-hover-text-color {
+    background-color: var(--button-muted-hover-text-color);
+}
+:root .color-button-muted-hover-text-color {
+    color: var(--button-muted-hover-text-color);
+}
+:root .bg-color-button-muted-disabled-text-color {
+    background-color: var(--button-muted-disabled-text-color);
+}
+:root .color-button-muted-disabled-text-color {
+    color: var(--button-muted-disabled-text-color);
+}
+:root .bg-color-button-muted-focus-box-shadow-color {
+    background-color: var(--button-muted-focus-box-shadow-color);
+}
+:root .color-button-muted-focus-box-shadow-color {
+    color: var(--button-muted-focus-box-shadow-color);
+}
+:root .bg-color-button-muted-inverted-text-color {
+    background-color: var(--button-muted-inverted-text-color);
+}
+:root .color-button-muted-inverted-text-color {
+    color: var(--button-muted-inverted-text-color);
+}
+:root .bg-color-button-muted-inverted-hover-text-color {
+    background-color: var(--button-muted-inverted-hover-text-color);
+}
+:root .color-button-muted-inverted-hover-text-color {
+    color: var(--button-muted-inverted-hover-text-color);
+}
+:root .bg-color-button-muted-inverted-disabled-text-color {
+    background-color: var(--button-muted-inverted-disabled-text-color);
+}
+:root .color-button-muted-inverted-disabled-text-color {
+    color: var(--button-muted-inverted-disabled-text-color);
+}
+:root .bg-color-button-muted-inverted-focus-box-shadow-color {
+    background-color: var(--button-muted-inverted-focus-box-shadow-color);
+}
+:root .color-button-muted-inverted-focus-box-shadow-color {
+    color: var(--button-muted-inverted-focus-box-shadow-color);
+}
+:root .bg-color-nav-side-fg {
+    background-color: var(--nav-side-fg);
+}
+:root .color-nav-side-fg {
+    color: var(--nav-side-fg);
+}
+:root .bg-color-nav-side-fg-hover {
+    background-color: var(--nav-side-fg-hover);
+}
+:root .color-nav-side-fg-hover {
+    color: var(--nav-side-fg-hover);
+}
+:root .bg-color-nav-side-fg-selected {
+    background-color: var(--nav-side-fg-selected);
+}
+:root .color-nav-side-fg-selected {
+    color: var(--nav-side-fg-selected);
+}
+:root .bg-color-nav-side-collapse-fg {
+    background-color: var(--nav-side-collapse-fg);
+}
+:root .color-nav-side-collapse-fg {
+    color: var(--nav-side-collapse-fg);
+}
+:root .bg-color-nav-side-notif-bg-tasks {
+    background-color: var(--nav-side-notif-bg-tasks);
+}
+:root .color-nav-side-notif-bg-tasks {
+    color: var(--nav-side-notif-bg-tasks);
+}
+:root .bg-color-nav-side-notif-bg {
+    background-color: var(--nav-side-notif-bg);
+}
+:root .color-nav-side-notif-bg {
+    color: var(--nav-side-notif-bg);
+}
+:root .bg-color-nav-side-notif-fg {
+    background-color: var(--nav-side-notif-fg);
+}
+:root .color-nav-side-notif-fg {
+    color: var(--nav-side-notif-fg);
+}
 :root .bg-color-fn-bg {
     background-color: var(--fn-bg);
 }
@@ -1452,6 +1970,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-fn-fg-lightest {
     color: var(--fn-fg-lightest);
 }
+:root .bg-color-fn-fg-on-dark {
+    background-color: var(--fn-fg-on-dark);
+}
+:root .color-fn-fg-on-dark {
+    color: var(--fn-fg-on-dark);
+}
 :root .bg-color-fn-brd-gl {
     background-color: var(--fn-brd-gl);
 }
@@ -1475,6 +1999,60 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 :root .color-fn-bg-hov-p-gl {
     color: var(--fn-bg-hov-p-gl);
+}
+:root .bg-color-fn-bg-cta-hov {
+    background-color: var(--fn-bg-cta-hov);
+}
+:root .color-fn-bg-cta-hov {
+    color: var(--fn-bg-cta-hov);
+}
+:root .bg-color-fn-bg-disabled {
+    background-color: var(--fn-bg-disabled);
+}
+:root .color-fn-bg-disabled {
+    color: var(--fn-bg-disabled);
+}
+:root .bg-color-fn-fg-on-dark-light {
+    background-color: var(--fn-fg-on-dark-light);
+}
+:root .color-fn-fg-on-dark-light {
+    color: var(--fn-fg-on-dark-light);
+}
+:root .bg-color-fn-fg-on-dark-lightest {
+    background-color: var(--fn-fg-on-dark-lightest);
+}
+:root .color-fn-fg-on-dark-lightest {
+    color: var(--fn-fg-on-dark-lightest);
+}
+:root .bg-color-fn-bg-on-dark {
+    background-color: var(--fn-bg-on-dark);
+}
+:root .color-fn-bg-on-dark {
+    color: var(--fn-bg-on-dark);
+}
+:root .bg-color-fn-bg-hov-i-gl {
+    background-color: var(--fn-bg-hov-i-gl);
+}
+:root .color-fn-bg-hov-i-gl {
+    color: var(--fn-bg-hov-i-gl);
+}
+:root .bg-color-fn-bg-dark {
+    background-color: var(--fn-bg-dark);
+}
+:root .color-fn-bg-dark {
+    color: var(--fn-bg-dark);
+}
+:root .bg-color-fn-shadow {
+    background-color: var(--fn-shadow);
+}
+:root .color-fn-shadow {
+    color: var(--fn-shadow);
+}
+:root .bg-color-fn-bg-rating-stars {
+    background-color: var(--fn-bg-rating-stars);
+}
+:root .color-fn-bg-rating-stars {
+    color: var(--fn-bg-rating-stars);
 }
 :root .bg-color-sc-charts-01 {
     background-color: var(--sc-charts-01);
@@ -1752,6 +2330,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-a2100 {
     color: var(--a2100);
 }
+:root .bg-color-a2300 {
+    background-color: var(--a2300);
+}
+:root .color-a2300 {
+    color: var(--a2300);
+}
 :root .bg-color-a2400 {
     background-color: var(--a2400);
 }
@@ -1799,6 +2383,534 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 :root .color-a3900 {
     color: var(--a3900);
+}
+:root .bg-color-a4100 {
+    background-color: var(--a4100);
+}
+:root .color-a4100 {
+    color: var(--a4100);
+}
+:root .bg-color-a4300 {
+    background-color: var(--a4300);
+}
+:root .color-a4300 {
+    color: var(--a4300);
+}
+:root .bg-color-a4500 {
+    background-color: var(--a4500);
+}
+:root .color-a4500 {
+    color: var(--a4500);
+}
+:root .bg-color-a4900 {
+    background-color: var(--a4900);
+}
+:root .color-a4900 {
+    color: var(--a4900);
+}
+:root .bg-color-seo50 {
+    background-color: var(--seo50);
+}
+:root .color-seo50 {
+    color: var(--seo50);
+}
+:root .bg-color-seo100 {
+    background-color: var(--seo100);
+}
+:root .color-seo100 {
+    color: var(--seo100);
+}
+:root .bg-color-seo200 {
+    background-color: var(--seo200);
+}
+:root .color-seo200 {
+    color: var(--seo200);
+}
+:root .bg-color-seo300 {
+    background-color: var(--seo300);
+}
+:root .color-seo300 {
+    color: var(--seo300);
+}
+:root .bg-color-seo400 {
+    background-color: var(--seo400);
+}
+:root .color-seo400 {
+    color: var(--seo400);
+}
+:root .bg-color-seo500 {
+    background-color: var(--seo500);
+}
+:root .color-seo500 {
+    color: var(--seo500);
+}
+:root .bg-color-seo600 {
+    background-color: var(--seo600);
+}
+:root .color-seo600 {
+    color: var(--seo600);
+}
+:root .bg-color-seo700 {
+    background-color: var(--seo700);
+}
+:root .color-seo700 {
+    color: var(--seo700);
+}
+:root .bg-color-seo800 {
+    background-color: var(--seo800);
+}
+:root .color-seo800 {
+    color: var(--seo800);
+}
+:root .bg-color-seo-accent50 {
+    background-color: var(--seo-accent50);
+}
+:root .color-seo-accent50 {
+    color: var(--seo-accent50);
+}
+:root .bg-color-seo-accent200 {
+    background-color: var(--seo-accent200);
+}
+:root .color-seo-accent200 {
+    color: var(--seo-accent200);
+}
+:root .bg-color-seo-accent400 {
+    background-color: var(--seo-accent400);
+}
+:root .color-seo-accent400 {
+    color: var(--seo-accent400);
+}
+:root .bg-color-seo-accent600 {
+    background-color: var(--seo-accent600);
+}
+:root .color-seo-accent600 {
+    color: var(--seo-accent600);
+}
+:root .bg-color-seo-accent800 {
+    background-color: var(--seo-accent800);
+}
+:root .color-seo-accent800 {
+    color: var(--seo-accent800);
+}
+:root .bg-color-wr50 {
+    background-color: var(--wr50);
+}
+:root .color-wr50 {
+    color: var(--wr50);
+}
+:root .bg-color-wr100 {
+    background-color: var(--wr100);
+}
+:root .color-wr100 {
+    color: var(--wr100);
+}
+:root .bg-color-wr200 {
+    background-color: var(--wr200);
+}
+:root .color-wr200 {
+    color: var(--wr200);
+}
+:root .bg-color-wr300 {
+    background-color: var(--wr300);
+}
+:root .color-wr300 {
+    color: var(--wr300);
+}
+:root .bg-color-wr400 {
+    background-color: var(--wr400);
+}
+:root .color-wr400 {
+    color: var(--wr400);
+}
+:root .bg-color-wr500 {
+    background-color: var(--wr500);
+}
+:root .color-wr500 {
+    color: var(--wr500);
+}
+:root .bg-color-wr600 {
+    background-color: var(--wr600);
+}
+:root .color-wr600 {
+    color: var(--wr600);
+}
+:root .bg-color-wr700 {
+    background-color: var(--wr700);
+}
+:root .color-wr700 {
+    color: var(--wr700);
+}
+:root .bg-color-wr800 {
+    background-color: var(--wr800);
+}
+:root .color-wr800 {
+    color: var(--wr800);
+}
+:root .bg-color-wr-accent50 {
+    background-color: var(--wr-accent50);
+}
+:root .color-wr-accent50 {
+    color: var(--wr-accent50);
+}
+:root .bg-color-wr-accent200 {
+    background-color: var(--wr-accent200);
+}
+:root .color-wr-accent200 {
+    color: var(--wr-accent200);
+}
+:root .bg-color-wr-accent400 {
+    background-color: var(--wr-accent400);
+}
+:root .color-wr-accent400 {
+    color: var(--wr-accent400);
+}
+:root .bg-color-wr-accent600 {
+    background-color: var(--wr-accent600);
+}
+:root .color-wr-accent600 {
+    color: var(--wr-accent600);
+}
+:root .bg-color-wr-accent800 {
+    background-color: var(--wr-accent800);
+}
+:root .color-wr-accent800 {
+    color: var(--wr-accent800);
+}
+:root .bg-color-ads50 {
+    background-color: var(--ads50);
+}
+:root .color-ads50 {
+    color: var(--ads50);
+}
+:root .bg-color-ads100 {
+    background-color: var(--ads100);
+}
+:root .color-ads100 {
+    color: var(--ads100);
+}
+:root .bg-color-ads200 {
+    background-color: var(--ads200);
+}
+:root .color-ads200 {
+    color: var(--ads200);
+}
+:root .bg-color-ads300 {
+    background-color: var(--ads300);
+}
+:root .color-ads300 {
+    color: var(--ads300);
+}
+:root .bg-color-ads400 {
+    background-color: var(--ads400);
+}
+:root .color-ads400 {
+    color: var(--ads400);
+}
+:root .bg-color-ads500 {
+    background-color: var(--ads500);
+}
+:root .color-ads500 {
+    color: var(--ads500);
+}
+:root .bg-color-ads600 {
+    background-color: var(--ads600);
+}
+:root .color-ads600 {
+    color: var(--ads600);
+}
+:root .bg-color-ads700 {
+    background-color: var(--ads700);
+}
+:root .color-ads700 {
+    color: var(--ads700);
+}
+:root .bg-color-ads800 {
+    background-color: var(--ads800);
+}
+:root .color-ads800 {
+    color: var(--ads800);
+}
+:root .bg-color-ads-accent50 {
+    background-color: var(--ads-accent50);
+}
+:root .color-ads-accent50 {
+    color: var(--ads-accent50);
+}
+:root .bg-color-ads-accent200 {
+    background-color: var(--ads-accent200);
+}
+:root .color-ads-accent200 {
+    color: var(--ads-accent200);
+}
+:root .bg-color-ads-accent400 {
+    background-color: var(--ads-accent400);
+}
+:root .color-ads-accent400 {
+    color: var(--ads-accent400);
+}
+:root .bg-color-ads-accent600 {
+    background-color: var(--ads-accent600);
+}
+:root .color-ads-accent600 {
+    color: var(--ads-accent600);
+}
+:root .bg-color-ads-accent800 {
+    background-color: var(--ads-accent800);
+}
+:root .color-ads-accent800 {
+    color: var(--ads-accent800);
+}
+:root .bg-color-op50 {
+    background-color: var(--op50);
+}
+:root .color-op50 {
+    color: var(--op50);
+}
+:root .bg-color-op100 {
+    background-color: var(--op100);
+}
+:root .color-op100 {
+    color: var(--op100);
+}
+:root .bg-color-op200 {
+    background-color: var(--op200);
+}
+:root .color-op200 {
+    color: var(--op200);
+}
+:root .bg-color-op300 {
+    background-color: var(--op300);
+}
+:root .color-op300 {
+    color: var(--op300);
+}
+:root .bg-color-op400 {
+    background-color: var(--op400);
+}
+:root .color-op400 {
+    color: var(--op400);
+}
+:root .bg-color-op500 {
+    background-color: var(--op500);
+}
+:root .color-op500 {
+    color: var(--op500);
+}
+:root .bg-color-op600 {
+    background-color: var(--op600);
+}
+:root .color-op600 {
+    color: var(--op600);
+}
+:root .bg-color-op700 {
+    background-color: var(--op700);
+}
+:root .color-op700 {
+    color: var(--op700);
+}
+:root .bg-color-op800 {
+    background-color: var(--op800);
+}
+:root .color-op800 {
+    color: var(--op800);
+}
+:root .bg-color-op-accent50 {
+    background-color: var(--op-accent50);
+}
+:root .color-op-accent50 {
+    color: var(--op-accent50);
+}
+:root .bg-color-op-accent200 {
+    background-color: var(--op-accent200);
+}
+:root .color-op-accent200 {
+    color: var(--op-accent200);
+}
+:root .bg-color-op-accent400 {
+    background-color: var(--op-accent400);
+}
+:root .color-op-accent400 {
+    color: var(--op-accent400);
+}
+:root .bg-color-op-accent600 {
+    background-color: var(--op-accent600);
+}
+:root .color-op-accent600 {
+    color: var(--op-accent600);
+}
+:root .bg-color-op-accent800 {
+    background-color: var(--op-accent800);
+}
+:root .color-op-accent800 {
+    color: var(--op-accent800);
+}
+:root .bg-color-eng50 {
+    background-color: var(--eng50);
+}
+:root .color-eng50 {
+    color: var(--eng50);
+}
+:root .bg-color-eng100 {
+    background-color: var(--eng100);
+}
+:root .color-eng100 {
+    color: var(--eng100);
+}
+:root .bg-color-eng200 {
+    background-color: var(--eng200);
+}
+:root .color-eng200 {
+    color: var(--eng200);
+}
+:root .bg-color-eng300 {
+    background-color: var(--eng300);
+}
+:root .color-eng300 {
+    color: var(--eng300);
+}
+:root .bg-color-eng400 {
+    background-color: var(--eng400);
+}
+:root .color-eng400 {
+    color: var(--eng400);
+}
+:root .bg-color-eng500 {
+    background-color: var(--eng500);
+}
+:root .color-eng500 {
+    color: var(--eng500);
+}
+:root .bg-color-eng600 {
+    background-color: var(--eng600);
+}
+:root .color-eng600 {
+    color: var(--eng600);
+}
+:root .bg-color-eng700 {
+    background-color: var(--eng700);
+}
+:root .color-eng700 {
+    color: var(--eng700);
+}
+:root .bg-color-eng800 {
+    background-color: var(--eng800);
+}
+:root .color-eng800 {
+    color: var(--eng800);
+}
+:root .bg-color-eng-accent50 {
+    background-color: var(--eng-accent50);
+}
+:root .color-eng-accent50 {
+    color: var(--eng-accent50);
+}
+:root .bg-color-eng-accent200 {
+    background-color: var(--eng-accent200);
+}
+:root .color-eng-accent200 {
+    color: var(--eng-accent200);
+}
+:root .bg-color-eng-accent400 {
+    background-color: var(--eng-accent400);
+}
+:root .color-eng-accent400 {
+    color: var(--eng-accent400);
+}
+:root .bg-color-eng-accent600 {
+    background-color: var(--eng-accent600);
+}
+:root .color-eng-accent600 {
+    color: var(--eng-accent600);
+}
+:root .bg-color-eng-accent800 {
+    background-color: var(--eng-accent800);
+}
+:root .color-eng-accent800 {
+    color: var(--eng-accent800);
+}
+:root .bg-color-bm50 {
+    background-color: var(--bm50);
+}
+:root .color-bm50 {
+    color: var(--bm50);
+}
+:root .bg-color-bm100 {
+    background-color: var(--bm100);
+}
+:root .color-bm100 {
+    color: var(--bm100);
+}
+:root .bg-color-bm200 {
+    background-color: var(--bm200);
+}
+:root .color-bm200 {
+    color: var(--bm200);
+}
+:root .bg-color-bm300 {
+    background-color: var(--bm300);
+}
+:root .color-bm300 {
+    color: var(--bm300);
+}
+:root .bg-color-bm400 {
+    background-color: var(--bm400);
+}
+:root .color-bm400 {
+    color: var(--bm400);
+}
+:root .bg-color-bm500 {
+    background-color: var(--bm500);
+}
+:root .color-bm500 {
+    color: var(--bm500);
+}
+:root .bg-color-bm600 {
+    background-color: var(--bm600);
+}
+:root .color-bm600 {
+    color: var(--bm600);
+}
+:root .bg-color-bm700 {
+    background-color: var(--bm700);
+}
+:root .color-bm700 {
+    color: var(--bm700);
+}
+:root .bg-color-bm800 {
+    background-color: var(--bm800);
+}
+:root .color-bm800 {
+    color: var(--bm800);
+}
+:root .bg-color-bm-accent50 {
+    background-color: var(--bm-accent50);
+}
+:root .color-bm-accent50 {
+    color: var(--bm-accent50);
+}
+:root .bg-color-bm-accent200 {
+    background-color: var(--bm-accent200);
+}
+:root .color-bm-accent200 {
+    color: var(--bm-accent200);
+}
+:root .bg-color-bm-accent400 {
+    background-color: var(--bm-accent400);
+}
+:root .color-bm-accent400 {
+    color: var(--bm-accent400);
+}
+:root .bg-color-bm-accent600 {
+    background-color: var(--bm-accent600);
+}
+:root .color-bm-accent600 {
+    color: var(--bm-accent600);
+}
+:root .bg-color-bm-accent800 {
+    background-color: var(--bm-accent800);
+}
+:root .color-bm-accent800 {
+    color: var(--bm-accent800);
 }
 :root .bg-color-post100 {
     background-color: var(--post100);
@@ -1872,24 +2984,54 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-draft900 {
     color: var(--draft900);
 }
+:root .bg-color-brand-light {
+    background-color: var(--brand-light);
+}
+:root .color-brand-light {
+    color: var(--brand-light);
+}
+:root .bg-color-brand-dark {
+    background-color: var(--brand-dark);
+}
+:root .color-brand-dark {
+    color: var(--brand-dark);
+}
 
 @font-face {
-    font-family: "Roboto";
+    font-family: "Inter";
     font-style: normal;
     font-weight: 400;
-    src: url("/vanguard/assets/fonts/Roboto-Regular.ttf") format("truetype");
+    src: url("/vanguard/assets/fonts/Inter-Regular.woff2") format("woff2");
 }
 @font-face {
-    font-family: "Roboto";
+    font-family: "Inter";
     font-style: normal;
     font-weight: 500;
-    src: url("/vanguard/assets/fonts/Roboto-Medium.ttf") format("truetype");
+    src: url("/vanguard/assets/fonts/Inter-Medium.woff2") format("woff2");
 }
 @font-face {
-    font-family: "Roboto";
+    font-family: "Inter";
     font-style: normal;
     font-weight: 700;
-    src: url("/vanguard/assets/fonts/Roboto-Bold.ttf") format("truetype");
+    src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    src: url("/vanguard/assets/fonts/Inter-Regular.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 500;
+    src: url("/vanguard/assets/fonts/Inter-Medium.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 700;
+    src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
 }
 body {
     font-family: var(--theme-typeface);

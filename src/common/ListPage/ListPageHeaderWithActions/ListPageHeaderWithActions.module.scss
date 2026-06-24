@@ -58,7 +58,7 @@
   padding: $x2 0;
 
   &.line {
-    border-top: $x0_125 solid var(--n200);
+    border-top: $x0_125 solid var(--fn-divider-gl);
   }
 
   @include media("<tablet") {
@@ -67,7 +67,7 @@
 }
 
 .shadow {
-  -webkit-box-shadow: -($x0_5 + $x0_125) $x3 $x2_5 -($x1_5 - $x0_125) rgba(0, 0, 0, 0.16);
-  -moz-box-shadow: -($x0_5 + $x0_125) $x3 $x2_5 -($x1_5 - $x0_125) rgba(0, 0, 0, 0.16);
-  box-shadow: -($x0_5 + $x0_125) $x3 $x2_5 -($x1_5 - $x0_125) rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: -($x0_5 + $x0_125) $x3 $x2_5 -($x1_5 - $x0_125) rgba(var(--fn-shadow-rgb), 0.16);
+  -moz-box-shadow: -($x0_5 + $x0_125) $x3 $x2_5 -($x1_5 - $x0_125) rgba(var(--fn-shadow-rgb), 0.16);
+  box-shadow: -($x0_5 + $x0_125) $x3 $x2_5 -($x1_5 - $x0_125) rgba(var(--fn-shadow-rgb), 0.16);
 }

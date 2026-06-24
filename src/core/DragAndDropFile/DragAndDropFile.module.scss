@@ -2,7 +2,7 @@
 .dropzone {
   width: 300px;
   height: 200px;
-  border: 2px dashed #ccc;
+  border: 2px dashed var(--fn-brd-gl);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,11 +11,11 @@
   transition: border-color 0.3s ease;
 
   &.dragging {
-    border-color: #007bff;
+    border-color: var(--i400);
   }
 
   &:hover {
-    border-color: #007bff;
+    border-color: var(--i400);
     background-color: #f0f0f0;
   }
 }

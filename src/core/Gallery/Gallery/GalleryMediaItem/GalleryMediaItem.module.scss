@@ -22,7 +22,7 @@
 
     .overlay-options {
       align-items: center;
-      background-color: rgba(var(--n900-rgb), .6);
+      background-color: rgba(var(--fn-shadow-rgb), 0.6);
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -48,7 +48,7 @@
           border-radius: $x0_5;
           margin-left: $x1;
           margin-right: $x1;
-          background-color: rgba(var(--n100-rgb), 0.2);
+          background-color: var(--fn-bg-hov-i-gl);
         }
 
         &.disabled {
@@ -70,7 +70,7 @@
 
       &.is-selected {
         opacity: 1;
-        background-color: rgba(var(--p500-rgb), .3);
+        background-color: rgba(var(--fn-bg-cta-rgb), 0.3);
         border: $x0_25 solid var(--fn-bg-cta);
       }
 
@@ -82,7 +82,7 @@
         gap: $x1;
 
         .action-divider {
-          border-bottom: 1px solid var(--n000);
+          border-bottom: 1px solid rgba(var(--fn-bg-rgb), 0.3);
           margin: 8px 16px 10px;
           opacity: .5;
           width: calc(100% - 32px);
@@ -95,7 +95,7 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: linear-gradient(180deg, rgba(42, 53, 70, 0.00) 0%, #171D26 126.79%);
+      background: linear-gradient(180deg, rgba(var(--fn-fg-rgb), 0) 0%, var(--fn-bg-dark) 126.79%);
       display: flex;
       justify-content: end;
       align-items: end;
