@@ -111,7 +111,8 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
           // This prevents rendering empty string in Select's value
           // if search text would exclude currently selected option.
           renderValue={(value) => {
-            return (options.find((o) => o.value === value)?.title as string) ?? '';
+            const title = (options.find((o) => o.value === value)?.title as string) ?? '';
+            return <Text>{title}</Text>;
           }}
           endAdornment={
             <InputAdornment position="end">
