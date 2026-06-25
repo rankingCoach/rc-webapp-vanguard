@@ -3,7 +3,7 @@ import { ModalResponse } from '@vanguard/Modal/ModalResponse';
 import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { AllowedDrawerProps, Drawer } from '../Drawer';
+import { AllowedDrawerProps, Drawer, DrawerProps } from '../Drawer';
 import { DrawerCloseResponse } from '../Drawer.types';
 import { DrawerService } from '../DrawerService';
 import styles from './DrawerRoot.module.scss';
@@ -36,21 +36,24 @@ export const DrawerRoot = (props: DrawerRootProps) => {
     /**
      * Open Drawer
      */
-    pubSubService.$sub(PUB_SUB_EVENTS.reactDrawerOpen, ({ component, options, id }) => {
-      // If a previous drawer is still registered (e.g. open→open without close),
-      // free its slot before claiming a new one so the ledger doesn't leak.
-      if (activeDrawerId.current && activeDrawerId.current !== id) {
-        OverlayStackingService.unregister(activeDrawerId.current);
-      }
-      setZIndex(OverlayStackingService.register(id, 'drawer'));
-      setChildren(component);
-      setDrawerProps({
-        ...defaultDrawerProps,
-        ...options,
-      });
-      activeDrawerId.current = id;
-      setIsDrawerOpen(true);
-    });
+    pubSubService.$sub(
+      PUB_SUB_EVENTS.reactDrawerOpen,
+      ({ component, options, id }: { component: any; options?: DrawerProps; id: string }) => {
+        // If a previous drawer is still registered (e.g. open→open without close),
+        // free its slot before claiming a new one so the ledger doesn't leak.
+        if (activeDrawerId.current && activeDrawerId.current !== id) {
+          OverlayStackingService.unregister(activeDrawerId.current);
+        }
+        setZIndex(OverlayStackingService.register(id, 'drawer', options?.baseZIndex));
+        setChildren(component);
+        setDrawerProps({
+          ...defaultDrawerProps,
+          ...options,
+        });
+        activeDrawerId.current = id;
+        setIsDrawerOpen(true);
+      },
+    );
 
     /**
      * Close Drawer
