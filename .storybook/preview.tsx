@@ -45,28 +45,45 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    // Canvas background is driven by the Theme toggle (var(--fn-bg)),
+    // so disable the separate Backgrounds addon control to avoid confusion.
+    backgrounds: { disable: true },
+  },
+  globalTypes: {
+    theme: {
+      description: "Color scheme (overrides OS preference for light-dark())",
+      defaultValue: "light",
+      toolbar: {
+        title: "Theme",
+        icon: "circlehollow",
+        items: [
+          { value: "light", title: "Light", icon: "sun" },
+          { value: "dark", title: "Dark", icon: "moon" },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
-    (Story: any) => {
-      // Close all modals before rendering each story
-      const cleanupAndRender = async () => {
-        return (
-          <div
-            className={"react-container"}
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Story />
-          </div>
-        );
-      };
+    (Story: any, context: any) => {
+      const theme = context.globals.theme;
+      // Force light-dark() resolution regardless of the OS preference, and
+      // make the canvas background follow the same theme token.
+      useEffect(() => {
+        document.documentElement.style.colorScheme = theme;
+        document.body.style.background = "var(--fn-bg)";
+      }, [theme]);
 
-      // For now, just render synchronously and handle cleanup in useEffect
       return (
+        <div
+          style={{
+            background: "var(--fn-bg)",
+            color: "var(--fn-fg)",
+            minHeight: "100vh",
+          }}
+        >
           <Story />
+        </div>
       );
     },
   ],

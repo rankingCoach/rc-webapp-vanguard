@@ -22,7 +22,7 @@ export const Link = (props: LinkProps) => {
     iconLeft,
     onClick,
     target = '_self',
-    color = '--p500',
+    color = '--fn-fg-cta',
     iconName = IconNames.newTab,
     disabled,
     ...other
@@ -34,7 +34,7 @@ export const Link = (props: LinkProps) => {
     } else if (color) {
       return color;
     } else {
-      return '--p500';
+      return '--fn-fg-cta';
     }
   };
 

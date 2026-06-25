@@ -58,7 +58,7 @@ export const BigLegendItem = (props: BigLegendItemProps) => {
     totalNumber,
     title,
     description,
-    descriptionColor = '--n500',
+    descriptionColor = '--fn-fg-light',
     descriptionType = TextTypes.textCaption,
     descriptionFont = FontWeights.regular,
     iconName,
@@ -215,7 +215,7 @@ export const BigLegendItem = (props: BigLegendItemProps) => {
                 <Text
                   type={totalNumberType ? totalNumberType : TextTypes.heading2}
                   fontWeight={FontWeights.bold}
-                  color={'--n700'}
+                  color={'--fn-fg'}
                   testId={'BigLegendItem_FormattedNumber_TestId'}
                   translate={false}
                 >
