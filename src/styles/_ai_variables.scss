@@ -5,7 +5,7 @@
   --ai-border-size: 4px;
   --ai-border-size-outside: calc(var(--ai-border-size) + 2px);
   --ai-border-radius: 16px;
-  --ai-stroke-color: rgba(from var(--global-background) r g b / 0.6);
+  --ai-stroke-color: rgba(from var(--fn-bg) r g b / 0.6);
   --ai-blur-width: 24px;
 }
 @property --ai-bg-angle {

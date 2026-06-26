@@ -35,6 +35,13 @@ export interface DrawerProps extends AllowedDrawerProps {
    * stacking guarantees. Leave it unset.
    */
   zIndex?: number;
+  /**
+   * Floor to stack this drawer from. Defaults to the shared stacking floor.
+   * Pass a higher value to force the drawer above content outside the overlay
+   * ledger (e.g. injected 3rd-party widgets) while still interleaving with
+   * other overlays. Prefer this over `zIndex`, which pins a static layer.
+   */
+  baseZIndex?: number;
 }
 
 export const Drawer = (props: PropsWithChildren<DrawerProps>) => {

@@ -5,7 +5,7 @@
      * -------------------------------------------------------------------------------------------------------------------
      */
     .MuiTooltip-tooltip {
-      background: var(--n000);
+      background: var(--fn-bg-surface);
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
       border-radius: 4px;
       padding: 8px 16px;
@@ -15,7 +15,7 @@
         width: 0;
         height: 0;
         border-width: 12px 12px 0 12px;
-        border-color: var(--n000) transparent transparent transparent;
+        border-color: var(--fn-bg-surface) transparent transparent transparent;
         border-style: solid;
 
         &:before {
@@ -33,8 +33,8 @@
         margin-bottom: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(0px 4px 2px rgba(4, 5, 6, 0.1));
-          border-color: var(--n000) transparent transparent transparent;
+          filter: drop-shadow(0px 4px 2px rgba(var(--fn-shadow-rgb), 0.1));
+          border-color: var(--fn-bg-surface) transparent transparent transparent;
           border-width: 12px 12px 0 12px;
           margin-bottom: -11px;
         }
@@ -46,8 +46,8 @@
         margin-top: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(0px -4px 2px rgba(4, 5, 6, 0.1));
-          border-color: transparent transparent var(--n000) transparent;
+          filter: drop-shadow(0px -4px 2px rgba(var(--fn-shadow-rgb), 0.1));
+          border-color: transparent transparent var(--fn-bg-surface) transparent;
           border-width: 0 12px 12px 12px;
           margin-top: -11px;
         }
@@ -59,8 +59,8 @@
         margin-right: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(4px 0 2px rgba(4, 5, 6, 0.1));
-          border-color: transparent transparent transparent var(--n000);
+          filter: drop-shadow(4px 0 2px rgba(var(--fn-shadow-rgb), 0.1));
+          border-color: transparent transparent transparent var(--fn-bg-surface);
           border-width: 12px 0 12px 12px;
           margin-right: -11px;
         }
@@ -72,8 +72,8 @@
         margin-left: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(-4px 0px 2px rgba(4, 5, 6, 0.1));
-          border-color: transparent var(--n000) transparent transparent;
+          filter: drop-shadow(-4px 0px 2px rgba(var(--fn-shadow-rgb), 0.1));
+          border-color: transparent var(--fn-bg-surface) transparent transparent;
           border-width: 12px 12px 12px 0;
           margin-left: -11px;
         }
@@ -93,22 +93,22 @@
       * -------------------------------------------------------------------------------------------------------------------
       */
     .MuiTooltip-tooltip {
-      background: var(--n800);
+      background: var(--fn-bg-dark);
       box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
       border-radius: 4px;
       padding: 8px 16px;
       text-align: center;
-      color: var(--n000);
+      color: var(--fn-fg-on-dark);
 
       > span {
-        color: var(--n000);
+        color: var(--fn-fg-on-dark);
       }
 
       .MuiTooltip-arrow {
         width: 0;
         height: 0;
         border-width: 12px 12px 0 12px;
-        border-color: var(--n800) transparent transparent transparent;
+        border-color: var(--fn-bg-dark) transparent transparent transparent;
         border-style: solid;
 
         &:before {
@@ -123,40 +123,40 @@
      */
     &[data-popper-placement*="top"] {
       .MuiTooltip-tooltip {
-        color: var(--n000);
+        color: var(--fn-fg-on-dark);
 
         .MuiTooltip-arrow {
-          border-color: var(--n800) transparent transparent transparent;
+          border-color: var(--fn-bg-dark) transparent transparent transparent;
         }
       }
     }
 
     &[data-popper-placement*="bottom"] {
       .MuiTooltip-tooltip {
-        color: var(--n000);
+        color: var(--fn-fg-on-dark);
 
         .MuiTooltip-arrow {
-          border-color: transparent transparent var(--n800) transparent;
+          border-color: transparent transparent var(--fn-bg-dark) transparent;
         }
       }
     }
 
     &[data-popper-placement*="left"] {
       .MuiTooltip-tooltip {
-        color: var(--n000);
+        color: var(--fn-fg-on-dark);
 
         .MuiTooltip-arrow {
-          border-color: transparent transparent transparent var(--n800);
+          border-color: transparent transparent transparent var(--fn-bg-dark);
         }
       }
     }
 
     &[data-popper-placement*="right"] {
       .MuiTooltip-tooltip {
-        color: var(--n000);
+        color: var(--fn-fg-on-dark);
 
         .MuiTooltip-arrow {
-          border-color: transparent var(--n800) transparent transparent;
+          border-color: transparent var(--fn-bg-dark) transparent transparent;
         }
       }
     }

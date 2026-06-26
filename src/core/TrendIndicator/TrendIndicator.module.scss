@@ -1,0 +1,19 @@
+.indicator {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.delta {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 2px;
+
+    .delta-value {
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+}

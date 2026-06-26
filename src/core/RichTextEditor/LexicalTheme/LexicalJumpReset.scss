@@ -6,12 +6,12 @@
   }
 
   a {
-    color: var(--p500);
+    color: var(--fn-fg-cta);
     text-decoration: none;
     transition: opacity 0.5s;
 
     &:hover {
-      color: var(--p700);
+      color: var(--fn-fg-cta-hov);
       text-decoration: none;
     }
   }

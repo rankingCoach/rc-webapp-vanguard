@@ -1,11 +1,11 @@
 .menu {
-  background: var(--n000);
+  background: var(--fn-bg-surface);
   display: flex;
   flex-direction: column;
   border-radius: 4px;
   padding: 8px;
-  filter: drop-shadow(0px 12px 40px rgba(4, 5, 6, 0.025)) drop-shadow(0px 8px 14px rgba(4, 5, 6, 0.05))
-    drop-shadow(0px 4px 4px rgba(4, 5, 6, 0.08));
+  filter: drop-shadow(0px 12px 40px rgba(var(--fn-shadow-rgb), 0.025)) drop-shadow(0px 8px 14px rgba(var(--fn-shadow-rgb), 0.05))
+    drop-shadow(0px 4px 4px rgba(var(--fn-shadow-rgb), 0.08));
   // Inner-stacking only — overall popper z-index is set inline from OVERLAY_BASE_Z_INDEX (OverlayStackingService).
   z-index: 1100;
 }
@@ -16,15 +16,15 @@
   z-index: 1101;
 
   border-width: 12px 12px 0 12px;
-  border-color: var(--n000) transparent transparent transparent;
+  border-color: var(--fn-bg-surface) transparent transparent transparent;
   border-style: solid;
 }
 
 [data-popper-placement*="top"] {
   .arrow {
     bottom: -12px;
-    filter: drop-shadow(0px 4px 2px rgba(4, 5, 6, 0.1));
-    border-color: var(--n000) transparent transparent transparent;
+    filter: drop-shadow(0px 4px 2px rgba(var(--fn-shadow-rgb), 0.1));
+    border-color: var(--fn-bg-surface) transparent transparent transparent;
     border-width: 12px 12px 0 12px;
   }
 }
@@ -32,16 +32,16 @@
 [data-popper-placement*="bottom"] {
   .arrow {
     top: -12px;
-    filter: drop-shadow(0px -2px 4px rgba(4, 5, 6, 0.05));
-    border-color: transparent transparent var(--n000) transparent;
+    filter: drop-shadow(0px -2px 4px rgba(var(--fn-shadow-rgb), 0.05));
+    border-color: transparent transparent var(--fn-bg-surface) transparent;
     border-width: 0 12px 12px 12px;
   }
 }
 
 [data-popper-placement*="left"] {
   .arrow {
-    filter: drop-shadow(4px 0 2px rgba(4, 5, 6, 0.05));
-    border-color: transparent transparent transparent var(--n000);
+    filter: drop-shadow(4px 0 2px rgba(var(--fn-shadow-rgb), 0.05));
+    border-color: transparent transparent transparent var(--fn-bg-surface);
     border-width: 12px 0 12px 12px;
     right: -12px;
   }
@@ -49,8 +49,8 @@
 
 [data-popper-placement*="right"] {
   .arrow {
-    filter: drop-shadow(-4px 0px 2px rgba(4, 5, 6, 0.05));
-    border-color: transparent var(--n000) transparent transparent;
+    filter: drop-shadow(-4px 0px 2px rgba(var(--fn-shadow-rgb), 0.05));
+    border-color: transparent var(--fn-bg-surface) transparent transparent;
     border-width: 12px 12px 12px 0;
     left: -12px;
   }

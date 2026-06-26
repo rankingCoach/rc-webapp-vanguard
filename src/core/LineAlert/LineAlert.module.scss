@@ -7,8 +7,8 @@ $borderWidth: 3px;
   min-width: 200px;
   max-width: 500px;
 
-  -webkit-box-shadow: 13px 5px 19px 5px rgba(0, 0, 0, 0.13);
-  box-shadow: 13px 5px 19px 5px rgba(0, 0, 0, 0.13);
+  -webkit-box-shadow: 13px 5px 19px 5px rgba(var(--fn-shadow-rgb), 0.13);
+  box-shadow: 13px 5px 19px 5px rgba(var(--fn-shadow-rgb), 0.13);
 
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
@@ -20,7 +20,7 @@ $borderWidth: 3px;
 
   @mixin alertType($color, $textColor) {
     border-left: $borderWidth solid var(--#{$color});
-    background-color: var(--n000);
+    background-color: var(--fn-bg-surface);
 
     .text {
       color: var(--#{$textColor});

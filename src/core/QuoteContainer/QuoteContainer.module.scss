@@ -21,7 +21,7 @@
       opacity: 0.15; // Make it subtle in the background
       
       path {
-        fill: rgba(var(--n500-rgb),0.5); // Use the accent color for the quote marks
+        fill: rgba(var(--fn-fg-light-rgb),0.5); // Use the accent color for the quote marks
       }
     }
   }

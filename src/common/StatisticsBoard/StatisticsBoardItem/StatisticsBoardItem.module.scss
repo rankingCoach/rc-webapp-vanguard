@@ -31,7 +31,7 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 250ms ease-in-out;
-  background-color: rgba(var(--n000-rgb), 0);
+  background-color: rgba(var(--fn-bg-rgb), 0);
   flex-grow: 1;
   border-radius: 8px;
   min-width: 184px;
@@ -47,8 +47,8 @@
   }
 
   &:hover {
-    background-color: rgba(var(--n000-rgb), 1);
-    border: 1px solid var(--n200);
+    background-color: rgba(var(--fn-bg-rgb), 1);
+    border: 1px solid var(--fn-brd-gl);
 
     .link {
       opacity: 1;
@@ -67,12 +67,12 @@
 
 .cta {
   width: 100%;
-  background: var(--n000) !important;
+  background: var(--fn-bg-surface) !important;
   justify-content: flex-start !important;
 
   &:hover {
-    background: var(--p100) !important;
-    color: var(--p500) !important;
+    background: var(--i100) !important;
+    color: var(--fn-fg-cta) !important;
   }
 }
 
@@ -84,14 +84,14 @@
   .card {
     display: flex;
     flex-direction: column;
-    background-color: rgba(var(--n000-rgb), 0.5);
+    background-color: rgba(var(--fn-bg-rgb), 0.5);
     align-items: center;
     justify-content: center;
     text-align: center;
     border: none;
 
     &:hover {
-      background-color: var(--p100);
+      background-color: var(--i100);
       border-radius: 8px;
       border: none;
     }

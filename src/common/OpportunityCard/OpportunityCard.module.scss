@@ -2,19 +2,19 @@
   width: 300px;
   height: 344px;
   border-radius: 4px;
-  background-color: var(--n000);
+  background-color: var(--fn-bg-surface);
   display: flex;
   flex-direction: column;
   gap: 16px;
   align-items: center;
   overflow: hidden;
   transition: all 0.3s ease-in-out;
-  border: 1px solid var(--n000);
+  border: 1px solid var(--fn-bg-surface);
   cursor: pointer;
 
   &:hover {
-    background-color: var(--p100);
-    border: 1px solid var(--p300);
+    background-color: var(--i100);
+    border: 1px solid var(--i400);
 
     .arrow {
       transform: translateX(5px);

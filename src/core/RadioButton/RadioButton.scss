@@ -19,8 +19,8 @@
   &-label-text {
     &:before {
       margin-top: $x0_5;
-      background-color: var(--n000);
-      border: $x0_25 solid var(--n400);
+      background-color: var(--fn-bg-surface);
+      border: $x0_25 solid var(--fn-brd-gl);
       border-radius: 50%;
       content: '';
       display: inline-block;
@@ -33,25 +33,25 @@
 
     &.checked.disabled {
       &:before {
-        border: $x0_5 + $x0_125 solid var(--n500);
+        border: $x0_5 + $x0_125 solid var(--fn-brd-gl);
       }
     }
 
     &.checked {
       &:before {
-        border: $x0_5+$x0_125 solid var(--p500);
+        border: $x0_5+$x0_125 solid var(--fn-bg-cta);
       }
 
       &:hover {
         &:before {
-          border: $x0_5+$x0_125 solid var(--p700);
+          border: $x0_5+$x0_125 solid var(--fn-bg-cta-hov);
         }
       }
     }
 
     &.disabled {
       &:before {
-        border: $x0_5+$x0_125 solid var(--n100);
+        border: $x0_5+$x0_125 solid var(--fn-brd-gl);
       }
     }
   }
@@ -60,8 +60,8 @@
     min-height: 28px;
     &:before {
       margin-top: $x0_5;
-      background-color: var(--n100);
-      border: $x0_125 solid var(--n400);
+      background-color: var(--fn-bg-var);
+      border: $x0_125 solid var(--fn-brd-gl);
       border-radius: 50%;
       content: '';
       display: inline-block;
@@ -115,7 +115,7 @@
 
   // Theme
   &.bordered {
-    border: $x0_125 solid var(--n400);
+    border: $x0_125 solid var(--fn-brd-gl);
     border-radius: $x0_5;
     padding: $x1_5 $x2;
   }

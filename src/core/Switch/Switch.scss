@@ -18,9 +18,9 @@
     margin: 0;
 
     border-radius: 16px;
-    border: 1px solid var(--n300);
+    border: 1px solid var(--fn-brd-gl);
 
-    background-color: var(--n000);
+    background-color: var(--fn-bg);
     transition: background-color 0.3s ease;
   }
 
@@ -31,7 +31,7 @@
 
   .vanguard-switch-input:focus-visible {
     outline: none;
-    border: 1px solid var(--p500);
+    border: 1px solid var(--fn-bg-cta);
   }
 
   .vanguard-switch-input:disabled {
@@ -63,14 +63,14 @@
     border: none;
     border-radius: 50%;
 
-    background-color: var(--n100);
-    box-shadow: 0px -2px 4px rgba(4, 5, 6, 0.05), 0px 8px 16px rgba(4, 5, 6, 0.1), 0px 4px 8px rgba(4, 5, 6, 0.1), 0px 2px 4px rgba(4, 5, 6, 0.15);
+    background-color: var(--fn-bg);
+    box-shadow: 0px -2px 4px rgba(var(--fn-shadow-rgb), 0.05), 0px 8px 16px rgba(var(--fn-shadow-rgb), 0.1), 0px 4px 8px rgba(var(--fn-shadow-rgb), 0.1), 0px 2px 4px rgba(var(--fn-shadow-rgb), 0.15);
   }
 
   .vanguard-switch-input:hover::before,
   .vanguard-switch-input:focus::before,
   .vanguard-switch-input:focus-visible::before {
-    box-shadow: -1px 0 0 6px rgba(4, 5, 6, 0.1);
+    box-shadow: -1px 0 0 6px rgba(var(--fn-shadow-rgb), 0.1);
   }
 
   .vanguard-switch-input:checked::before {
@@ -78,14 +78,14 @@
     right: calc(50% - 2px);
     transform: translateX(100%);
 
-    background-color: var(--n000);
-    box-shadow: 0px -2px 4px rgba(0, 98, 255, 0.1), 0px 8px 16px rgba(0, 98, 255, 0.2), 0px 4px 8px rgba(0, 98, 255, 0.2), 0px 2px 4px rgba(0, 98, 255, 0.25);
+    background-color: var(--fn-bg);
+    box-shadow: 0px -2px 4px rgba(var(--fn-bg-cta-rgb), 0.1), 0px 8px 16px rgba(var(--fn-bg-cta-rgb), 0.2), 0px 4px 8px rgba(var(--fn-bg-cta-rgb), 0.2), 0px 2px 4px rgba(var(--fn-bg-cta-rgb), 0.25);
   }
 
   .vanguard-switch-input:checked:hover::before,
   .vanguard-switch-input:checked:focus::before,
   .vanguard-switch-input:checked:focus-visible::before {
-    box-shadow: 1px 0 0 6px rgba(0, 98, 255, 0.2);
+    box-shadow: 1px 0 0 6px rgba(var(--fn-bg-cta-rgb), 0.2);
   }
 
 

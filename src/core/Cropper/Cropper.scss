@@ -54,34 +54,34 @@
 
         &:after {
           content: "";
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(var(--fn-bg-rgb), 0.1);
           position: absolute;
           left: 0;
           top: 0;
           height: 100%;
           width: var(--rc-cropper-sidebar-width, 0);
           z-index: 2;
-          border-right: var(--rc-cropper-border-width, 0) dashed var(--n000);
+          border-right: var(--rc-cropper-border-width, 0) dashed var(--fn-fg-on-dark);
         }
 
         &:before {
           content: "";
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(var(--fn-bg-rgb), 0.1);
           position: absolute;
           right: 0;
           top: 0;
           height: 100%;
           width: var(--rc-cropper-sidebar-width, 0);
           z-index: 2;
-          border-left:  var(--rc-cropper-border-width, 0) dashed var(--n000);
+          border-left:  var(--rc-cropper-border-width, 0) dashed var(--fn-fg-on-dark);
 
 
         }
       }
 
       .cropper-point {
-        border: var(--n100) 2px solid;
-        background-color: var(--p500);
+        border: var(--fn-fg-on-dark) 2px solid;
+        background-color: var(--fn-bg-cta);
         opacity: 1;
         width: 8px;
         height: 8px;
@@ -120,12 +120,12 @@
       }
 
       .cropper-view-box {
-        box-shadow: 0 0 0 1px var(--n000);
-        background: white;
+        box-shadow: 0 0 0 1px var(--fn-fg-on-dark);
+        background: var(--fn-bg-surface);
       }
 
       .cropper-modal {
-        background-color: var(--n900);
+        background-color: rgba(var(--fn-shadow-rgb), 0.45);
         opacity: 0.45;
       }
     }
@@ -150,7 +150,7 @@
         gap: 16px;
 
         button {
-          background: var(--n000);
+          background: var(--fn-bg-on-dark);
         }
       }
     }

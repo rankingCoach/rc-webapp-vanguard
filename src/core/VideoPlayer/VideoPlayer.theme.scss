@@ -1,6 +1,6 @@
 .video-js {
   font-size: 10px;
-  color: var(--n000);
+  color: var(--fn-fg-on-dark);
 
   .vjs-default-skin .vjs-big-play-button {
 
@@ -24,7 +24,7 @@
   .vjs-volume-level,
   .vjs-play-progress,
   .vjs-slider-bar {
-    background: var(--n000);
+    background: var(--fn-fg-on-dark);
   }
 
   .vjs-load-progress {
@@ -34,7 +34,7 @@
 
     div {
       //background: rgba(168, 226, 255, 0.75);
-      background-color: rgba(var(--p300-rgb), 0.75);
+      background-color: rgba(var(--i400-rgb), 0.75);
 
     }
   }

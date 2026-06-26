@@ -6,27 +6,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: -$x0_25 0 $x0_25 rgba(4, 5, 6, 0.03), -$x0_5 0 $x1 rgba(4, 5, 6, 0.05), -$x1 0 $x3 rgba(4, 5, 6, 0.08);
+  box-shadow: -$x0_25 0 $x0_25 rgba(var(--fn-shadow-rgb), 0.03), -$x0_5 0 $x1 rgba(var(--fn-shadow-rgb), 0.05), -$x1 0 $x3 rgba(var(--fn-shadow-rgb), 0.08);
   border-radius: $x6 0 0 $x6;
   position: absolute;
   top: 50%;
-  border: $x0_5 solid var(--n000);
+  border: $x0_5 solid var(--fn-bg);
   border-right: none;
-  background-color: var(--n100);
+  background-color: var(--fn-bg-var);
   z-index: 999;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.15s ease;
 
   &:hover {
-    background-color: var(--n200);
+    background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
 
     svg path {
-      fill: var(--n500);
+      fill: var(--fn-fg-light);
     }
   }
 
   &:active {
-    background-color: var(--n300);
+    background-color: var(--fn-bg-hov-n-gl);
   }
 
   &.right {

@@ -3,8 +3,8 @@
 
 // To correlate all transition animation time -> button color / background / text background
 $transitionTime: 0.2s;
-$loader-color: var(--p100);
-$loader-color2: var(--p400);
+$loader-color: var(--i100);
+$loader-color2: var(--i400);
 $loader-spinner: $x2;
 $loader-spinner-t: $x2;
 $loader-timing: 850ms;
@@ -16,7 +16,7 @@ $loader-timing: 850ms;
   transition: 250ms;
 
   &:hover {
-    background-color: var(--n100);
+    background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
   }
 
   display: flex;
@@ -27,7 +27,7 @@ $loader-timing: 850ms;
   height: 48px;
   /* Neutral/$n000 */
 
-  background: var(--n000);
+  background: var(--fn-bg);
   /* Divider/top */
 
   border-radius: 0 0 8px 8px;
@@ -40,7 +40,7 @@ $loader-timing: 850ms;
   pointer-events: none;
 
   &:hover {
-    background-color: var(--n000);
+    background-color: var(--fn-bg);
   }
 }
 
