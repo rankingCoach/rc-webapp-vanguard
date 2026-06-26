@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.14.12](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.11...v1.14.12) (2026-06-26)
+
+
+### Bug Fixes
+
+* **gallery:** correct image size error wording to match AND validation ([2534d6e](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2534d6ef3c02ca01cdd3bea8d02246da7e0010a8)), closes [#VAN-62](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-62)
+
 ### [1.14.11](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.10...v1.14.11) (2026-06-25)
 
 ### [1.14.10](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.9...v1.14.10) (2026-06-17)
