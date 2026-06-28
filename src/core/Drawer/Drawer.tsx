@@ -69,6 +69,11 @@ export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
       open={open}
       variant={variant}
       sx={zIndex !== undefined ? { zIndex } : { zIndex: 1099 }}
+      PaperProps={{
+        // MUI's paper defaults to white (+ an elevation background-image in dark themes).
+        // Force the dark-aware surface (light: white, dark: #18212f) and drop the overlay.
+        sx: { backgroundColor: 'var(--fn-bg-surface)', backgroundImage: 'none' },
+      }}
       ModalProps={{
         hideBackdrop: hideBackdrop,
         BackdropProps: {
