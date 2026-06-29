@@ -3,13 +3,15 @@ import { classNames } from '@helpers/classNames';
 import React, { useEffect, useState } from 'react';
 import { a, useSpring } from 'react-spring';
 
-import type { SplitViewElement } from '../ModalSplitView';
+import type { ModalSplitViewCollapseToggle, SplitViewElement } from '../ModalSplitView';
+import { SplitViewCollapseFab } from '../SplitViewCollapseFab';
 
 interface ModalSplitViewRightOverlayProps {
   elements: [SplitViewElement, SplitViewElement];
   autoCloseWidth: number;
   isContracted: boolean;
   bottomMargin?: string;
+  collapseToggle?: ModalSplitViewCollapseToggle;
   /**
    * Opt-in (default off → behaviour unchanged). When true on desktop the right panel slides in
    * as an overlay (GPU `translateX`) on top of the left panel, and the left panel keeps its full
@@ -22,7 +24,7 @@ interface ModalSplitViewRightOverlayProps {
 }
 
 export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProps) => {
-  const { elements, isContracted, autoCloseWidth, bottomMargin, animateOnSlideEnd } = props;
+  const { elements, isContracted, autoCloseWidth, bottomMargin, animateOnSlideEnd, collapseToggle } = props;
 
   const [firstElement, secondElement] = elements;
   const width = useWindowResize();
@@ -60,10 +62,16 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
     immediate: slideEnabled,
   });
 
+  // The divider FAB's `left` is part of THIS spring (not a second one), so it animates on the exact same clock as
+  // the panel's slide/fade — it can never get ahead of the drawer. On the divider when open, right screen edge when
+  // collapsed.
+  const openLeft = firstElement?.contractedWidth ?? '100%';
+
   const secondElementSpring = useSpring({
     opacity: isContracted ? 1 : 0,
     transform:
       (isMobile && !isContracted) || (slideEnabled && !isOpen) ? 'translateX(100%)' : 'translateX(0%)',
+    fabLeft: isOpen ? openLeft : '100%',
     onRest: () => {
       if (slideEnabled && isOpen) {
         setIsLeftResized(true);
@@ -115,6 +123,10 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
       <a.div className={rightClassName} style={rightStyle}>
         {secondElement?.component}
       </a.div>
+
+      {collapseToggle && !isMobile && (
+        <SplitViewCollapseFab collapseToggle={collapseToggle} isOpen={isOpen} animatedLeft={secondElementSpring.fabLeft} />
+      )}
     </>
   );
 };

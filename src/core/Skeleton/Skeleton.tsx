@@ -14,6 +14,7 @@ export interface SkeletonProps {
   style?: CSSProperties | undefined;
   borderRadius?: string | number;
   testId?: string;
+  /** @deprecated Skeleton now auto-adapts to light/dark via theme tokens. Prop ignored. */
   color?: 'dark' | 'light';
   noAnimation?: boolean;
 }
@@ -33,7 +34,6 @@ export const Skeleton = (props: SkeletonProps) => {
     type,
     className,
     testId = 'Skeleton',
-    color = 'light',
     noAnimation,
     borderRadius = 4,
   } = props;
@@ -41,21 +41,18 @@ export const Skeleton = (props: SkeletonProps) => {
   /**
    * Spring animation
    */
+  const shimmer =
+    'linear-gradient(45deg, var(--fn-skeleton-base) 45%, var(--fn-skeleton-shimmer) 55%, var(--fn-skeleton-base) 65%)';
+
   const bgStyle = useSpring({
     loop: true,
     from: {
       transform: 'translate(-100%,0)',
-      background:
-        color === 'light'
-          ? 'linear-gradient(45deg, var(--fn-bg-hov-n-gl) 45%, var(--fn-bg-var) 55%, var(--fn-bg-hov-n-gl) 65%)'
-          : 'linear-gradient(45deg, var(--fn-bg-disabled) 45%, var(--fn-bg-hov-n-gl) 55%, var(--fn-bg-disabled) 65%)',
+      background: shimmer,
     },
     to: {
       transform: 'translate(30%,0)',
-      background:
-        color === 'light'
-          ? 'linear-gradient(45deg, var(--fn-bg-hov-n-gl) 45%, var(--fn-bg-var) 55%, var(--fn-bg-hov-n-gl) 65%)'
-          : 'linear-gradient(45deg, var(--fn-bg-disabled) 45%, var(--fn-bg-hov-n-gl) 55%, var(--fn-bg-disabled) 65%)',
+      background: shimmer,
     },
     config: {
       duration: 1500,
@@ -66,7 +63,7 @@ export const Skeleton = (props: SkeletonProps) => {
    * Without animation
    */
   const bgStyleNoAnimation = {
-    background: color === 'light' ? 'var(--fn-bg-hov-n-gl)' : 'var(--fn-bg-disabled)',
+    background: 'var(--fn-skeleton-base)',
   };
 
   /**
@@ -78,7 +75,7 @@ export const Skeleton = (props: SkeletonProps) => {
       testId={testId}
       className={classNames(styles.container, className ?? '')}
       style={{
-        backgroundColor: color === 'light' ? 'var(--fn-bg-hov-n-gl)' : 'var(--fn-bg-disabled)',
+        backgroundColor: 'var(--fn-skeleton-base)',
         width: type === SkeletonTypes.fill ? '100%' : width,
         height: type === SkeletonTypes.fill ? '100%' : height,
         borderRadius: type === SkeletonTypes.circle ? '50%' : borderRadius,

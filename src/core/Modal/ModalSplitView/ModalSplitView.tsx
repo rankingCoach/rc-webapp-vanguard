@@ -2,8 +2,27 @@ import './ModalSplitView.scss';
 
 import React from 'react';
 
+import { IconNames } from '@vanguard/Icon/IconNames';
+
 import { ModalSplitViewLeftOverlay } from './variants/ModalSplitViewLeftOverlay';
 import { ModalSplitViewRightOverlay } from './variants/ModalSplitViewRightOverlay';
+
+/**
+ * Optional round FAB on the divider (`right-overlay`, desktop). When provided, the split view renders a circular
+ * button that rides the right panel's left edge: it sits ON the divider while the panel is open and peeks half-off
+ * the right screen edge while it's collapsed. The view owns positioning + which chevron to show (derived from
+ * `isContracted`); the consumer owns the action via `onToggle`.
+ */
+export interface ModalSplitViewCollapseToggle {
+  onToggle: () => void;
+  /** Icon while the right panel is OPEN (click → collapse). Default `caretLeft`. */
+  collapseIcon?: IconNames;
+  /** Icon while the right panel is COLLAPSED (click → expand). Default `caretRight`. */
+  expandIcon?: IconNames;
+  ariaLabel?: string;
+  /** Vertical position of the FAB as a percentage of the split-view height (0 = top, 100 = bottom). Default 50 (centered). */
+  verticalPositionPercent?: number;
+}
 
 export type SplitViewElement =
   | {
@@ -30,6 +49,8 @@ interface ModalSplitViewProps {
    * content (e.g. a chat). See ModalSplitViewRightOverlay.
    */
   animateOnSlideEnd?: boolean;
+  /** Optional round divider FAB (right-overlay desktop only). See {@link ModalSplitViewCollapseToggle}. */
+  collapseToggle?: ModalSplitViewCollapseToggle;
 }
 
 export const ModalSplitView = (props: ModalSplitViewProps) => {
@@ -40,6 +61,7 @@ export const ModalSplitView = (props: ModalSplitViewProps) => {
     collapseMode = 'left-overlay',
     bottomMargin,
     animateOnSlideEnd,
+    collapseToggle,
   } = props;
 
   if (collapseMode === 'right-overlay') {
@@ -50,9 +72,17 @@ export const ModalSplitView = (props: ModalSplitViewProps) => {
         autoCloseWidth={autoCloseWidth}
         bottomMargin={bottomMargin}
         animateOnSlideEnd={animateOnSlideEnd}
+        collapseToggle={collapseToggle}
       />
     );
   }
 
-  return <ModalSplitViewLeftOverlay elements={elements} isContracted={isContracted} autoCloseWidth={autoCloseWidth} />;
+  return (
+    <ModalSplitViewLeftOverlay
+      elements={elements}
+      isContracted={isContracted}
+      autoCloseWidth={autoCloseWidth}
+      collapseToggle={collapseToggle}
+    />
+  );
 };

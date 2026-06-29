@@ -1,4 +1,11 @@
 .container {
+  /* Auto-adaptive skeleton tokens, composed from existing functional tokens.
+     Highlight must stay lighter than base in BOTH schemes for the shimmer to read,
+     and no single functional token does that — light's lighter neighbour is
+     --fn-bg-var, dark's is --fn-bg-disabled — so select per scheme via light-dark(). */
+  --fn-skeleton-base: var(--fn-bg-hov-n-gl);
+  --fn-skeleton-shimmer: light-dark(var(--fn-bg-var), var(--fn-bg-disabled));
+
   overflow: hidden;
   position: relative;
 
