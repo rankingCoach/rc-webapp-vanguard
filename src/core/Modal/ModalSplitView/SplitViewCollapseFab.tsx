@@ -37,7 +37,7 @@ export const SplitViewCollapseFab = (props: SplitViewCollapseFabProps) => {
       onClick={collapseToggle.onToggle}
       aria-label={collapseToggle.ariaLabel ?? (isOpen ? 'Collapse panel' : 'Expand panel')}
     >
-      <Icon color="var(--fn-fg)">
+      <Icon color="var(--fn-fg)" forceSize={24}>
         {isOpen
           ? collapseToggle.collapseIcon ?? IconNames.caretLeft
           : collapseToggle.expandIcon ?? IconNames.caretRight}
