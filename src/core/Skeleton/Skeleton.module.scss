@@ -1,10 +1,11 @@
 .container {
-  /* Auto-adaptive skeleton tokens, composed from existing functional tokens.
-     Highlight must stay lighter than base in BOTH schemes for the shimmer to read,
-     and no single functional token does that — light's lighter neighbour is
-     --fn-bg-var, dark's is --fn-bg-disabled — so select per scheme via light-dark(). */
+  /* Skeleton shimmer derived from the base surface token, not a second theme
+     token. --fn-bg-hov-n-gl already themes correctly (light grey / dark slate),
+     and mixing it toward white yields a "lighter base" highlight in either
+     scheme without depending on theme-specific tokens (e.g. --fn-bg-disabled,
+     which some brand themes map to an accent colour). */
   --fn-skeleton-base: var(--fn-bg-hov-n-gl);
-  --fn-skeleton-shimmer: light-dark(var(--fn-bg-var), var(--fn-bg-disabled));
+  --fn-skeleton-shimmer: color-mix(in srgb, var(--fn-bg-hov-n-gl), white 24%);
 
   overflow: hidden;
   position: relative;
