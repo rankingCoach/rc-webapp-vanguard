@@ -56,23 +56,21 @@ describe('Modal close button', () => {
   });
 
   test('hideCloseButtonOnMobile adds the mobile-hide class only when requested', () => {
-    // `testId` is on Button's container span; `className` lands on the inner button.
-    const innerBtn = `${CLOSE_BTN}_button`;
-
-    const { rerender } = render(
+    // The positioning classes live on the wrapper div around the Button.
+    const { container, rerender } = render(
       <Modal onClose={vi.fn()}>
         <div>content</div>
       </Modal>,
     );
-    expect(appScreen.getByTestId(innerBtn).className).toContain('modal-close-btn');
-    expect(appScreen.getByTestId(innerBtn).className).not.toContain('modal-close-btn-hidden-mobile');
+    expect(container.querySelector('.modal-close-btn')).not.toBeNull();
+    expect(container.querySelector('.modal-close-btn-hidden-mobile')).toBeNull();
 
     rerender(
       <Modal onClose={vi.fn()} hideCloseButtonOnMobile>
         <div>content</div>
       </Modal>,
     );
-    expect(appScreen.getByTestId(innerBtn).className).toContain('modal-close-btn-hidden-mobile');
+    expect(container.querySelector('.modal-close-btn-hidden-mobile')).not.toBeNull();
   });
 });
 

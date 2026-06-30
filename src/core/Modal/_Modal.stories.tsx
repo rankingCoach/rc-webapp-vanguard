@@ -9,6 +9,7 @@ import { CloseViaHeaderButtonWithResponse as _CloseViaHeaderButtonWithResponse }
 import { CloseViaHeaderButton as _CloseViaHeaderButton } from "./stories/CloseViaHeaderButton.story";
 import { CloseViaModalButton as _CloseViaModalButton } from "./stories/CloseViaModalButton.story";
 import { CloseViaEscKey as _CloseViaEscKey } from "./stories/CloseViaEscKey.story";
+import { FullImageWithCloseButton as _FullImageWithCloseButton } from "./stories/FullImageWithCloseButton.story";
 import { CloseViaOutsideClick as _CloseViaOutsideClick } from "./stories/CloseViaOutsideClick.story";
 import { CloseViaCallbacks as _CloseViaCallbacks } from "./stories/CloseViaCallbacks.story";
 import { MultipleModalsClosing as _MultipleModalsClosing } from "./stories/MultipleModalsClosing.story";
@@ -52,6 +53,7 @@ export const CloseViaHeaderButtonWithResponse: Story = { ..._CloseViaHeaderButto
 export const CloseViaHeaderButton: Story = { ..._CloseViaHeaderButton };
 export const CloseViaModalButton: Story = { ..._CloseViaModalButton };
 export const CloseViaEscKey: Story = { ..._CloseViaEscKey };
+export const FullImageWithCloseButton: Story = { ..._FullImageWithCloseButton };
 export const CloseViaOutsideClick: Story = { ..._CloseViaOutsideClick };
 export const CloseViaCallbacks: Story = { ..._CloseViaCallbacks };
 export const MultipleModalsClosing: Story = { ..._MultipleModalsClosing };

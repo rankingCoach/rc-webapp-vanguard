@@ -150,15 +150,18 @@ export const Modal = (props: Props) => {
         style={getContentStyle()}
       >
         {shouldRenderCloseBtn ? (
-          <Button
+          <div
             className={classNames('modal-close-btn', hideCloseButtonOnMobile ? 'modal-close-btn-hidden-mobile' : '')}
-            testId={'modal-close-cta'}
-            type={ButtonTypes.muted}
-            size={ButtonSizes.large}
-            icon={IconNames.close}
-            rounded
-            onClick={() => onClose?.()}
-          />
+          >
+            <Button
+              testId={'modal-close-cta'}
+              type={ButtonTypes.muted}
+              size={ButtonSizes.large}
+              icon={IconNames.close}
+              rounded
+              onClick={() => onClose?.()}
+            />
+          </div>
         ) : null}
         {children}
       </div>
