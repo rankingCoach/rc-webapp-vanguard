@@ -17,9 +17,23 @@ export interface ModalHeaderProps {
   title?: string;
   titleTextType?: TextTypes;
   children?: React.ReactNode;
+  /**
+   * @deprecated The close button is now managed by `<Modal>`. Pass `onClose`
+   * to `<Modal>` instead of `closeFn` to `<ModalHeader>`. Kept for backwards
+   * compatibility.
+   */
   closeFn?: (response?: ModalResponse<any>) => void;
   className?: string;
+  /**
+   * @deprecated Use `<Modal hideCloseButtonOnMobile />`. The modal now owns its
+   * close button. Kept for backwards compatibility.
+   */
   hideCloseButtonOnMobile?: boolean;
+  /**
+   * @deprecated Use `<Modal showCloseButton={false} />` (or simply omit
+   * `onClose`). The modal now owns its close button. Kept for backwards
+   * compatibility.
+   */
   hideHeaderCloseBtn?: boolean;
   hideTypeIcon?: boolean;
   replacements?: TextReplacements;
