@@ -48,7 +48,7 @@
           border-radius: $x0_5;
           margin-left: $x1;
           margin-right: $x1;
-          background-color: var(--fn-bg-hov-i-gl);
+          background-color: rgba(var(--fn-bg-hov-i-gl-rgb), 0.2);
         }
 
         &.disabled {
