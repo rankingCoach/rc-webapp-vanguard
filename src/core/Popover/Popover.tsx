@@ -1,10 +1,12 @@
 import { useWindowResize } from '@custom-hooks/use-window.resize';
+import { uuidv4 } from '@helpers/generate-uid';
 import { Tooltip } from '@mui/material';
 import { TooltipClasses } from '@mui/material/Tooltip/tooltipClasses';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { PopoverPopper } from '@vanguard/Popover/PopoverPopper/PopoverPopper';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export type PopoverTheme = 'default' | 'dark';
 export type PopoverPosition = 'bottom' | 'top' | 'left' | 'right';
@@ -49,9 +51,32 @@ export const Popover = (props: PopoverProps) => {
   const width = useWindowResize();
   const [popoverOpen, setIsPopoverOpen] = useState<boolean>(false);
 
+  /**
+   * Tooltip popper stacking
+   * -------
+   * MUI's Tooltip portals to <body> with no z-index, so inside a stacked
+   * modal/drawer it paints *behind* the surface that opened it. Register a
+   * 'popover' slot on open and release it on close — same pattern as the
+   * Select dropdown in InputBase.
+   */
+  const popperIdRef = useRef<string>(`popover-popper-${uuidv4()}`);
+  const [popperZIndex, setPopperZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const openPopover = () => {
+    setPopperZIndex(OverlayStackingService.register(popperIdRef.current, 'popover'));
+    setIsPopoverOpen(true);
+  };
+  const closePopover = () => {
+    OverlayStackingService.unregister(popperIdRef.current);
+    setPopperZIndex(OVERLAY_BASE_Z_INDEX);
+    setIsPopoverOpen(false);
+  };
+  // Release the slot if the popover unmounts while still open.
+  useEffect(() => () => OverlayStackingService.unregister(popperIdRef.current), []);
+
   useEffect(() => {
     if (hideUnderBreakpoint && width < hideUnderBreakpoint) {
-      setIsPopoverOpen(false);
+      closePopover();
     }
   }, []);
   /**
@@ -105,7 +130,9 @@ export const Popover = (props: PopoverProps) => {
       open={popoverOpen}
       classes={className}
       PopperProps={{
-        style: { maxWidth: maxWidth },
+        // Override MUI's static tooltip z-index so the popper stacks above
+        // any modal/drawer it was opened from (see OverlayStackingService).
+        style: { maxWidth: maxWidth, zIndex: popperZIndex },
         className: theme === 'dark' ? 'MuiTooltip-popper-dark' : '',
         placement: position,
       }}
@@ -117,13 +144,13 @@ export const Popover = (props: PopoverProps) => {
       }}
       onMouseEnter={() => {
         if (hideUnderBreakpoint && width < hideUnderBreakpoint) {
-          setIsPopoverOpen(false);
+          closePopover();
           return;
         }
-        setIsPopoverOpen(true);
+        openPopover();
       }}
       onMouseLeave={() => {
-        setIsPopoverOpen(false);
+        closePopover();
       }}
     >
       {renderChildren()}

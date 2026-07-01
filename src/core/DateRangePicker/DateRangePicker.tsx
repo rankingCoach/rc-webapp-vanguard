@@ -5,10 +5,12 @@ import { useOutsideCallback } from '@custom-hooks/use-outside-callback';
 import { dFlex } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { dateIsBefore, dateIsSameDay } from '@helpers/date-helpers';
+import { uuidv4 } from '@helpers/generate-uid';
 import { Fade, Popper } from '@mui/material';
 import { translationService } from '@services/translation.service';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { DateRangePickerResp } from '@vanguard/DateRange/DateRange';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import {
   ensureIsRealDate,
   formatDateForComparison,
@@ -162,6 +164,29 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
    * Used to open/close the popover
    * */
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+
+  /**
+   * Popper stacking
+   * -------
+   * The dropdown below portals to <body> with no z-index, so inside a stacked
+   * modal/drawer it paints *behind* the surface that opened it. `open` is
+   * derived from several state setters, so we mirror the resolved boolean
+   * into an effect: register a 'popover' slot while open, release it on close
+   * — same pattern as the Select dropdown in InputBase.
+   */
+  const popperIdRef = useRef<string>(`date-range-picker-popper-${uuidv4()}`);
+  const [popperZIndex, setPopperZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+  const popperIsOpen = isPopoverOpen && !!anchorEl && !disabled;
+
+  useEffect(() => {
+    if (popperIsOpen) {
+      setPopperZIndex(OverlayStackingService.register(popperIdRef.current, 'popover'));
+    } else {
+      OverlayStackingService.unregister(popperIdRef.current);
+      setPopperZIndex(OVERLAY_BASE_Z_INDEX);
+    }
+    return () => OverlayStackingService.unregister(popperIdRef.current);
+  }, [popperIsOpen]);
   /**
    * Main ref of the component
    * */
@@ -615,10 +640,13 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
       </div>
 
       <Popper
-        open={isPopoverOpen && !!anchorEl && !disabled}
+        open={popperIsOpen}
         anchorEl={anchorEl}
         transition
         className={'date-range-picker-popper'}
+        // Override MUI's default z-index so the dropdown stacks above any
+        // modal/drawer it was opened from (see OverlayStackingService).
+        style={{ zIndex: popperZIndex }}
       >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={350}>
