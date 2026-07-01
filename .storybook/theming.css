@@ -3,3003 +3,3274 @@
 The purpose of this file is to implement all modifier functions in it so the main file is clean
 **/
 [data-lastpass-root] {
-    display: none;
+  display: none;
 }
 
 [data-lastpass-icon-root] {
-    display: none;
+  display: none;
 }
 
 :root {
-    color-scheme: light dark;
-    --color-scheme-is-dark: light-dark(0, 1);
-    --white: white;
-    --white-rgb: 255, 255, 255;
-    --black: #01040b;
-    --black-rgb: 1, 4, 11;
-    --brand-color: #0062ff;
-    --brand-color-rgb: 0, 98, 255;
-    --color-primary-lightness-multiplier: 1;
-    --p500: #0062ff;
-    --p500-rgb: 0, 98, 255;
-    --color-base-primary: #0062ff;
-    --color-base-primary-rgb: 0, 98, 255;
-    --i500: light-dark(#0062ff, #3696ff);
-    --i500-rgb: 0, 98, 255;
-    --color-base-info: light-dark(#0062ff, #3696ff);
-    --color-base-info-rgb: 0, 98, 255;
-    --n500: #506586;
-    --n500-rgb: 80, 101, 134;
-    --color-base-neutral: #506586;
-    --color-base-neutral-rgb: 80, 101, 134;
-    --s500: light-dark(#1ba138, #36c34f);
-    --s500-rgb: 27, 161, 56;
-    --color-base-success: light-dark(#1ba138, #36c34f);
-    --color-base-success-rgb: 27, 161, 56;
-    --e500: light-dark(#f44034, #ff5242);
-    --e500-rgb: 244, 64, 52;
-    --color-base-error: light-dark(#f44034, #ff5242);
-    --color-base-error-rgb: 244, 64, 52;
-    --w500: light-dark(#db7d0a, #ef8700);
-    --w500-rgb: 219, 125, 10;
-    --color-base-warning: light-dark(#db7d0a, #ef8700);
-    --color-base-warning-rgb: 219, 125, 10;
-    --a1-500: #3c28cc;
-    --a1-500-rgb: 60, 40, 204;
-    --color-base-a1: #3c28cc;
-    --color-base-a1-rgb: 60, 40, 204;
-    --a2-500: #ffd37a;
-    --a2-500-rgb: 255, 211, 122;
-    --color-base-a2: #ffd37a;
-    --color-base-a2-rgb: 255, 211, 122;
-    --a3-500: #ff1f6d;
-    --a3-500-rgb: 255, 31, 109;
-    --color-base-a3: #ff1f6d;
-    --color-base-a3-rgb: 255, 31, 109;
-    --a4-500: #399d8b;
-    --a4-500-rgb: 57, 157, 139;
-    --color-base-a4: #399d8b;
-    --color-base-a4-rgb: 57, 157, 139;
-    --base-op: #1036a8;
-    --base-op-rgb: 16, 54, 168;
-    --base-bm: #6f42c1;
-    --base-bm-rgb: 111, 66, 193;
-    --base-seo: #059669;
-    --base-seo-rgb: 5, 150, 105;
-    --base-wr: #ffc420;
-    --base-wr-rgb: 255, 196, 32;
-    --base-eng: #078688;
-    --base-eng-rgb: 7, 134, 136;
-    --base-ads: #b81450;
-    --base-ads-rgb: 184, 20, 80;
-    --ado-face-gradient-start: #00495d;
-    --ado-face-gradient-start-rgb: 0, 73, 93;
-    --ado-face-gradient-end: #12ffff;
-    --ado-face-gradient-end-rgb: 18, 255, 255;
-    --ado-face-feature: white;
-    --ado-face-feature-rgb: 255, 255, 255;
-    --ado-face-bubble-bg: rgba(0, 73, 93, 0.8);
-    --post-base-color: #0e549b;
-    --post-base-color-rgb: 14, 84, 155;
-    --event-base-color: #5b0297;
-    --event-base-color-rgb: 91, 2, 151;
-    --draft-base-color: #1a1919;
-    --draft-base-color-rgb: 26, 25, 25;
-    --boost-base-color: #d91c3f;
-    --boost-base-color-rgb: 217, 28, 63;
-    --email-brand: #0062ff;
-    --email-brand-rgb: 0, 98, 255;
-    --email-fn-cta-lightest: #f1f9ff;
-    --email-fn-cta-lightest-rgb: 241, 249, 255;
-    --email-fn-cta-light: #6db3ff;
-    --email-fn-cta-light-rgb: 109, 179, 255;
-    --email-fn-cta: #0062ff;
-    --email-fn-cta-rgb: 0, 98, 255;
-    --email-fn-cta-dark: #00369e;
-    --email-fn-cta-dark-rgb: 0, 54, 158;
-    --email-fn-bg: white;
-    --email-fn-bg-rgb: 255, 255, 255;
-    --email-fn-bg-var: #f6f9fc;
-    --email-fn-bg-var-rgb: 246, 249, 252;
-    --email-fn-fg: #263349;
-    --email-fn-fg-rgb: 38, 51, 73;
-    --email-fn-fg-on-cta: white;
-    --email-fn-fg-on-cta-rgb: 255, 255, 255;
-    --email-fn-fg-light: #506586;
-    --email-fn-fg-light-rgb: 80, 101, 134;
-    --email-fn-fg-lightest: #869cc0;
-    --email-fn-fg-lightest-rgb: 134, 156, 192;
-    --email-fn-brd: #b9c5d8;
-    --email-fn-brd-rgb: 185, 197, 216;
-    --email-fn-divider: #e6eaf0;
-    --email-fn-divider-rgb: 230, 234, 240;
-    --email-background: #f6f9fc;
-    --email-background-rgb: 246, 249, 252;
-    --email-content-background: #f6f9fc;
-    --email-content-background-rgb: 246, 249, 252;
-    --email-content-padding: 0px 4px;
-    --email-warning-lightest: #fff1e3;
-    --email-warning-lightest-rgb: 255, 241, 227;
-    --email-warning-dark: #db7d0a;
-    --email-warning-dark-rgb: 219, 125, 10;
-    --email-warning-darkest: #661b00;
-    --email-warning-darkest-rgb: 102, 27, 0;
-    --email-error-lightest: #ffece6;
-    --email-error-lightest-rgb: 255, 236, 230;
-    --email-error-dark: #f44034;
-    --email-error-dark-rgb: 244, 64, 52;
-    --email-error-darkest: #651913;
-    --email-error-darkest-rgb: 101, 25, 19;
-    --email-success-lightest: #e8fce8;
-    --email-success-lightest-rgb: 232, 252, 232;
-    --email-success-light: #36c34f;
-    --email-success-light-rgb: 54, 195, 79;
-    --email-success-dark: #1ba138;
-    --email-success-dark-rgb: 27, 161, 56;
-    --email-success-darkest: #0f4418;
-    --email-success-darkest-rgb: 15, 68, 24;
-    --email-info-lightest: #e5f6ff;
-    --email-info-lightest-rgb: 229, 246, 255;
-    --email-info-dark: #0062ff;
-    --email-info-dark-rgb: 0, 98, 255;
-    --email-info-darkest: #0e3376;
-    --email-info-darkest-rgb: 14, 51, 118;
-    --email-ai-light: #f5f8ff;
-    --email-ai-light-rgb: 245, 248, 255;
-    --email-ai-dark: #3920c8;
-    --email-ai-dark-rgb: 57, 32, 200;
-    --email-acc02-darkest: #ffc22b;
-    --email-acc02-darkest-rgb: 255, 194, 43;
-    --email-header-version: 1;
-    --email-header-gradient-version: none;
-    --email-header-theme-mode: light;
-    --email-header-additional-information: date;
-    --email-header-fn-fg: #263349;
-    --email-header-fn-fg-rgb: 38, 51, 73;
-    --email-header-fn-bg: #f6f9fc;
-    --email-header-fn-bg-rgb: 246, 249, 252;
-    --email-footer-version: 1;
-    --email-footer-theme-mode: light;
-    --email-footer-display-logo: bottom;
-    --email-footer-fg-main: #263349;
-    --email-footer-fg-main-rgb: 38, 51, 73;
-    --email-footer-bg-main: white;
-    --email-footer-bg-main-rgb: 255, 255, 255;
-    --email-footer-fg-light-main: #506586;
-    --email-footer-fg-light-main-rgb: 80, 101, 134;
-    --email-footer-fg-lightest-main: #869cc0;
-    --email-footer-fg-lightest-main-rgb: 134, 156, 192;
-    --email-footer-bg-accent: #0062ff;
-    --email-footer-bg-accent-rgb: 0, 98, 255;
-    --email-footer-fg-on-bg-accent: white;
-    --email-footer-fg-on-bg-accent-rgb: 255, 255, 255;
-    --email-footer-bg-accent2: #f6f9fc;
-    --email-footer-bg-accent2-rgb: 246, 249, 252;
-    --email-footer-fg-on-bg-accent2: #506586;
-    --email-footer-fg-on-bg-accent2-rgb: 80, 101, 134;
-    --email-footer-cta-fg-on-bg-accent2: #0062ff;
-    --email-footer-cta-fg-on-bg-accent2-rgb: 0, 98, 255;
-    --email-button-primary-bg: #0062ff;
-    --email-button-primary-bg-rgb: 0, 98, 255;
-    --email-button-primary-fg: white;
-    --email-button-primary-fg-rgb: 255, 255, 255;
-    --email-button-primary-border: #0062ff;
-    --email-button-primary-border-rgb: 0, 98, 255;
-    --email-button-default-bg: white;
-    --email-button-default-bg-rgb: 255, 255, 255;
-    --email-button-default-fg: #0062ff;
-    --email-button-default-fg-rgb: 0, 98, 255;
-    --email-button-default-border: white;
-    --email-button-default-border-rgb: 255, 255, 255;
-    --email-button-border-radius: 4px;
-    --review-booster-pm-1-text: white;
-    --review-booster-pm-1-text-rgb: 255, 255, 255;
-    --review-booster-pm-1-background: rgba(1, 4, 11, 0.7);
-    --review-booster-pm-1-qr-code: black;
-    --review-booster-pm-1-qr-code-rgb: 0, 0, 0;
-    --review-booster-pm-2-text: #263349;
-    --review-booster-pm-2-text-rgb: 38, 51, 73;
-    --review-booster-pm-2-background: white;
-    --review-booster-pm-2-background-rgb: 255, 255, 255;
-    --review-booster-pm-2-stroke: linear-gradient(133.06deg, #f1f9ff 0%, #b8d9ff 100%);
-    --review-booster-pm-2-qr-code: black;
-    --review-booster-pm-2-qr-code-rgb: 0, 0, 0;
-    --heading-typeface: 'Inter', sans-serif;
-    --heading-color: light-dark(#263349, #f6f9fc);
-    --heading-color-rgb: 38, 51, 73;
-    --text-typeface: 'Inter', sans-serif;
-    --text-color: light-dark(#263349, #f6f9fc);
-    --text-color-rgb: 38, 51, 73;
-    --em-color: light-dark(#0062ff, #6db3ff);
-    --em-color-rgb: 0, 98, 255;
-    --header-color: light-dark(white, #18212f);
-    --header-color-rgb: 255, 255, 255;
-    --header-opacity: 0.8;
-    --header-button-secondary-text-color: light-dark(#263349, #f6f9fc);
-    --header-button-secondary-text-color-rgb: 38, 51, 73;
-    --header-button-secondary-background-color: light-dark(white, #18212f);
-    --header-button-secondary-background-color-rgb: 255, 255, 255;
-    --header-button-secondary-border-color: light-dark(#b9c5d8, #263349);
-    --header-button-secondary-border-color-rgb: 185, 197, 216;
-    --header-button-secondary-hover-text-color: light-dark(#0062ff, #6db3ff);
-    --header-button-secondary-hover-text-color-rgb: 0, 98, 255;
-    --header-button-secondary-hover-background-color: light-dark(#f6f9fc, #01040b);
-    --header-button-secondary-hover-background-color-rgb: 246, 249, 252;
-    --header-button-secondary-hover-border-color: light-dark(#b9c5d8, #263349);
-    --header-button-secondary-hover-border-color-rgb: 185, 197, 216;
-    --header-button-secondary-disabled-text-color: light-dark(#263349, #f6f9fc);
-    --header-button-secondary-disabled-text-color-rgb: 38, 51, 73;
-    --header-button-secondary-disabled-background-color: light-dark(white, #18212f);
-    --header-button-secondary-disabled-background-color-rgb: 255, 255, 255;
-    --header-button-secondary-disabled-border-color: light-dark(#b9c5d8, #263349);
-    --header-button-secondary-disabled-border-color-rgb: 185, 197, 216;
-    --header-button-secondary-focus-text-color: light-dark(#263349, #f6f9fc);
-    --header-button-secondary-focus-text-color-rgb: 38, 51, 73;
-    --header-button-secondary-focus-background-color: light-dark(white, #18212f);
-    --header-button-secondary-focus-background-color-rgb: 255, 255, 255;
-    --header-button-secondary-focus-border-color: light-dark(#b9c5d8, #263349);
-    --header-button-secondary-focus-border-color-rgb: 185, 197, 216;
-    --header-button-secondary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
-    --header-button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
-    --header-button-secondary-ripple-color: light-dark(#0062ff, #358cff);
-    --header-button-secondary-ripple-color-rgb: 0, 98, 255;
-    --header-logo: url("/jump/img/logo_new_layout.svg");
-    --header-logo-mobile: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-vision: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-adcoach-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-adcoach-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-adcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-listingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-vision-easylisting-listingcoach-rankingcoach-adcoach: url("/jump/img/logo_new_layout.svg");
-    --header-logo-360: url("/vanguard/assets/images/rc-360-logo.svg");
-    --logo-height: 22px;
-    --logo-height-tablet: 22px;
-    --logo-height-mobile: 22px;
-    --logo-height-vision: 22px;
-    --logo-height-adcoach: 22px;
-    --logo-height-listingcoach: 22px;
-    --logo-height-rankingcoach: 22px;
-    --logo-height-social: 22px;
-    --logo-height-reviews: 22px;
-    --logo-height-vision-adcoach: 22px;
-    --logo-height-vision-listingcoach: 22px;
-    --logo-height-vision-rankingcoach: 22px;
-    --logo-height-adcoach-listingcoach: 22px;
-    --logo-height-adcoach-rankingcoach: 22px;
-    --logo-height-listingcoach-rankingcoach: 22px;
-    --logo-height-vision-social: 22px;
-    --logo-height-vision-reviews: 22px;
-    --logo-height-vision-listingcoach-rankingcoach: 22px;
-    --logo-height-vision-adcoach-rankingcoach: 22px;
-    --logo-height-vision-adcoach-listingcoach: 22px;
-    --logo-height-vision-adcoach-reviews: 22px;
-    --logo-height-vision-adcoach-social: 22px;
-    --logo-height-vision-listingcoach-reviews: 22px;
-    --logo-height-vision-listingcoach-social: 22px;
-    --logo-height-vision-rankingcoach-reviews: 22px;
-    --logo-height-vision-rankingcoach-social: 22px;
-    --logo-height-vision-social-reviews: 22px;
-    --logo-height-vision-adcoach-listingcoach-reviews: 22px;
-    --logo-height-vision-adcoach-listingcoach-social: 22px;
-    --logo-height-vision-adcoach-rankingcoach-reviews: 22px;
-    --logo-height-vision-adcoach-rankingcoach-social: 22px;
-    --logo-height-vision-adcoach-social-reviews: 22px;
-    --logo-height-vision-listingcoach-rankingcoach-reviews: 22px;
-    --logo-height-vision-listingcoach-rankingcoach-social: 22px;
-    --logo-height-vision-listingcoach-social-reviews: 22px;
-    --logo-height-vision-rankingcoach-social-reviews: 22px;
-    --logo-height-vision-adcoach-listingcoach-rankingcoach-reviews: 22px;
-    --logo-height-vision-adcoach-listingcoach-rankingcoach-social: 22px;
-    --logo-height-vision-adcoach-listingcoach-social-reviews: 22px;
-    --logo-height-vision-adcoach-rankingcoach-social-reviews: 22px;
-    --logo-height-vision-listingcoach-rankingcoach-social-reviews: 22px;
-    --logo-height-vision-adcoach-listingcoach-rankingcoach-social-reviews: 22px;
-    --logo-height-360: 22px;
-    --header-height: 54px;
-    --header-height-tablet: 54px;
-    --header-height-mobile: 54px;
-    --heading-weight-bold: 700;
-    --heading-V700-weight-autogen: 700;
-    --heading-V700-src-autogen: "/vanguard/assets/fonts/Inter-Bold.woff2";
-    --heading-weight-medium: 500;
-    --heading-V500-weight-autogen: 500;
-    --heading-V500-src-autogen: "/vanguard/assets/fonts/Inter-Medium.woff2";
-    --heading-weight-regular: 400;
-    --heading-V400-weight-autogen: 400;
-    --heading-V400-src-autogen: "/vanguard/assets/fonts/Inter-Regular.woff2";
-    --theme-weight-bold: 700;
-    --V700-weight-autogen: 700;
-    --V700-src-autogen: "/vanguard/assets/fonts/Inter-Bold.woff2";
-    --theme-weight-medium: 500;
-    --V500-weight-autogen: 500;
-    --V500-src-autogen: "/vanguard/assets/fonts/Inter-Medium.woff2";
-    --theme-weight-regular: 400;
-    --V400-weight-autogen: 400;
-    --V400-src-autogen: "/vanguard/assets/fonts/Inter-Regular.woff2";
-    --font-name: "Inter";
-    --theme-typeface: 'Inter', sans-serif;
-    --heading-font-name: "Inter";
-    --buttons-typeface: 'Inter', sans-serif;
-    --buttons-border-radius: 4px;
-    --button-default-text-color: light-dark(#0062ff, #6db3ff);
-    --button-default-text-color-rgb: 0, 98, 255;
-    --button-default-background-color: light-dark(white, #090d17);
-    --button-default-background-color-rgb: 255, 255, 255;
-    --button-default-hover-text-color: light-dark(#00369e, #358cff);
-    --button-default-hover-text-color-rgb: 0, 54, 158;
-    --button-default-hover-background-color: light-dark(#f6f9fc, #01040b);
-    --button-default-hover-background-color-rgb: 246, 249, 252;
-    --button-default-disabled-text-color: light-dark(#263349, #f6f9fc);
-    --button-default-disabled-text-color-rgb: 38, 51, 73;
-    --button-default-disabled-background-color: rgba(0, 0, 0, 0);
-    --button-default-disabled-background-color-rgb: 0, 0, 0;
-    --button-default-focus-text-color: light-dark(#0062ff, #6db3ff);
-    --button-default-focus-text-color-rgb: 0, 98, 255;
-    --button-default-focus-background-color: rgba(0, 0, 0, 0);
-    --button-default-focus-background-color-rgb: 0, 0, 0;
-    --button-default-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
-    --button-default-focus-box-shadow-color-rgb: 184, 217, 255;
-    --button-default-ripple-color: light-dark(#0062ff, #358cff);
-    --button-default-ripple-color-rgb: 0, 98, 255;
-    --button-primary-text-color: white;
-    --button-primary-text-color-rgb: 255, 255, 255;
-    --button-primary-background-color: light-dark(#0062ff, #358cff);
-    --button-primary-background-color-rgb: 0, 98, 255;
-    --button-primary-hover-text-color: white;
-    --button-primary-hover-text-color-rgb: 255, 255, 255;
-    --button-primary-hover-background-color: #0e52ca;
-    --button-primary-hover-background-color-rgb: 14, 82, 202;
-    --button-primary-disabled-text-color: white;
-    --button-primary-disabled-text-color-rgb: 255, 255, 255;
-    --button-primary-disabled-background-color: light-dark(#869cc0, #263349);
-    --button-primary-disabled-background-color-rgb: 134, 156, 192;
-    --button-primary-focus-text-color: white;
-    --button-primary-focus-text-color-rgb: 255, 255, 255;
-    --button-primary-focus-background-color: light-dark(#0062ff, #358cff);
-    --button-primary-focus-background-color-rgb: 0, 98, 255;
-    --button-primary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
-    --button-primary-focus-box-shadow-color-rgb: 184, 217, 255;
-    --button-primary-ripple-color: light-dark(#b8d9ff, #000335);
-    --button-primary-ripple-color-rgb: 184, 217, 255;
-    --button-secondary-text-color: light-dark(#263349, #f6f9fc);
-    --button-secondary-text-color-rgb: 38, 51, 73;
-    --button-secondary-no-border-text-color: light-dark(#506586, #b9c5d8);
-    --button-secondary-no-border-text-color-rgb: 80, 101, 134;
-    --button-secondary-background-color: light-dark(white, #18212f);
-    --button-secondary-background-color-rgb: 255, 255, 255;
-    --button-secondary-border-color: light-dark(#b9c5d8, #263349);
-    --button-secondary-border-color-rgb: 185, 197, 216;
-    --button-secondary-hover-text-color: light-dark(#0062ff, #6db3ff);
-    --button-secondary-hover-text-color-rgb: 0, 98, 255;
-    --button-secondary-hover-background-color: light-dark(#f6f9fc, #01040b);
-    --button-secondary-hover-background-color-rgb: 246, 249, 252;
-    --button-secondary-hover-border-color: light-dark(#b9c5d8, #263349);
-    --button-secondary-hover-border-color-rgb: 185, 197, 216;
-    --button-secondary-disabled-text-color: light-dark(#263349, #f6f9fc);
-    --button-secondary-disabled-text-color-rgb: 38, 51, 73;
-    --button-secondary-disabled-background-color: light-dark(white, #18212f);
-    --button-secondary-disabled-background-color-rgb: 255, 255, 255;
-    --button-secondary-disabled-border-color: light-dark(#b9c5d8, #263349);
-    --button-secondary-disabled-border-color-rgb: 185, 197, 216;
-    --button-secondary-focus-text-color: light-dark(#263349, #f6f9fc);
-    --button-secondary-focus-text-color-rgb: 38, 51, 73;
-    --button-secondary-focus-background-color: light-dark(white, #18212f);
-    --button-secondary-focus-background-color-rgb: 255, 255, 255;
-    --button-secondary-focus-border-color: light-dark(#b9c5d8, #263349);
-    --button-secondary-focus-border-color-rgb: 185, 197, 216;
-    --button-secondary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
-    --button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
-    --button-secondary-ripple-color: light-dark(#0062ff, #358cff);
-    --button-secondary-ripple-color-rgb: 0, 98, 255;
-    --button-shimmer-text-color: white;
-    --button-shimmer-text-color-rgb: 255, 255, 255;
-    --button-shimmer-background-color: light-dark(#3920c8, #93a1ff);
-    --button-shimmer-background-color-rgb: 57, 32, 200;
-    --button-shimmer-hover-text-color: white;
-    --button-shimmer-hover-text-color-rgb: 255, 255, 255;
-    --button-shimmer-hover-background-color: light-dark(#21008d, #f5f8ff);
-    --button-shimmer-hover-background-color-rgb: 33, 0, 141;
-    --button-shimmer-disabled-text-color: white;
-    --button-shimmer-disabled-text-color-rgb: 255, 255, 255;
-    --button-shimmer-disabled-background-color: light-dark(#869cc0, #263349);
-    --button-shimmer-disabled-background-color-rgb: 134, 156, 192;
-    --button-shimmer-focus-text-color: white;
-    --button-shimmer-focus-text-color-rgb: 255, 255, 255;
-    --button-shimmer-focus-background-color: light-dark(#0062ff, #358cff);
-    --button-shimmer-focus-background-color-rgb: 0, 98, 255;
-    --button-shimmer-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
-    --button-shimmer-focus-box-shadow-color-rgb: 184, 217, 255;
-    --button-shimmer-ripple-color: light-dark(#b8d9ff, #000335);
-    --button-shimmer-ripple-color-rgb: 184, 217, 255;
-    --button-muted-text-color: light-dark(#263349, #f6f9fc);
-    --button-muted-text-color-rgb: 38, 51, 73;
-    --button-muted-background-color: rgba(1, 4, 11, 0.02);
-    --button-muted-hover-text-color: light-dark(#263349, #f6f9fc);
-    --button-muted-hover-text-color-rgb: 38, 51, 73;
-    --button-muted-disabled-text-color: light-dark(#263349, #f6f9fc);
-    --button-muted-disabled-text-color-rgb: 38, 51, 73;
-    --button-muted-hover-background-color: rgba(1, 4, 11, 0.02);
-    --button-muted-disabled-background-color: rgba(1, 4, 11, 0.02);
-    --button-muted-focus-box-shadow-color: #99c0ff;
-    --button-muted-focus-box-shadow-color-rgb: 153, 192, 255;
-    --button-muted-inverted-text-color: white;
-    --button-muted-inverted-text-color-rgb: 255, 255, 255;
-    --button-muted-inverted-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
-    --button-muted-inverted-hover-text-color: white;
-    --button-muted-inverted-hover-text-color-rgb: 255, 255, 255;
-    --button-muted-inverted-disabled-text-color: white;
-    --button-muted-inverted-disabled-text-color-rgb: 255, 255, 255;
-    --button-muted-inverted-hover-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
-    --button-muted-inverted-disabled-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
-    --button-muted-inverted-focus-box-shadow-color: #99c0ff;
-    --button-muted-inverted-focus-box-shadow-color-rgb: 153, 192, 255;
-    --icon-font-family: rc-Icons;
-    --nav-side-fg: light-dark(#506586, #b9c5d8);
-    --nav-side-fg-rgb: 80, 101, 134;
-    --nav-side-bg: light-dark(rgba(255, 255, 255, 0), rgba(9, 13, 23, 0));
-    --nav-side-fg-hover: light-dark(#263349, #f6f9fc);
-    --nav-side-fg-hover-rgb: 38, 51, 73;
-    --nav-side-bg-hover: light-dark(rgba(0, 98, 255, 0.05), rgba(53, 140, 255, 0.05));
-    --nav-side-fg-selected: light-dark(#00369e, #358cff);
-    --nav-side-fg-selected-rgb: 0, 54, 158;
-    --nav-side-collapse-fg: light-dark(#263349, #f6f9fc);
-    --nav-side-collapse-fg-rgb: 38, 51, 73;
-    --nav-side-collapse-bg-hover: rgba(80, 101, 134, 0.1);
-    --nav-side-notif-bg-tasks: light-dark(#93a1ff, #3920c8);
-    --nav-side-notif-bg-tasks-rgb: 147, 161, 255;
-    --nav-side-notif-bg: light-dark(#f50065, #ff5b94);
-    --nav-side-notif-bg-rgb: 245, 0, 101;
-    --nav-side-notif-fg: white;
-    --nav-side-notif-fg-rgb: 255, 255, 255;
-    --nav-side-powered-by-display: none;
-    --nav-side-powered-by-max-height: unset;
-    --fn-bg: light-dark(white, #090d17);
-    --fn-bg-rgb: 255, 255, 255;
-    --fn-bg-var: light-dark(#f6f9fc, #01040b);
-    --fn-bg-var-rgb: 246, 249, 252;
-    --fn-bg-surface: light-dark(white, #18212f);
-    --fn-bg-surface-rgb: 255, 255, 255;
-    --fn-bg-cta: light-dark(#0062ff, #358cff);
-    --fn-bg-cta-rgb: 0, 98, 255;
-    --fn-fg-cta: light-dark(#0062ff, #6db3ff);
-    --fn-fg-cta-rgb: 0, 98, 255;
-    --fn-fg-cta-hov: light-dark(#00369e, #358cff);
-    --fn-fg-cta-hov-rgb: 0, 54, 158;
-    --fn-bg-cta-fg: white;
-    --fn-bg-cta-fg-rgb: 255, 255, 255;
-    --fn-bg-cta-fg-hov: rgba(255, 255, 255, 0.7);
-    --fn-fg: light-dark(#263349, #f6f9fc);
-    --fn-fg-rgb: 38, 51, 73;
-    --fn-fg-light: light-dark(#506586, #b9c5d8);
-    --fn-fg-light-rgb: 80, 101, 134;
-    --fn-fg-lightest: light-dark(#869cc0, #506586);
-    --fn-fg-lightest-rgb: 134, 156, 192;
-    --fn-fg-on-dark: white;
-    --fn-fg-on-dark-rgb: 255, 255, 255;
-    --fn-brd-gl: light-dark(#b9c5d8, #263349);
-    --fn-brd-gl-rgb: 185, 197, 216;
-    --fn-divider-gl: light-dark(#e6eaf0, #18212f);
-    --fn-divider-gl-rgb: 230, 234, 240;
-    --fn-bg-hov-n-gl: light-dark(#b9c5d8, #18212f);
-    --fn-bg-hov-n-gl-rgb: 185, 197, 216;
-    --fn-bg-hov-p-gl: light-dark(#b8d9ff, #000335);
-    --fn-bg-hov-p-gl-rgb: 184, 217, 255;
-    --fn-bg-frost: light-dark(rgba(255, 255, 255, 0.3), rgba(9, 13, 23, 0.3));
-    --fn-bg-cta-hov: light-dark(#00369e, #0e52ca);
-    --fn-bg-cta-hov-rgb: 0, 54, 158;
-    --fn-bg-disabled: light-dark(#869cc0, #263349);
-    --fn-bg-disabled-rgb: 134, 156, 192;
-    --fn-fg-on-dark-hov: rgba(255, 255, 255, 0.7);
-    --fn-fg-on-dark-light: #b9c5d8;
-    --fn-fg-on-dark-light-rgb: 185, 197, 216;
-    --fn-fg-on-dark-lightest: #c5cedd;
-    --fn-fg-on-dark-lightest-rgb: 197, 206, 221;
-    --fn-bg-on-dark: light-dark(white, #18212f);
-    --fn-bg-on-dark-rgb: 255, 255, 255;
-    --fn-bg-on-dark-hover: light-dark(rgba(255, 255, 255, 0.7), rgba(24, 33, 47, 0.7));
-    --fn-bg-hov-i-gl: white;
-    --fn-bg-hov-i-gl-rgb: 255, 255, 255;
-    --fn-bg-dark: #01040b;
-    --fn-bg-dark-rgb: 1, 4, 11;
-    --fn-shadow: #01040b;
-    --fn-shadow-rgb: 1, 4, 11;
-    --fn-bg-rating-stars: #ffc22b;
-    --fn-bg-rating-stars-rgb: 255, 194, 43;
-    --sc-charts-01: #0062ff;
-    --sc-charts-01-rgb: 0, 98, 255;
-    --sc-charts-01-op10: rgba(0, 98, 255, 0.1);
-    --sc-charts-01-op50: rgba(0, 98, 255, 0.5);
-    --sc-charts-02: light-dark(#ffc22b, #fff7e7);
-    --sc-charts-02-rgb: 255, 194, 43;
-    --sc-charts-02-op10: light-dark(rgba(255, 194, 43, 0.1), rgba(255, 247, 231, 0.1));
-    --sc-charts-02-op50: light-dark(rgba(255, 194, 43, 0.5), rgba(255, 247, 231, 0.5));
-    --sc-charts-03: light-dark(#36c34f, #1ba138);
-    --sc-charts-03-rgb: 54, 195, 79;
-    --sc-charts-03-op10: light-dark(rgba(54, 195, 79, 0.1), rgba(27, 161, 56, 0.1));
-    --sc-charts-04: light-dark(#f50065, #ff5b94);
-    --sc-charts-04-rgb: 245, 0, 101;
-    --sc-charts-04-op10: light-dark(rgba(245, 0, 101, 0.1), rgba(255, 91, 148, 0.1));
-    --sc-charts-05: #0e52ca;
-    --sc-charts-05-rgb: 14, 82, 202;
-    --sc-charts-05-op10: rgba(14, 82, 202, 0.1);
-    --sc-charts-06: #358cff;
-    --sc-charts-06-rgb: 53, 140, 255;
-    --sc-charts-06-op10: rgba(53, 140, 255, 0.1);
-    --sc-charts-07: #b8d9ff;
-    --sc-charts-07-rgb: 184, 217, 255;
-    --sc-charts-07-op10: rgba(184, 217, 255, 0.1);
-    --sc-charts-08: light-dark(#21008d, #f5f8ff);
-    --sc-charts-08-rgb: 33, 0, 141;
-    --sc-charts-08-op10: light-dark(rgba(33, 0, 141, 0.1), rgba(245, 248, 255, 0.1));
-    --sc-charts-09: light-dark(#3920c8, #93a1ff);
-    --sc-charts-09-rgb: 57, 32, 200;
-    --sc-charts-09-op10: light-dark(rgba(57, 32, 200, 0.1), rgba(147, 161, 255, 0.1));
-    --sc-charts-10: light-dark(#93a1ff, #3920c8);
-    --sc-charts-10-rgb: 147, 161, 255;
-    --sc-charts-10-op10: light-dark(rgba(147, 161, 255, 0.1), rgba(57, 32, 200, 0.1));
-    --sc-charts-11: light-dark(#f44034, #ff5242);
-    --sc-charts-11-rgb: 244, 64, 52;
-    --sc-charts-11-op10: light-dark(rgba(244, 64, 52, 0.1), rgba(255, 82, 66, 0.1));
-    --ai-base-color: light-dark(#0062ff, #358cff);
-    --ai-base-color-rgb: 0, 98, 255;
-    --header-logo-mobile-vision: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-adcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-vision-adcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-vision-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-vision-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-adcoach-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-vision-adcoach-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-adcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-listingcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --header-logo-mobile-360: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
-    --p100: #f1f9ff;
-    --p100-rgb: 241, 249, 255;
-    --p200: #b8d9ff;
-    --p200-rgb: 184, 217, 255;
-    --p300: #6db3ff;
-    --p300-rgb: 109, 179, 255;
-    --p400: #358cff;
-    --p400-rgb: 53, 140, 255;
-    --p600: #0e52ca;
-    --p600-rgb: 14, 82, 202;
-    --p700: #00369e;
-    --p700-rgb: 0, 54, 158;
-    --p800: #001a5e;
-    --p800-rgb: 0, 26, 94;
-    --p900: #000335;
-    --p900-rgb: 0, 3, 53;
-    --i100: light-dark(#e5f6ff, #0e3376);
-    --i100-rgb: 229, 246, 255;
-    --i400: light-dark(#3696ff, #0062ff);
-    --i400-rgb: 54, 150, 255;
-    --i900: light-dark(#0e3376, #e5f6ff);
-    --i900-rgb: 14, 51, 118;
-    --n000: white;
-    --n000-rgb: 255, 255, 255;
-    --n100: #f6f9fc;
-    --n100-rgb: 246, 249, 252;
-    --n200: #e6eaf0;
-    --n200-rgb: 230, 234, 240;
-    --n300: #b9c5d8;
-    --n300-rgb: 185, 197, 216;
-    --n400: #869cc0;
-    --n400-rgb: 134, 156, 192;
-    --n600: #41506a;
-    --n600-rgb: 65, 80, 106;
-    --n700: #263349;
-    --n700-rgb: 38, 51, 73;
-    --n800: #18212f;
-    --n800-rgb: 24, 33, 47;
-    --n900: #01040b;
-    --n900-rgb: 1, 4, 11;
-    --s100: light-dark(#e8fce8, #0f4418);
-    --s100-rgb: 232, 252, 232;
-    --s400: light-dark(#36c34f, #1ba138);
-    --s400-rgb: 54, 195, 79;
-    --s900: light-dark(#0f4418, #e8fce8);
-    --s900-rgb: 15, 68, 24;
-    --w100: light-dark(#fff1e3, #661b00);
-    --w100-rgb: 255, 241, 227;
-    --w400: light-dark(#ef8700, #db7d0a);
-    --w400-rgb: 239, 135, 0;
-    --w900: light-dark(#661b00, #fff1e3);
-    --w900-rgb: 102, 27, 0;
-    --e100: light-dark(#ffece6, #651913);
-    --e100-rgb: 255, 236, 230;
-    --e400: light-dark(#ff5242, #f44034);
-    --e400-rgb: 255, 82, 66;
-    --e900: light-dark(#651913, #ffece6);
-    --e900-rgb: 101, 25, 19;
-    --a1100: light-dark(#f5f8ff, #21008d);
-    --a1100-rgb: 245, 248, 255;
-    --a1300: light-dark(#93a1ff, #3920c8);
-    --a1300-rgb: 147, 161, 255;
-    --a1500: light-dark(#3920c8, #93a1ff);
-    --a1500-rgb: 57, 32, 200;
-    --a1900: light-dark(#21008d, #f5f8ff);
-    --a1900-rgb: 33, 0, 141;
-    --a2100: light-dark(#fff7e7, #ffc22b);
-    --a2100-rgb: 255, 247, 231;
-    --a2300: light-dark(#ffe7ab, #ffcf5e);
-    --a2300-rgb: 255, 231, 171;
-    --a2400: #ffdb88;
-    --a2400-rgb: 255, 219, 136;
-    --a2500: light-dark(#ffcf5e, #ffe7ab);
-    --a2500-rgb: 255, 207, 94;
-    --a2900: light-dark(#ffc22b, #fff7e7);
-    --a2900-rgb: 255, 194, 43;
-    --a3100: light-dark(#fff3f5, #da0051);
-    --a3100-rgb: 255, 243, 245;
-    --a3300: light-dark(#ff5b94, #f50065);
-    --a3300-rgb: 255, 91, 148;
-    --a3400: #ff397c;
-    --a3400-rgb: 255, 57, 124;
-    --a3500: light-dark(#f50065, #ff5b94);
-    --a3500-rgb: 245, 0, 101;
-    --a3900: light-dark(#da0051, #fff3f5);
-    --a3900-rgb: 218, 0, 81;
-    --a4100: light-dark(#f3faf8, #128472);
-    --a4100-rgb: 243, 250, 248;
-    --a4300: light-dark(#6accb8, #329987);
-    --a4300-rgb: 106, 204, 184;
-    --a4500: light-dark(#329987, #6accb8);
-    --a4500-rgb: 50, 153, 135;
-    --a4900: light-dark(#128472, #f3faf8);
-    --a4900-rgb: 18, 132, 114;
-    --seo50: #e9fff6;
-    --seo50-rgb: 233, 255, 246;
-    --seo100: #ddffed;
-    --seo100-rgb: 221, 255, 237;
-    --seo200: #c2f6dc;
-    --seo200-rgb: 194, 246, 220;
-    --seo300: #69cfa2;
-    --seo300-rgb: 105, 207, 162;
-    --seo400: #00b16d;
-    --seo400-rgb: 0, 177, 109;
-    --seo500: #005732;
-    --seo500-rgb: 0, 87, 50;
-    --seo600: #004b28;
-    --seo600-rgb: 0, 75, 40;
-    --seo700: #003b20;
-    --seo700-rgb: 0, 59, 32;
-    --seo800: #142620;
-    --seo800-rgb: 20, 38, 32;
-    --seo-accent50: #fff4f2;
-    --seo-accent50-rgb: 255, 244, 242;
-    --seo-accent200: #c6fba2;
-    --seo-accent200-rgb: 198, 251, 162;
-    --seo-accent400: #9dcf78;
-    --seo-accent400-rgb: 157, 207, 120;
-    --seo-accent600: #8dbf69;
-    --seo-accent600-rgb: 141, 191, 105;
-    --seo-accent800: #52812a;
-    --seo-accent800-rgb: 82, 129, 42;
-    --wr50: #fffadc;
-    --wr50-rgb: 255, 250, 220;
-    --wr100: #fff3cb;
-    --wr100-rgb: 255, 243, 203;
-    --wr200: #ffe4a7;
-    --wr200-rgb: 255, 228, 167;
-    --wr300: #e3ae20;
-    --wr300-rgb: 227, 174, 32;
-    --wr400: #d27800;
-    --wr400-rgb: 210, 120, 0;
-    --wr500: #6a3800;
-    --wr500-rgb: 106, 56, 0;
-    --wr600: #5d2e00;
-    --wr600-rgb: 93, 46, 0;
-    --wr700: #482500;
-    --wr700-rgb: 72, 37, 0;
-    --wr800: #27220e;
-    --wr800-rgb: 39, 34, 14;
-    --wr-accent50: #fff5ff;
-    --wr-accent50-rgb: 255, 245, 255;
-    --wr-accent200: #ffc770;
-    --wr-accent200-rgb: 255, 199, 112;
-    --wr-accent400: #ff9d42;
-    --wr-accent400-rgb: 255, 157, 66;
-    --wr-accent600: #fc8d2e;
-    --wr-accent600-rgb: 252, 141, 46;
-    --wr-accent800: #b84e00;
-    --wr-accent800-rgb: 184, 78, 0;
-    --ads50: #ffeff5;
-    --ads50-rgb: 255, 239, 245;
-    --ads100: #ffe4ed;
-    --ads100-rgb: 255, 228, 237;
-    --ads200: #ffcddb;
-    --ads200-rgb: 255, 205, 219;
-    --ads300: #ff81a2;
-    --ads300-rgb: 255, 129, 162;
-    --ads400: #ff006d;
-    --ads400-rgb: 255, 0, 109;
-    --ads500: #8b0032;
-    --ads500-rgb: 139, 0, 50;
-    --ads600: #7b0029;
-    --ads600-rgb: 123, 0, 41;
-    --ads700: #5f0021;
-    --ads700-rgb: 95, 0, 33;
-    --ads800: #321a1a;
-    --ads800-rgb: 50, 26, 26;
-    --ads-accent50: #dbffff;
-    --ads-accent50-rgb: 219, 255, 255;
-    --ads-accent200: #ffb1ff;
-    --ads-accent200-rgb: 255, 177, 255;
-    --ads-accent400: #ff87e8;
-    --ads-accent400-rgb: 255, 135, 232;
-    --ads-accent600: #f976d8;
-    --ads-accent600-rgb: 249, 118, 216;
-    --ads-accent800: #b43598;
-    --ads-accent800-rgb: 180, 53, 152;
-    --op50: #ecfcff;
-    --op50-rgb: 236, 252, 255;
-    --op100: #e1f6ff;
-    --op100-rgb: 225, 246, 255;
-    --op200: #c9e8ff;
-    --op200-rgb: 201, 232, 255;
-    --op300: #80b3ff;
-    --op300-rgb: 128, 179, 255;
-    --op400: #3478ff;
-    --op400-rgb: 52, 120, 255;
-    --op500: #1237a1;
-    --op500-rgb: 18, 55, 161;
-    --op600: #0b2c90;
-    --op600-rgb: 11, 44, 144;
-    --op700: #0b256e;
-    --op700-rgb: 11, 37, 110;
-    --op800: #1c2034;
-    --op800-rgb: 28, 32, 52;
-    --op-accent50: #f5ffe0;
-    --op-accent50-rgb: 245, 255, 224;
-    --op-accent200: #34faff;
-    --op-accent200-rgb: 52, 250, 255;
-    --op-accent400: #00ceff;
-    --op-accent400-rgb: 0, 206, 255;
-    --op-accent600: #00bdff;
-    --op-accent600-rgb: 0, 189, 255;
-    --op-accent800: #007dcc;
-    --op-accent800-rgb: 0, 125, 204;
-    --eng50: #eaffff;
-    --eng50-rgb: 234, 255, 255;
-    --eng100: #defcfc;
-    --eng100-rgb: 222, 252, 252;
-    --eng200: #c4f2f2;
-    --eng200-rgb: 196, 242, 242;
-    --eng300: #6fc9ca;
-    --eng300-rgb: 111, 201, 202;
-    --eng400: #00a8ac;
-    --eng400-rgb: 0, 168, 172;
-    --eng500: #005355;
-    --eng500-rgb: 0, 83, 85;
-    --eng600: #004749;
-    --eng600-rgb: 0, 71, 73;
-    --eng700: #003739;
-    --eng700-rgb: 0, 55, 57;
-    --eng800: #172426;
-    --eng800-rgb: 23, 36, 38;
-    --eng-accent50: #fff8ed;
-    --eng-accent50-rgb: 255, 248, 237;
-    --eng-accent200: #a9fdda;
-    --eng-accent200-rgb: 169, 253, 218;
-    --eng-accent400: #7fd2b1;
-    --eng-accent400-rgb: 127, 210, 177;
-    --eng-accent600: #6fc1a1;
-    --eng-accent600-rgb: 111, 193, 161;
-    --eng-accent800: #2d8365;
-    --eng-accent800-rgb: 45, 131, 101;
-    --bm50: #fdf6ff;
-    --bm50-rgb: 253, 246, 255;
-    --bm100: #f7eeff;
-    --bm100-rgb: 247, 238, 255;
-    --bm200: #ecdcff;
-    --bm200-rgb: 236, 220, 255;
-    --bm300: #c09eff;
-    --bm300-rgb: 192, 158, 255;
-    --bm400: #a351ff;
-    --bm400-rgb: 163, 81, 255;
-    --bm500: #502197;
-    --bm500-rgb: 80, 33, 151;
-    --bm600: #451587;
-    --bm600-rgb: 69, 21, 135;
-    --bm700: #351567;
-    --bm700-rgb: 53, 21, 103;
-    --bm800: #261d30;
-    --bm800-rgb: 38, 29, 48;
-    --bm-accent50: #e4ffee;
-    --bm-accent50-rgb: 228, 255, 238;
-    --bm-accent200: #aae3ff;
-    --bm-accent200-rgb: 170, 227, 255;
-    --bm-accent400: #81b8ff;
-    --bm-accent400-rgb: 129, 184, 255;
-    --bm-accent600: #72a7ff;
-    --bm-accent600-rgb: 114, 167, 255;
-    --bm-accent800: #3a67de;
-    --bm-accent800-rgb: 58, 103, 222;
-    --post100: #deedfc;
-    --post100-rgb: 222, 237, 252;
-    --post600: #1165bb;
-    --post600-rgb: 17, 101, 187;
-    --post900: #04192f;
-    --post900-rgb: 4, 25, 47;
-    --event100: #f1dcff;
-    --event100-rgb: 241, 220, 255;
-    --event600: #7903c9;
-    --event600-rgb: 121, 3, 201;
-    --event900: #1e0132;
-    --event900-rgb: 30, 1, 50;
-    --boost100: #fbdfe4;
-    --boost100-rgb: 251, 223, 228;
-    --boost600: #b51734;
-    --boost600-rgb: 181, 23, 52;
-    --boost900: #2d060d;
-    --boost900-rgb: 45, 6, 13;
-    --draft100: #eeeded;
-    --draft100-rgb: 238, 237, 237;
-    --draft600: #686464;
-    --draft600-rgb: 104, 100, 100;
-    --draft900: #1a1919;
-    --draft900-rgb: 26, 25, 25;
-    --brand-light: #2d84ff;
-    --brand-light-rgb: 45, 132, 255;
-    --brand-dark: #0029ca;
-    --brand-dark-rgb: 0, 41, 202;
+  --color-scheme-is-dark: light-dark(0, 1);
+  --white: white;
+  --white-rgb: 255, 255, 255;
+  --black: #01040b;
+  --black-rgb: 1, 4, 11;
+  --brand-color: #0062ff;
+  --brand-color-rgb: 0, 98, 255;
+  --color-primary-lightness-multiplier: 1;
+  --p500: #0062ff;
+  --p500-rgb: 0, 98, 255;
+  --color-base-primary: #0062ff;
+  --color-base-primary-rgb: 0, 98, 255;
+  --i500: light-dark(#0062ff, #3696ff);
+  --i500-rgb: 0, 98, 255;
+  --color-base-info: light-dark(#0062ff, #3696ff);
+  --color-base-info-rgb: 0, 98, 255;
+  --n500: #506586;
+  --n500-rgb: 80, 101, 134;
+  --color-base-neutral: #506586;
+  --color-base-neutral-rgb: 80, 101, 134;
+  --s500: light-dark(#1ba138, #36c34f);
+  --s500-rgb: 27, 161, 56;
+  --color-base-success: light-dark(#1ba138, #36c34f);
+  --color-base-success-rgb: 27, 161, 56;
+  --e500: light-dark(#f44034, #ff5242);
+  --e500-rgb: 244, 64, 52;
+  --color-base-error: light-dark(#f44034, #ff5242);
+  --color-base-error-rgb: 244, 64, 52;
+  --w500: light-dark(#db7d0a, #ef8700);
+  --w500-rgb: 219, 125, 10;
+  --color-base-warning: light-dark(#db7d0a, #ef8700);
+  --color-base-warning-rgb: 219, 125, 10;
+  --a1-500: #3c28cc;
+  --a1-500-rgb: 60, 40, 204;
+  --color-base-a1: #3c28cc;
+  --color-base-a1-rgb: 60, 40, 204;
+  --a2-500: #ffd37a;
+  --a2-500-rgb: 255, 211, 122;
+  --color-base-a2: #ffd37a;
+  --color-base-a2-rgb: 255, 211, 122;
+  --a3-500: #ff1f6d;
+  --a3-500-rgb: 255, 31, 109;
+  --color-base-a3: #ff1f6d;
+  --color-base-a3-rgb: 255, 31, 109;
+  --a4-500: #399d8b;
+  --a4-500-rgb: 57, 157, 139;
+  --color-base-a4: #399d8b;
+  --color-base-a4-rgb: 57, 157, 139;
+  --base-op: #1036a8;
+  --base-op-rgb: 16, 54, 168;
+  --base-bm: #6f42c1;
+  --base-bm-rgb: 111, 66, 193;
+  --base-seo: #059669;
+  --base-seo-rgb: 5, 150, 105;
+  --base-wr: #ffc420;
+  --base-wr-rgb: 255, 196, 32;
+  --base-eng: #078688;
+  --base-eng-rgb: 7, 134, 136;
+  --base-ads: #b81450;
+  --base-ads-rgb: 184, 20, 80;
+  --ado-face-gradient-start: #00495d;
+  --ado-face-gradient-start-rgb: 0, 73, 93;
+  --ado-face-gradient-end: #12ffff;
+  --ado-face-gradient-end-rgb: 18, 255, 255;
+  --ado-face-feature: white;
+  --ado-face-feature-rgb: 255, 255, 255;
+  --ado-face-bubble-bg: rgba(0, 73, 93, 0.8);
+  --ado-shader-light-start-bg: light-dark(#f6f9fc, #01040b);
+  --ado-shader-light-start-bg-rgb: 246, 249, 252;
+  --ado-shader-light-start-col1: #00495d;
+  --ado-shader-light-start-col1-rgb: 0, 73, 93;
+  --ado-shader-light-start-col2: #29ecfa;
+  --ado-shader-light-start-col2-rgb: 41, 236, 250;
+  --ado-shader-light-start-col3: #e0c9fd;
+  --ado-shader-light-start-col3-rgb: 224, 201, 253;
+  --ado-shader-light-end-bg: light-dark(#f6f9fc, #01040b);
+  --ado-shader-light-end-bg-rgb: 246, 249, 252;
+  --ado-shader-light-end-col1: #1f9e9e;
+  --ado-shader-light-end-col1-rgb: 31, 158, 158;
+  --ado-shader-light-end-col2: #acebea;
+  --ado-shader-light-end-col2-rgb: 172, 235, 234;
+  --ado-shader-light-end-col3: #e0c9fd;
+  --ado-shader-light-end-col3-rgb: 224, 201, 253;
+  --ado-shader-dark-start-bg: light-dark(#f6f9fc, #01040b);
+  --ado-shader-dark-start-bg-rgb: 246, 249, 252;
+  --ado-shader-dark-start-col1: #00495d;
+  --ado-shader-dark-start-col1-rgb: 0, 73, 93;
+  --ado-shader-dark-start-col2: #70deea;
+  --ado-shader-dark-start-col2-rgb: 112, 222, 234;
+  --ado-shader-dark-start-col3: #f7e4d4;
+  --ado-shader-dark-start-col3-rgb: 247, 228, 212;
+  --ado-shader-dark-end-bg: light-dark(#f6f9fc, #01040b);
+  --ado-shader-dark-end-bg-rgb: 246, 249, 252;
+  --ado-shader-dark-end-col1: #34dfdf;
+  --ado-shader-dark-end-col1-rgb: 52, 223, 223;
+  --ado-shader-dark-end-col2: #0099ff;
+  --ado-shader-dark-end-col2-rgb: 0, 153, 255;
+  --ado-shader-dark-end-col3: #824ed4;
+  --ado-shader-dark-end-col3-rgb: 130, 78, 212;
+  --post-base-color: #0e549b;
+  --post-base-color-rgb: 14, 84, 155;
+  --event-base-color: #5b0297;
+  --event-base-color-rgb: 91, 2, 151;
+  --draft-base-color: #1a1919;
+  --draft-base-color-rgb: 26, 25, 25;
+  --boost-base-color: #d91c3f;
+  --boost-base-color-rgb: 217, 28, 63;
+  --email-brand: #0062ff;
+  --email-brand-rgb: 0, 98, 255;
+  --email-fn-cta-lightest: #f1f9ff;
+  --email-fn-cta-lightest-rgb: 241, 249, 255;
+  --email-fn-cta-light: #6db3ff;
+  --email-fn-cta-light-rgb: 109, 179, 255;
+  --email-fn-cta: #0062ff;
+  --email-fn-cta-rgb: 0, 98, 255;
+  --email-fn-cta-dark: #00369e;
+  --email-fn-cta-dark-rgb: 0, 54, 158;
+  --email-fn-bg: white;
+  --email-fn-bg-rgb: 255, 255, 255;
+  --email-fn-bg-var: #f6f9fc;
+  --email-fn-bg-var-rgb: 246, 249, 252;
+  --email-fn-fg: #263349;
+  --email-fn-fg-rgb: 38, 51, 73;
+  --email-fn-fg-on-cta: white;
+  --email-fn-fg-on-cta-rgb: 255, 255, 255;
+  --email-fn-fg-light: #506586;
+  --email-fn-fg-light-rgb: 80, 101, 134;
+  --email-fn-fg-lightest: #869cc0;
+  --email-fn-fg-lightest-rgb: 134, 156, 192;
+  --email-fn-brd: #b9c5d8;
+  --email-fn-brd-rgb: 185, 197, 216;
+  --email-fn-divider: #e6eaf0;
+  --email-fn-divider-rgb: 230, 234, 240;
+  --email-background: #f6f9fc;
+  --email-background-rgb: 246, 249, 252;
+  --email-content-background: #f6f9fc;
+  --email-content-background-rgb: 246, 249, 252;
+  --email-content-padding: 0px 4px;
+  --email-warning-lightest: #fff1e3;
+  --email-warning-lightest-rgb: 255, 241, 227;
+  --email-warning-dark: #db7d0a;
+  --email-warning-dark-rgb: 219, 125, 10;
+  --email-warning-darkest: #661b00;
+  --email-warning-darkest-rgb: 102, 27, 0;
+  --email-error-lightest: #ffece6;
+  --email-error-lightest-rgb: 255, 236, 230;
+  --email-error-dark: #f44034;
+  --email-error-dark-rgb: 244, 64, 52;
+  --email-error-darkest: #651913;
+  --email-error-darkest-rgb: 101, 25, 19;
+  --email-success-lightest: #e8fce8;
+  --email-success-lightest-rgb: 232, 252, 232;
+  --email-success-light: #36c34f;
+  --email-success-light-rgb: 54, 195, 79;
+  --email-success-dark: #1ba138;
+  --email-success-dark-rgb: 27, 161, 56;
+  --email-success-darkest: #0f4418;
+  --email-success-darkest-rgb: 15, 68, 24;
+  --email-info-lightest: #e5f6ff;
+  --email-info-lightest-rgb: 229, 246, 255;
+  --email-info-dark: #0062ff;
+  --email-info-dark-rgb: 0, 98, 255;
+  --email-info-darkest: #0e3376;
+  --email-info-darkest-rgb: 14, 51, 118;
+  --email-ai-light: #f5f8ff;
+  --email-ai-light-rgb: 245, 248, 255;
+  --email-ai-dark: #3920c8;
+  --email-ai-dark-rgb: 57, 32, 200;
+  --email-acc02-darkest: #ffc22b;
+  --email-acc02-darkest-rgb: 255, 194, 43;
+  --email-header-version: 1;
+  --email-header-gradient-version: none;
+  --email-header-theme-mode: light;
+  --email-header-additional-information: date;
+  --email-header-fn-fg: #263349;
+  --email-header-fn-fg-rgb: 38, 51, 73;
+  --email-header-fn-bg: #f6f9fc;
+  --email-header-fn-bg-rgb: 246, 249, 252;
+  --email-footer-version: 1;
+  --email-footer-theme-mode: light;
+  --email-footer-display-logo: bottom;
+  --email-footer-fg-main: #263349;
+  --email-footer-fg-main-rgb: 38, 51, 73;
+  --email-footer-bg-main: white;
+  --email-footer-bg-main-rgb: 255, 255, 255;
+  --email-footer-fg-light-main: #506586;
+  --email-footer-fg-light-main-rgb: 80, 101, 134;
+  --email-footer-fg-lightest-main: #869cc0;
+  --email-footer-fg-lightest-main-rgb: 134, 156, 192;
+  --email-footer-bg-accent: #0062ff;
+  --email-footer-bg-accent-rgb: 0, 98, 255;
+  --email-footer-fg-on-bg-accent: white;
+  --email-footer-fg-on-bg-accent-rgb: 255, 255, 255;
+  --email-footer-bg-accent2: #f6f9fc;
+  --email-footer-bg-accent2-rgb: 246, 249, 252;
+  --email-footer-fg-on-bg-accent2: #506586;
+  --email-footer-fg-on-bg-accent2-rgb: 80, 101, 134;
+  --email-footer-cta-fg-on-bg-accent2: #0062ff;
+  --email-footer-cta-fg-on-bg-accent2-rgb: 0, 98, 255;
+  --email-button-primary-bg: #0062ff;
+  --email-button-primary-bg-rgb: 0, 98, 255;
+  --email-button-primary-fg: white;
+  --email-button-primary-fg-rgb: 255, 255, 255;
+  --email-button-primary-border: #0062ff;
+  --email-button-primary-border-rgb: 0, 98, 255;
+  --email-button-default-bg: white;
+  --email-button-default-bg-rgb: 255, 255, 255;
+  --email-button-default-fg: #0062ff;
+  --email-button-default-fg-rgb: 0, 98, 255;
+  --email-button-default-border: white;
+  --email-button-default-border-rgb: 255, 255, 255;
+  --email-button-border-radius: 4px;
+  --review-booster-pm-1-text: white;
+  --review-booster-pm-1-text-rgb: 255, 255, 255;
+  --review-booster-pm-1-background: rgba(1, 4, 11, 0.7);
+  --review-booster-pm-1-qr-code: black;
+  --review-booster-pm-1-qr-code-rgb: 0, 0, 0;
+  --review-booster-pm-2-text: #263349;
+  --review-booster-pm-2-text-rgb: 38, 51, 73;
+  --review-booster-pm-2-background: white;
+  --review-booster-pm-2-background-rgb: 255, 255, 255;
+  --review-booster-pm-2-stroke: linear-gradient(133.06deg, #f1f9ff 0%, #b8d9ff 100%);
+  --review-booster-pm-2-qr-code: black;
+  --review-booster-pm-2-qr-code-rgb: 0, 0, 0;
+  --heading-typeface: 'Inter', sans-serif;
+  --heading-color: light-dark(#263349, #f6f9fc);
+  --heading-color-rgb: 38, 51, 73;
+  --text-typeface: 'Inter', sans-serif;
+  --text-color: light-dark(#263349, #f6f9fc);
+  --text-color-rgb: 38, 51, 73;
+  --em-color: light-dark(#0062ff, #6db3ff);
+  --em-color-rgb: 0, 98, 255;
+  --header-color: light-dark(white, #18212f);
+  --header-color-rgb: 255, 255, 255;
+  --header-opacity: 0.8;
+  --header-button-secondary-text-color: light-dark(#263349, #f6f9fc);
+  --header-button-secondary-text-color-rgb: 38, 51, 73;
+  --header-button-secondary-background-color: light-dark(white, #18212f);
+  --header-button-secondary-background-color-rgb: 255, 255, 255;
+  --header-button-secondary-border-color: light-dark(#b9c5d8, #263349);
+  --header-button-secondary-border-color-rgb: 185, 197, 216;
+  --header-button-secondary-hover-text-color: light-dark(#0062ff, #6db3ff);
+  --header-button-secondary-hover-text-color-rgb: 0, 98, 255;
+  --header-button-secondary-hover-background-color: light-dark(#f6f9fc, #01040b);
+  --header-button-secondary-hover-background-color-rgb: 246, 249, 252;
+  --header-button-secondary-hover-border-color: light-dark(#b9c5d8, #263349);
+  --header-button-secondary-hover-border-color-rgb: 185, 197, 216;
+  --header-button-secondary-disabled-text-color: light-dark(#263349, #f6f9fc);
+  --header-button-secondary-disabled-text-color-rgb: 38, 51, 73;
+  --header-button-secondary-disabled-background-color: light-dark(white, #18212f);
+  --header-button-secondary-disabled-background-color-rgb: 255, 255, 255;
+  --header-button-secondary-disabled-border-color: light-dark(#b9c5d8, #263349);
+  --header-button-secondary-disabled-border-color-rgb: 185, 197, 216;
+  --header-button-secondary-focus-text-color: light-dark(#263349, #f6f9fc);
+  --header-button-secondary-focus-text-color-rgb: 38, 51, 73;
+  --header-button-secondary-focus-background-color: light-dark(white, #18212f);
+  --header-button-secondary-focus-background-color-rgb: 255, 255, 255;
+  --header-button-secondary-focus-border-color: light-dark(#b9c5d8, #263349);
+  --header-button-secondary-focus-border-color-rgb: 185, 197, 216;
+  --header-button-secondary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
+  --header-button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
+  --header-button-secondary-ripple-color: light-dark(#0062ff, #358cff);
+  --header-button-secondary-ripple-color-rgb: 0, 98, 255;
+  --header-logo: url("/jump/img/logo_new_layout.svg");
+  --header-logo-mobile: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-vision: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-rankingcoach-social: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-rankingcoach-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-adcoach-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-adcoach-listingcoach-rankingcoach-social-reviews: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-adcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-adcoach-listingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-listingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-adcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-listingcoach-rankingcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-vision-easylisting-listingcoach-rankingcoach-adcoach: url("/jump/img/logo_new_layout.svg");
+  --header-logo-360: url("/vanguard/assets/images/rc-360-logo.svg");
+  --logo-height: 22px;
+  --logo-height-tablet: 22px;
+  --logo-height-mobile: 22px;
+  --logo-height-vision: 22px;
+  --logo-height-adcoach: 22px;
+  --logo-height-listingcoach: 22px;
+  --logo-height-rankingcoach: 22px;
+  --logo-height-social: 22px;
+  --logo-height-reviews: 22px;
+  --logo-height-vision-adcoach: 22px;
+  --logo-height-vision-listingcoach: 22px;
+  --logo-height-vision-rankingcoach: 22px;
+  --logo-height-adcoach-listingcoach: 22px;
+  --logo-height-adcoach-rankingcoach: 22px;
+  --logo-height-listingcoach-rankingcoach: 22px;
+  --logo-height-vision-social: 22px;
+  --logo-height-vision-reviews: 22px;
+  --logo-height-vision-listingcoach-rankingcoach: 22px;
+  --logo-height-vision-adcoach-rankingcoach: 22px;
+  --logo-height-vision-adcoach-listingcoach: 22px;
+  --logo-height-vision-adcoach-reviews: 22px;
+  --logo-height-vision-adcoach-social: 22px;
+  --logo-height-vision-listingcoach-reviews: 22px;
+  --logo-height-vision-listingcoach-social: 22px;
+  --logo-height-vision-rankingcoach-reviews: 22px;
+  --logo-height-vision-rankingcoach-social: 22px;
+  --logo-height-vision-social-reviews: 22px;
+  --logo-height-vision-adcoach-listingcoach-reviews: 22px;
+  --logo-height-vision-adcoach-listingcoach-social: 22px;
+  --logo-height-vision-adcoach-rankingcoach-reviews: 22px;
+  --logo-height-vision-adcoach-rankingcoach-social: 22px;
+  --logo-height-vision-adcoach-social-reviews: 22px;
+  --logo-height-vision-listingcoach-rankingcoach-reviews: 22px;
+  --logo-height-vision-listingcoach-rankingcoach-social: 22px;
+  --logo-height-vision-listingcoach-social-reviews: 22px;
+  --logo-height-vision-rankingcoach-social-reviews: 22px;
+  --logo-height-vision-adcoach-listingcoach-rankingcoach-reviews: 22px;
+  --logo-height-vision-adcoach-listingcoach-rankingcoach-social: 22px;
+  --logo-height-vision-adcoach-listingcoach-social-reviews: 22px;
+  --logo-height-vision-adcoach-rankingcoach-social-reviews: 22px;
+  --logo-height-vision-listingcoach-rankingcoach-social-reviews: 22px;
+  --logo-height-vision-adcoach-listingcoach-rankingcoach-social-reviews: 22px;
+  --logo-height-360: 22px;
+  --header-height: 54px;
+  --header-height-tablet: 54px;
+  --header-height-mobile: 54px;
+  --heading-weight-bold: 700;
+  --heading-V700-weight-autogen: 700;
+  --heading-V700-src-autogen: "/vanguard/assets/fonts/Inter-Bold.woff2";
+  --heading-weight-medium: 500;
+  --heading-V500-weight-autogen: 500;
+  --heading-V500-src-autogen: "/vanguard/assets/fonts/Inter-Medium.woff2";
+  --heading-weight-regular: 400;
+  --heading-V400-weight-autogen: 400;
+  --heading-V400-src-autogen: "/vanguard/assets/fonts/Inter-Regular.woff2";
+  --theme-weight-bold: 700;
+  --V700-weight-autogen: 700;
+  --V700-src-autogen: "/vanguard/assets/fonts/Inter-Bold.woff2";
+  --theme-weight-medium: 500;
+  --V500-weight-autogen: 500;
+  --V500-src-autogen: "/vanguard/assets/fonts/Inter-Medium.woff2";
+  --theme-weight-regular: 400;
+  --V400-weight-autogen: 400;
+  --V400-src-autogen: "/vanguard/assets/fonts/Inter-Regular.woff2";
+  --font-name: "Inter";
+  --theme-typeface: 'Inter', sans-serif;
+  --heading-font-name: "Inter";
+  --buttons-typeface: 'Inter', sans-serif;
+  --buttons-border-radius: 4px;
+  --button-default-text-color: light-dark(#0062ff, #6db3ff);
+  --button-default-text-color-rgb: 0, 98, 255;
+  --button-default-background-color: light-dark(white, #090d17);
+  --button-default-background-color-rgb: 255, 255, 255;
+  --button-default-hover-text-color: light-dark(#00369e, #358cff);
+  --button-default-hover-text-color-rgb: 0, 54, 158;
+  --button-default-hover-background-color: light-dark(#f6f9fc, #01040b);
+  --button-default-hover-background-color-rgb: 246, 249, 252;
+  --button-default-disabled-text-color: light-dark(#263349, #f6f9fc);
+  --button-default-disabled-text-color-rgb: 38, 51, 73;
+  --button-default-disabled-background-color: rgba(0, 0, 0, 0);
+  --button-default-disabled-background-color-rgb: 0, 0, 0;
+  --button-default-focus-text-color: light-dark(#0062ff, #6db3ff);
+  --button-default-focus-text-color-rgb: 0, 98, 255;
+  --button-default-focus-background-color: rgba(0, 0, 0, 0);
+  --button-default-focus-background-color-rgb: 0, 0, 0;
+  --button-default-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
+  --button-default-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-default-ripple-color: light-dark(#0062ff, #358cff);
+  --button-default-ripple-color-rgb: 0, 98, 255;
+  --button-primary-text-color: white;
+  --button-primary-text-color-rgb: 255, 255, 255;
+  --button-primary-background-color: light-dark(#0062ff, #358cff);
+  --button-primary-background-color-rgb: 0, 98, 255;
+  --button-primary-hover-text-color: white;
+  --button-primary-hover-text-color-rgb: 255, 255, 255;
+  --button-primary-hover-background-color: #0e52ca;
+  --button-primary-hover-background-color-rgb: 14, 82, 202;
+  --button-primary-disabled-text-color: white;
+  --button-primary-disabled-text-color-rgb: 255, 255, 255;
+  --button-primary-disabled-background-color: light-dark(#869cc0, #263349);
+  --button-primary-disabled-background-color-rgb: 134, 156, 192;
+  --button-primary-focus-text-color: white;
+  --button-primary-focus-text-color-rgb: 255, 255, 255;
+  --button-primary-focus-background-color: light-dark(#0062ff, #358cff);
+  --button-primary-focus-background-color-rgb: 0, 98, 255;
+  --button-primary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
+  --button-primary-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-primary-ripple-color: light-dark(#b8d9ff, #000335);
+  --button-primary-ripple-color-rgb: 184, 217, 255;
+  --button-secondary-text-color: light-dark(#263349, #f6f9fc);
+  --button-secondary-text-color-rgb: 38, 51, 73;
+  --button-secondary-no-border-text-color: light-dark(#506586, #b9c5d8);
+  --button-secondary-no-border-text-color-rgb: 80, 101, 134;
+  --button-secondary-background-color: light-dark(white, #18212f);
+  --button-secondary-background-color-rgb: 255, 255, 255;
+  --button-secondary-border-color: light-dark(#b9c5d8, #263349);
+  --button-secondary-border-color-rgb: 185, 197, 216;
+  --button-secondary-hover-text-color: light-dark(#0062ff, #6db3ff);
+  --button-secondary-hover-text-color-rgb: 0, 98, 255;
+  --button-secondary-hover-background-color: light-dark(#f6f9fc, #01040b);
+  --button-secondary-hover-background-color-rgb: 246, 249, 252;
+  --button-secondary-hover-border-color: light-dark(#b9c5d8, #263349);
+  --button-secondary-hover-border-color-rgb: 185, 197, 216;
+  --button-secondary-disabled-text-color: light-dark(#263349, #f6f9fc);
+  --button-secondary-disabled-text-color-rgb: 38, 51, 73;
+  --button-secondary-disabled-background-color: light-dark(white, #18212f);
+  --button-secondary-disabled-background-color-rgb: 255, 255, 255;
+  --button-secondary-disabled-border-color: light-dark(#b9c5d8, #263349);
+  --button-secondary-disabled-border-color-rgb: 185, 197, 216;
+  --button-secondary-focus-text-color: light-dark(#263349, #f6f9fc);
+  --button-secondary-focus-text-color-rgb: 38, 51, 73;
+  --button-secondary-focus-background-color: light-dark(white, #18212f);
+  --button-secondary-focus-background-color-rgb: 255, 255, 255;
+  --button-secondary-focus-border-color: light-dark(#b9c5d8, #263349);
+  --button-secondary-focus-border-color-rgb: 185, 197, 216;
+  --button-secondary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
+  --button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-secondary-ripple-color: light-dark(#0062ff, #358cff);
+  --button-secondary-ripple-color-rgb: 0, 98, 255;
+  --button-shimmer-text-color: white;
+  --button-shimmer-text-color-rgb: 255, 255, 255;
+  --button-shimmer-background-color: light-dark(#3920c8, #93a1ff);
+  --button-shimmer-background-color-rgb: 57, 32, 200;
+  --button-shimmer-hover-text-color: white;
+  --button-shimmer-hover-text-color-rgb: 255, 255, 255;
+  --button-shimmer-hover-background-color: light-dark(#21008d, #f5f8ff);
+  --button-shimmer-hover-background-color-rgb: 33, 0, 141;
+  --button-shimmer-disabled-text-color: white;
+  --button-shimmer-disabled-text-color-rgb: 255, 255, 255;
+  --button-shimmer-disabled-background-color: light-dark(#869cc0, #263349);
+  --button-shimmer-disabled-background-color-rgb: 134, 156, 192;
+  --button-shimmer-focus-text-color: white;
+  --button-shimmer-focus-text-color-rgb: 255, 255, 255;
+  --button-shimmer-focus-background-color: light-dark(#0062ff, #358cff);
+  --button-shimmer-focus-background-color-rgb: 0, 98, 255;
+  --button-shimmer-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
+  --button-shimmer-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-shimmer-ripple-color: light-dark(#b8d9ff, #000335);
+  --button-shimmer-ripple-color-rgb: 184, 217, 255;
+  --button-muted-text-color: light-dark(#263349, #f6f9fc);
+  --button-muted-text-color-rgb: 38, 51, 73;
+  --button-muted-background-color: light-dark(rgba(1, 4, 11, 0.02), rgba(255, 255, 255, 0.3));
+  --button-muted-hover-text-color: light-dark(#263349, #f6f9fc);
+  --button-muted-hover-text-color-rgb: 38, 51, 73;
+  --button-muted-disabled-text-color: light-dark(#263349, #f6f9fc);
+  --button-muted-disabled-text-color-rgb: 38, 51, 73;
+  --button-muted-hover-background-color: light-dark(rgba(1, 4, 11, 0.02), rgba(255, 255, 255, 0.3));
+  --button-muted-ripple-background-color: light-dark(#b9c5d8, white);
+  --button-muted-ripple-background-color-rgb: 185, 197, 216;
+  --button-muted-disabled-background-color: rgba(1, 4, 11, 0.02);
+  --button-muted-focus-box-shadow-color: #99c0ff;
+  --button-muted-focus-box-shadow-color-rgb: 153, 192, 255;
+  --button-muted-inverted-text-color: white;
+  --button-muted-inverted-text-color-rgb: 255, 255, 255;
+  --button-muted-inverted-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
+  --button-muted-inverted-hover-text-color: white;
+  --button-muted-inverted-hover-text-color-rgb: 255, 255, 255;
+  --button-muted-inverted-disabled-text-color: white;
+  --button-muted-inverted-disabled-text-color-rgb: 255, 255, 255;
+  --button-muted-inverted-hover-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
+  --button-muted-inverted-disabled-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
+  --button-muted-inverted-focus-box-shadow-color: #99c0ff;
+  --button-muted-inverted-focus-box-shadow-color-rgb: 153, 192, 255;
+  --icon-font-family: rc-Icons;
+  --nav-side-fg: light-dark(#506586, #b9c5d8);
+  --nav-side-fg-rgb: 80, 101, 134;
+  --nav-side-bg: light-dark(rgba(255, 255, 255, 0), rgba(9, 13, 23, 0));
+  --nav-side-fg-hover: light-dark(#263349, #f6f9fc);
+  --nav-side-fg-hover-rgb: 38, 51, 73;
+  --nav-side-bg-hover: light-dark(rgba(0, 98, 255, 0.05), rgba(53, 140, 255, 0.05));
+  --nav-side-fg-selected: light-dark(#00369e, #358cff);
+  --nav-side-fg-selected-rgb: 0, 54, 158;
+  --nav-side-collapse-fg: light-dark(#263349, #f6f9fc);
+  --nav-side-collapse-fg-rgb: 38, 51, 73;
+  --nav-side-collapse-bg-hover: rgba(80, 101, 134, 0.1);
+  --nav-side-notif-bg-tasks: light-dark(#93a1ff, #3920c8);
+  --nav-side-notif-bg-tasks-rgb: 147, 161, 255;
+  --nav-side-notif-bg: light-dark(#f50065, #ff5b94);
+  --nav-side-notif-bg-rgb: 245, 0, 101;
+  --nav-side-notif-fg: white;
+  --nav-side-notif-fg-rgb: 255, 255, 255;
+  --nav-side-powered-by-display: none;
+  --nav-side-powered-by-max-height: unset;
+  --fn-bg: light-dark(white, #090d17);
+  --fn-bg-rgb: 255, 255, 255;
+  --fn-bg-var: light-dark(#f6f9fc, #01040b);
+  --fn-bg-var-rgb: 246, 249, 252;
+  --fn-bg-surface: light-dark(white, #18212f);
+  --fn-bg-surface-rgb: 255, 255, 255;
+  --fn-bg-cta: light-dark(#0062ff, #358cff);
+  --fn-bg-cta-rgb: 0, 98, 255;
+  --fn-fg-cta: light-dark(#0062ff, #6db3ff);
+  --fn-fg-cta-rgb: 0, 98, 255;
+  --fn-fg-cta-hov: light-dark(#00369e, #358cff);
+  --fn-fg-cta-hov-rgb: 0, 54, 158;
+  --fn-bg-cta-fg: white;
+  --fn-bg-cta-fg-rgb: 255, 255, 255;
+  --fn-bg-cta-fg-hov: rgba(255, 255, 255, 0.7);
+  --fn-fg: light-dark(#263349, #f6f9fc);
+  --fn-fg-rgb: 38, 51, 73;
+  --fn-fg-light: light-dark(#506586, #b9c5d8);
+  --fn-fg-light-rgb: 80, 101, 134;
+  --fn-fg-lightest: light-dark(#869cc0, #506586);
+  --fn-fg-lightest-rgb: 134, 156, 192;
+  --fn-fg-on-dark: white;
+  --fn-fg-on-dark-rgb: 255, 255, 255;
+  --fn-brd-gl: light-dark(#b9c5d8, #263349);
+  --fn-brd-gl-rgb: 185, 197, 216;
+  --fn-divider-gl: light-dark(#e6eaf0, #18212f);
+  --fn-divider-gl-rgb: 230, 234, 240;
+  --fn-bg-hov-n-gl: light-dark(#b9c5d8, #18212f);
+  --fn-bg-hov-n-gl-rgb: 185, 197, 216;
+  --fn-bg-hov-p-gl: light-dark(#b8d9ff, #000335);
+  --fn-bg-hov-p-gl-rgb: 184, 217, 255;
+  --fn-bg-frost: light-dark(rgba(255, 255, 255, 0.3), rgba(9, 13, 23, 0.3));
+  --fn-bg-cta-hov: light-dark(#00369e, #0e52ca);
+  --fn-bg-cta-hov-rgb: 0, 54, 158;
+  --fn-bg-disabled: light-dark(#869cc0, #263349);
+  --fn-bg-disabled-rgb: 134, 156, 192;
+  --fn-fg-on-dark-hov: rgba(255, 255, 255, 0.7);
+  --fn-fg-on-dark-light: #b9c5d8;
+  --fn-fg-on-dark-light-rgb: 185, 197, 216;
+  --fn-fg-on-dark-lightest: #c5cedd;
+  --fn-fg-on-dark-lightest-rgb: 197, 206, 221;
+  --fn-bg-on-dark: light-dark(white, #18212f);
+  --fn-bg-on-dark-rgb: 255, 255, 255;
+  --fn-bg-on-dark-hover: light-dark(rgba(255, 255, 255, 0.7), rgba(24, 33, 47, 0.7));
+  --fn-bg-hov-i-gl: white;
+  --fn-bg-hov-i-gl-rgb: 255, 255, 255;
+  --fn-bg-dark: #01040b;
+  --fn-bg-dark-rgb: 1, 4, 11;
+  --fn-shadow: light-dark(#01040b, white);
+  --fn-shadow-rgb: 1, 4, 11;
+  --fn-bg-rating-stars: #ffc22b;
+  --fn-bg-rating-stars-rgb: 255, 194, 43;
+  --sc-charts-01: #0062ff;
+  --sc-charts-01-rgb: 0, 98, 255;
+  --sc-charts-01-op10: rgba(0, 98, 255, 0.1);
+  --sc-charts-01-op50: rgba(0, 98, 255, 0.5);
+  --sc-charts-02: light-dark(#ffc22b, #fff7e7);
+  --sc-charts-02-rgb: 255, 194, 43;
+  --sc-charts-02-op10: light-dark(rgba(255, 194, 43, 0.1), rgba(255, 247, 231, 0.1));
+  --sc-charts-02-op50: light-dark(rgba(255, 194, 43, 0.5), rgba(255, 247, 231, 0.5));
+  --sc-charts-03: light-dark(#36c34f, #1ba138);
+  --sc-charts-03-rgb: 54, 195, 79;
+  --sc-charts-03-op10: light-dark(rgba(54, 195, 79, 0.1), rgba(27, 161, 56, 0.1));
+  --sc-charts-04: light-dark(#f50065, #ff5b94);
+  --sc-charts-04-rgb: 245, 0, 101;
+  --sc-charts-04-op10: light-dark(rgba(245, 0, 101, 0.1), rgba(255, 91, 148, 0.1));
+  --sc-charts-05: #0e52ca;
+  --sc-charts-05-rgb: 14, 82, 202;
+  --sc-charts-05-op10: rgba(14, 82, 202, 0.1);
+  --sc-charts-06: #358cff;
+  --sc-charts-06-rgb: 53, 140, 255;
+  --sc-charts-06-op10: rgba(53, 140, 255, 0.1);
+  --sc-charts-07: #b8d9ff;
+  --sc-charts-07-rgb: 184, 217, 255;
+  --sc-charts-07-op10: rgba(184, 217, 255, 0.1);
+  --sc-charts-08: light-dark(#21008d, #f5f8ff);
+  --sc-charts-08-rgb: 33, 0, 141;
+  --sc-charts-08-op10: light-dark(rgba(33, 0, 141, 0.1), rgba(245, 248, 255, 0.1));
+  --sc-charts-09: light-dark(#3920c8, #93a1ff);
+  --sc-charts-09-rgb: 57, 32, 200;
+  --sc-charts-09-op10: light-dark(rgba(57, 32, 200, 0.1), rgba(147, 161, 255, 0.1));
+  --sc-charts-10: light-dark(#93a1ff, #3920c8);
+  --sc-charts-10-rgb: 147, 161, 255;
+  --sc-charts-10-op10: light-dark(rgba(147, 161, 255, 0.1), rgba(57, 32, 200, 0.1));
+  --sc-charts-11: light-dark(#f44034, #ff5242);
+  --sc-charts-11-rgb: 244, 64, 52;
+  --sc-charts-11-op10: light-dark(rgba(244, 64, 52, 0.1), rgba(255, 82, 66, 0.1));
+  --ai-base-color: light-dark(#0062ff, #358cff);
+  --ai-base-color-rgb: 0, 98, 255;
+  --header-logo-mobile-vision: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-adcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-adcoach-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-listingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-adcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-listingcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-360: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --p100: #f1f9ff;
+  --p100-rgb: 241, 249, 255;
+  --p200: #b8d9ff;
+  --p200-rgb: 184, 217, 255;
+  --p300: #6db3ff;
+  --p300-rgb: 109, 179, 255;
+  --p400: #358cff;
+  --p400-rgb: 53, 140, 255;
+  --p600: #0e52ca;
+  --p600-rgb: 14, 82, 202;
+  --p700: #00369e;
+  --p700-rgb: 0, 54, 158;
+  --p800: #001a5e;
+  --p800-rgb: 0, 26, 94;
+  --p900: #000335;
+  --p900-rgb: 0, 3, 53;
+  --i100: light-dark(#e5f6ff, #0e3376);
+  --i100-rgb: 229, 246, 255;
+  --i400: light-dark(#3696ff, #0062ff);
+  --i400-rgb: 54, 150, 255;
+  --i900: light-dark(#0e3376, #e5f6ff);
+  --i900-rgb: 14, 51, 118;
+  --n000: white;
+  --n000-rgb: 255, 255, 255;
+  --n100: #f6f9fc;
+  --n100-rgb: 246, 249, 252;
+  --n200: #e6eaf0;
+  --n200-rgb: 230, 234, 240;
+  --n300: #b9c5d8;
+  --n300-rgb: 185, 197, 216;
+  --n400: #869cc0;
+  --n400-rgb: 134, 156, 192;
+  --n600: #41506a;
+  --n600-rgb: 65, 80, 106;
+  --n700: #263349;
+  --n700-rgb: 38, 51, 73;
+  --n800: #18212f;
+  --n800-rgb: 24, 33, 47;
+  --n900: #01040b;
+  --n900-rgb: 1, 4, 11;
+  --s100: light-dark(#e8fce8, #0f4418);
+  --s100-rgb: 232, 252, 232;
+  --s400: light-dark(#36c34f, #1ba138);
+  --s400-rgb: 54, 195, 79;
+  --s900: light-dark(#0f4418, #e8fce8);
+  --s900-rgb: 15, 68, 24;
+  --w100: light-dark(#fff1e3, #661b00);
+  --w100-rgb: 255, 241, 227;
+  --w400: light-dark(#ef8700, #db7d0a);
+  --w400-rgb: 239, 135, 0;
+  --w900: light-dark(#661b00, #fff1e3);
+  --w900-rgb: 102, 27, 0;
+  --e100: light-dark(#ffece6, #651913);
+  --e100-rgb: 255, 236, 230;
+  --e400: light-dark(#ff5242, #f44034);
+  --e400-rgb: 255, 82, 66;
+  --e900: light-dark(#651913, #ffece6);
+  --e900-rgb: 101, 25, 19;
+  --a1100: light-dark(#f5f8ff, #21008d);
+  --a1100-rgb: 245, 248, 255;
+  --a1300: light-dark(#93a1ff, #3920c8);
+  --a1300-rgb: 147, 161, 255;
+  --a1500: light-dark(#3920c8, #93a1ff);
+  --a1500-rgb: 57, 32, 200;
+  --a1900: light-dark(#21008d, #f5f8ff);
+  --a1900-rgb: 33, 0, 141;
+  --a2100: light-dark(#fff7e7, #ffc22b);
+  --a2100-rgb: 255, 247, 231;
+  --a2300: light-dark(#ffe7ab, #ffcf5e);
+  --a2300-rgb: 255, 231, 171;
+  --a2400: #ffdb88;
+  --a2400-rgb: 255, 219, 136;
+  --a2500: light-dark(#ffcf5e, #ffe7ab);
+  --a2500-rgb: 255, 207, 94;
+  --a2900: light-dark(#ffc22b, #fff7e7);
+  --a2900-rgb: 255, 194, 43;
+  --a3100: light-dark(#fff3f5, #da0051);
+  --a3100-rgb: 255, 243, 245;
+  --a3300: light-dark(#ff5b94, #f50065);
+  --a3300-rgb: 255, 91, 148;
+  --a3400: #ff397c;
+  --a3400-rgb: 255, 57, 124;
+  --a3500: light-dark(#f50065, #ff5b94);
+  --a3500-rgb: 245, 0, 101;
+  --a3900: light-dark(#da0051, #fff3f5);
+  --a3900-rgb: 218, 0, 81;
+  --a4100: light-dark(#f3faf8, #128472);
+  --a4100-rgb: 243, 250, 248;
+  --a4300: light-dark(#6accb8, #329987);
+  --a4300-rgb: 106, 204, 184;
+  --a4500: light-dark(#329987, #6accb8);
+  --a4500-rgb: 50, 153, 135;
+  --a4900: light-dark(#128472, #f3faf8);
+  --a4900-rgb: 18, 132, 114;
+  --seo50: #e9fff6;
+  --seo50-rgb: 233, 255, 246;
+  --seo100: #ddffed;
+  --seo100-rgb: 221, 255, 237;
+  --seo200: #c2f6dc;
+  --seo200-rgb: 194, 246, 220;
+  --seo300: #69cfa2;
+  --seo300-rgb: 105, 207, 162;
+  --seo400: #00b16d;
+  --seo400-rgb: 0, 177, 109;
+  --seo500: #005732;
+  --seo500-rgb: 0, 87, 50;
+  --seo600: #004b28;
+  --seo600-rgb: 0, 75, 40;
+  --seo700: #003b20;
+  --seo700-rgb: 0, 59, 32;
+  --seo800: #142620;
+  --seo800-rgb: 20, 38, 32;
+  --seo-accent50: #fff4f2;
+  --seo-accent50-rgb: 255, 244, 242;
+  --seo-accent200: #c6fba2;
+  --seo-accent200-rgb: 198, 251, 162;
+  --seo-accent400: #9dcf78;
+  --seo-accent400-rgb: 157, 207, 120;
+  --seo-accent600: #8dbf69;
+  --seo-accent600-rgb: 141, 191, 105;
+  --seo-accent800: #52812a;
+  --seo-accent800-rgb: 82, 129, 42;
+  --wr50: #fffadc;
+  --wr50-rgb: 255, 250, 220;
+  --wr100: #fff3cb;
+  --wr100-rgb: 255, 243, 203;
+  --wr200: #ffe4a7;
+  --wr200-rgb: 255, 228, 167;
+  --wr300: #e3ae20;
+  --wr300-rgb: 227, 174, 32;
+  --wr400: #d27800;
+  --wr400-rgb: 210, 120, 0;
+  --wr500: #6a3800;
+  --wr500-rgb: 106, 56, 0;
+  --wr600: #5d2e00;
+  --wr600-rgb: 93, 46, 0;
+  --wr700: #482500;
+  --wr700-rgb: 72, 37, 0;
+  --wr800: #27220e;
+  --wr800-rgb: 39, 34, 14;
+  --wr-accent50: #fff5ff;
+  --wr-accent50-rgb: 255, 245, 255;
+  --wr-accent200: #ffc770;
+  --wr-accent200-rgb: 255, 199, 112;
+  --wr-accent400: #ff9d42;
+  --wr-accent400-rgb: 255, 157, 66;
+  --wr-accent600: #fc8d2e;
+  --wr-accent600-rgb: 252, 141, 46;
+  --wr-accent800: #b84e00;
+  --wr-accent800-rgb: 184, 78, 0;
+  --ads50: #ffeff5;
+  --ads50-rgb: 255, 239, 245;
+  --ads100: #ffe4ed;
+  --ads100-rgb: 255, 228, 237;
+  --ads200: #ffcddb;
+  --ads200-rgb: 255, 205, 219;
+  --ads300: #ff81a2;
+  --ads300-rgb: 255, 129, 162;
+  --ads400: #ff006d;
+  --ads400-rgb: 255, 0, 109;
+  --ads500: #8b0032;
+  --ads500-rgb: 139, 0, 50;
+  --ads600: #7b0029;
+  --ads600-rgb: 123, 0, 41;
+  --ads700: #5f0021;
+  --ads700-rgb: 95, 0, 33;
+  --ads800: #321a1a;
+  --ads800-rgb: 50, 26, 26;
+  --ads-accent50: #dbffff;
+  --ads-accent50-rgb: 219, 255, 255;
+  --ads-accent200: #ffb1ff;
+  --ads-accent200-rgb: 255, 177, 255;
+  --ads-accent400: #ff87e8;
+  --ads-accent400-rgb: 255, 135, 232;
+  --ads-accent600: #f976d8;
+  --ads-accent600-rgb: 249, 118, 216;
+  --ads-accent800: #b43598;
+  --ads-accent800-rgb: 180, 53, 152;
+  --op50: #ecfcff;
+  --op50-rgb: 236, 252, 255;
+  --op100: #e1f6ff;
+  --op100-rgb: 225, 246, 255;
+  --op200: #c9e8ff;
+  --op200-rgb: 201, 232, 255;
+  --op300: #80b3ff;
+  --op300-rgb: 128, 179, 255;
+  --op400: #3478ff;
+  --op400-rgb: 52, 120, 255;
+  --op500: #1237a1;
+  --op500-rgb: 18, 55, 161;
+  --op600: #0b2c90;
+  --op600-rgb: 11, 44, 144;
+  --op700: #0b256e;
+  --op700-rgb: 11, 37, 110;
+  --op800: #1c2034;
+  --op800-rgb: 28, 32, 52;
+  --op-accent50: #f5ffe0;
+  --op-accent50-rgb: 245, 255, 224;
+  --op-accent200: #34faff;
+  --op-accent200-rgb: 52, 250, 255;
+  --op-accent400: #00ceff;
+  --op-accent400-rgb: 0, 206, 255;
+  --op-accent600: #00bdff;
+  --op-accent600-rgb: 0, 189, 255;
+  --op-accent800: #007dcc;
+  --op-accent800-rgb: 0, 125, 204;
+  --eng50: #eaffff;
+  --eng50-rgb: 234, 255, 255;
+  --eng100: #defcfc;
+  --eng100-rgb: 222, 252, 252;
+  --eng200: #c4f2f2;
+  --eng200-rgb: 196, 242, 242;
+  --eng300: #6fc9ca;
+  --eng300-rgb: 111, 201, 202;
+  --eng400: #00a8ac;
+  --eng400-rgb: 0, 168, 172;
+  --eng500: #005355;
+  --eng500-rgb: 0, 83, 85;
+  --eng600: #004749;
+  --eng600-rgb: 0, 71, 73;
+  --eng700: #003739;
+  --eng700-rgb: 0, 55, 57;
+  --eng800: #172426;
+  --eng800-rgb: 23, 36, 38;
+  --eng-accent50: #fff8ed;
+  --eng-accent50-rgb: 255, 248, 237;
+  --eng-accent200: #a9fdda;
+  --eng-accent200-rgb: 169, 253, 218;
+  --eng-accent400: #7fd2b1;
+  --eng-accent400-rgb: 127, 210, 177;
+  --eng-accent600: #6fc1a1;
+  --eng-accent600-rgb: 111, 193, 161;
+  --eng-accent800: #2d8365;
+  --eng-accent800-rgb: 45, 131, 101;
+  --bm50: #fdf6ff;
+  --bm50-rgb: 253, 246, 255;
+  --bm100: #f7eeff;
+  --bm100-rgb: 247, 238, 255;
+  --bm200: #ecdcff;
+  --bm200-rgb: 236, 220, 255;
+  --bm300: #c09eff;
+  --bm300-rgb: 192, 158, 255;
+  --bm400: #a351ff;
+  --bm400-rgb: 163, 81, 255;
+  --bm500: #502197;
+  --bm500-rgb: 80, 33, 151;
+  --bm600: #451587;
+  --bm600-rgb: 69, 21, 135;
+  --bm700: #351567;
+  --bm700-rgb: 53, 21, 103;
+  --bm800: #261d30;
+  --bm800-rgb: 38, 29, 48;
+  --bm-accent50: #e4ffee;
+  --bm-accent50-rgb: 228, 255, 238;
+  --bm-accent200: #aae3ff;
+  --bm-accent200-rgb: 170, 227, 255;
+  --bm-accent400: #81b8ff;
+  --bm-accent400-rgb: 129, 184, 255;
+  --bm-accent600: #72a7ff;
+  --bm-accent600-rgb: 114, 167, 255;
+  --bm-accent800: #3a67de;
+  --bm-accent800-rgb: 58, 103, 222;
+  --post100: #deedfc;
+  --post100-rgb: 222, 237, 252;
+  --post600: #1165bb;
+  --post600-rgb: 17, 101, 187;
+  --post900: #04192f;
+  --post900-rgb: 4, 25, 47;
+  --event100: #f1dcff;
+  --event100-rgb: 241, 220, 255;
+  --event600: #7903c9;
+  --event600-rgb: 121, 3, 201;
+  --event900: #1e0132;
+  --event900-rgb: 30, 1, 50;
+  --boost100: #fbdfe4;
+  --boost100-rgb: 251, 223, 228;
+  --boost600: #b51734;
+  --boost600-rgb: 181, 23, 52;
+  --boost900: #2d060d;
+  --boost900-rgb: 45, 6, 13;
+  --draft100: #eeeded;
+  --draft100-rgb: 238, 237, 237;
+  --draft600: #686464;
+  --draft600-rgb: 104, 100, 100;
+  --draft900: #1a1919;
+  --draft900-rgb: 26, 25, 25;
+  --brand-light: #2d84ff;
+  --brand-light-rgb: 45, 132, 255;
+  --brand-dark: #0029ca;
+  --brand-dark-rgb: 0, 41, 202;
 }
 :root .bg-color-white {
-    background-color: var(--white);
+  background-color: var(--white);
 }
 :root .color-white {
-    color: var(--white);
+  color: var(--white);
 }
 :root .bg-color-black {
-    background-color: var(--black);
+  background-color: var(--black);
 }
 :root .color-black {
-    color: var(--black);
+  color: var(--black);
 }
 :root .bg-color-brand-color {
-    background-color: var(--brand-color);
+  background-color: var(--brand-color);
 }
 :root .color-brand-color {
-    color: var(--brand-color);
+  color: var(--brand-color);
 }
 :root .bg-color-p500 {
-    background-color: var(--p500);
+  background-color: var(--p500);
 }
 :root .color-p500 {
-    color: var(--p500);
+  color: var(--p500);
 }
 :root .bg-color-color-base-primary {
-    background-color: var(--color-base-primary);
+  background-color: var(--color-base-primary);
 }
 :root .color-color-base-primary {
-    color: var(--color-base-primary);
+  color: var(--color-base-primary);
 }
 :root .bg-color-i500 {
-    background-color: var(--i500);
+  background-color: var(--i500);
 }
 :root .color-i500 {
-    color: var(--i500);
+  color: var(--i500);
 }
 :root .bg-color-color-base-info {
-    background-color: var(--color-base-info);
+  background-color: var(--color-base-info);
 }
 :root .color-color-base-info {
-    color: var(--color-base-info);
+  color: var(--color-base-info);
 }
 :root .bg-color-n500 {
-    background-color: var(--n500);
+  background-color: var(--n500);
 }
 :root .color-n500 {
-    color: var(--n500);
+  color: var(--n500);
 }
 :root .bg-color-color-base-neutral {
-    background-color: var(--color-base-neutral);
+  background-color: var(--color-base-neutral);
 }
 :root .color-color-base-neutral {
-    color: var(--color-base-neutral);
+  color: var(--color-base-neutral);
 }
 :root .bg-color-s500 {
-    background-color: var(--s500);
+  background-color: var(--s500);
 }
 :root .color-s500 {
-    color: var(--s500);
+  color: var(--s500);
 }
 :root .bg-color-color-base-success {
-    background-color: var(--color-base-success);
+  background-color: var(--color-base-success);
 }
 :root .color-color-base-success {
-    color: var(--color-base-success);
+  color: var(--color-base-success);
 }
 :root .bg-color-e500 {
-    background-color: var(--e500);
+  background-color: var(--e500);
 }
 :root .color-e500 {
-    color: var(--e500);
+  color: var(--e500);
 }
 :root .bg-color-color-base-error {
-    background-color: var(--color-base-error);
+  background-color: var(--color-base-error);
 }
 :root .color-color-base-error {
-    color: var(--color-base-error);
+  color: var(--color-base-error);
 }
 :root .bg-color-w500 {
-    background-color: var(--w500);
+  background-color: var(--w500);
 }
 :root .color-w500 {
-    color: var(--w500);
+  color: var(--w500);
 }
 :root .bg-color-color-base-warning {
-    background-color: var(--color-base-warning);
+  background-color: var(--color-base-warning);
 }
 :root .color-color-base-warning {
-    color: var(--color-base-warning);
+  color: var(--color-base-warning);
 }
 :root .bg-color-a1-500 {
-    background-color: var(--a1-500);
+  background-color: var(--a1-500);
 }
 :root .color-a1-500 {
-    color: var(--a1-500);
+  color: var(--a1-500);
 }
 :root .bg-color-color-base-a1 {
-    background-color: var(--color-base-a1);
+  background-color: var(--color-base-a1);
 }
 :root .color-color-base-a1 {
-    color: var(--color-base-a1);
+  color: var(--color-base-a1);
 }
 :root .bg-color-a2-500 {
-    background-color: var(--a2-500);
+  background-color: var(--a2-500);
 }
 :root .color-a2-500 {
-    color: var(--a2-500);
+  color: var(--a2-500);
 }
 :root .bg-color-color-base-a2 {
-    background-color: var(--color-base-a2);
+  background-color: var(--color-base-a2);
 }
 :root .color-color-base-a2 {
-    color: var(--color-base-a2);
+  color: var(--color-base-a2);
 }
 :root .bg-color-a3-500 {
-    background-color: var(--a3-500);
+  background-color: var(--a3-500);
 }
 :root .color-a3-500 {
-    color: var(--a3-500);
+  color: var(--a3-500);
 }
 :root .bg-color-color-base-a3 {
-    background-color: var(--color-base-a3);
+  background-color: var(--color-base-a3);
 }
 :root .color-color-base-a3 {
-    color: var(--color-base-a3);
+  color: var(--color-base-a3);
 }
 :root .bg-color-a4-500 {
-    background-color: var(--a4-500);
+  background-color: var(--a4-500);
 }
 :root .color-a4-500 {
-    color: var(--a4-500);
+  color: var(--a4-500);
 }
 :root .bg-color-color-base-a4 {
-    background-color: var(--color-base-a4);
+  background-color: var(--color-base-a4);
 }
 :root .color-color-base-a4 {
-    color: var(--color-base-a4);
+  color: var(--color-base-a4);
 }
 :root .bg-color-base-op {
-    background-color: var(--base-op);
+  background-color: var(--base-op);
 }
 :root .color-base-op {
-    color: var(--base-op);
+  color: var(--base-op);
 }
 :root .bg-color-base-bm {
-    background-color: var(--base-bm);
+  background-color: var(--base-bm);
 }
 :root .color-base-bm {
-    color: var(--base-bm);
+  color: var(--base-bm);
 }
 :root .bg-color-base-seo {
-    background-color: var(--base-seo);
+  background-color: var(--base-seo);
 }
 :root .color-base-seo {
-    color: var(--base-seo);
+  color: var(--base-seo);
 }
 :root .bg-color-base-wr {
-    background-color: var(--base-wr);
+  background-color: var(--base-wr);
 }
 :root .color-base-wr {
-    color: var(--base-wr);
+  color: var(--base-wr);
 }
 :root .bg-color-base-eng {
-    background-color: var(--base-eng);
+  background-color: var(--base-eng);
 }
 :root .color-base-eng {
-    color: var(--base-eng);
+  color: var(--base-eng);
 }
 :root .bg-color-base-ads {
-    background-color: var(--base-ads);
+  background-color: var(--base-ads);
 }
 :root .color-base-ads {
-    color: var(--base-ads);
+  color: var(--base-ads);
 }
 :root .bg-color-ado-face-gradient-start {
-    background-color: var(--ado-face-gradient-start);
+  background-color: var(--ado-face-gradient-start);
 }
 :root .color-ado-face-gradient-start {
-    color: var(--ado-face-gradient-start);
+  color: var(--ado-face-gradient-start);
 }
 :root .bg-color-ado-face-gradient-end {
-    background-color: var(--ado-face-gradient-end);
+  background-color: var(--ado-face-gradient-end);
 }
 :root .color-ado-face-gradient-end {
-    color: var(--ado-face-gradient-end);
+  color: var(--ado-face-gradient-end);
 }
 :root .bg-color-ado-face-feature {
-    background-color: var(--ado-face-feature);
+  background-color: var(--ado-face-feature);
 }
 :root .color-ado-face-feature {
-    color: var(--ado-face-feature);
+  color: var(--ado-face-feature);
+}
+:root .bg-color-ado-shader-light-start-bg {
+  background-color: var(--ado-shader-light-start-bg);
+}
+:root .color-ado-shader-light-start-bg {
+  color: var(--ado-shader-light-start-bg);
+}
+:root .bg-color-ado-shader-light-start-col1 {
+  background-color: var(--ado-shader-light-start-col1);
+}
+:root .color-ado-shader-light-start-col1 {
+  color: var(--ado-shader-light-start-col1);
+}
+:root .bg-color-ado-shader-light-start-col2 {
+  background-color: var(--ado-shader-light-start-col2);
+}
+:root .color-ado-shader-light-start-col2 {
+  color: var(--ado-shader-light-start-col2);
+}
+:root .bg-color-ado-shader-light-start-col3 {
+  background-color: var(--ado-shader-light-start-col3);
+}
+:root .color-ado-shader-light-start-col3 {
+  color: var(--ado-shader-light-start-col3);
+}
+:root .bg-color-ado-shader-light-end-bg {
+  background-color: var(--ado-shader-light-end-bg);
+}
+:root .color-ado-shader-light-end-bg {
+  color: var(--ado-shader-light-end-bg);
+}
+:root .bg-color-ado-shader-light-end-col1 {
+  background-color: var(--ado-shader-light-end-col1);
+}
+:root .color-ado-shader-light-end-col1 {
+  color: var(--ado-shader-light-end-col1);
+}
+:root .bg-color-ado-shader-light-end-col2 {
+  background-color: var(--ado-shader-light-end-col2);
+}
+:root .color-ado-shader-light-end-col2 {
+  color: var(--ado-shader-light-end-col2);
+}
+:root .bg-color-ado-shader-light-end-col3 {
+  background-color: var(--ado-shader-light-end-col3);
+}
+:root .color-ado-shader-light-end-col3 {
+  color: var(--ado-shader-light-end-col3);
+}
+:root .bg-color-ado-shader-dark-start-bg {
+  background-color: var(--ado-shader-dark-start-bg);
+}
+:root .color-ado-shader-dark-start-bg {
+  color: var(--ado-shader-dark-start-bg);
+}
+:root .bg-color-ado-shader-dark-start-col1 {
+  background-color: var(--ado-shader-dark-start-col1);
+}
+:root .color-ado-shader-dark-start-col1 {
+  color: var(--ado-shader-dark-start-col1);
+}
+:root .bg-color-ado-shader-dark-start-col2 {
+  background-color: var(--ado-shader-dark-start-col2);
+}
+:root .color-ado-shader-dark-start-col2 {
+  color: var(--ado-shader-dark-start-col2);
+}
+:root .bg-color-ado-shader-dark-start-col3 {
+  background-color: var(--ado-shader-dark-start-col3);
+}
+:root .color-ado-shader-dark-start-col3 {
+  color: var(--ado-shader-dark-start-col3);
+}
+:root .bg-color-ado-shader-dark-end-bg {
+  background-color: var(--ado-shader-dark-end-bg);
+}
+:root .color-ado-shader-dark-end-bg {
+  color: var(--ado-shader-dark-end-bg);
+}
+:root .bg-color-ado-shader-dark-end-col1 {
+  background-color: var(--ado-shader-dark-end-col1);
+}
+:root .color-ado-shader-dark-end-col1 {
+  color: var(--ado-shader-dark-end-col1);
+}
+:root .bg-color-ado-shader-dark-end-col2 {
+  background-color: var(--ado-shader-dark-end-col2);
+}
+:root .color-ado-shader-dark-end-col2 {
+  color: var(--ado-shader-dark-end-col2);
+}
+:root .bg-color-ado-shader-dark-end-col3 {
+  background-color: var(--ado-shader-dark-end-col3);
+}
+:root .color-ado-shader-dark-end-col3 {
+  color: var(--ado-shader-dark-end-col3);
 }
 :root .bg-color-post-base-color {
-    background-color: var(--post-base-color);
+  background-color: var(--post-base-color);
 }
 :root .color-post-base-color {
-    color: var(--post-base-color);
+  color: var(--post-base-color);
 }
 :root .bg-color-event-base-color {
-    background-color: var(--event-base-color);
+  background-color: var(--event-base-color);
 }
 :root .color-event-base-color {
-    color: var(--event-base-color);
+  color: var(--event-base-color);
 }
 :root .bg-color-draft-base-color {
-    background-color: var(--draft-base-color);
+  background-color: var(--draft-base-color);
 }
 :root .color-draft-base-color {
-    color: var(--draft-base-color);
+  color: var(--draft-base-color);
 }
 :root .bg-color-boost-base-color {
-    background-color: var(--boost-base-color);
+  background-color: var(--boost-base-color);
 }
 :root .color-boost-base-color {
-    color: var(--boost-base-color);
+  color: var(--boost-base-color);
 }
 :root .bg-color-email-brand {
-    background-color: var(--email-brand);
+  background-color: var(--email-brand);
 }
 :root .color-email-brand {
-    color: var(--email-brand);
+  color: var(--email-brand);
 }
 :root .bg-color-email-fn-cta-lightest {
-    background-color: var(--email-fn-cta-lightest);
+  background-color: var(--email-fn-cta-lightest);
 }
 :root .color-email-fn-cta-lightest {
-    color: var(--email-fn-cta-lightest);
+  color: var(--email-fn-cta-lightest);
 }
 :root .bg-color-email-fn-cta-light {
-    background-color: var(--email-fn-cta-light);
+  background-color: var(--email-fn-cta-light);
 }
 :root .color-email-fn-cta-light {
-    color: var(--email-fn-cta-light);
+  color: var(--email-fn-cta-light);
 }
 :root .bg-color-email-fn-cta {
-    background-color: var(--email-fn-cta);
+  background-color: var(--email-fn-cta);
 }
 :root .color-email-fn-cta {
-    color: var(--email-fn-cta);
+  color: var(--email-fn-cta);
 }
 :root .bg-color-email-fn-cta-dark {
-    background-color: var(--email-fn-cta-dark);
+  background-color: var(--email-fn-cta-dark);
 }
 :root .color-email-fn-cta-dark {
-    color: var(--email-fn-cta-dark);
+  color: var(--email-fn-cta-dark);
 }
 :root .bg-color-email-fn-bg {
-    background-color: var(--email-fn-bg);
+  background-color: var(--email-fn-bg);
 }
 :root .color-email-fn-bg {
-    color: var(--email-fn-bg);
+  color: var(--email-fn-bg);
 }
 :root .bg-color-email-fn-bg-var {
-    background-color: var(--email-fn-bg-var);
+  background-color: var(--email-fn-bg-var);
 }
 :root .color-email-fn-bg-var {
-    color: var(--email-fn-bg-var);
+  color: var(--email-fn-bg-var);
 }
 :root .bg-color-email-fn-fg {
-    background-color: var(--email-fn-fg);
+  background-color: var(--email-fn-fg);
 }
 :root .color-email-fn-fg {
-    color: var(--email-fn-fg);
+  color: var(--email-fn-fg);
 }
 :root .bg-color-email-fn-fg-on-cta {
-    background-color: var(--email-fn-fg-on-cta);
+  background-color: var(--email-fn-fg-on-cta);
 }
 :root .color-email-fn-fg-on-cta {
-    color: var(--email-fn-fg-on-cta);
+  color: var(--email-fn-fg-on-cta);
 }
 :root .bg-color-email-fn-fg-light {
-    background-color: var(--email-fn-fg-light);
+  background-color: var(--email-fn-fg-light);
 }
 :root .color-email-fn-fg-light {
-    color: var(--email-fn-fg-light);
+  color: var(--email-fn-fg-light);
 }
 :root .bg-color-email-fn-fg-lightest {
-    background-color: var(--email-fn-fg-lightest);
+  background-color: var(--email-fn-fg-lightest);
 }
 :root .color-email-fn-fg-lightest {
-    color: var(--email-fn-fg-lightest);
+  color: var(--email-fn-fg-lightest);
 }
 :root .bg-color-email-fn-brd {
-    background-color: var(--email-fn-brd);
+  background-color: var(--email-fn-brd);
 }
 :root .color-email-fn-brd {
-    color: var(--email-fn-brd);
+  color: var(--email-fn-brd);
 }
 :root .bg-color-email-fn-divider {
-    background-color: var(--email-fn-divider);
+  background-color: var(--email-fn-divider);
 }
 :root .color-email-fn-divider {
-    color: var(--email-fn-divider);
+  color: var(--email-fn-divider);
 }
 :root .bg-color-email-background {
-    background-color: var(--email-background);
+  background-color: var(--email-background);
 }
 :root .color-email-background {
-    color: var(--email-background);
+  color: var(--email-background);
 }
 :root .bg-color-email-content-background {
-    background-color: var(--email-content-background);
+  background-color: var(--email-content-background);
 }
 :root .color-email-content-background {
-    color: var(--email-content-background);
+  color: var(--email-content-background);
 }
 :root .bg-color-email-warning-lightest {
-    background-color: var(--email-warning-lightest);
+  background-color: var(--email-warning-lightest);
 }
 :root .color-email-warning-lightest {
-    color: var(--email-warning-lightest);
+  color: var(--email-warning-lightest);
 }
 :root .bg-color-email-warning-dark {
-    background-color: var(--email-warning-dark);
+  background-color: var(--email-warning-dark);
 }
 :root .color-email-warning-dark {
-    color: var(--email-warning-dark);
+  color: var(--email-warning-dark);
 }
 :root .bg-color-email-warning-darkest {
-    background-color: var(--email-warning-darkest);
+  background-color: var(--email-warning-darkest);
 }
 :root .color-email-warning-darkest {
-    color: var(--email-warning-darkest);
+  color: var(--email-warning-darkest);
 }
 :root .bg-color-email-error-lightest {
-    background-color: var(--email-error-lightest);
+  background-color: var(--email-error-lightest);
 }
 :root .color-email-error-lightest {
-    color: var(--email-error-lightest);
+  color: var(--email-error-lightest);
 }
 :root .bg-color-email-error-dark {
-    background-color: var(--email-error-dark);
+  background-color: var(--email-error-dark);
 }
 :root .color-email-error-dark {
-    color: var(--email-error-dark);
+  color: var(--email-error-dark);
 }
 :root .bg-color-email-error-darkest {
-    background-color: var(--email-error-darkest);
+  background-color: var(--email-error-darkest);
 }
 :root .color-email-error-darkest {
-    color: var(--email-error-darkest);
+  color: var(--email-error-darkest);
 }
 :root .bg-color-email-success-lightest {
-    background-color: var(--email-success-lightest);
+  background-color: var(--email-success-lightest);
 }
 :root .color-email-success-lightest {
-    color: var(--email-success-lightest);
+  color: var(--email-success-lightest);
 }
 :root .bg-color-email-success-light {
-    background-color: var(--email-success-light);
+  background-color: var(--email-success-light);
 }
 :root .color-email-success-light {
-    color: var(--email-success-light);
+  color: var(--email-success-light);
 }
 :root .bg-color-email-success-dark {
-    background-color: var(--email-success-dark);
+  background-color: var(--email-success-dark);
 }
 :root .color-email-success-dark {
-    color: var(--email-success-dark);
+  color: var(--email-success-dark);
 }
 :root .bg-color-email-success-darkest {
-    background-color: var(--email-success-darkest);
+  background-color: var(--email-success-darkest);
 }
 :root .color-email-success-darkest {
-    color: var(--email-success-darkest);
+  color: var(--email-success-darkest);
 }
 :root .bg-color-email-info-lightest {
-    background-color: var(--email-info-lightest);
+  background-color: var(--email-info-lightest);
 }
 :root .color-email-info-lightest {
-    color: var(--email-info-lightest);
+  color: var(--email-info-lightest);
 }
 :root .bg-color-email-info-dark {
-    background-color: var(--email-info-dark);
+  background-color: var(--email-info-dark);
 }
 :root .color-email-info-dark {
-    color: var(--email-info-dark);
+  color: var(--email-info-dark);
 }
 :root .bg-color-email-info-darkest {
-    background-color: var(--email-info-darkest);
+  background-color: var(--email-info-darkest);
 }
 :root .color-email-info-darkest {
-    color: var(--email-info-darkest);
+  color: var(--email-info-darkest);
 }
 :root .bg-color-email-ai-light {
-    background-color: var(--email-ai-light);
+  background-color: var(--email-ai-light);
 }
 :root .color-email-ai-light {
-    color: var(--email-ai-light);
+  color: var(--email-ai-light);
 }
 :root .bg-color-email-ai-dark {
-    background-color: var(--email-ai-dark);
+  background-color: var(--email-ai-dark);
 }
 :root .color-email-ai-dark {
-    color: var(--email-ai-dark);
+  color: var(--email-ai-dark);
 }
 :root .bg-color-email-acc02-darkest {
-    background-color: var(--email-acc02-darkest);
+  background-color: var(--email-acc02-darkest);
 }
 :root .color-email-acc02-darkest {
-    color: var(--email-acc02-darkest);
+  color: var(--email-acc02-darkest);
 }
 :root .bg-color-email-header-fn-fg {
-    background-color: var(--email-header-fn-fg);
+  background-color: var(--email-header-fn-fg);
 }
 :root .color-email-header-fn-fg {
-    color: var(--email-header-fn-fg);
+  color: var(--email-header-fn-fg);
 }
 :root .bg-color-email-header-fn-bg {
-    background-color: var(--email-header-fn-bg);
+  background-color: var(--email-header-fn-bg);
 }
 :root .color-email-header-fn-bg {
-    color: var(--email-header-fn-bg);
+  color: var(--email-header-fn-bg);
 }
 :root .bg-color-email-footer-fg-main {
-    background-color: var(--email-footer-fg-main);
+  background-color: var(--email-footer-fg-main);
 }
 :root .color-email-footer-fg-main {
-    color: var(--email-footer-fg-main);
+  color: var(--email-footer-fg-main);
 }
 :root .bg-color-email-footer-bg-main {
-    background-color: var(--email-footer-bg-main);
+  background-color: var(--email-footer-bg-main);
 }
 :root .color-email-footer-bg-main {
-    color: var(--email-footer-bg-main);
+  color: var(--email-footer-bg-main);
 }
 :root .bg-color-email-footer-fg-light-main {
-    background-color: var(--email-footer-fg-light-main);
+  background-color: var(--email-footer-fg-light-main);
 }
 :root .color-email-footer-fg-light-main {
-    color: var(--email-footer-fg-light-main);
+  color: var(--email-footer-fg-light-main);
 }
 :root .bg-color-email-footer-fg-lightest-main {
-    background-color: var(--email-footer-fg-lightest-main);
+  background-color: var(--email-footer-fg-lightest-main);
 }
 :root .color-email-footer-fg-lightest-main {
-    color: var(--email-footer-fg-lightest-main);
+  color: var(--email-footer-fg-lightest-main);
 }
 :root .bg-color-email-footer-bg-accent {
-    background-color: var(--email-footer-bg-accent);
+  background-color: var(--email-footer-bg-accent);
 }
 :root .color-email-footer-bg-accent {
-    color: var(--email-footer-bg-accent);
+  color: var(--email-footer-bg-accent);
 }
 :root .bg-color-email-footer-fg-on-bg-accent {
-    background-color: var(--email-footer-fg-on-bg-accent);
+  background-color: var(--email-footer-fg-on-bg-accent);
 }
 :root .color-email-footer-fg-on-bg-accent {
-    color: var(--email-footer-fg-on-bg-accent);
+  color: var(--email-footer-fg-on-bg-accent);
 }
 :root .bg-color-email-footer-bg-accent2 {
-    background-color: var(--email-footer-bg-accent2);
+  background-color: var(--email-footer-bg-accent2);
 }
 :root .color-email-footer-bg-accent2 {
-    color: var(--email-footer-bg-accent2);
+  color: var(--email-footer-bg-accent2);
 }
 :root .bg-color-email-footer-fg-on-bg-accent2 {
-    background-color: var(--email-footer-fg-on-bg-accent2);
+  background-color: var(--email-footer-fg-on-bg-accent2);
 }
 :root .color-email-footer-fg-on-bg-accent2 {
-    color: var(--email-footer-fg-on-bg-accent2);
+  color: var(--email-footer-fg-on-bg-accent2);
 }
 :root .bg-color-email-footer-cta-fg-on-bg-accent2 {
-    background-color: var(--email-footer-cta-fg-on-bg-accent2);
+  background-color: var(--email-footer-cta-fg-on-bg-accent2);
 }
 :root .color-email-footer-cta-fg-on-bg-accent2 {
-    color: var(--email-footer-cta-fg-on-bg-accent2);
+  color: var(--email-footer-cta-fg-on-bg-accent2);
 }
 :root .bg-color-email-button-primary-bg {
-    background-color: var(--email-button-primary-bg);
+  background-color: var(--email-button-primary-bg);
 }
 :root .color-email-button-primary-bg {
-    color: var(--email-button-primary-bg);
+  color: var(--email-button-primary-bg);
 }
 :root .bg-color-email-button-primary-fg {
-    background-color: var(--email-button-primary-fg);
+  background-color: var(--email-button-primary-fg);
 }
 :root .color-email-button-primary-fg {
-    color: var(--email-button-primary-fg);
+  color: var(--email-button-primary-fg);
 }
 :root .bg-color-email-button-primary-border {
-    background-color: var(--email-button-primary-border);
+  background-color: var(--email-button-primary-border);
 }
 :root .color-email-button-primary-border {
-    color: var(--email-button-primary-border);
+  color: var(--email-button-primary-border);
 }
 :root .bg-color-email-button-default-bg {
-    background-color: var(--email-button-default-bg);
+  background-color: var(--email-button-default-bg);
 }
 :root .color-email-button-default-bg {
-    color: var(--email-button-default-bg);
+  color: var(--email-button-default-bg);
 }
 :root .bg-color-email-button-default-fg {
-    background-color: var(--email-button-default-fg);
+  background-color: var(--email-button-default-fg);
 }
 :root .color-email-button-default-fg {
-    color: var(--email-button-default-fg);
+  color: var(--email-button-default-fg);
 }
 :root .bg-color-email-button-default-border {
-    background-color: var(--email-button-default-border);
+  background-color: var(--email-button-default-border);
 }
 :root .color-email-button-default-border {
-    color: var(--email-button-default-border);
+  color: var(--email-button-default-border);
 }
 :root .bg-color-review-booster-pm-1-text {
-    background-color: var(--review-booster-pm-1-text);
+  background-color: var(--review-booster-pm-1-text);
 }
 :root .color-review-booster-pm-1-text {
-    color: var(--review-booster-pm-1-text);
+  color: var(--review-booster-pm-1-text);
 }
 :root .bg-color-review-booster-pm-1-qr-code {
-    background-color: var(--review-booster-pm-1-qr-code);
+  background-color: var(--review-booster-pm-1-qr-code);
 }
 :root .color-review-booster-pm-1-qr-code {
-    color: var(--review-booster-pm-1-qr-code);
+  color: var(--review-booster-pm-1-qr-code);
 }
 :root .bg-color-review-booster-pm-2-text {
-    background-color: var(--review-booster-pm-2-text);
+  background-color: var(--review-booster-pm-2-text);
 }
 :root .color-review-booster-pm-2-text {
-    color: var(--review-booster-pm-2-text);
+  color: var(--review-booster-pm-2-text);
 }
 :root .bg-color-review-booster-pm-2-background {
-    background-color: var(--review-booster-pm-2-background);
+  background-color: var(--review-booster-pm-2-background);
 }
 :root .color-review-booster-pm-2-background {
-    color: var(--review-booster-pm-2-background);
+  color: var(--review-booster-pm-2-background);
 }
 :root .bg-color-review-booster-pm-2-qr-code {
-    background-color: var(--review-booster-pm-2-qr-code);
+  background-color: var(--review-booster-pm-2-qr-code);
 }
 :root .color-review-booster-pm-2-qr-code {
-    color: var(--review-booster-pm-2-qr-code);
+  color: var(--review-booster-pm-2-qr-code);
 }
 :root .bg-color-heading-color {
-    background-color: var(--heading-color);
+  background-color: var(--heading-color);
 }
 :root .color-heading-color {
-    color: var(--heading-color);
+  color: var(--heading-color);
 }
 :root .bg-color-text-color {
-    background-color: var(--text-color);
+  background-color: var(--text-color);
 }
 :root .color-text-color {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 :root .bg-color-em-color {
-    background-color: var(--em-color);
+  background-color: var(--em-color);
 }
 :root .color-em-color {
-    color: var(--em-color);
+  color: var(--em-color);
 }
 :root .bg-color-header-color {
-    background-color: var(--header-color);
+  background-color: var(--header-color);
 }
 :root .color-header-color {
-    color: var(--header-color);
+  color: var(--header-color);
 }
 :root .bg-color-header-button-secondary-text-color {
-    background-color: var(--header-button-secondary-text-color);
+  background-color: var(--header-button-secondary-text-color);
 }
 :root .color-header-button-secondary-text-color {
-    color: var(--header-button-secondary-text-color);
+  color: var(--header-button-secondary-text-color);
 }
 :root .bg-color-header-button-secondary-background-color {
-    background-color: var(--header-button-secondary-background-color);
+  background-color: var(--header-button-secondary-background-color);
 }
 :root .color-header-button-secondary-background-color {
-    color: var(--header-button-secondary-background-color);
+  color: var(--header-button-secondary-background-color);
 }
 :root .bg-color-header-button-secondary-border-color {
-    background-color: var(--header-button-secondary-border-color);
+  background-color: var(--header-button-secondary-border-color);
 }
 :root .color-header-button-secondary-border-color {
-    color: var(--header-button-secondary-border-color);
+  color: var(--header-button-secondary-border-color);
 }
 :root .bg-color-header-button-secondary-hover-text-color {
-    background-color: var(--header-button-secondary-hover-text-color);
+  background-color: var(--header-button-secondary-hover-text-color);
 }
 :root .color-header-button-secondary-hover-text-color {
-    color: var(--header-button-secondary-hover-text-color);
+  color: var(--header-button-secondary-hover-text-color);
 }
 :root .bg-color-header-button-secondary-hover-background-color {
-    background-color: var(--header-button-secondary-hover-background-color);
+  background-color: var(--header-button-secondary-hover-background-color);
 }
 :root .color-header-button-secondary-hover-background-color {
-    color: var(--header-button-secondary-hover-background-color);
+  color: var(--header-button-secondary-hover-background-color);
 }
 :root .bg-color-header-button-secondary-hover-border-color {
-    background-color: var(--header-button-secondary-hover-border-color);
+  background-color: var(--header-button-secondary-hover-border-color);
 }
 :root .color-header-button-secondary-hover-border-color {
-    color: var(--header-button-secondary-hover-border-color);
+  color: var(--header-button-secondary-hover-border-color);
 }
 :root .bg-color-header-button-secondary-disabled-text-color {
-    background-color: var(--header-button-secondary-disabled-text-color);
+  background-color: var(--header-button-secondary-disabled-text-color);
 }
 :root .color-header-button-secondary-disabled-text-color {
-    color: var(--header-button-secondary-disabled-text-color);
+  color: var(--header-button-secondary-disabled-text-color);
 }
 :root .bg-color-header-button-secondary-disabled-background-color {
-    background-color: var(--header-button-secondary-disabled-background-color);
+  background-color: var(--header-button-secondary-disabled-background-color);
 }
 :root .color-header-button-secondary-disabled-background-color {
-    color: var(--header-button-secondary-disabled-background-color);
+  color: var(--header-button-secondary-disabled-background-color);
 }
 :root .bg-color-header-button-secondary-disabled-border-color {
-    background-color: var(--header-button-secondary-disabled-border-color);
+  background-color: var(--header-button-secondary-disabled-border-color);
 }
 :root .color-header-button-secondary-disabled-border-color {
-    color: var(--header-button-secondary-disabled-border-color);
+  color: var(--header-button-secondary-disabled-border-color);
 }
 :root .bg-color-header-button-secondary-focus-text-color {
-    background-color: var(--header-button-secondary-focus-text-color);
+  background-color: var(--header-button-secondary-focus-text-color);
 }
 :root .color-header-button-secondary-focus-text-color {
-    color: var(--header-button-secondary-focus-text-color);
+  color: var(--header-button-secondary-focus-text-color);
 }
 :root .bg-color-header-button-secondary-focus-background-color {
-    background-color: var(--header-button-secondary-focus-background-color);
+  background-color: var(--header-button-secondary-focus-background-color);
 }
 :root .color-header-button-secondary-focus-background-color {
-    color: var(--header-button-secondary-focus-background-color);
+  color: var(--header-button-secondary-focus-background-color);
 }
 :root .bg-color-header-button-secondary-focus-border-color {
-    background-color: var(--header-button-secondary-focus-border-color);
+  background-color: var(--header-button-secondary-focus-border-color);
 }
 :root .color-header-button-secondary-focus-border-color {
-    color: var(--header-button-secondary-focus-border-color);
+  color: var(--header-button-secondary-focus-border-color);
 }
 :root .bg-color-header-button-secondary-focus-box-shadow-color {
-    background-color: var(--header-button-secondary-focus-box-shadow-color);
+  background-color: var(--header-button-secondary-focus-box-shadow-color);
 }
 :root .color-header-button-secondary-focus-box-shadow-color {
-    color: var(--header-button-secondary-focus-box-shadow-color);
+  color: var(--header-button-secondary-focus-box-shadow-color);
 }
 :root .bg-color-header-button-secondary-ripple-color {
-    background-color: var(--header-button-secondary-ripple-color);
+  background-color: var(--header-button-secondary-ripple-color);
 }
 :root .color-header-button-secondary-ripple-color {
-    color: var(--header-button-secondary-ripple-color);
+  color: var(--header-button-secondary-ripple-color);
 }
 :root .bg-color-button-default-text-color {
-    background-color: var(--button-default-text-color);
+  background-color: var(--button-default-text-color);
 }
 :root .color-button-default-text-color {
-    color: var(--button-default-text-color);
+  color: var(--button-default-text-color);
 }
 :root .bg-color-button-default-background-color {
-    background-color: var(--button-default-background-color);
+  background-color: var(--button-default-background-color);
 }
 :root .color-button-default-background-color {
-    color: var(--button-default-background-color);
+  color: var(--button-default-background-color);
 }
 :root .bg-color-button-default-hover-text-color {
-    background-color: var(--button-default-hover-text-color);
+  background-color: var(--button-default-hover-text-color);
 }
 :root .color-button-default-hover-text-color {
-    color: var(--button-default-hover-text-color);
+  color: var(--button-default-hover-text-color);
 }
 :root .bg-color-button-default-hover-background-color {
-    background-color: var(--button-default-hover-background-color);
+  background-color: var(--button-default-hover-background-color);
 }
 :root .color-button-default-hover-background-color {
-    color: var(--button-default-hover-background-color);
+  color: var(--button-default-hover-background-color);
 }
 :root .bg-color-button-default-disabled-text-color {
-    background-color: var(--button-default-disabled-text-color);
+  background-color: var(--button-default-disabled-text-color);
 }
 :root .color-button-default-disabled-text-color {
-    color: var(--button-default-disabled-text-color);
+  color: var(--button-default-disabled-text-color);
 }
 :root .bg-color-button-default-disabled-background-color {
-    background-color: var(--button-default-disabled-background-color);
+  background-color: var(--button-default-disabled-background-color);
 }
 :root .color-button-default-disabled-background-color {
-    color: var(--button-default-disabled-background-color);
+  color: var(--button-default-disabled-background-color);
 }
 :root .bg-color-button-default-focus-text-color {
-    background-color: var(--button-default-focus-text-color);
+  background-color: var(--button-default-focus-text-color);
 }
 :root .color-button-default-focus-text-color {
-    color: var(--button-default-focus-text-color);
+  color: var(--button-default-focus-text-color);
 }
 :root .bg-color-button-default-focus-background-color {
-    background-color: var(--button-default-focus-background-color);
+  background-color: var(--button-default-focus-background-color);
 }
 :root .color-button-default-focus-background-color {
-    color: var(--button-default-focus-background-color);
+  color: var(--button-default-focus-background-color);
 }
 :root .bg-color-button-default-focus-box-shadow-color {
-    background-color: var(--button-default-focus-box-shadow-color);
+  background-color: var(--button-default-focus-box-shadow-color);
 }
 :root .color-button-default-focus-box-shadow-color {
-    color: var(--button-default-focus-box-shadow-color);
+  color: var(--button-default-focus-box-shadow-color);
 }
 :root .bg-color-button-default-ripple-color {
-    background-color: var(--button-default-ripple-color);
+  background-color: var(--button-default-ripple-color);
 }
 :root .color-button-default-ripple-color {
-    color: var(--button-default-ripple-color);
+  color: var(--button-default-ripple-color);
 }
 :root .bg-color-button-primary-text-color {
-    background-color: var(--button-primary-text-color);
+  background-color: var(--button-primary-text-color);
 }
 :root .color-button-primary-text-color {
-    color: var(--button-primary-text-color);
+  color: var(--button-primary-text-color);
 }
 :root .bg-color-button-primary-background-color {
-    background-color: var(--button-primary-background-color);
+  background-color: var(--button-primary-background-color);
 }
 :root .color-button-primary-background-color {
-    color: var(--button-primary-background-color);
+  color: var(--button-primary-background-color);
 }
 :root .bg-color-button-primary-hover-text-color {
-    background-color: var(--button-primary-hover-text-color);
+  background-color: var(--button-primary-hover-text-color);
 }
 :root .color-button-primary-hover-text-color {
-    color: var(--button-primary-hover-text-color);
+  color: var(--button-primary-hover-text-color);
 }
 :root .bg-color-button-primary-hover-background-color {
-    background-color: var(--button-primary-hover-background-color);
+  background-color: var(--button-primary-hover-background-color);
 }
 :root .color-button-primary-hover-background-color {
-    color: var(--button-primary-hover-background-color);
+  color: var(--button-primary-hover-background-color);
 }
 :root .bg-color-button-primary-disabled-text-color {
-    background-color: var(--button-primary-disabled-text-color);
+  background-color: var(--button-primary-disabled-text-color);
 }
 :root .color-button-primary-disabled-text-color {
-    color: var(--button-primary-disabled-text-color);
+  color: var(--button-primary-disabled-text-color);
 }
 :root .bg-color-button-primary-disabled-background-color {
-    background-color: var(--button-primary-disabled-background-color);
+  background-color: var(--button-primary-disabled-background-color);
 }
 :root .color-button-primary-disabled-background-color {
-    color: var(--button-primary-disabled-background-color);
+  color: var(--button-primary-disabled-background-color);
 }
 :root .bg-color-button-primary-focus-text-color {
-    background-color: var(--button-primary-focus-text-color);
+  background-color: var(--button-primary-focus-text-color);
 }
 :root .color-button-primary-focus-text-color {
-    color: var(--button-primary-focus-text-color);
+  color: var(--button-primary-focus-text-color);
 }
 :root .bg-color-button-primary-focus-background-color {
-    background-color: var(--button-primary-focus-background-color);
+  background-color: var(--button-primary-focus-background-color);
 }
 :root .color-button-primary-focus-background-color {
-    color: var(--button-primary-focus-background-color);
+  color: var(--button-primary-focus-background-color);
 }
 :root .bg-color-button-primary-focus-box-shadow-color {
-    background-color: var(--button-primary-focus-box-shadow-color);
+  background-color: var(--button-primary-focus-box-shadow-color);
 }
 :root .color-button-primary-focus-box-shadow-color {
-    color: var(--button-primary-focus-box-shadow-color);
+  color: var(--button-primary-focus-box-shadow-color);
 }
 :root .bg-color-button-primary-ripple-color {
-    background-color: var(--button-primary-ripple-color);
+  background-color: var(--button-primary-ripple-color);
 }
 :root .color-button-primary-ripple-color {
-    color: var(--button-primary-ripple-color);
+  color: var(--button-primary-ripple-color);
 }
 :root .bg-color-button-secondary-text-color {
-    background-color: var(--button-secondary-text-color);
+  background-color: var(--button-secondary-text-color);
 }
 :root .color-button-secondary-text-color {
-    color: var(--button-secondary-text-color);
+  color: var(--button-secondary-text-color);
 }
 :root .bg-color-button-secondary-no-border-text-color {
-    background-color: var(--button-secondary-no-border-text-color);
+  background-color: var(--button-secondary-no-border-text-color);
 }
 :root .color-button-secondary-no-border-text-color {
-    color: var(--button-secondary-no-border-text-color);
+  color: var(--button-secondary-no-border-text-color);
 }
 :root .bg-color-button-secondary-background-color {
-    background-color: var(--button-secondary-background-color);
+  background-color: var(--button-secondary-background-color);
 }
 :root .color-button-secondary-background-color {
-    color: var(--button-secondary-background-color);
+  color: var(--button-secondary-background-color);
 }
 :root .bg-color-button-secondary-border-color {
-    background-color: var(--button-secondary-border-color);
+  background-color: var(--button-secondary-border-color);
 }
 :root .color-button-secondary-border-color {
-    color: var(--button-secondary-border-color);
+  color: var(--button-secondary-border-color);
 }
 :root .bg-color-button-secondary-hover-text-color {
-    background-color: var(--button-secondary-hover-text-color);
+  background-color: var(--button-secondary-hover-text-color);
 }
 :root .color-button-secondary-hover-text-color {
-    color: var(--button-secondary-hover-text-color);
+  color: var(--button-secondary-hover-text-color);
 }
 :root .bg-color-button-secondary-hover-background-color {
-    background-color: var(--button-secondary-hover-background-color);
+  background-color: var(--button-secondary-hover-background-color);
 }
 :root .color-button-secondary-hover-background-color {
-    color: var(--button-secondary-hover-background-color);
+  color: var(--button-secondary-hover-background-color);
 }
 :root .bg-color-button-secondary-hover-border-color {
-    background-color: var(--button-secondary-hover-border-color);
+  background-color: var(--button-secondary-hover-border-color);
 }
 :root .color-button-secondary-hover-border-color {
-    color: var(--button-secondary-hover-border-color);
+  color: var(--button-secondary-hover-border-color);
 }
 :root .bg-color-button-secondary-disabled-text-color {
-    background-color: var(--button-secondary-disabled-text-color);
+  background-color: var(--button-secondary-disabled-text-color);
 }
 :root .color-button-secondary-disabled-text-color {
-    color: var(--button-secondary-disabled-text-color);
+  color: var(--button-secondary-disabled-text-color);
 }
 :root .bg-color-button-secondary-disabled-background-color {
-    background-color: var(--button-secondary-disabled-background-color);
+  background-color: var(--button-secondary-disabled-background-color);
 }
 :root .color-button-secondary-disabled-background-color {
-    color: var(--button-secondary-disabled-background-color);
+  color: var(--button-secondary-disabled-background-color);
 }
 :root .bg-color-button-secondary-disabled-border-color {
-    background-color: var(--button-secondary-disabled-border-color);
+  background-color: var(--button-secondary-disabled-border-color);
 }
 :root .color-button-secondary-disabled-border-color {
-    color: var(--button-secondary-disabled-border-color);
+  color: var(--button-secondary-disabled-border-color);
 }
 :root .bg-color-button-secondary-focus-text-color {
-    background-color: var(--button-secondary-focus-text-color);
+  background-color: var(--button-secondary-focus-text-color);
 }
 :root .color-button-secondary-focus-text-color {
-    color: var(--button-secondary-focus-text-color);
+  color: var(--button-secondary-focus-text-color);
 }
 :root .bg-color-button-secondary-focus-background-color {
-    background-color: var(--button-secondary-focus-background-color);
+  background-color: var(--button-secondary-focus-background-color);
 }
 :root .color-button-secondary-focus-background-color {
-    color: var(--button-secondary-focus-background-color);
+  color: var(--button-secondary-focus-background-color);
 }
 :root .bg-color-button-secondary-focus-border-color {
-    background-color: var(--button-secondary-focus-border-color);
+  background-color: var(--button-secondary-focus-border-color);
 }
 :root .color-button-secondary-focus-border-color {
-    color: var(--button-secondary-focus-border-color);
+  color: var(--button-secondary-focus-border-color);
 }
 :root .bg-color-button-secondary-focus-box-shadow-color {
-    background-color: var(--button-secondary-focus-box-shadow-color);
+  background-color: var(--button-secondary-focus-box-shadow-color);
 }
 :root .color-button-secondary-focus-box-shadow-color {
-    color: var(--button-secondary-focus-box-shadow-color);
+  color: var(--button-secondary-focus-box-shadow-color);
 }
 :root .bg-color-button-secondary-ripple-color {
-    background-color: var(--button-secondary-ripple-color);
+  background-color: var(--button-secondary-ripple-color);
 }
 :root .color-button-secondary-ripple-color {
-    color: var(--button-secondary-ripple-color);
+  color: var(--button-secondary-ripple-color);
 }
 :root .bg-color-button-shimmer-text-color {
-    background-color: var(--button-shimmer-text-color);
+  background-color: var(--button-shimmer-text-color);
 }
 :root .color-button-shimmer-text-color {
-    color: var(--button-shimmer-text-color);
+  color: var(--button-shimmer-text-color);
 }
 :root .bg-color-button-shimmer-background-color {
-    background-color: var(--button-shimmer-background-color);
+  background-color: var(--button-shimmer-background-color);
 }
 :root .color-button-shimmer-background-color {
-    color: var(--button-shimmer-background-color);
+  color: var(--button-shimmer-background-color);
 }
 :root .bg-color-button-shimmer-hover-text-color {
-    background-color: var(--button-shimmer-hover-text-color);
+  background-color: var(--button-shimmer-hover-text-color);
 }
 :root .color-button-shimmer-hover-text-color {
-    color: var(--button-shimmer-hover-text-color);
+  color: var(--button-shimmer-hover-text-color);
 }
 :root .bg-color-button-shimmer-hover-background-color {
-    background-color: var(--button-shimmer-hover-background-color);
+  background-color: var(--button-shimmer-hover-background-color);
 }
 :root .color-button-shimmer-hover-background-color {
-    color: var(--button-shimmer-hover-background-color);
+  color: var(--button-shimmer-hover-background-color);
 }
 :root .bg-color-button-shimmer-disabled-text-color {
-    background-color: var(--button-shimmer-disabled-text-color);
+  background-color: var(--button-shimmer-disabled-text-color);
 }
 :root .color-button-shimmer-disabled-text-color {
-    color: var(--button-shimmer-disabled-text-color);
+  color: var(--button-shimmer-disabled-text-color);
 }
 :root .bg-color-button-shimmer-disabled-background-color {
-    background-color: var(--button-shimmer-disabled-background-color);
+  background-color: var(--button-shimmer-disabled-background-color);
 }
 :root .color-button-shimmer-disabled-background-color {
-    color: var(--button-shimmer-disabled-background-color);
+  color: var(--button-shimmer-disabled-background-color);
 }
 :root .bg-color-button-shimmer-focus-text-color {
-    background-color: var(--button-shimmer-focus-text-color);
+  background-color: var(--button-shimmer-focus-text-color);
 }
 :root .color-button-shimmer-focus-text-color {
-    color: var(--button-shimmer-focus-text-color);
+  color: var(--button-shimmer-focus-text-color);
 }
 :root .bg-color-button-shimmer-focus-background-color {
-    background-color: var(--button-shimmer-focus-background-color);
+  background-color: var(--button-shimmer-focus-background-color);
 }
 :root .color-button-shimmer-focus-background-color {
-    color: var(--button-shimmer-focus-background-color);
+  color: var(--button-shimmer-focus-background-color);
 }
 :root .bg-color-button-shimmer-focus-box-shadow-color {
-    background-color: var(--button-shimmer-focus-box-shadow-color);
+  background-color: var(--button-shimmer-focus-box-shadow-color);
 }
 :root .color-button-shimmer-focus-box-shadow-color {
-    color: var(--button-shimmer-focus-box-shadow-color);
+  color: var(--button-shimmer-focus-box-shadow-color);
 }
 :root .bg-color-button-shimmer-ripple-color {
-    background-color: var(--button-shimmer-ripple-color);
+  background-color: var(--button-shimmer-ripple-color);
 }
 :root .color-button-shimmer-ripple-color {
-    color: var(--button-shimmer-ripple-color);
+  color: var(--button-shimmer-ripple-color);
 }
 :root .bg-color-button-muted-text-color {
-    background-color: var(--button-muted-text-color);
+  background-color: var(--button-muted-text-color);
 }
 :root .color-button-muted-text-color {
-    color: var(--button-muted-text-color);
+  color: var(--button-muted-text-color);
 }
 :root .bg-color-button-muted-hover-text-color {
-    background-color: var(--button-muted-hover-text-color);
+  background-color: var(--button-muted-hover-text-color);
 }
 :root .color-button-muted-hover-text-color {
-    color: var(--button-muted-hover-text-color);
+  color: var(--button-muted-hover-text-color);
 }
 :root .bg-color-button-muted-disabled-text-color {
-    background-color: var(--button-muted-disabled-text-color);
+  background-color: var(--button-muted-disabled-text-color);
 }
 :root .color-button-muted-disabled-text-color {
-    color: var(--button-muted-disabled-text-color);
+  color: var(--button-muted-disabled-text-color);
+}
+:root .bg-color-button-muted-ripple-background-color {
+  background-color: var(--button-muted-ripple-background-color);
+}
+:root .color-button-muted-ripple-background-color {
+  color: var(--button-muted-ripple-background-color);
 }
 :root .bg-color-button-muted-focus-box-shadow-color {
-    background-color: var(--button-muted-focus-box-shadow-color);
+  background-color: var(--button-muted-focus-box-shadow-color);
 }
 :root .color-button-muted-focus-box-shadow-color {
-    color: var(--button-muted-focus-box-shadow-color);
+  color: var(--button-muted-focus-box-shadow-color);
 }
 :root .bg-color-button-muted-inverted-text-color {
-    background-color: var(--button-muted-inverted-text-color);
+  background-color: var(--button-muted-inverted-text-color);
 }
 :root .color-button-muted-inverted-text-color {
-    color: var(--button-muted-inverted-text-color);
+  color: var(--button-muted-inverted-text-color);
 }
 :root .bg-color-button-muted-inverted-hover-text-color {
-    background-color: var(--button-muted-inverted-hover-text-color);
+  background-color: var(--button-muted-inverted-hover-text-color);
 }
 :root .color-button-muted-inverted-hover-text-color {
-    color: var(--button-muted-inverted-hover-text-color);
+  color: var(--button-muted-inverted-hover-text-color);
 }
 :root .bg-color-button-muted-inverted-disabled-text-color {
-    background-color: var(--button-muted-inverted-disabled-text-color);
+  background-color: var(--button-muted-inverted-disabled-text-color);
 }
 :root .color-button-muted-inverted-disabled-text-color {
-    color: var(--button-muted-inverted-disabled-text-color);
+  color: var(--button-muted-inverted-disabled-text-color);
 }
 :root .bg-color-button-muted-inverted-focus-box-shadow-color {
-    background-color: var(--button-muted-inverted-focus-box-shadow-color);
+  background-color: var(--button-muted-inverted-focus-box-shadow-color);
 }
 :root .color-button-muted-inverted-focus-box-shadow-color {
-    color: var(--button-muted-inverted-focus-box-shadow-color);
+  color: var(--button-muted-inverted-focus-box-shadow-color);
 }
 :root .bg-color-nav-side-fg {
-    background-color: var(--nav-side-fg);
+  background-color: var(--nav-side-fg);
 }
 :root .color-nav-side-fg {
-    color: var(--nav-side-fg);
+  color: var(--nav-side-fg);
 }
 :root .bg-color-nav-side-fg-hover {
-    background-color: var(--nav-side-fg-hover);
+  background-color: var(--nav-side-fg-hover);
 }
 :root .color-nav-side-fg-hover {
-    color: var(--nav-side-fg-hover);
+  color: var(--nav-side-fg-hover);
 }
 :root .bg-color-nav-side-fg-selected {
-    background-color: var(--nav-side-fg-selected);
+  background-color: var(--nav-side-fg-selected);
 }
 :root .color-nav-side-fg-selected {
-    color: var(--nav-side-fg-selected);
+  color: var(--nav-side-fg-selected);
 }
 :root .bg-color-nav-side-collapse-fg {
-    background-color: var(--nav-side-collapse-fg);
+  background-color: var(--nav-side-collapse-fg);
 }
 :root .color-nav-side-collapse-fg {
-    color: var(--nav-side-collapse-fg);
+  color: var(--nav-side-collapse-fg);
 }
 :root .bg-color-nav-side-notif-bg-tasks {
-    background-color: var(--nav-side-notif-bg-tasks);
+  background-color: var(--nav-side-notif-bg-tasks);
 }
 :root .color-nav-side-notif-bg-tasks {
-    color: var(--nav-side-notif-bg-tasks);
+  color: var(--nav-side-notif-bg-tasks);
 }
 :root .bg-color-nav-side-notif-bg {
-    background-color: var(--nav-side-notif-bg);
+  background-color: var(--nav-side-notif-bg);
 }
 :root .color-nav-side-notif-bg {
-    color: var(--nav-side-notif-bg);
+  color: var(--nav-side-notif-bg);
 }
 :root .bg-color-nav-side-notif-fg {
-    background-color: var(--nav-side-notif-fg);
+  background-color: var(--nav-side-notif-fg);
 }
 :root .color-nav-side-notif-fg {
-    color: var(--nav-side-notif-fg);
+  color: var(--nav-side-notif-fg);
 }
 :root .bg-color-fn-bg {
-    background-color: var(--fn-bg);
+  background-color: var(--fn-bg);
 }
 :root .color-fn-bg {
-    color: var(--fn-bg);
+  color: var(--fn-bg);
 }
 :root .bg-color-fn-bg-var {
-    background-color: var(--fn-bg-var);
+  background-color: var(--fn-bg-var);
 }
 :root .color-fn-bg-var {
-    color: var(--fn-bg-var);
+  color: var(--fn-bg-var);
 }
 :root .bg-color-fn-bg-surface {
-    background-color: var(--fn-bg-surface);
+  background-color: var(--fn-bg-surface);
 }
 :root .color-fn-bg-surface {
-    color: var(--fn-bg-surface);
+  color: var(--fn-bg-surface);
 }
 :root .bg-color-fn-bg-cta {
-    background-color: var(--fn-bg-cta);
+  background-color: var(--fn-bg-cta);
 }
 :root .color-fn-bg-cta {
-    color: var(--fn-bg-cta);
+  color: var(--fn-bg-cta);
 }
 :root .bg-color-fn-fg-cta {
-    background-color: var(--fn-fg-cta);
+  background-color: var(--fn-fg-cta);
 }
 :root .color-fn-fg-cta {
-    color: var(--fn-fg-cta);
+  color: var(--fn-fg-cta);
 }
 :root .bg-color-fn-fg-cta-hov {
-    background-color: var(--fn-fg-cta-hov);
+  background-color: var(--fn-fg-cta-hov);
 }
 :root .color-fn-fg-cta-hov {
-    color: var(--fn-fg-cta-hov);
+  color: var(--fn-fg-cta-hov);
 }
 :root .bg-color-fn-bg-cta-fg {
-    background-color: var(--fn-bg-cta-fg);
+  background-color: var(--fn-bg-cta-fg);
 }
 :root .color-fn-bg-cta-fg {
-    color: var(--fn-bg-cta-fg);
+  color: var(--fn-bg-cta-fg);
 }
 :root .bg-color-fn-fg {
-    background-color: var(--fn-fg);
+  background-color: var(--fn-fg);
 }
 :root .color-fn-fg {
-    color: var(--fn-fg);
+  color: var(--fn-fg);
 }
 :root .bg-color-fn-fg-light {
-    background-color: var(--fn-fg-light);
+  background-color: var(--fn-fg-light);
 }
 :root .color-fn-fg-light {
-    color: var(--fn-fg-light);
+  color: var(--fn-fg-light);
 }
 :root .bg-color-fn-fg-lightest {
-    background-color: var(--fn-fg-lightest);
+  background-color: var(--fn-fg-lightest);
 }
 :root .color-fn-fg-lightest {
-    color: var(--fn-fg-lightest);
+  color: var(--fn-fg-lightest);
 }
 :root .bg-color-fn-fg-on-dark {
-    background-color: var(--fn-fg-on-dark);
+  background-color: var(--fn-fg-on-dark);
 }
 :root .color-fn-fg-on-dark {
-    color: var(--fn-fg-on-dark);
+  color: var(--fn-fg-on-dark);
 }
 :root .bg-color-fn-brd-gl {
-    background-color: var(--fn-brd-gl);
+  background-color: var(--fn-brd-gl);
 }
 :root .color-fn-brd-gl {
-    color: var(--fn-brd-gl);
+  color: var(--fn-brd-gl);
 }
 :root .bg-color-fn-divider-gl {
-    background-color: var(--fn-divider-gl);
+  background-color: var(--fn-divider-gl);
 }
 :root .color-fn-divider-gl {
-    color: var(--fn-divider-gl);
+  color: var(--fn-divider-gl);
 }
 :root .bg-color-fn-bg-hov-n-gl {
-    background-color: var(--fn-bg-hov-n-gl);
+  background-color: var(--fn-bg-hov-n-gl);
 }
 :root .color-fn-bg-hov-n-gl {
-    color: var(--fn-bg-hov-n-gl);
+  color: var(--fn-bg-hov-n-gl);
 }
 :root .bg-color-fn-bg-hov-p-gl {
-    background-color: var(--fn-bg-hov-p-gl);
+  background-color: var(--fn-bg-hov-p-gl);
 }
 :root .color-fn-bg-hov-p-gl {
-    color: var(--fn-bg-hov-p-gl);
+  color: var(--fn-bg-hov-p-gl);
 }
 :root .bg-color-fn-bg-cta-hov {
-    background-color: var(--fn-bg-cta-hov);
+  background-color: var(--fn-bg-cta-hov);
 }
 :root .color-fn-bg-cta-hov {
-    color: var(--fn-bg-cta-hov);
+  color: var(--fn-bg-cta-hov);
 }
 :root .bg-color-fn-bg-disabled {
-    background-color: var(--fn-bg-disabled);
+  background-color: var(--fn-bg-disabled);
 }
 :root .color-fn-bg-disabled {
-    color: var(--fn-bg-disabled);
+  color: var(--fn-bg-disabled);
 }
 :root .bg-color-fn-fg-on-dark-light {
-    background-color: var(--fn-fg-on-dark-light);
+  background-color: var(--fn-fg-on-dark-light);
 }
 :root .color-fn-fg-on-dark-light {
-    color: var(--fn-fg-on-dark-light);
+  color: var(--fn-fg-on-dark-light);
 }
 :root .bg-color-fn-fg-on-dark-lightest {
-    background-color: var(--fn-fg-on-dark-lightest);
+  background-color: var(--fn-fg-on-dark-lightest);
 }
 :root .color-fn-fg-on-dark-lightest {
-    color: var(--fn-fg-on-dark-lightest);
+  color: var(--fn-fg-on-dark-lightest);
 }
 :root .bg-color-fn-bg-on-dark {
-    background-color: var(--fn-bg-on-dark);
+  background-color: var(--fn-bg-on-dark);
 }
 :root .color-fn-bg-on-dark {
-    color: var(--fn-bg-on-dark);
+  color: var(--fn-bg-on-dark);
 }
 :root .bg-color-fn-bg-hov-i-gl {
-    background-color: var(--fn-bg-hov-i-gl);
+  background-color: var(--fn-bg-hov-i-gl);
 }
 :root .color-fn-bg-hov-i-gl {
-    color: var(--fn-bg-hov-i-gl);
+  color: var(--fn-bg-hov-i-gl);
 }
 :root .bg-color-fn-bg-dark {
-    background-color: var(--fn-bg-dark);
+  background-color: var(--fn-bg-dark);
 }
 :root .color-fn-bg-dark {
-    color: var(--fn-bg-dark);
+  color: var(--fn-bg-dark);
 }
 :root .bg-color-fn-shadow {
-    background-color: var(--fn-shadow);
+  background-color: var(--fn-shadow);
 }
 :root .color-fn-shadow {
-    color: var(--fn-shadow);
+  color: var(--fn-shadow);
 }
 :root .bg-color-fn-bg-rating-stars {
-    background-color: var(--fn-bg-rating-stars);
+  background-color: var(--fn-bg-rating-stars);
 }
 :root .color-fn-bg-rating-stars {
-    color: var(--fn-bg-rating-stars);
+  color: var(--fn-bg-rating-stars);
 }
 :root .bg-color-sc-charts-01 {
-    background-color: var(--sc-charts-01);
+  background-color: var(--sc-charts-01);
 }
 :root .color-sc-charts-01 {
-    color: var(--sc-charts-01);
+  color: var(--sc-charts-01);
 }
 :root .bg-color-sc-charts-02 {
-    background-color: var(--sc-charts-02);
+  background-color: var(--sc-charts-02);
 }
 :root .color-sc-charts-02 {
-    color: var(--sc-charts-02);
+  color: var(--sc-charts-02);
 }
 :root .bg-color-sc-charts-03 {
-    background-color: var(--sc-charts-03);
+  background-color: var(--sc-charts-03);
 }
 :root .color-sc-charts-03 {
-    color: var(--sc-charts-03);
+  color: var(--sc-charts-03);
 }
 :root .bg-color-sc-charts-04 {
-    background-color: var(--sc-charts-04);
+  background-color: var(--sc-charts-04);
 }
 :root .color-sc-charts-04 {
-    color: var(--sc-charts-04);
+  color: var(--sc-charts-04);
 }
 :root .bg-color-sc-charts-05 {
-    background-color: var(--sc-charts-05);
+  background-color: var(--sc-charts-05);
 }
 :root .color-sc-charts-05 {
-    color: var(--sc-charts-05);
+  color: var(--sc-charts-05);
 }
 :root .bg-color-sc-charts-06 {
-    background-color: var(--sc-charts-06);
+  background-color: var(--sc-charts-06);
 }
 :root .color-sc-charts-06 {
-    color: var(--sc-charts-06);
+  color: var(--sc-charts-06);
 }
 :root .bg-color-sc-charts-07 {
-    background-color: var(--sc-charts-07);
+  background-color: var(--sc-charts-07);
 }
 :root .color-sc-charts-07 {
-    color: var(--sc-charts-07);
+  color: var(--sc-charts-07);
 }
 :root .bg-color-sc-charts-08 {
-    background-color: var(--sc-charts-08);
+  background-color: var(--sc-charts-08);
 }
 :root .color-sc-charts-08 {
-    color: var(--sc-charts-08);
+  color: var(--sc-charts-08);
 }
 :root .bg-color-sc-charts-09 {
-    background-color: var(--sc-charts-09);
+  background-color: var(--sc-charts-09);
 }
 :root .color-sc-charts-09 {
-    color: var(--sc-charts-09);
+  color: var(--sc-charts-09);
 }
 :root .bg-color-sc-charts-10 {
-    background-color: var(--sc-charts-10);
+  background-color: var(--sc-charts-10);
 }
 :root .color-sc-charts-10 {
-    color: var(--sc-charts-10);
+  color: var(--sc-charts-10);
 }
 :root .bg-color-sc-charts-11 {
-    background-color: var(--sc-charts-11);
+  background-color: var(--sc-charts-11);
 }
 :root .color-sc-charts-11 {
-    color: var(--sc-charts-11);
+  color: var(--sc-charts-11);
 }
 :root .bg-color-ai-base-color {
-    background-color: var(--ai-base-color);
+  background-color: var(--ai-base-color);
 }
 :root .color-ai-base-color {
-    color: var(--ai-base-color);
+  color: var(--ai-base-color);
 }
 :root .bg-color-p100 {
-    background-color: var(--p100);
+  background-color: var(--p100);
 }
 :root .color-p100 {
-    color: var(--p100);
+  color: var(--p100);
 }
 :root .bg-color-p200 {
-    background-color: var(--p200);
+  background-color: var(--p200);
 }
 :root .color-p200 {
-    color: var(--p200);
+  color: var(--p200);
 }
 :root .bg-color-p300 {
-    background-color: var(--p300);
+  background-color: var(--p300);
 }
 :root .color-p300 {
-    color: var(--p300);
+  color: var(--p300);
 }
 :root .bg-color-p400 {
-    background-color: var(--p400);
+  background-color: var(--p400);
 }
 :root .color-p400 {
-    color: var(--p400);
+  color: var(--p400);
 }
 :root .bg-color-p600 {
-    background-color: var(--p600);
+  background-color: var(--p600);
 }
 :root .color-p600 {
-    color: var(--p600);
+  color: var(--p600);
 }
 :root .bg-color-p700 {
-    background-color: var(--p700);
+  background-color: var(--p700);
 }
 :root .color-p700 {
-    color: var(--p700);
+  color: var(--p700);
 }
 :root .bg-color-p800 {
-    background-color: var(--p800);
+  background-color: var(--p800);
 }
 :root .color-p800 {
-    color: var(--p800);
+  color: var(--p800);
 }
 :root .bg-color-p900 {
-    background-color: var(--p900);
+  background-color: var(--p900);
 }
 :root .color-p900 {
-    color: var(--p900);
+  color: var(--p900);
 }
 :root .bg-color-i100 {
-    background-color: var(--i100);
+  background-color: var(--i100);
 }
 :root .color-i100 {
-    color: var(--i100);
+  color: var(--i100);
 }
 :root .bg-color-i400 {
-    background-color: var(--i400);
+  background-color: var(--i400);
 }
 :root .color-i400 {
-    color: var(--i400);
+  color: var(--i400);
 }
 :root .bg-color-i900 {
-    background-color: var(--i900);
+  background-color: var(--i900);
 }
 :root .color-i900 {
-    color: var(--i900);
+  color: var(--i900);
 }
 :root .bg-color-n000 {
-    background-color: var(--n000);
+  background-color: var(--n000);
 }
 :root .color-n000 {
-    color: var(--n000);
+  color: var(--n000);
 }
 :root .bg-color-n100 {
-    background-color: var(--n100);
+  background-color: var(--n100);
 }
 :root .color-n100 {
-    color: var(--n100);
+  color: var(--n100);
 }
 :root .bg-color-n200 {
-    background-color: var(--n200);
+  background-color: var(--n200);
 }
 :root .color-n200 {
-    color: var(--n200);
+  color: var(--n200);
 }
 :root .bg-color-n300 {
-    background-color: var(--n300);
+  background-color: var(--n300);
 }
 :root .color-n300 {
-    color: var(--n300);
+  color: var(--n300);
 }
 :root .bg-color-n400 {
-    background-color: var(--n400);
+  background-color: var(--n400);
 }
 :root .color-n400 {
-    color: var(--n400);
+  color: var(--n400);
 }
 :root .bg-color-n600 {
-    background-color: var(--n600);
+  background-color: var(--n600);
 }
 :root .color-n600 {
-    color: var(--n600);
+  color: var(--n600);
 }
 :root .bg-color-n700 {
-    background-color: var(--n700);
+  background-color: var(--n700);
 }
 :root .color-n700 {
-    color: var(--n700);
+  color: var(--n700);
 }
 :root .bg-color-n800 {
-    background-color: var(--n800);
+  background-color: var(--n800);
 }
 :root .color-n800 {
-    color: var(--n800);
+  color: var(--n800);
 }
 :root .bg-color-n900 {
-    background-color: var(--n900);
+  background-color: var(--n900);
 }
 :root .color-n900 {
-    color: var(--n900);
+  color: var(--n900);
 }
 :root .bg-color-s100 {
-    background-color: var(--s100);
+  background-color: var(--s100);
 }
 :root .color-s100 {
-    color: var(--s100);
+  color: var(--s100);
 }
 :root .bg-color-s400 {
-    background-color: var(--s400);
+  background-color: var(--s400);
 }
 :root .color-s400 {
-    color: var(--s400);
+  color: var(--s400);
 }
 :root .bg-color-s900 {
-    background-color: var(--s900);
+  background-color: var(--s900);
 }
 :root .color-s900 {
-    color: var(--s900);
+  color: var(--s900);
 }
 :root .bg-color-w100 {
-    background-color: var(--w100);
+  background-color: var(--w100);
 }
 :root .color-w100 {
-    color: var(--w100);
+  color: var(--w100);
 }
 :root .bg-color-w400 {
-    background-color: var(--w400);
+  background-color: var(--w400);
 }
 :root .color-w400 {
-    color: var(--w400);
+  color: var(--w400);
 }
 :root .bg-color-w900 {
-    background-color: var(--w900);
+  background-color: var(--w900);
 }
 :root .color-w900 {
-    color: var(--w900);
+  color: var(--w900);
 }
 :root .bg-color-e100 {
-    background-color: var(--e100);
+  background-color: var(--e100);
 }
 :root .color-e100 {
-    color: var(--e100);
+  color: var(--e100);
 }
 :root .bg-color-e400 {
-    background-color: var(--e400);
+  background-color: var(--e400);
 }
 :root .color-e400 {
-    color: var(--e400);
+  color: var(--e400);
 }
 :root .bg-color-e900 {
-    background-color: var(--e900);
+  background-color: var(--e900);
 }
 :root .color-e900 {
-    color: var(--e900);
+  color: var(--e900);
 }
 :root .bg-color-a1100 {
-    background-color: var(--a1100);
+  background-color: var(--a1100);
 }
 :root .color-a1100 {
-    color: var(--a1100);
+  color: var(--a1100);
 }
 :root .bg-color-a1300 {
-    background-color: var(--a1300);
+  background-color: var(--a1300);
 }
 :root .color-a1300 {
-    color: var(--a1300);
+  color: var(--a1300);
 }
 :root .bg-color-a1500 {
-    background-color: var(--a1500);
+  background-color: var(--a1500);
 }
 :root .color-a1500 {
-    color: var(--a1500);
+  color: var(--a1500);
 }
 :root .bg-color-a1900 {
-    background-color: var(--a1900);
+  background-color: var(--a1900);
 }
 :root .color-a1900 {
-    color: var(--a1900);
+  color: var(--a1900);
 }
 :root .bg-color-a2100 {
-    background-color: var(--a2100);
+  background-color: var(--a2100);
 }
 :root .color-a2100 {
-    color: var(--a2100);
+  color: var(--a2100);
 }
 :root .bg-color-a2300 {
-    background-color: var(--a2300);
+  background-color: var(--a2300);
 }
 :root .color-a2300 {
-    color: var(--a2300);
+  color: var(--a2300);
 }
 :root .bg-color-a2400 {
-    background-color: var(--a2400);
+  background-color: var(--a2400);
 }
 :root .color-a2400 {
-    color: var(--a2400);
+  color: var(--a2400);
 }
 :root .bg-color-a2500 {
-    background-color: var(--a2500);
+  background-color: var(--a2500);
 }
 :root .color-a2500 {
-    color: var(--a2500);
+  color: var(--a2500);
 }
 :root .bg-color-a2900 {
-    background-color: var(--a2900);
+  background-color: var(--a2900);
 }
 :root .color-a2900 {
-    color: var(--a2900);
+  color: var(--a2900);
 }
 :root .bg-color-a3100 {
-    background-color: var(--a3100);
+  background-color: var(--a3100);
 }
 :root .color-a3100 {
-    color: var(--a3100);
+  color: var(--a3100);
 }
 :root .bg-color-a3300 {
-    background-color: var(--a3300);
+  background-color: var(--a3300);
 }
 :root .color-a3300 {
-    color: var(--a3300);
+  color: var(--a3300);
 }
 :root .bg-color-a3400 {
-    background-color: var(--a3400);
+  background-color: var(--a3400);
 }
 :root .color-a3400 {
-    color: var(--a3400);
+  color: var(--a3400);
 }
 :root .bg-color-a3500 {
-    background-color: var(--a3500);
+  background-color: var(--a3500);
 }
 :root .color-a3500 {
-    color: var(--a3500);
+  color: var(--a3500);
 }
 :root .bg-color-a3900 {
-    background-color: var(--a3900);
+  background-color: var(--a3900);
 }
 :root .color-a3900 {
-    color: var(--a3900);
+  color: var(--a3900);
 }
 :root .bg-color-a4100 {
-    background-color: var(--a4100);
+  background-color: var(--a4100);
 }
 :root .color-a4100 {
-    color: var(--a4100);
+  color: var(--a4100);
 }
 :root .bg-color-a4300 {
-    background-color: var(--a4300);
+  background-color: var(--a4300);
 }
 :root .color-a4300 {
-    color: var(--a4300);
+  color: var(--a4300);
 }
 :root .bg-color-a4500 {
-    background-color: var(--a4500);
+  background-color: var(--a4500);
 }
 :root .color-a4500 {
-    color: var(--a4500);
+  color: var(--a4500);
 }
 :root .bg-color-a4900 {
-    background-color: var(--a4900);
+  background-color: var(--a4900);
 }
 :root .color-a4900 {
-    color: var(--a4900);
+  color: var(--a4900);
 }
 :root .bg-color-seo50 {
-    background-color: var(--seo50);
+  background-color: var(--seo50);
 }
 :root .color-seo50 {
-    color: var(--seo50);
+  color: var(--seo50);
 }
 :root .bg-color-seo100 {
-    background-color: var(--seo100);
+  background-color: var(--seo100);
 }
 :root .color-seo100 {
-    color: var(--seo100);
+  color: var(--seo100);
 }
 :root .bg-color-seo200 {
-    background-color: var(--seo200);
+  background-color: var(--seo200);
 }
 :root .color-seo200 {
-    color: var(--seo200);
+  color: var(--seo200);
 }
 :root .bg-color-seo300 {
-    background-color: var(--seo300);
+  background-color: var(--seo300);
 }
 :root .color-seo300 {
-    color: var(--seo300);
+  color: var(--seo300);
 }
 :root .bg-color-seo400 {
-    background-color: var(--seo400);
+  background-color: var(--seo400);
 }
 :root .color-seo400 {
-    color: var(--seo400);
+  color: var(--seo400);
 }
 :root .bg-color-seo500 {
-    background-color: var(--seo500);
+  background-color: var(--seo500);
 }
 :root .color-seo500 {
-    color: var(--seo500);
+  color: var(--seo500);
 }
 :root .bg-color-seo600 {
-    background-color: var(--seo600);
+  background-color: var(--seo600);
 }
 :root .color-seo600 {
-    color: var(--seo600);
+  color: var(--seo600);
 }
 :root .bg-color-seo700 {
-    background-color: var(--seo700);
+  background-color: var(--seo700);
 }
 :root .color-seo700 {
-    color: var(--seo700);
+  color: var(--seo700);
 }
 :root .bg-color-seo800 {
-    background-color: var(--seo800);
+  background-color: var(--seo800);
 }
 :root .color-seo800 {
-    color: var(--seo800);
+  color: var(--seo800);
 }
 :root .bg-color-seo-accent50 {
-    background-color: var(--seo-accent50);
+  background-color: var(--seo-accent50);
 }
 :root .color-seo-accent50 {
-    color: var(--seo-accent50);
+  color: var(--seo-accent50);
 }
 :root .bg-color-seo-accent200 {
-    background-color: var(--seo-accent200);
+  background-color: var(--seo-accent200);
 }
 :root .color-seo-accent200 {
-    color: var(--seo-accent200);
+  color: var(--seo-accent200);
 }
 :root .bg-color-seo-accent400 {
-    background-color: var(--seo-accent400);
+  background-color: var(--seo-accent400);
 }
 :root .color-seo-accent400 {
-    color: var(--seo-accent400);
+  color: var(--seo-accent400);
 }
 :root .bg-color-seo-accent600 {
-    background-color: var(--seo-accent600);
+  background-color: var(--seo-accent600);
 }
 :root .color-seo-accent600 {
-    color: var(--seo-accent600);
+  color: var(--seo-accent600);
 }
 :root .bg-color-seo-accent800 {
-    background-color: var(--seo-accent800);
+  background-color: var(--seo-accent800);
 }
 :root .color-seo-accent800 {
-    color: var(--seo-accent800);
+  color: var(--seo-accent800);
 }
 :root .bg-color-wr50 {
-    background-color: var(--wr50);
+  background-color: var(--wr50);
 }
 :root .color-wr50 {
-    color: var(--wr50);
+  color: var(--wr50);
 }
 :root .bg-color-wr100 {
-    background-color: var(--wr100);
+  background-color: var(--wr100);
 }
 :root .color-wr100 {
-    color: var(--wr100);
+  color: var(--wr100);
 }
 :root .bg-color-wr200 {
-    background-color: var(--wr200);
+  background-color: var(--wr200);
 }
 :root .color-wr200 {
-    color: var(--wr200);
+  color: var(--wr200);
 }
 :root .bg-color-wr300 {
-    background-color: var(--wr300);
+  background-color: var(--wr300);
 }
 :root .color-wr300 {
-    color: var(--wr300);
+  color: var(--wr300);
 }
 :root .bg-color-wr400 {
-    background-color: var(--wr400);
+  background-color: var(--wr400);
 }
 :root .color-wr400 {
-    color: var(--wr400);
+  color: var(--wr400);
 }
 :root .bg-color-wr500 {
-    background-color: var(--wr500);
+  background-color: var(--wr500);
 }
 :root .color-wr500 {
-    color: var(--wr500);
+  color: var(--wr500);
 }
 :root .bg-color-wr600 {
-    background-color: var(--wr600);
+  background-color: var(--wr600);
 }
 :root .color-wr600 {
-    color: var(--wr600);
+  color: var(--wr600);
 }
 :root .bg-color-wr700 {
-    background-color: var(--wr700);
+  background-color: var(--wr700);
 }
 :root .color-wr700 {
-    color: var(--wr700);
+  color: var(--wr700);
 }
 :root .bg-color-wr800 {
-    background-color: var(--wr800);
+  background-color: var(--wr800);
 }
 :root .color-wr800 {
-    color: var(--wr800);
+  color: var(--wr800);
 }
 :root .bg-color-wr-accent50 {
-    background-color: var(--wr-accent50);
+  background-color: var(--wr-accent50);
 }
 :root .color-wr-accent50 {
-    color: var(--wr-accent50);
+  color: var(--wr-accent50);
 }
 :root .bg-color-wr-accent200 {
-    background-color: var(--wr-accent200);
+  background-color: var(--wr-accent200);
 }
 :root .color-wr-accent200 {
-    color: var(--wr-accent200);
+  color: var(--wr-accent200);
 }
 :root .bg-color-wr-accent400 {
-    background-color: var(--wr-accent400);
+  background-color: var(--wr-accent400);
 }
 :root .color-wr-accent400 {
-    color: var(--wr-accent400);
+  color: var(--wr-accent400);
 }
 :root .bg-color-wr-accent600 {
-    background-color: var(--wr-accent600);
+  background-color: var(--wr-accent600);
 }
 :root .color-wr-accent600 {
-    color: var(--wr-accent600);
+  color: var(--wr-accent600);
 }
 :root .bg-color-wr-accent800 {
-    background-color: var(--wr-accent800);
+  background-color: var(--wr-accent800);
 }
 :root .color-wr-accent800 {
-    color: var(--wr-accent800);
+  color: var(--wr-accent800);
 }
 :root .bg-color-ads50 {
-    background-color: var(--ads50);
+  background-color: var(--ads50);
 }
 :root .color-ads50 {
-    color: var(--ads50);
+  color: var(--ads50);
 }
 :root .bg-color-ads100 {
-    background-color: var(--ads100);
+  background-color: var(--ads100);
 }
 :root .color-ads100 {
-    color: var(--ads100);
+  color: var(--ads100);
 }
 :root .bg-color-ads200 {
-    background-color: var(--ads200);
+  background-color: var(--ads200);
 }
 :root .color-ads200 {
-    color: var(--ads200);
+  color: var(--ads200);
 }
 :root .bg-color-ads300 {
-    background-color: var(--ads300);
+  background-color: var(--ads300);
 }
 :root .color-ads300 {
-    color: var(--ads300);
+  color: var(--ads300);
 }
 :root .bg-color-ads400 {
-    background-color: var(--ads400);
+  background-color: var(--ads400);
 }
 :root .color-ads400 {
-    color: var(--ads400);
+  color: var(--ads400);
 }
 :root .bg-color-ads500 {
-    background-color: var(--ads500);
+  background-color: var(--ads500);
 }
 :root .color-ads500 {
-    color: var(--ads500);
+  color: var(--ads500);
 }
 :root .bg-color-ads600 {
-    background-color: var(--ads600);
+  background-color: var(--ads600);
 }
 :root .color-ads600 {
-    color: var(--ads600);
+  color: var(--ads600);
 }
 :root .bg-color-ads700 {
-    background-color: var(--ads700);
+  background-color: var(--ads700);
 }
 :root .color-ads700 {
-    color: var(--ads700);
+  color: var(--ads700);
 }
 :root .bg-color-ads800 {
-    background-color: var(--ads800);
+  background-color: var(--ads800);
 }
 :root .color-ads800 {
-    color: var(--ads800);
+  color: var(--ads800);
 }
 :root .bg-color-ads-accent50 {
-    background-color: var(--ads-accent50);
+  background-color: var(--ads-accent50);
 }
 :root .color-ads-accent50 {
-    color: var(--ads-accent50);
+  color: var(--ads-accent50);
 }
 :root .bg-color-ads-accent200 {
-    background-color: var(--ads-accent200);
+  background-color: var(--ads-accent200);
 }
 :root .color-ads-accent200 {
-    color: var(--ads-accent200);
+  color: var(--ads-accent200);
 }
 :root .bg-color-ads-accent400 {
-    background-color: var(--ads-accent400);
+  background-color: var(--ads-accent400);
 }
 :root .color-ads-accent400 {
-    color: var(--ads-accent400);
+  color: var(--ads-accent400);
 }
 :root .bg-color-ads-accent600 {
-    background-color: var(--ads-accent600);
+  background-color: var(--ads-accent600);
 }
 :root .color-ads-accent600 {
-    color: var(--ads-accent600);
+  color: var(--ads-accent600);
 }
 :root .bg-color-ads-accent800 {
-    background-color: var(--ads-accent800);
+  background-color: var(--ads-accent800);
 }
 :root .color-ads-accent800 {
-    color: var(--ads-accent800);
+  color: var(--ads-accent800);
 }
 :root .bg-color-op50 {
-    background-color: var(--op50);
+  background-color: var(--op50);
 }
 :root .color-op50 {
-    color: var(--op50);
+  color: var(--op50);
 }
 :root .bg-color-op100 {
-    background-color: var(--op100);
+  background-color: var(--op100);
 }
 :root .color-op100 {
-    color: var(--op100);
+  color: var(--op100);
 }
 :root .bg-color-op200 {
-    background-color: var(--op200);
+  background-color: var(--op200);
 }
 :root .color-op200 {
-    color: var(--op200);
+  color: var(--op200);
 }
 :root .bg-color-op300 {
-    background-color: var(--op300);
+  background-color: var(--op300);
 }
 :root .color-op300 {
-    color: var(--op300);
+  color: var(--op300);
 }
 :root .bg-color-op400 {
-    background-color: var(--op400);
+  background-color: var(--op400);
 }
 :root .color-op400 {
-    color: var(--op400);
+  color: var(--op400);
 }
 :root .bg-color-op500 {
-    background-color: var(--op500);
+  background-color: var(--op500);
 }
 :root .color-op500 {
-    color: var(--op500);
+  color: var(--op500);
 }
 :root .bg-color-op600 {
-    background-color: var(--op600);
+  background-color: var(--op600);
 }
 :root .color-op600 {
-    color: var(--op600);
+  color: var(--op600);
 }
 :root .bg-color-op700 {
-    background-color: var(--op700);
+  background-color: var(--op700);
 }
 :root .color-op700 {
-    color: var(--op700);
+  color: var(--op700);
 }
 :root .bg-color-op800 {
-    background-color: var(--op800);
+  background-color: var(--op800);
 }
 :root .color-op800 {
-    color: var(--op800);
+  color: var(--op800);
 }
 :root .bg-color-op-accent50 {
-    background-color: var(--op-accent50);
+  background-color: var(--op-accent50);
 }
 :root .color-op-accent50 {
-    color: var(--op-accent50);
+  color: var(--op-accent50);
 }
 :root .bg-color-op-accent200 {
-    background-color: var(--op-accent200);
+  background-color: var(--op-accent200);
 }
 :root .color-op-accent200 {
-    color: var(--op-accent200);
+  color: var(--op-accent200);
 }
 :root .bg-color-op-accent400 {
-    background-color: var(--op-accent400);
+  background-color: var(--op-accent400);
 }
 :root .color-op-accent400 {
-    color: var(--op-accent400);
+  color: var(--op-accent400);
 }
 :root .bg-color-op-accent600 {
-    background-color: var(--op-accent600);
+  background-color: var(--op-accent600);
 }
 :root .color-op-accent600 {
-    color: var(--op-accent600);
+  color: var(--op-accent600);
 }
 :root .bg-color-op-accent800 {
-    background-color: var(--op-accent800);
+  background-color: var(--op-accent800);
 }
 :root .color-op-accent800 {
-    color: var(--op-accent800);
+  color: var(--op-accent800);
 }
 :root .bg-color-eng50 {
-    background-color: var(--eng50);
+  background-color: var(--eng50);
 }
 :root .color-eng50 {
-    color: var(--eng50);
+  color: var(--eng50);
 }
 :root .bg-color-eng100 {
-    background-color: var(--eng100);
+  background-color: var(--eng100);
 }
 :root .color-eng100 {
-    color: var(--eng100);
+  color: var(--eng100);
 }
 :root .bg-color-eng200 {
-    background-color: var(--eng200);
+  background-color: var(--eng200);
 }
 :root .color-eng200 {
-    color: var(--eng200);
+  color: var(--eng200);
 }
 :root .bg-color-eng300 {
-    background-color: var(--eng300);
+  background-color: var(--eng300);
 }
 :root .color-eng300 {
-    color: var(--eng300);
+  color: var(--eng300);
 }
 :root .bg-color-eng400 {
-    background-color: var(--eng400);
+  background-color: var(--eng400);
 }
 :root .color-eng400 {
-    color: var(--eng400);
+  color: var(--eng400);
 }
 :root .bg-color-eng500 {
-    background-color: var(--eng500);
+  background-color: var(--eng500);
 }
 :root .color-eng500 {
-    color: var(--eng500);
+  color: var(--eng500);
 }
 :root .bg-color-eng600 {
-    background-color: var(--eng600);
+  background-color: var(--eng600);
 }
 :root .color-eng600 {
-    color: var(--eng600);
+  color: var(--eng600);
 }
 :root .bg-color-eng700 {
-    background-color: var(--eng700);
+  background-color: var(--eng700);
 }
 :root .color-eng700 {
-    color: var(--eng700);
+  color: var(--eng700);
 }
 :root .bg-color-eng800 {
-    background-color: var(--eng800);
+  background-color: var(--eng800);
 }
 :root .color-eng800 {
-    color: var(--eng800);
+  color: var(--eng800);
 }
 :root .bg-color-eng-accent50 {
-    background-color: var(--eng-accent50);
+  background-color: var(--eng-accent50);
 }
 :root .color-eng-accent50 {
-    color: var(--eng-accent50);
+  color: var(--eng-accent50);
 }
 :root .bg-color-eng-accent200 {
-    background-color: var(--eng-accent200);
+  background-color: var(--eng-accent200);
 }
 :root .color-eng-accent200 {
-    color: var(--eng-accent200);
+  color: var(--eng-accent200);
 }
 :root .bg-color-eng-accent400 {
-    background-color: var(--eng-accent400);
+  background-color: var(--eng-accent400);
 }
 :root .color-eng-accent400 {
-    color: var(--eng-accent400);
+  color: var(--eng-accent400);
 }
 :root .bg-color-eng-accent600 {
-    background-color: var(--eng-accent600);
+  background-color: var(--eng-accent600);
 }
 :root .color-eng-accent600 {
-    color: var(--eng-accent600);
+  color: var(--eng-accent600);
 }
 :root .bg-color-eng-accent800 {
-    background-color: var(--eng-accent800);
+  background-color: var(--eng-accent800);
 }
 :root .color-eng-accent800 {
-    color: var(--eng-accent800);
+  color: var(--eng-accent800);
 }
 :root .bg-color-bm50 {
-    background-color: var(--bm50);
+  background-color: var(--bm50);
 }
 :root .color-bm50 {
-    color: var(--bm50);
+  color: var(--bm50);
 }
 :root .bg-color-bm100 {
-    background-color: var(--bm100);
+  background-color: var(--bm100);
 }
 :root .color-bm100 {
-    color: var(--bm100);
+  color: var(--bm100);
 }
 :root .bg-color-bm200 {
-    background-color: var(--bm200);
+  background-color: var(--bm200);
 }
 :root .color-bm200 {
-    color: var(--bm200);
+  color: var(--bm200);
 }
 :root .bg-color-bm300 {
-    background-color: var(--bm300);
+  background-color: var(--bm300);
 }
 :root .color-bm300 {
-    color: var(--bm300);
+  color: var(--bm300);
 }
 :root .bg-color-bm400 {
-    background-color: var(--bm400);
+  background-color: var(--bm400);
 }
 :root .color-bm400 {
-    color: var(--bm400);
+  color: var(--bm400);
 }
 :root .bg-color-bm500 {
-    background-color: var(--bm500);
+  background-color: var(--bm500);
 }
 :root .color-bm500 {
-    color: var(--bm500);
+  color: var(--bm500);
 }
 :root .bg-color-bm600 {
-    background-color: var(--bm600);
+  background-color: var(--bm600);
 }
 :root .color-bm600 {
-    color: var(--bm600);
+  color: var(--bm600);
 }
 :root .bg-color-bm700 {
-    background-color: var(--bm700);
+  background-color: var(--bm700);
 }
 :root .color-bm700 {
-    color: var(--bm700);
+  color: var(--bm700);
 }
 :root .bg-color-bm800 {
-    background-color: var(--bm800);
+  background-color: var(--bm800);
 }
 :root .color-bm800 {
-    color: var(--bm800);
+  color: var(--bm800);
 }
 :root .bg-color-bm-accent50 {
-    background-color: var(--bm-accent50);
+  background-color: var(--bm-accent50);
 }
 :root .color-bm-accent50 {
-    color: var(--bm-accent50);
+  color: var(--bm-accent50);
 }
 :root .bg-color-bm-accent200 {
-    background-color: var(--bm-accent200);
+  background-color: var(--bm-accent200);
 }
 :root .color-bm-accent200 {
-    color: var(--bm-accent200);
+  color: var(--bm-accent200);
 }
 :root .bg-color-bm-accent400 {
-    background-color: var(--bm-accent400);
+  background-color: var(--bm-accent400);
 }
 :root .color-bm-accent400 {
-    color: var(--bm-accent400);
+  color: var(--bm-accent400);
 }
 :root .bg-color-bm-accent600 {
-    background-color: var(--bm-accent600);
+  background-color: var(--bm-accent600);
 }
 :root .color-bm-accent600 {
-    color: var(--bm-accent600);
+  color: var(--bm-accent600);
 }
 :root .bg-color-bm-accent800 {
-    background-color: var(--bm-accent800);
+  background-color: var(--bm-accent800);
 }
 :root .color-bm-accent800 {
-    color: var(--bm-accent800);
+  color: var(--bm-accent800);
 }
 :root .bg-color-post100 {
-    background-color: var(--post100);
+  background-color: var(--post100);
 }
 :root .color-post100 {
-    color: var(--post100);
+  color: var(--post100);
 }
 :root .bg-color-post600 {
-    background-color: var(--post600);
+  background-color: var(--post600);
 }
 :root .color-post600 {
-    color: var(--post600);
+  color: var(--post600);
 }
 :root .bg-color-post900 {
-    background-color: var(--post900);
+  background-color: var(--post900);
 }
 :root .color-post900 {
-    color: var(--post900);
+  color: var(--post900);
 }
 :root .bg-color-event100 {
-    background-color: var(--event100);
+  background-color: var(--event100);
 }
 :root .color-event100 {
-    color: var(--event100);
+  color: var(--event100);
 }
 :root .bg-color-event600 {
-    background-color: var(--event600);
+  background-color: var(--event600);
 }
 :root .color-event600 {
-    color: var(--event600);
+  color: var(--event600);
 }
 :root .bg-color-event900 {
-    background-color: var(--event900);
+  background-color: var(--event900);
 }
 :root .color-event900 {
-    color: var(--event900);
+  color: var(--event900);
 }
 :root .bg-color-boost100 {
-    background-color: var(--boost100);
+  background-color: var(--boost100);
 }
 :root .color-boost100 {
-    color: var(--boost100);
+  color: var(--boost100);
 }
 :root .bg-color-boost600 {
-    background-color: var(--boost600);
+  background-color: var(--boost600);
 }
 :root .color-boost600 {
-    color: var(--boost600);
+  color: var(--boost600);
 }
 :root .bg-color-boost900 {
-    background-color: var(--boost900);
+  background-color: var(--boost900);
 }
 :root .color-boost900 {
-    color: var(--boost900);
+  color: var(--boost900);
 }
 :root .bg-color-draft100 {
-    background-color: var(--draft100);
+  background-color: var(--draft100);
 }
 :root .color-draft100 {
-    color: var(--draft100);
+  color: var(--draft100);
 }
 :root .bg-color-draft600 {
-    background-color: var(--draft600);
+  background-color: var(--draft600);
 }
 :root .color-draft600 {
-    color: var(--draft600);
+  color: var(--draft600);
 }
 :root .bg-color-draft900 {
-    background-color: var(--draft900);
+  background-color: var(--draft900);
 }
 :root .color-draft900 {
-    color: var(--draft900);
+  color: var(--draft900);
 }
 :root .bg-color-brand-light {
-    background-color: var(--brand-light);
+  background-color: var(--brand-light);
 }
 :root .color-brand-light {
-    color: var(--brand-light);
+  color: var(--brand-light);
 }
 :root .bg-color-brand-dark {
-    background-color: var(--brand-dark);
+  background-color: var(--brand-dark);
 }
 :root .color-brand-dark {
-    color: var(--brand-dark);
+  color: var(--brand-dark);
 }
 
 :root[data-color-scheme=dark] {
+  color-scheme: dark;
+  --i500-rgb: 54, 150, 255;
+  --color-base-info-rgb: 54, 150, 255;
+  --s500-rgb: 54, 195, 79;
+  --color-base-success-rgb: 54, 195, 79;
+  --e500-rgb: 255, 82, 66;
+  --color-base-error-rgb: 255, 82, 66;
+  --w500-rgb: 239, 135, 0;
+  --color-base-warning-rgb: 239, 135, 0;
+  --ado-shader-light-start-bg-rgb: 1, 4, 11;
+  --ado-shader-light-end-bg-rgb: 1, 4, 11;
+  --ado-shader-dark-start-bg-rgb: 1, 4, 11;
+  --ado-shader-dark-end-bg-rgb: 1, 4, 11;
+  --heading-color-rgb: 246, 249, 252;
+  --text-color-rgb: 246, 249, 252;
+  --em-color-rgb: 109, 179, 255;
+  --header-color-rgb: 24, 33, 47;
+  --header-button-secondary-text-color-rgb: 246, 249, 252;
+  --header-button-secondary-background-color-rgb: 24, 33, 47;
+  --header-button-secondary-border-color-rgb: 38, 51, 73;
+  --header-button-secondary-hover-text-color-rgb: 109, 179, 255;
+  --header-button-secondary-hover-background-color-rgb: 1, 4, 11;
+  --header-button-secondary-hover-border-color-rgb: 38, 51, 73;
+  --header-button-secondary-disabled-text-color-rgb: 246, 249, 252;
+  --header-button-secondary-disabled-background-color-rgb: 24, 33, 47;
+  --header-button-secondary-disabled-border-color-rgb: 38, 51, 73;
+  --header-button-secondary-focus-text-color-rgb: 246, 249, 252;
+  --header-button-secondary-focus-background-color-rgb: 24, 33, 47;
+  --header-button-secondary-focus-border-color-rgb: 38, 51, 73;
+  --header-button-secondary-focus-box-shadow-color-rgb: 0, 3, 53;
+  --header-button-secondary-ripple-color-rgb: 53, 140, 255;
+  --button-default-text-color-rgb: 109, 179, 255;
+  --button-default-background-color-rgb: 9, 13, 23;
+  --button-default-hover-text-color-rgb: 53, 140, 255;
+  --button-default-hover-background-color-rgb: 1, 4, 11;
+  --button-default-disabled-text-color-rgb: 246, 249, 252;
+  --button-default-focus-text-color-rgb: 109, 179, 255;
+  --button-default-focus-box-shadow-color-rgb: 0, 3, 53;
+  --button-default-ripple-color-rgb: 53, 140, 255;
+  --button-primary-background-color-rgb: 53, 140, 255;
+  --button-primary-disabled-background-color-rgb: 38, 51, 73;
+  --button-primary-focus-background-color-rgb: 53, 140, 255;
+  --button-primary-focus-box-shadow-color-rgb: 0, 3, 53;
+  --button-primary-ripple-color-rgb: 0, 3, 53;
+  --button-secondary-text-color-rgb: 246, 249, 252;
+  --button-secondary-no-border-text-color-rgb: 185, 197, 216;
+  --button-secondary-background-color-rgb: 24, 33, 47;
+  --button-secondary-border-color-rgb: 38, 51, 73;
+  --button-secondary-hover-text-color-rgb: 109, 179, 255;
+  --button-secondary-hover-background-color-rgb: 1, 4, 11;
+  --button-secondary-hover-border-color-rgb: 38, 51, 73;
+  --button-secondary-disabled-text-color-rgb: 246, 249, 252;
+  --button-secondary-disabled-background-color-rgb: 24, 33, 47;
+  --button-secondary-disabled-border-color-rgb: 38, 51, 73;
+  --button-secondary-focus-text-color-rgb: 246, 249, 252;
+  --button-secondary-focus-background-color-rgb: 24, 33, 47;
+  --button-secondary-focus-border-color-rgb: 38, 51, 73;
+  --button-secondary-focus-box-shadow-color-rgb: 0, 3, 53;
+  --button-secondary-ripple-color-rgb: 53, 140, 255;
+  --button-shimmer-background-color-rgb: 147, 161, 255;
+  --button-shimmer-hover-background-color-rgb: 245, 248, 255;
+  --button-shimmer-disabled-background-color-rgb: 38, 51, 73;
+  --button-shimmer-focus-background-color-rgb: 53, 140, 255;
+  --button-shimmer-focus-box-shadow-color-rgb: 0, 3, 53;
+  --button-shimmer-ripple-color-rgb: 0, 3, 53;
+  --button-muted-text-color-rgb: 246, 249, 252;
+  --button-muted-hover-text-color-rgb: 246, 249, 252;
+  --button-muted-disabled-text-color-rgb: 246, 249, 252;
+  --button-muted-ripple-background-color-rgb: 255, 255, 255;
+  --nav-side-fg-rgb: 185, 197, 216;
+  --nav-side-fg-hover-rgb: 246, 249, 252;
+  --nav-side-fg-selected-rgb: 53, 140, 255;
+  --nav-side-collapse-fg-rgb: 246, 249, 252;
+  --nav-side-notif-bg-tasks-rgb: 57, 32, 200;
+  --nav-side-notif-bg-rgb: 255, 91, 148;
+  --fn-bg-rgb: 9, 13, 23;
+  --fn-bg-var-rgb: 1, 4, 11;
+  --fn-bg-surface-rgb: 24, 33, 47;
+  --fn-bg-cta-rgb: 53, 140, 255;
+  --fn-fg-cta-rgb: 109, 179, 255;
+  --fn-fg-cta-hov-rgb: 53, 140, 255;
+  --fn-fg-rgb: 246, 249, 252;
+  --fn-fg-light-rgb: 185, 197, 216;
+  --fn-fg-lightest-rgb: 80, 101, 134;
+  --fn-brd-gl-rgb: 38, 51, 73;
+  --fn-divider-gl-rgb: 24, 33, 47;
+  --fn-bg-hov-n-gl-rgb: 24, 33, 47;
+  --fn-bg-hov-p-gl-rgb: 0, 3, 53;
+  --fn-bg-cta-hov-rgb: 14, 82, 202;
+  --fn-bg-disabled-rgb: 38, 51, 73;
+  --fn-bg-on-dark-rgb: 24, 33, 47;
+  --fn-shadow-rgb: 255, 255, 255;
+  --sc-charts-02-rgb: 255, 247, 231;
+  --sc-charts-03-rgb: 27, 161, 56;
+  --sc-charts-04-rgb: 255, 91, 148;
+  --sc-charts-08-rgb: 245, 248, 255;
+  --sc-charts-09-rgb: 147, 161, 255;
+  --sc-charts-10-rgb: 57, 32, 200;
+  --sc-charts-11-rgb: 255, 82, 66;
+  --ai-base-color-rgb: 53, 140, 255;
+  --i100-rgb: 14, 51, 118;
+  --i400-rgb: 0, 98, 255;
+  --i900-rgb: 229, 246, 255;
+  --s100-rgb: 15, 68, 24;
+  --s400-rgb: 27, 161, 56;
+  --s900-rgb: 232, 252, 232;
+  --w100-rgb: 102, 27, 0;
+  --w400-rgb: 219, 125, 10;
+  --w900-rgb: 255, 241, 227;
+  --e100-rgb: 101, 25, 19;
+  --e400-rgb: 244, 64, 52;
+  --e900-rgb: 255, 236, 230;
+  --a1100-rgb: 33, 0, 141;
+  --a1300-rgb: 57, 32, 200;
+  --a1500-rgb: 147, 161, 255;
+  --a1900-rgb: 245, 248, 255;
+  --a2100-rgb: 255, 194, 43;
+  --a2300-rgb: 255, 207, 94;
+  --a2500-rgb: 255, 231, 171;
+  --a2900-rgb: 255, 247, 231;
+  --a3100-rgb: 218, 0, 81;
+  --a3300-rgb: 245, 0, 101;
+  --a3500-rgb: 255, 91, 148;
+  --a3900-rgb: 255, 243, 245;
+  --a4100-rgb: 18, 132, 114;
+  --a4300-rgb: 50, 153, 135;
+  --a4500-rgb: 106, 204, 184;
+  --a4900-rgb: 243, 250, 248;
+}
+
+:root[data-color-scheme=system] {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-color-scheme=system] {
     --i500-rgb: 54, 150, 255;
     --color-base-info-rgb: 54, 150, 255;
     --s500-rgb: 54, 195, 79;
@@ -3008,6 +3279,10 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --color-base-error-rgb: 255, 82, 66;
     --w500-rgb: 239, 135, 0;
     --color-base-warning-rgb: 239, 135, 0;
+    --ado-shader-light-start-bg-rgb: 1, 4, 11;
+    --ado-shader-light-end-bg-rgb: 1, 4, 11;
+    --ado-shader-dark-start-bg-rgb: 1, 4, 11;
+    --ado-shader-dark-end-bg-rgb: 1, 4, 11;
     --heading-color-rgb: 246, 249, 252;
     --text-color-rgb: 246, 249, 252;
     --em-color-rgb: 109, 179, 255;
@@ -3063,6 +3338,7 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --button-muted-text-color-rgb: 246, 249, 252;
     --button-muted-hover-text-color-rgb: 246, 249, 252;
     --button-muted-disabled-text-color-rgb: 246, 249, 252;
+    --button-muted-ripple-background-color-rgb: 255, 255, 255;
     --nav-side-fg-rgb: 185, 197, 216;
     --nav-side-fg-hover-rgb: 246, 249, 252;
     --nav-side-fg-selected-rgb: 53, 140, 255;
@@ -3085,6 +3361,7 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --fn-bg-cta-hov-rgb: 14, 82, 202;
     --fn-bg-disabled-rgb: 38, 51, 73;
     --fn-bg-on-dark-rgb: 24, 33, 47;
+    --fn-shadow-rgb: 255, 255, 255;
     --sc-charts-02-rgb: 255, 247, 231;
     --sc-charts-03-rgb: 27, 161, 56;
     --sc-charts-04-rgb: 255, 91, 148;
@@ -3121,169 +3398,58 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --a4300-rgb: 50, 153, 135;
     --a4500-rgb: 106, 204, 184;
     --a4900-rgb: 243, 250, 248;
+  }
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/vanguard/assets/fonts/Inter-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  src: url("/vanguard/assets/fonts/Inter-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/vanguard/assets/fonts/Inter-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  src: url("/vanguard/assets/fonts/Inter-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
+}
+body {
+  font-family: var(--theme-typeface);
+}
+
+:root {
+  --body-background: linear-gradient(135deg, #ffffff 0%, #fffaf7 10%, #fff3ea 20%, #f5f3f0 33%, #ddf3ff 66%, #d0f1c9 100%) center center fixed;
+}
+
+:root[data-color-scheme=dark] {
+  --body-background: linear-gradient(135deg, #01040b 0%, #0b0805 10%, #120c06 20%, #0c0b09 33%, #061018 66%, #061209 100%) center center fixed;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root[data-color-scheme=system] {
-        --i500-rgb: 54, 150, 255;
-        --color-base-info-rgb: 54, 150, 255;
-        --s500-rgb: 54, 195, 79;
-        --color-base-success-rgb: 54, 195, 79;
-        --e500-rgb: 255, 82, 66;
-        --color-base-error-rgb: 255, 82, 66;
-        --w500-rgb: 239, 135, 0;
-        --color-base-warning-rgb: 239, 135, 0;
-        --heading-color-rgb: 246, 249, 252;
-        --text-color-rgb: 246, 249, 252;
-        --em-color-rgb: 109, 179, 255;
-        --header-color-rgb: 24, 33, 47;
-        --header-button-secondary-text-color-rgb: 246, 249, 252;
-        --header-button-secondary-background-color-rgb: 24, 33, 47;
-        --header-button-secondary-border-color-rgb: 38, 51, 73;
-        --header-button-secondary-hover-text-color-rgb: 109, 179, 255;
-        --header-button-secondary-hover-background-color-rgb: 1, 4, 11;
-        --header-button-secondary-hover-border-color-rgb: 38, 51, 73;
-        --header-button-secondary-disabled-text-color-rgb: 246, 249, 252;
-        --header-button-secondary-disabled-background-color-rgb: 24, 33, 47;
-        --header-button-secondary-disabled-border-color-rgb: 38, 51, 73;
-        --header-button-secondary-focus-text-color-rgb: 246, 249, 252;
-        --header-button-secondary-focus-background-color-rgb: 24, 33, 47;
-        --header-button-secondary-focus-border-color-rgb: 38, 51, 73;
-        --header-button-secondary-focus-box-shadow-color-rgb: 0, 3, 53;
-        --header-button-secondary-ripple-color-rgb: 53, 140, 255;
-        --button-default-text-color-rgb: 109, 179, 255;
-        --button-default-background-color-rgb: 9, 13, 23;
-        --button-default-hover-text-color-rgb: 53, 140, 255;
-        --button-default-hover-background-color-rgb: 1, 4, 11;
-        --button-default-disabled-text-color-rgb: 246, 249, 252;
-        --button-default-focus-text-color-rgb: 109, 179, 255;
-        --button-default-focus-box-shadow-color-rgb: 0, 3, 53;
-        --button-default-ripple-color-rgb: 53, 140, 255;
-        --button-primary-background-color-rgb: 53, 140, 255;
-        --button-primary-disabled-background-color-rgb: 38, 51, 73;
-        --button-primary-focus-background-color-rgb: 53, 140, 255;
-        --button-primary-focus-box-shadow-color-rgb: 0, 3, 53;
-        --button-primary-ripple-color-rgb: 0, 3, 53;
-        --button-secondary-text-color-rgb: 246, 249, 252;
-        --button-secondary-no-border-text-color-rgb: 185, 197, 216;
-        --button-secondary-background-color-rgb: 24, 33, 47;
-        --button-secondary-border-color-rgb: 38, 51, 73;
-        --button-secondary-hover-text-color-rgb: 109, 179, 255;
-        --button-secondary-hover-background-color-rgb: 1, 4, 11;
-        --button-secondary-hover-border-color-rgb: 38, 51, 73;
-        --button-secondary-disabled-text-color-rgb: 246, 249, 252;
-        --button-secondary-disabled-background-color-rgb: 24, 33, 47;
-        --button-secondary-disabled-border-color-rgb: 38, 51, 73;
-        --button-secondary-focus-text-color-rgb: 246, 249, 252;
-        --button-secondary-focus-background-color-rgb: 24, 33, 47;
-        --button-secondary-focus-border-color-rgb: 38, 51, 73;
-        --button-secondary-focus-box-shadow-color-rgb: 0, 3, 53;
-        --button-secondary-ripple-color-rgb: 53, 140, 255;
-        --button-shimmer-background-color-rgb: 147, 161, 255;
-        --button-shimmer-hover-background-color-rgb: 245, 248, 255;
-        --button-shimmer-disabled-background-color-rgb: 38, 51, 73;
-        --button-shimmer-focus-background-color-rgb: 53, 140, 255;
-        --button-shimmer-focus-box-shadow-color-rgb: 0, 3, 53;
-        --button-shimmer-ripple-color-rgb: 0, 3, 53;
-        --button-muted-text-color-rgb: 246, 249, 252;
-        --button-muted-hover-text-color-rgb: 246, 249, 252;
-        --button-muted-disabled-text-color-rgb: 246, 249, 252;
-        --nav-side-fg-rgb: 185, 197, 216;
-        --nav-side-fg-hover-rgb: 246, 249, 252;
-        --nav-side-fg-selected-rgb: 53, 140, 255;
-        --nav-side-collapse-fg-rgb: 246, 249, 252;
-        --nav-side-notif-bg-tasks-rgb: 57, 32, 200;
-        --nav-side-notif-bg-rgb: 255, 91, 148;
-        --fn-bg-rgb: 9, 13, 23;
-        --fn-bg-var-rgb: 1, 4, 11;
-        --fn-bg-surface-rgb: 24, 33, 47;
-        --fn-bg-cta-rgb: 53, 140, 255;
-        --fn-fg-cta-rgb: 109, 179, 255;
-        --fn-fg-cta-hov-rgb: 53, 140, 255;
-        --fn-fg-rgb: 246, 249, 252;
-        --fn-fg-light-rgb: 185, 197, 216;
-        --fn-fg-lightest-rgb: 80, 101, 134;
-        --fn-brd-gl-rgb: 38, 51, 73;
-        --fn-divider-gl-rgb: 24, 33, 47;
-        --fn-bg-hov-n-gl-rgb: 24, 33, 47;
-        --fn-bg-hov-p-gl-rgb: 0, 3, 53;
-        --fn-bg-cta-hov-rgb: 14, 82, 202;
-        --fn-bg-disabled-rgb: 38, 51, 73;
-        --fn-bg-on-dark-rgb: 24, 33, 47;
-        --sc-charts-02-rgb: 255, 247, 231;
-        --sc-charts-03-rgb: 27, 161, 56;
-        --sc-charts-04-rgb: 255, 91, 148;
-        --sc-charts-08-rgb: 245, 248, 255;
-        --sc-charts-09-rgb: 147, 161, 255;
-        --sc-charts-10-rgb: 57, 32, 200;
-        --sc-charts-11-rgb: 255, 82, 66;
-        --ai-base-color-rgb: 53, 140, 255;
-        --i100-rgb: 14, 51, 118;
-        --i400-rgb: 0, 98, 255;
-        --i900-rgb: 229, 246, 255;
-        --s100-rgb: 15, 68, 24;
-        --s400-rgb: 27, 161, 56;
-        --s900-rgb: 232, 252, 232;
-        --w100-rgb: 102, 27, 0;
-        --w400-rgb: 219, 125, 10;
-        --w900-rgb: 255, 241, 227;
-        --e100-rgb: 101, 25, 19;
-        --e400-rgb: 244, 64, 52;
-        --e900-rgb: 255, 236, 230;
-        --a1100-rgb: 33, 0, 141;
-        --a1300-rgb: 57, 32, 200;
-        --a1500-rgb: 147, 161, 255;
-        --a1900-rgb: 245, 248, 255;
-        --a2100-rgb: 255, 194, 43;
-        --a2300-rgb: 255, 207, 94;
-        --a2500-rgb: 255, 231, 171;
-        --a2900-rgb: 255, 247, 231;
-        --a3100-rgb: 218, 0, 81;
-        --a3300-rgb: 245, 0, 101;
-        --a3500-rgb: 255, 91, 148;
-        --a3900-rgb: 255, 243, 245;
-        --a4100-rgb: 18, 132, 114;
-        --a4300-rgb: 50, 153, 135;
-        --a4500-rgb: 106, 204, 184;
-        --a4900-rgb: 243, 250, 248;
-    }
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 400;
-    src: url("/vanguard/assets/fonts/Inter-Regular.woff2") format("woff2");
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 500;
-    src: url("/vanguard/assets/fonts/Inter-Medium.woff2") format("woff2");
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 700;
-    src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 400;
-    src: url("/vanguard/assets/fonts/Inter-Regular.woff2") format("woff2");
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 500;
-    src: url("/vanguard/assets/fonts/Inter-Medium.woff2") format("woff2");
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 700;
-    src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
-}
-body {
-    font-family: var(--theme-typeface);
+  :root[data-color-scheme=system] {
+    --body-background: linear-gradient(135deg, #01040b 0%, #0b0805 10%, #120c06 20%, #0c0b09 33%, #061018 66%, #061209 100%) center center fixed;
+  }
 }
