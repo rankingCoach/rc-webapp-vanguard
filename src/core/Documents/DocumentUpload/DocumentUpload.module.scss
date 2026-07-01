@@ -12,7 +12,7 @@
   height: 100%;
   border-radius: 4px;
   padding: 8px;
-  background: var(--n100);
+  background: var(--fn-bg-var);
   display: flex;
   gap: 10px;
   align-items: center;
@@ -22,7 +22,7 @@
   cursor: pointer;
   transition: background-color 300ms linear;
   &:hover {
-    background: var(--n200);
+    background: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
     text-decoration: none;
   }
 }

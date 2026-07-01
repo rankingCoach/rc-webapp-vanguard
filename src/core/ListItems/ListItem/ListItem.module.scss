@@ -4,7 +4,7 @@
 .hoverable {
   &:hover {
     cursor: pointer;
-    background-color: var(--n100);
+    background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
     border-radius: 4px;
   }
 }
@@ -26,11 +26,11 @@
 
   &.clicked {
     padding: 12px 12px 12px 24px;
-    background-color: var(--n100);
+    background-color: var(--fn-bg-var);
     border-radius: 4px;
 
     &:hover {
-      background-color: var(--n200);
+      background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
     }
   }
 

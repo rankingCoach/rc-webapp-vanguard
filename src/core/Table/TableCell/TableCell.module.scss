@@ -4,12 +4,12 @@
   padding: $x1;
   flex: 1;
   text-align: left;
-  border-bottom: 1px solid var(--n200);
+  border-bottom: 1px solid var(--fn-divider-gl);
   line-height: 32px;
   position: relative;
 
   &.table-grey-body {
-    background-color: var(--n100);
+    background-color: var(--fn-bg-var);
   }
   .cell-prefix {
     padding: 8px;
@@ -41,7 +41,7 @@
     left: calc(100% - ($x0_25 + $x0_125));
     width: $x1 + $x0_25;
     pointer-events: none;
-    background: linear-gradient(to right, rgba(var(--n400-rgb), 0.45) 0, rgba(var(--n400-rgb), 0.30) 0, rgba(var(--n400-rgb), 0.12) $x0_25, rgba(var(--n400-rgb), 0) 100%);
+    background: linear-gradient(to right, rgba(var(--fn-shadow-rgb), 0.225) 0, rgba(var(--fn-shadow-rgb), 0.15) 0, rgba(var(--fn-shadow-rgb), 0.06) $x0_25, rgba(var(--fn-shadow-rgb), 0) 100%);
   }
 
   .value {

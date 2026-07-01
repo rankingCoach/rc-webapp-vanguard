@@ -1,7 +1,7 @@
 @import "./src/styles/spacings";
 
 .order-summary-container {
-    background-color: var(--n100);
+    background-color: var(--fn-bg-var);
     border-radius: $x1;       
     padding: $x2 $x3;
     display: flex;
@@ -16,7 +16,7 @@
     }
 
     .order-summary-items {
-        box-shadow: inset 0px -1px 0px var(--n200);
+        box-shadow: inset 0px -1px 0px var(--fn-divider-gl);
     }
 
     .order-summary-item {

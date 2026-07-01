@@ -10,7 +10,7 @@
   align-items: center;
   width: $x6;
   height: $x1 - $x0_5;
-  background: #FFFF;
+  background: var(--fn-bg);
   border-radius: $x0_5;
 }
 

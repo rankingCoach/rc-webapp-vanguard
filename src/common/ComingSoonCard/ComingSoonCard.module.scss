@@ -17,12 +17,12 @@
   width: 100%;
   cursor: pointer;
   transition: all 250ms ease-in-out;
-  background-color: var(--n000);
+  background-color: var(--fn-bg-surface);
   flex-grow: 1;
 
   align-items: flex-start;
   border: 1px solid var(--accent1-100);
-  box-shadow: 0px 0px 0px 3px rgba(232, 229, 250, 0.25);
+  box-shadow: 0px 0px 0px 3px rgba(var(--a1100-rgb), 0.25);
   border-radius: $x3;
   overflow: hidden;
 

@@ -26,7 +26,7 @@
   width: var(--benchmark-gauge-pin-size, $x2);
   height: var(--benchmark-gauge-pin-size, $x2);
   border-radius: 50%;
-  border: $x0_5 solid var(--n000);
+  border: $x0_5 solid var(--fn-bg);
   transition:
           width 0.18s ease,
           height 0.18s ease,
@@ -41,7 +41,7 @@
 .defaultPinGrown {
   width: calc(var(--benchmark-gauge-pin-size, $x2) * 2);
   height: calc(var(--benchmark-gauge-pin-size, $x2) * 2);
-  border: $x0_25 + $x0_125 solid var(--n000);
+  border: $x0_25 + $x0_125 solid var(--fn-bg);
 }
 
 // ─── Highlighted content ─────────────────────────────────────────────────────

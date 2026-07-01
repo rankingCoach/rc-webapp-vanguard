@@ -2,7 +2,7 @@
 @import '../../../styles/spacings';
 
 .hoverable-card {
-    background-color: var(--n000);
+    background-color: var(--fn-bg-surface);
     border-radius: $x1;
 
     &.disabled {
@@ -14,7 +14,7 @@
         cursor: pointer;
 
         &:hover {
-            background-color: var(--n100);
+            background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
         }
     }
 
@@ -37,13 +37,13 @@
             .separator {
                 width: $x0_125;
                 height: $x3;
-                box-shadow: inset -1px 0px 0px var(--n200);
+                box-shadow: inset -1px 0px 0px var(--fn-divider-gl);
             }
         }
     }
 
     .content {
-        color: var(--n500);
+        color: var(--fn-fg-light);
         margin-top: $x0_5;
     }
 }

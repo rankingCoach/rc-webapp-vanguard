@@ -275,11 +275,11 @@ Typographic scale sizes and fluid rules
 .not-translated {
   padding: 5px;
   border: 1px solid red;
-  background: rgba(255, 0, 0, 0.2);
+  background: rgba(var(--e500-rgb), 0.2);
 }
 
 .text-isBlurred {
-  text-shadow: 0 0 12px var(--n500);
+  text-shadow: 0 0 12px var(--fn-fg-light);
   color: transparent !important;
   user-select: none; /* Standard syntax */
 
@@ -288,13 +288,13 @@ Typographic scale sizes and fluid rules
 .was-translated {
   padding: 5px;
   border: 1px solid green;
-  background: rgba(0, 255, 0, 0.2);
+  background: rgba(var(--s400-rgb), 0.2);
 }
 
 .do-not-translate {
   padding: 5px;
   border: 1px solid blue;
-  background: rgba(0, 0, 255, 0.2);
+  background: rgba(var(--fn-bg-cta-rgb), 0.2);
 }
 
 .uppercase {
@@ -313,7 +313,7 @@ Typographic scale sizes and fluid rules
     position: absolute;
     bottom: 0;
     right: 0;
-    background: var(--n000);
+    background: var(--fn-bg);
     padding: 0 $x0_5;
     font-weight: bold;
   }

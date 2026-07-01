@@ -11,7 +11,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(16, 16, 16, 0.5);
+    background-color: rgba(var(--fn-shadow-rgb), 0.5);
   }
 
   @-webkit-keyframes uil-ring-anim {
@@ -160,7 +160,7 @@
     top: 20px;
     left: 20px;
     border-radius: 80px;
-    box-shadow: 0 6px 0 0 #ffffff;
+    box-shadow: 0 6px 0 0 var(--fn-fg-on-dark);
     -ms-animation: uil-ring-anim 1s linear infinite;
     -moz-animation: uil-ring-anim 1s linear infinite;
     -webkit-animation: uil-ring-anim 1s linear infinite;

@@ -8,13 +8,13 @@
     left: $x3;
     top: $x2;
     bottom: $x2;
-    background: white;
+    background: var(--fn-bg);
     height: calc(100% - ($x6 - $x1));
 
     padding: $x3 $x4;
     overflow: hidden;
     word-break: break-word;
-    box-shadow: 0 $x2 $x8 rgba(4, 5, 6, 0.03), 0px $x1_5 $x2_5 rgba(4, 5, 6, 0.05), 0px $x1 $x1 rgba(4, 5, 6, 0.08);
+    box-shadow: 0 $x2 $x8 rgba(var(--fn-shadow-rgb), 0.03), 0px $x1_5 $x2_5 rgba(var(--fn-shadow-rgb), 0.05), 0px $x1 $x1 rgba(var(--fn-shadow-rgb), 0.08);
     border-radius: $x1;
   }
 }
@@ -50,7 +50,7 @@
   align-items: center;
   padding: 24px 44px;
   height: 119px;
-  background: var(--n100);
+  background: var(--fn-bg-var);
 }
 
 .own-stuck-top {
@@ -63,7 +63,7 @@
   align-items: center;
   padding: 24px 44px;
   height: 119px;
-  background: var(--n100);
+  background: var(--fn-bg-var);
   -webkit-mask: radial-gradient(var(--R) at 50% calc(100% - calc(1.8 * var(--size))), #000 99%, #0000 101%) calc(50% - 2 * var(--size)) 0/calc(4*var(--size)) 100%,
   radial-gradient(var(--R) at 50% calc(100% + calc(.8 * var(--size))), #0000 99%, #000 101%) 50% calc(100% - var(--size))/calc(4*var(--size)) 100% repeat-x;
 }
@@ -78,7 +78,7 @@
   align-items: center;
   padding: 24px 44px;
   height: 119px;
-  background: var(--n100);
+  background: var(--fn-bg-var);
   -webkit-mask: radial-gradient(var(--R) at 50% calc(1.8 * var(--size)), #000 99%, #0000 101%) calc(50% - 2 * var(--size)) 0/calc(4*var(--size)) 100%,
   radial-gradient(var(--R) at 50% calc(-.8 * var(--size)), #0000 99%, #000 101%) 50% var(--size)/calc(4*var(--size)) 100% repeat-x;
 }
@@ -95,6 +95,6 @@
 }
 
 .left_content_circle {
-  background-color: var(--n200);
+  background-color: var(--fn-bg-var);
   border-radius: 50%;
 }

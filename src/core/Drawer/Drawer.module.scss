@@ -8,13 +8,16 @@
   max-inline-size: 100vw;
   height: 100%;
   overflow-y: auto;
+  // MUI's drawer paper defaults to white; fill it with a dark-aware surface
+  // (light: white, dark: #18212f) so the panel themes correctly.
+  background-color: var(--fn-bg-surface);
 }
 
 .headerSticky {
   position: sticky;
   top: 0;
   z-index: 2; // keep above scrolling content
-  background-color: var(--drawer-header-bg, #fff); // fallback ensures header isn't transparent over content
+  background-color: var(--drawer-header-bg, var(--fn-bg-surface)); // fallback ensures header isn't transparent over content
 }
 
 .headerContainer {

@@ -36,7 +36,7 @@
       height: 8px;
       border-radius: 4px;
 
-      background-color: var(--n200);
+      background-color: var(--fn-bg-var);
       transition: all 0.3s ease;
 
       opacity: 1
@@ -53,19 +53,19 @@
       height: 8px;
       border-radius: 4px;
 
-      background-color: var(--p500);
+      background-color: var(--fn-bg-cta);
       transition: background-color 0.3s ease;
     }
 
     &:hover {
       .MuiSlider-track {
-        background-color: var(--p600);
+        background-color: var(--fn-bg-cta-hov);
       }
     }
 
     &.MuiSlider-dragging {
       .MuiSlider-track {
-        background-color: var(--p700);
+        background-color: var(--fn-bg-cta-hov);
       }
     }
 
@@ -84,26 +84,26 @@
       box-sizing: border-box;
       border-radius: 50%;
 
-      background-color: var(--p500); // @todo Had to use inline SVG, because Webpack is serving wrong urls
+      background-color: var(--fn-bg-cta); // @todo Had to use inline SVG, because Webpack is serving wrong urls
       background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2.85829 7.99163L5.70829 5.1583L4.27496 3.7583L0.041626 7.99163L4.29163 12.2416L5.70829 10.825L2.85829 7.99163ZM13.125 7.99163L10.2916 10.825L11.7083 12.2416L15.9583 7.99163L11.7083 3.7583L10.2916 5.1583L13.125 7.99163ZM7.99163 10.0083C9.09163 10.0083 9.99163 9.12497 9.99163 8.0083C9.99163 6.9083 9.09163 6.0083 7.97496 6.0083C6.87496 6.0083 5.99163 6.9083 5.99163 8.0083C5.99163 9.12497 6.89163 10.0083 7.99163 10.0083Z' fill='white'/%3E%3C/svg%3E%0A");
       background-repeat: no-repeat;
       background-position: center center;
 
-      box-shadow: 0 8px 24px rgba(4, 5, 6, 0.03), 0 4px 8px rgba(4, 5, 6, 0.05), 0 2px 2px rgba(4, 5, 6, 0.08);
+      box-shadow: 0 8px 24px rgba(var(--fn-shadow-rgb), 0.03), 0 4px 8px rgba(var(--fn-shadow-rgb), 0.05), 0 2px 2px rgba(var(--fn-shadow-rgb), 0.08);
       transition: background-color 0.3s ease, border-color 0.3s ease;
 
       &:hover {
-        background-color: var(--p700);
+        background-color: var(--fn-bg-cta-hov);
       }
 
       &.Mui-active {
-        background-color: var(--p700);
+        background-color: var(--fn-bg-cta-hov);
       }
     }
 
     &:hover {
       .MuiSlider-thumb {
-        background-color: var(--p700);
+        background-color: var(--fn-bg-cta-hov);
       }
     }
 
@@ -152,7 +152,7 @@
         content: "";
         width: 1px;
         height: 8px;
-        background-color: var(--n200);
+        background-color: var(--fn-divider-gl);
         // position: absolute;
         // top: 18px;
         // left: 0;
@@ -167,7 +167,7 @@
      * -----------------------------------------------------------------------------------------------------------------
      */
     .MuiSlider-valueLabel {
-      background: var(--n000);
+      background: var(--fn-bg-surface);
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 16px;
@@ -175,7 +175,7 @@
 
       text-align: center;
       font-weight: bold;
-      color: var(--n700);
+      color: var(--fn-fg);
 
       transition: opacity 0.1s ease;
       opacity: 0;
@@ -226,45 +226,45 @@
   &.vng-slider-simple {
     .MuiSlider-root {
       .MuiSlider-rail {
-        background-color: var(--n100);
+        background-color: var(--fn-bg-var);
       }
 
       .MuiSlider-track {
-        background-color: var(--n100);
+        background-color: var(--fn-bg-var);
       }
 
       &:hover {
         .MuiSlider-track {
-          background-color: var(--n200);
+          background-color: var(--fn-bg-var);
         }
       }
 
       &.MuiSlider-dragging {
         .MuiSlider-track {
-          background-color: var(--n200);
+          background-color: var(--fn-bg-var);
         }
       }
 
       .MuiSlider-thumb {
-        border: 2px solid var(--n300);
-        background: var(--n000);
+        border: 2px solid var(--fn-brd-gl);
+        background: var(--fn-bg-surface);
         box-shadow: none;
 
         &:hover {
-          background-color: var(--n000);
-          border: 2px solid var(--n400);
+          background-color: var(--fn-bg-surface);
+          border: 2px solid var(--fn-brd-gl);
         }
 
         &.Mui-active {
-          background-color: var(--n000);
-          border: 2px solid var(--n400);
+          background-color: var(--fn-bg-surface);
+          border: 2px solid var(--fn-brd-gl);
         }
       }
 
       &:hover {
         .MuiSlider-thumb {
-          background-color: var(--n000);
-          border: 2px solid var(--n400);
+          background-color: var(--fn-bg-surface);
+          border: 2px solid var(--fn-brd-gl);
         }
       }
     }
@@ -278,46 +278,46 @@
   &.vng-slider-primary {
     .MuiSlider-root {
       .MuiSlider-rail {
-        background-color: var(--n100);
+        background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
         z-index: 1;
 
       }
 
       .MuiSlider-track {
-        background-color: var(--p500);
+        background-color: var(--fn-bg-cta);
         z-index: 3;
       }
 
       &:hover {
         .MuiSlider-track {
-          background-color: var(--p600);
+          background-color: var(--fn-bg-cta-hov);
         }
       }
 
       &.MuiSlider-dragging {
         .MuiSlider-track {
-          background-color: var(--p600);
+          background-color: var(--fn-bg-cta-hov);
         }
       }
 
       .MuiSlider-thumb {
-        background: var(--n000);
+        background: var(--fn-bg-surface);
         box-shadow: none;
-        filter: drop-shadow(4px 0px 2px rgba(4, 5, 6, 0.15));
+        filter: drop-shadow(4px 0px 2px rgba(var(--fn-shadow-rgb), 0.15));
         z-index: 3;
 
         &:hover {
-          background-color: var(--n000);
+          background-color: var(--fn-bg-surface);
         }
 
         &.Mui-active {
-          background-color: var(--n000);
+          background-color: var(--fn-bg-surface);
         }
       }
 
       &:hover {
         .MuiSlider-thumb {
-          background-color: var(--n000);
+          background-color: var(--fn-bg-surface);
         }
       }
     }

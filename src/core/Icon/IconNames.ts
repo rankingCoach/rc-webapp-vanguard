@@ -6,6 +6,7 @@ export enum IconNames {
   language = 'language',
   check = 'check',
   close = 'close',
+  closeCanvas = 'close-canvas',
   warning = 'warning',
   info = 'info',
   help = 'help',

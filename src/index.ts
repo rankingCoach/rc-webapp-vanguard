@@ -158,6 +158,22 @@ export { Switch } from './core/Switch';
 export type { SkeletonProps } from './core/Skeleton';
 export { Skeleton, SkeletonTypes } from './core/Skeleton';
 
+// CircularGauge
+export type { CircularGaugeProps } from './core/CircularGauge';
+export { CircularGauge } from './core/CircularGauge';
+
+// AnimatedNumber
+export type { AnimatedNumberProps, UseAnimatedValueOptions } from './core/AnimatedNumber';
+export { AnimatedNumber, useAnimatedValue } from './core/AnimatedNumber';
+
+// TrendIndicator
+export type { TrendDeltaProps, TrendDirection, TrendIndicatorProps } from './core/TrendIndicator';
+export { formatMagnitude, getTrend, TREND_THRESHOLD, TrendDelta, TrendIndicator } from './core/TrendIndicator';
+
+// SegmentBar
+export type { SegmentBarProps, SegmentBarSegment } from './core/SegmentBar';
+export { SegmentBar } from './core/SegmentBar';
+
 // Toggle
 export type { TogglerOption, TogglerState, TogglerWithTextProps } from './core/TogglerWithText';
 export { TogglerWithText } from './core/TogglerWithText';

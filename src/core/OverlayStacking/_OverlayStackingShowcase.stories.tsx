@@ -2,6 +2,7 @@ import { baseStore } from '@stores/redux-base.store';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { Modal } from '@vanguard/Modal/Modal';
 
+import { DrawerModalSelect as _DrawerModalSelect } from './stories/DrawerModalSelect.story';
 import { DrawerOverFullscreenModal as _DrawerOverFullscreenModal } from './stories/DrawerOverFullscreenModal.story';
 import { FullscreenModalDrawerModal as _FullscreenModalDrawerModal } from './stories/FullscreenModalDrawerModal.story';
 import { FullscreenModalDrawerModalPopover as _FullscreenModalDrawerModalPopover } from './stories/FullscreenModalDrawerModalPopover.story';
@@ -12,6 +13,7 @@ export const ModalOverDrawer: Story = { ..._ModalOverDrawer };
 export const DrawerOverFullscreenModal: Story = { ..._DrawerOverFullscreenModal };
 export const FullscreenModalDrawerModal: Story = { ..._FullscreenModalDrawerModal };
 export const FullscreenModalDrawerModalPopover: Story = { ..._FullscreenModalDrawerModalPopover };
+export const DrawerModalSelect: Story = { ..._DrawerModalSelect };
 
 export default {
   ...SbDecorator({

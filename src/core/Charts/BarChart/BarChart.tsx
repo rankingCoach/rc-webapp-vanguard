@@ -206,7 +206,7 @@ export const BarChart = (props: BarChartProps) => {
     },
     grid: {
       show: showGrid,
-      borderColor: 'rgba(4, 5, 6, 0.1)',
+      borderColor: 'rgba(var(--fn-fg-rgb), 0.1)',
       strokeDashArray: 6,
       position: 'back',
       xaxis: {

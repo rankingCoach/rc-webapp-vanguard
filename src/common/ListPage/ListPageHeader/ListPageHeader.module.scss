@@ -13,9 +13,9 @@
 }
 
 .shadow {
-  -webkit-box-shadow: -5px 24px 20px -11px rgba(0, 0, 0, 0.16);
-  -moz-box-shadow: -5px 24px 20px -11px rgba(0, 0, 0, 0.16);
-  box-shadow: -5px 24px 20px -11px rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: -5px 24px 20px -11px rgba(var(--fn-shadow-rgb), 0.16);
+  -moz-box-shadow: -5px 24px 20px -11px rgba(var(--fn-shadow-rgb), 0.16);
+  box-shadow: -5px 24px 20px -11px rgba(var(--fn-shadow-rgb), 0.16);
 }
 
 .line {
@@ -44,7 +44,7 @@
 .checkboxesContainer {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--n200);
+  border-top: 1px solid var(--fn-divider-gl);
   padding: $x2 0;
 
   @include media("<tablet") {

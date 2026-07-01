@@ -50,7 +50,7 @@
   }
 
   &.modal-footer-border {
-    border-top: 1px solid var(--n200);
+    border-top: 1px solid var(--fn-divider-gl);
   }
 }
 
@@ -67,8 +67,8 @@
     width: 100vw;
     padding: 22px 32px;
 
-    box-shadow: inset 0 1px 0 #e6e9f0;
-    background-color: rgba(var(--n000-rgb), 0.8);
+    box-shadow: inset 0 1px 0 var(--fn-divider-gl);
+    background-color: rgba(var(--fn-bg-rgb), 0.8);
     backdrop-filter: blur(5px);
 
     .modal-footer-buttons {

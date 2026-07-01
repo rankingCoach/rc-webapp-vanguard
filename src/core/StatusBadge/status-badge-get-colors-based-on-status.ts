@@ -154,7 +154,7 @@ export const getColorsBasedOnStatus = (
         reverseColor: '--n400',
         iconColor: '--n500',
         textColor: '--n400',
-        bgColor: '--n100',
+        bgColor: '--fn-bg',
         iconName: IconNames.close,
       };
     case 'not_sent':

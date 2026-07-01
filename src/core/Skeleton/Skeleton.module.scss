@@ -1,4 +1,12 @@
 .container {
+  /* Skeleton shimmer derived from the base surface token, not a second theme
+     token. --fn-bg-hov-n-gl already themes correctly (light grey / dark slate),
+     and mixing it toward white yields a "lighter base" highlight in either
+     scheme without depending on theme-specific tokens (e.g. --fn-bg-disabled,
+     which some brand themes map to an accent colour). */
+  --fn-skeleton-base: var(--fn-bg-hov-n-gl);
+  --fn-skeleton-shimmer: color-mix(in srgb, var(--fn-bg-hov-n-gl), white 24%);
+
   overflow: hidden;
   position: relative;
 
