@@ -37,74 +37,76 @@
   }
 }
 
-.MuiMenu-paper {
-  padding: 4px;
-  padding-bottom: 8px;
-  margin-top: 4px;
-
-  .MuiMenu-list {
+.vanguard-searchable-select {
+  .MuiMenu-paper {
     padding: 4px;
-    padding-bottom: 0;
-    max-height: 276px;
-    overflow-x: hidden;
+    padding-bottom: 8px;
+    margin-top: 4px;
 
-    &::-webkit-scrollbar {
-      -webkit-appearance: none;
-      width: 8px;
-    }
+    .MuiMenu-list {
+      padding: 4px;
+      padding-bottom: 0;
+      max-height: 276px;
+      overflow-x: hidden;
 
-    &::-webkit-scrollbar-thumb {
-      background: var(--n300);
-      border-radius: 4px;
-    }
-
-    .MuiOutlinedInput-root {
-      .MuiOutlinedInput-input {
-        padding-left: 42px;
-        padding-right: 14px;
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 8px;
       }
 
-      .MuiInputAdornment-root {
-        margin: 0;
-        position: absolute;
-        left: 14px;
-      }
-    }
-
-    .search-bar-container {
-      margin-bottom: 8px;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    .vanguard-searchable-select-input-menu-list-footer {
-      padding: 8px 16px;
-      margin-top: 8px;
-      border-top: 1px solid var(--n200);
-      border-radius: 0 0 4px 4px;
-      background: #FFFFFF;
-      position: sticky;
-      bottom: 0;
-    }
-
-    .MuiMenuItem-root {
-      padding: 8px 16px;
-      font-weight: 400;
-      font-size: 16px;
-      line-height: 28px;
-      color: var(--n700);
-      background: #FFFFFF;
-      word-break: break-word;
-      white-space: normal;
-
-      &:hover {
-        background: var(--n100);
-        border-radius: 8px;
+      &::-webkit-scrollbar-thumb {
+        background: var(--n300);
+        border-radius: 4px;
       }
 
-      &.Mui-selected {
-        color: var(--p500);
+      .MuiOutlinedInput-root {
+        .MuiOutlinedInput-input {
+          padding-left: 42px;
+          padding-right: 14px;
+        }
+
+        .MuiInputAdornment-root {
+          margin: 0;
+          position: absolute;
+          left: 14px;
+        }
+      }
+
+      .search-bar-container {
+        margin-bottom: 8px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      .vanguard-searchable-select-input-menu-list-footer {
+        padding: 8px 16px;
+        margin-top: 8px;
+        border-top: 1px solid var(--n200);
+        border-radius: 0 0 4px 4px;
+        background: #FFFFFF;
+        position: sticky;
+        bottom: 0;
+      }
+
+      .MuiMenuItem-root {
+        padding: 8px 16px;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 28px;
+        color: var(--n700);
+        background: #FFFFFF;
+        word-break: break-word;
+        white-space: normal;
+
+        &:hover {
+          background: var(--n100);
+          border-radius: 8px;
+        }
+
+        &.Mui-selected {
+          color: var(--p500);
+        }
       }
     }
   }
