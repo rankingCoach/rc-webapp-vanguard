@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.15.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.13...v1.15.0) (2026-07-02)
+
+
+### Features
+
+* **phone-utils:** reintegrate phone masks for multiple countries ([9c999ab](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9c999ab2cebc3d1f4826a750eadda623a9bd91a1)), closes [#VAN-65](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-65)
+* **PhoneNumber:** add validation stories for Israeli, Japanese, and Nigerian numbers ([caa6d13](https://github.com/rankingCoach/rc-webapp-vanguard/commit/caa6d133af1b5d071af89ce82290dfc1c4a2426a)), closes [#VAN-65](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-65)
+
 ### [1.14.13](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.12...v1.14.13) (2026-07-01)
 
 ### [1.14.12](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.11...v1.14.12) (2026-06-26)
