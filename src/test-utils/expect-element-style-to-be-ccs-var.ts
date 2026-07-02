@@ -100,11 +100,25 @@ export const expectElementValueToBeCssVar = async (el: HTMLElement, prop: string
     return rootStyle || getComputedStyle(element).getPropertyValue(value).trim();
   };
 
+  const resolveCssVarForProp = (value: string, property: string, element: HTMLElement): string => {
+    const probe = document.createElement('span');
+    probe.style.setProperty('position', 'absolute');
+    probe.style.setProperty('visibility', 'hidden');
+    probe.style.setProperty(property, `var(${value})`);
+
+    element.appendChild(probe);
+    const resolved = getComputedStyleForProp(probe, property);
+    element.removeChild(probe);
+
+    return resolved;
+  };
+
   const computed = getComputedStyleForProp(el, prop);
 
   const root = getRootOrElementStyleForCssValue(cssValue, el);
+  const resolvedRoot = resolveCssVarForProp(cssValue, prop, el) || root;
 
-  const areEqual = compareColors(root, computed);
+  const areEqual = compareColors(resolvedRoot, computed);
 
-  return await expect(areEqual, `Expected ${cssValue}(${root}) to be ${computed}`).toBe(true);
+  return await expect(areEqual, `Expected ${cssValue}(${root}) to resolve to ${computed}`).toBe(true);
 };

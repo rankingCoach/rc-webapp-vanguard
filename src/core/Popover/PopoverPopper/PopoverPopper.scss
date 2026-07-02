@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 .vanguard-popover {
   &.MuiTooltip-popper {
     /**
@@ -33,7 +34,7 @@
         margin-bottom: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(0px 4px 2px rgba(var(--fn-shadow-rgb), 0.1));
+          filter: drop-shadow(0px 4px 2px rc_transparent(--fn-shadow, 0.1));
           border-color: var(--fn-bg-surface) transparent transparent transparent;
           border-width: 12px 12px 0 12px;
           margin-bottom: -11px;
@@ -46,7 +47,7 @@
         margin-top: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(0px -4px 2px rgba(var(--fn-shadow-rgb), 0.1));
+          filter: drop-shadow(0px -4px 2px rc_transparent(--fn-shadow, 0.1));
           border-color: transparent transparent var(--fn-bg-surface) transparent;
           border-width: 0 12px 12px 12px;
           margin-top: -11px;
@@ -59,7 +60,7 @@
         margin-right: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(4px 0 2px rgba(var(--fn-shadow-rgb), 0.1));
+          filter: drop-shadow(4px 0 2px rc_transparent(--fn-shadow, 0.1));
           border-color: transparent transparent transparent var(--fn-bg-surface);
           border-width: 12px 0 12px 12px;
           margin-right: -11px;
@@ -72,7 +73,7 @@
         margin-left: 18px !important;
 
         .MuiTooltip-arrow {
-          filter: drop-shadow(-4px 0px 2px rgba(var(--fn-shadow-rgb), 0.1));
+          filter: drop-shadow(-4px 0px 2px rc_transparent(--fn-shadow, 0.1));
           border-color: transparent var(--fn-bg-surface) transparent transparent;
           border-width: 12px 12px 12px 0;
           margin-left: -11px;

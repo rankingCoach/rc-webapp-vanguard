@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "../../../../styles/spacings";
 @import "../../../../styles/media-mixins";
 
@@ -14,7 +15,7 @@
     padding: $x3 $x4;
     overflow: hidden;
     word-break: break-word;
-    box-shadow: 0 $x2 $x8 rgba(var(--fn-shadow-rgb), 0.03), 0px $x1_5 $x2_5 rgba(var(--fn-shadow-rgb), 0.05), 0px $x1 $x1 rgba(var(--fn-shadow-rgb), 0.08);
+    box-shadow: 0 $x2 $x8 rc_transparent(--fn-shadow, 0.03), 0px $x1_5 $x2_5 rc_transparent(--fn-shadow, 0.05), 0px $x1 $x1 rc_transparent(--fn-shadow, 0.08);
     border-radius: $x1;
   }
 }

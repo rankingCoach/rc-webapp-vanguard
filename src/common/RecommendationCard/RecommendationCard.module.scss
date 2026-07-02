@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "./src/styles/spacings";
 @import './src/styles/media-mixins';
 
@@ -5,7 +6,7 @@
     border-radius: $x3;
     border: 1px solid var(--a1-100);
     background: var(--fn-bg);
-    box-shadow: 0px 0px 0px 3px rgba(var(--a1100-rgb), 0.25);
+    box-shadow: 0px 0px 0px 3px rc_transparent(--a1100, 0.25);
     padding: $x6;
     position: relative;
     overflow: hidden;

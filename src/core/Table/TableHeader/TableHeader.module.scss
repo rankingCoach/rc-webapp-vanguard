@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "./src/styles/spacings";
 
 .table-head {
@@ -49,7 +50,7 @@
       left: calc(100% - ($x0_25 + $x0_125));
       width: $x1 + $x0_25;
       pointer-events: none;
-      background: linear-gradient(to right, rgba(var(--fn-shadow-rgb), 0.225) 0, rgba(var(--fn-shadow-rgb), 0.15) 0, rgba(var(--fn-shadow-rgb), 0.06) $x0_25, rgba(var(--fn-shadow-rgb), 0) 100%);
+      background: linear-gradient(to right, rc_transparent(--fn-shadow, 0.225) 0, rc_transparent(--fn-shadow, 0.15) 0, rc_transparent(--fn-shadow, 0.06) $x0_25, rc_transparent(--fn-shadow, 0) 100%);
     }
 
     .cell-text {

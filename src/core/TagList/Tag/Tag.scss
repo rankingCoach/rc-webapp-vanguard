@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 .Tag-container {
   display: flex;
   flex-direction: row;
@@ -22,11 +23,11 @@
     gap: 8px;
 
     &.tag-primary {
-      background-color: rgba(var(--s400-rgb), 8%);
+      background-color: rc_transparent(--s400, 8%);
     }
 
     &.tag-default {
-      background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 16%);
+      background-color: rc_transparent(--fn-bg-hov-n-gl, 16%);
     }
   }
 

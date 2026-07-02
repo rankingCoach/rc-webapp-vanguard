@@ -163,7 +163,7 @@ export const useLineChartOptions = (opts: LineChartBaseProps) => {
         },
         axisBorder: {
           show: true,
-          color: 'rgba(var(--fn-fg-rgb), 0.2)', // todo: replace with variable
+          color: 'color-mix(in srgb, var(--fn-fg) 20%, transparent)', // todo: replace with variable
         },
         labels: {
           offsetX: 5,
@@ -182,7 +182,7 @@ export const useLineChartOptions = (opts: LineChartBaseProps) => {
       },
       grid: {
         show: true,
-        borderColor: 'rgba(var(--fn-fg-rgb), 0.2)', // todo: replace with variable
+        borderColor: 'color-mix(in srgb, var(--fn-fg) 20%, transparent)', // todo: replace with variable
         xaxis: {
           lines: {
             show: true,

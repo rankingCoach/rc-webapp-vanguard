@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import '../../styles/spacings';
 @import '../../styles/media-mixins';
 
@@ -54,7 +55,7 @@
 
         &:after {
           content: "";
-          background: rgba(var(--fn-bg-rgb), 0.1);
+          background: rc_transparent(--fn-bg, 0.1);
           position: absolute;
           left: 0;
           top: 0;
@@ -66,7 +67,7 @@
 
         &:before {
           content: "";
-          background: rgba(var(--fn-bg-rgb), 0.1);
+          background: rc_transparent(--fn-bg, 0.1);
           position: absolute;
           right: 0;
           top: 0;
@@ -125,7 +126,7 @@
       }
 
       .cropper-modal {
-        background-color: rgba(var(--fn-shadow-rgb), 0.45);
+        background-color: rc_transparent(--fn-shadow, 0.45);
         opacity: 0.45;
       }
     }

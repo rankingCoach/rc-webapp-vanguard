@@ -4,6 +4,7 @@ import { within, expect } from "storybook/test";
 import { IconNames } from "@vanguard/Icon/IconNames";
 import { FontWeights } from "@vanguard/Text/Text";
 import { Story } from "./_BigLegend.default";
+import { expectElementValueToBeCssVar } from "@test-utils/expect-element-style-to-be-ccs-var";
 
 export const CustomStyling: Story = {
   args: {
@@ -54,7 +55,7 @@ export const CustomStyling: Story = {
     // Test that the component is rendered with custom styling
     const component = canvas.getByTestId("custom-styling-big-legend");
     await expect(component).toBeInTheDocument();
-    await expect(component).toHaveStyle("background-color: rgb(245, 247, 249)");
+    await expectElementValueToBeCssVar(component, "background-color", "--n100");
     await expect(component).toHaveStyle("padding: 24px");
     await expect(component).toHaveStyle("border-radius: 8px");
 

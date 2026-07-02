@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 // Storybook preview
 
 .sb-show-main {
@@ -62,7 +63,7 @@
 .MuiAutocomplete-paper,
 .MuiMenu-root > .MuiPaper-root {
   background: var(--fn-bg-surface);
-  box-shadow: 0 8px 16px rgba(var(--fn-shadow-rgb), 0.1);
+  box-shadow: 0 8px 16px rc_transparent(--fn-shadow, 0.1);
   border-radius: 4px;
   margin-top: 8px;
   font-size: 16px;

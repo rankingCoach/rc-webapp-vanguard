@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 .root {
   display: flex;
   height: 100vh;
@@ -105,12 +106,12 @@
 }
 
 .tagStory {
-  background: rgba(var(--s500-rgb, 34, 168, 84), 0.16);
+  background: rc_transparent(--s500, 0.16, rgb(34 168 84));
   color: var(--s500);
 }
 
 .tagFallback {
-  background: rgba(var(--n500-rgb, 108, 115, 127), 0.16);
+  background: rc_transparent(--n500, 0.16, rgb(108 115 127));
   color: var(--fn-fg-light);
 }
 

@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import "./src/styles/spacings";
 @import '../../../styles/media-mixins';
 
@@ -6,7 +7,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: -$x0_25 0 $x0_25 rgba(var(--fn-shadow-rgb), 0.03), -$x0_5 0 $x1 rgba(var(--fn-shadow-rgb), 0.05), -$x1 0 $x3 rgba(var(--fn-shadow-rgb), 0.08);
+  box-shadow: -$x0_25 0 $x0_25 rc_transparent(--fn-shadow, 0.03), -$x0_5 0 $x1 rc_transparent(--fn-shadow, 0.05), -$x1 0 $x3 rc_transparent(--fn-shadow, 0.08);
   border-radius: $x6 0 0 $x6;
   position: absolute;
   top: 50%;
@@ -18,7 +19,7 @@
   transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.15s ease;
 
   &:hover {
-    background-color: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
+    background-color: rc_transparent(--fn-bg-hov-n-gl, 0.15);
 
     svg path {
       fill: var(--fn-fg-light);

@@ -210,7 +210,7 @@ export const HSBChart = (props: HSBChartProps) => {
     },
     grid: {
       show: true,
-      borderColor: 'rgba(var(--fn-fg-rgb), 0.2)',
+      borderColor: 'color-mix(in srgb, var(--fn-fg) 20%, transparent)',
       strokeDashArray: 6,
       position: 'front',
       xaxis: {

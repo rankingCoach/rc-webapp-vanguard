@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 .container {
   flex: 1;
   display: flex;
@@ -31,7 +32,7 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 250ms ease-in-out;
-  background-color: rgba(var(--fn-bg-rgb), 0);
+  background-color: rc_transparent(--fn-bg, 0);
   flex-grow: 1;
   border-radius: 8px;
   min-width: 184px;
@@ -47,7 +48,7 @@
   }
 
   &:hover {
-    background-color: rgba(var(--fn-bg-rgb), 1);
+    background-color: rc_transparent(--fn-bg, 1);
     border: 1px solid var(--fn-brd-gl);
 
     .link {
@@ -84,7 +85,7 @@
   .card {
     display: flex;
     flex-direction: column;
-    background-color: rgba(var(--fn-bg-rgb), 0.5);
+    background-color: rc_transparent(--fn-bg, 0.5);
     align-items: center;
     justify-content: center;
     text-align: center;

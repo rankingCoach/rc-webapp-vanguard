@@ -160,6 +160,10 @@
     }
 
     &.Mui-disabled {
+      // Vanguard mapping made --fn-bg-disabled a solid color, so the fill
+      // covered the field. Dim the whole input instead (design = "with opacity").
+      opacity: 40%;
+
       fieldset {
         border-width: 1px;
         border-color: var(--fn-brd-gl);

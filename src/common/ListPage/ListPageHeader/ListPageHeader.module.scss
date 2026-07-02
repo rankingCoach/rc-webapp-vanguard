@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "../../../../styles/spacings";
 @import "../../../../styles/media-mixins";
 
@@ -13,9 +14,9 @@
 }
 
 .shadow {
-  -webkit-box-shadow: -5px 24px 20px -11px rgba(var(--fn-shadow-rgb), 0.16);
-  -moz-box-shadow: -5px 24px 20px -11px rgba(var(--fn-shadow-rgb), 0.16);
-  box-shadow: -5px 24px 20px -11px rgba(var(--fn-shadow-rgb), 0.16);
+  -webkit-box-shadow: -5px 24px 20px -11px rc_transparent(--fn-shadow, 0.16);
+  -moz-box-shadow: -5px 24px 20px -11px rc_transparent(--fn-shadow, 0.16);
+  box-shadow: -5px 24px 20px -11px rc_transparent(--fn-shadow, 0.16);
 }
 
 .line {

@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import '../../styles/spacings';
 @import '../../styles/media-mixins';
 
@@ -80,7 +81,7 @@
         width: $x3;
         height: $x3;
         top: calc(50% - 24px/2);
-        background: rgba(var(--s500-rgb), 0.15);
+        background: rc_transparent(--s500, 0.15);
         border-radius: 38px;
         border: 0px;
       }

@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 .quoteContainer {
   position: relative;
   width: 100%;
@@ -21,7 +22,7 @@
       opacity: 0.15; // Make it subtle in the background
       
       path {
-        fill: rgba(var(--fn-fg-light-rgb),0.5); // Use the accent color for the quote marks
+        fill: rc_transparent(--fn-fg-light, 0.5); // Use the accent color for the quote marks
       }
     }
   }

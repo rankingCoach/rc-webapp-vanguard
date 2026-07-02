@@ -5,7 +5,7 @@ const baseArgs = {
   children: 'contact@EXAMPLE.com for Contact support CONTACT',
   highlightWords: ['CONTACT'],
   translate: false,
-  highlightColor: 'rgba(var(--w400-rgb),0.4)',
+  highlightColor: 'color-mix(in srgb, var(--w400) 40%, transparent)',
 } satisfies Partial<Story['args']>;
 
 export const HighlightCaseInsensitiveFalse: Story = {

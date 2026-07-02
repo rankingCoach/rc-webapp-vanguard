@@ -5,7 +5,7 @@ import styles from './CssUpdateRenderedComponent.module.scss';
 
 /* ----------------------------- StoryFrame ----------------------------- */
 
-function StoryFrame({ storyId }: { storyId: string }) {
+function StoryFrame({ storyId, theme }: { storyId: string; theme?: 'light' | 'dark' }) {
   const ref = useRef<HTMLIFrameElement>(null);
   const [loading, setLoading] = useState(true);
   const [height, setHeight] = useState(420);
@@ -46,12 +46,14 @@ function StoryFrame({ storyId }: { storyId: string }) {
       )}
       <iframe
         ref={ref}
-        key={storyId}
+        key={`${storyId}-${theme ?? 'inherit'}`}
         title={storyId}
         className={styles.frame}
         style={{ height }}
         data-testid="css-update-story-iframe"
-        src={`iframe.html?id=${encodeURIComponent(storyId)}&viewMode=story&singleStory=true`}
+        src={`iframe.html?id=${encodeURIComponent(storyId)}&viewMode=story&singleStory=true${
+          theme ? `&globals=theme:${theme}` : ''
+        }`}
         onLoad={onLoad}
       />
     </div>
@@ -70,7 +72,14 @@ function MissingStoryNotice({ record }: { record: CssUpdateRecord }) {
 
 /* ------------------------------- entry -------------------------------- */
 
-export function CssUpdateRenderedComponent({ record }: { record: CssUpdateRecord }) {
-  if (record.storyId) return <StoryFrame storyId={record.storyId} />;
+export function CssUpdateRenderedComponent({
+  record,
+  theme,
+}: {
+  record: CssUpdateRecord;
+  /** Force the embedded story's color scheme — nested iframes do not inherit the toolbar globals. */
+  theme?: 'light' | 'dark';
+}) {
+  if (record.storyId) return <StoryFrame storyId={record.storyId} theme={theme} />;
   return <MissingStoryNotice record={record} />;
 }

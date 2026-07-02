@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import './src/styles/spacings';
 @import './src/styles/media-mixins';
 
@@ -22,7 +23,7 @@
 
   align-items: flex-start;
   border: 1px solid var(--accent1-100);
-  box-shadow: 0px 0px 0px 3px rgba(var(--a1100-rgb), 0.25);
+  box-shadow: 0px 0px 0px 3px rc_transparent(--a1100, 0.25);
   border-radius: $x3;
   overflow: hidden;
 

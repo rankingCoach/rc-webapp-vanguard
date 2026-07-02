@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 /**
  * A div that stores all the modals
  * ---------------------------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@
   overflow: hidden;
   display: flex;
 
-  background-color: rgba(var(--fn-shadow-rgb), 0.4);
+  background-color: rc_transparent(--fn-shadow, 0.4);
 
   .modalRoot-container {
     //

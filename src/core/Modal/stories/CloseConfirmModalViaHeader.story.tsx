@@ -27,6 +27,10 @@ const CloseConfirmModalViaHeaderComponent = () => {
 };
 
 export const CloseConfirmModalViaHeader: Story = {
+  beforeEach: async () => {
+    ModalService.closeAllModals();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  },
   render: () => <CloseConfirmModalViaHeaderComponent />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

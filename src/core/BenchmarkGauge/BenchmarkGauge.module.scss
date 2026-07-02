@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "@styles/spacings";
 @import "@styles/media-mixins";
 
@@ -194,7 +195,7 @@
   pointer-events: none;
   padding: $x0_5 $x1;
   border-radius: $x9;
-  background: rgba(var(--fn-shadow-rgb), 0.8);
+  background: rc_transparent(--fn-shadow, 0.8);
 }
 
 .labelStart {

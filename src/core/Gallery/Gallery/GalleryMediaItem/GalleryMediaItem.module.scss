@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "./src/styles/spacings";
 @import "./src/styles/media-mixins";
 
@@ -22,7 +23,7 @@
 
     .overlay-options {
       align-items: center;
-      background-color: rgba(var(--fn-shadow-rgb), 0.6);
+      background-color: rc_transparent(--fn-shadow, 0.6);
       display: flex;
       flex-direction: column;
       height: 100%;
@@ -48,7 +49,7 @@
           border-radius: $x0_5;
           margin-left: $x1;
           margin-right: $x1;
-          background-color: rgba(var(--fn-bg-hov-i-gl-rgb), 0.2);
+          background-color: rc_transparent(--fn-bg-hov-i-gl, 0.2);
         }
 
         &.disabled {
@@ -70,7 +71,7 @@
 
       &.is-selected {
         opacity: 1;
-        background-color: rgba(var(--fn-bg-cta-rgb), 0.3);
+        background-color: rc_transparent(--fn-bg-cta, 0.3);
         border: $x0_25 solid var(--fn-bg-cta);
       }
 
@@ -82,7 +83,7 @@
         gap: $x1;
 
         .action-divider {
-          border-bottom: 1px solid rgba(var(--fn-bg-rgb), 0.3);
+          border-bottom: 1px solid rc_transparent(--fn-bg, 0.3);
           margin: 8px 16px 10px;
           opacity: .5;
           width: calc(100% - 32px);
@@ -95,7 +96,7 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: linear-gradient(180deg, rgba(var(--fn-fg-rgb), 0) 0%, var(--fn-bg-dark) 126.79%);
+      background: linear-gradient(180deg, rc_transparent(--fn-fg, 0) 0%, var(--fn-bg-dark) 126.79%);
       display: flex;
       justify-content: end;
       align-items: end;

@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import './src/styles/spacings';
 @import "./src/styles/media-mixins";
 
@@ -19,7 +20,7 @@
   top: 0;
   transform: translateX(-80%);
   height: 100%;
-  background: linear-gradient(90deg, var(--fn-bg) 50.33%, rgba(var(--fn-bg-rgb), 0) 100%);
+  background: linear-gradient(90deg, var(--fn-bg) 50.33%, rc_transparent(--fn-bg, 0) 100%);
   z-index: 9;
   width: 35vw;
   pointer-events: none;
@@ -31,7 +32,7 @@
   top: 0;
   transform: translateX(80%);
   height: 100%;
-  background: linear-gradient(90deg, rgba(var(--fn-bg-rgb), 0) 0%, var(--fn-bg) 50.6%);
+  background: linear-gradient(90deg, rc_transparent(--fn-bg, 0) 0%, var(--fn-bg) 50.6%);
   z-index: 9;
   width: 35vw;
   pointer-events: none;
@@ -47,12 +48,12 @@
   border: none !important;
 
   &:hover {
-    background-color: var(--arrow-hover-color, rgba(var(--fn-shadow-rgb), 0.8)) !important;
+    background-color: var(--arrow-hover-color, rc_transparent(--fn-shadow, 0.8)) !important;
   }
 }
 
 .arrowBorder {
-  border: $x0_5 solid rgba(var(--fn-bg-rgb), 0.7) !important;
+  border: $x0_5 solid rc_transparent(--fn-bg, 0.7) !important;
 }
 
 .arrowLeft {

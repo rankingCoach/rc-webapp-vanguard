@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 .vanguard-searchable-select-input {
   .MuiOutlinedInput-root {
 
@@ -54,7 +55,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba(var(--fn-bg-dark-rgb), 0.3);
+      background: rc_transparent(--fn-bg-dark, 0.3);
       border-radius: 4px;
     }
 
@@ -99,7 +100,7 @@
       white-space: normal;
 
       &:hover {
-        background: rgba(var(--fn-bg-hov-n-gl-rgb), 0.15);
+        background: rc_transparent(--fn-bg-hov-n-gl, 0.15);
         border-radius: 8px;
       }
 

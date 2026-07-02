@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "./src/styles/spacings";
 
 /* ==============
@@ -275,7 +276,7 @@ Typographic scale sizes and fluid rules
 .not-translated {
   padding: 5px;
   border: 1px solid red;
-  background: rgba(var(--e500-rgb), 0.2);
+  background: rc_transparent(--e500, 0.2);
 }
 
 .text-isBlurred {
@@ -288,13 +289,13 @@ Typographic scale sizes and fluid rules
 .was-translated {
   padding: 5px;
   border: 1px solid green;
-  background: rgba(var(--s400-rgb), 0.2);
+  background: rc_transparent(--s400, 0.2);
 }
 
 .do-not-translate {
   padding: 5px;
   border: 1px solid blue;
-  background: rgba(var(--fn-bg-cta-rgb), 0.2);
+  background: rc_transparent(--fn-bg-cta, 0.2);
 }
 
 .uppercase {

@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "@styles/spacings";
 @import "@styles/media-mixins";
 
@@ -68,7 +69,7 @@
     padding: 22px 32px;
 
     box-shadow: inset 0 1px 0 var(--fn-divider-gl);
-    background-color: rgba(var(--fn-bg-rgb), 0.8);
+    background-color: rc_transparent(--fn-bg, 0.8);
     backdrop-filter: blur(5px);
 
     .modal-footer-buttons {

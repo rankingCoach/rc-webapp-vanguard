@@ -1,12 +1,13 @@
+@import '@styles/color-functions';
 @import '../../styles/spacings';
 @import '../../styles/media-mixins';
 /**
  * Variables
  */
 :root {
-  --shadow-small: 0 1px 3px 0 rgba(var(--fn-shadow-rgb), 0.1), 0 1px 2px 0 rgba(var(--fn-shadow-rgb), 0.06);
-  --shadow-medium: 0 4px 6px -1px rgba(var(--fn-shadow-rgb), 0.1), 0 2px 4px -1px rgba(var(--fn-shadow-rgb), 0.06);
-  --shadow-large: 0px 12px 40px rgba(var(--fn-shadow-rgb), 0.0239911), 0px 8px 14px rgba(var(--fn-shadow-rgb), 0.05), 0px 4px 4px rgba(var(--fn-shadow-rgb), 0.08);
+  --shadow-small: 0 1px 3px 0 #{rc_transparent(--fn-shadow, 0.1)}, 0 1px 2px 0 #{rc_transparent(--fn-shadow, 0.06)};
+  --shadow-medium: 0 4px 6px -1px #{rc_transparent(--fn-shadow, 0.1)}, 0 2px 4px -1px #{rc_transparent(--fn-shadow, 0.06)};
+  --shadow-large: 0px 12px 40px #{rc_transparent(--fn-shadow, 0.0239911)}, 0px 8px 14px #{rc_transparent(--fn-shadow, 0.05)}, 0px 4px 4px #{rc_transparent(--fn-shadow, 0.08)};
 }
 
 /**
