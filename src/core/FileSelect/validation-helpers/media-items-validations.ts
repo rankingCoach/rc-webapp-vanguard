@@ -35,8 +35,8 @@ export enum POST_VIDEO_VALIDATION_REQUIREMENTS {
 
 export enum IMAGE_VALIDATION_ERRORS {
   WRONG_FILE_FORMAT = 'All uploaded photos <b>must be %imageFormats% file format</b>.',
-  RESOLUTION_TOO_SMALL = 'The image <b>must be at least %imageSize%</b> tall or wide.',
-  RESOLUTION_TOO_LARGE = 'The image <b>must be less than %imageSize%</b> tall or wide.',
+  RESOLUTION_TOO_SMALL = 'The image <b>must be at least %imageSize%</b> tall and wide.',
+  RESOLUTION_TOO_LARGE = 'The image <b>must be less than %imageSize%</b> tall and wide.',
   ASPECT_RATIO_NOT_IN_LIMITS = 'The image aspect ratio <b>must be within the range of %min_aspect_ratio% to %max_aspect_ratio%</b>.',
   DUPLICATE = "Some of the media items you've uploaded are duplicates. To avoid repetition, these duplicates will not be included.",
 }
