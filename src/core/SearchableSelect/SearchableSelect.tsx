@@ -112,7 +112,7 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
           // if search text would exclude currently selected option.
           renderValue={(value) => {
             const title = (options.find((o) => o.value === value)?.title as string) ?? '';
-            return <Text>{title}</Text>;
+            return <Text translate={false}>{title}</Text>;
           }}
           endAdornment={
             <InputAdornment position="end">
