@@ -458,16 +458,17 @@ export const phoneMasks: PhoneMask[] = [
   //         "(849)###-####"
   //     ]
   // },
-  // {
-  //     name: "Ecuador",
-  //     code: "+593",
-  //     iso: "EC",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/ec.svg",
-  //     mask: [
-  //         "#-###-####",
-  //         "##-###-####"
-  //     ]
-  // },
+  {
+    name: 'Ecuador',
+    code: '+593',
+    iso: 'EC',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/ec.svg',
+    mask: '##-###-####',
+    // mask: [
+    //     "#-###-####",
+    //     "##-###-####"
+    // ]
+  },
   {
     name: 'Egypt',
     code: '+20',
@@ -780,16 +781,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/im.svg',
     mask: '(####)######',
   },
-  // {
-  //     name: "Israel",
-  //     code: "+972",
-  //     iso: "IL",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/il.svg",
-  //     mask: [
-  //         "#-###-####",
-  //         "5#-###-####"
-  //     ]
-  // },
+  {
+    name: 'Israel',
+    code: '+972',
+    iso: 'IL',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/il.svg',
+    mask: '5#-###-####',
+    // mask: [
+    //     "#-###-####",
+    //     "5#-###-####"
+    // ]
+  },
   {
     name: 'Italy',
     code: '+39',
@@ -811,16 +813,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/jm.svg',
     mask: '(876)###-####',
   },
-  // {
-  //     name: "Japan",
-  //     code: "+81",
-  //     iso: "JP",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/jp.svg",
-  //     mask: [
-  //         "(###)###-###",
-  //         "##-####-####"
-  //     ]
-  // },
+  {
+    name: 'Japan',
+    code: '+81',
+    iso: 'JP',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/jp.svg',
+    mask: '##-####-####',
+    //     mask: [
+    //         "(###)###-###",
+    //         "##-####-####"
+    //     ]
+  },
   {
     name: 'Jersey',
     code: '+44',
@@ -1194,17 +1197,18 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/nc.svg',
     mask: '##-####',
   },
-  // {
-  //     name: "New Zealand",
-  //     code: "+24",
-  //     iso: "NZ",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/nz.svg",
-  //     mask: [
-  //         "#-###-###",
-  //         "(###)###-###",
-  //         "(###)###-####"
-  //     ]
-  // },
+  {
+    name: 'New Zealand',
+    code: '+64',
+    iso: 'NZ',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/nz.svg',
+    mask: '(###)###-####',
+    // mask: [
+    //     "#-###-###",
+    //     "(###)###-###",
+    //     "(###)###-####"
+    // ]
+  },
   {
     name: 'Nicaragua',
     code: '+505',
@@ -1219,17 +1223,18 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/ne.svg',
     mask: '##-##-####',
   },
-  // {
-  //     name: "Nigeria",
-  //     code: "+234",
-  //     iso: "NG",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/ng.svg",
-  //     mask: [
-  //         "##-###-##",
-  //         "##-###-###",
-  //         "(###)###-####"
-  //     ]
-  // },
+  {
+    name: 'Nigeria',
+    code: '+234',
+    iso: 'NG',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/ng.svg',
+    mask: '(###)###-####',
+    // mask: [
+    //     "##-###-##",
+    //     "##-###-###",
+    //     "(###)###-####"
+    // ]
+  },
   {
     name: 'Niue',
     code: '+683',
@@ -1464,16 +1469,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/st.svg',
     mask: '##-#####',
   },
-  // {
-  //     name: "Saudi Arabia",
-  //     code: "+966",
-  //     iso: "SA",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/sa.svg",
-  //     mask: [
-  //         "#-###-####",
-  //         "5#-####-####"
-  //     ]
-  // },
+  {
+    name: 'Saudi Arabia',
+    code: '+966',
+    iso: 'SA',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/sa.svg',
+    mask: '5#-####-####',
+    // mask: [
+    //     "#-###-####",
+    //     "5#-####-####"
+    // ]
+  },
   {
     name: 'Senegal',
     code: '+221',
@@ -1630,16 +1636,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/sy.svg',
     mask: '##-####-###',
   },
-  // {
-  //     name: "Taiwan",
-  //     code: "+886",
-  //     iso: "TW",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/tw.svg",
-  //     mask: [
-  //         "####-####",
-  //         "#-####-####"
-  //     ]
-  // },
+  {
+    name: 'Taiwan',
+    code: '+886',
+    iso: 'TW',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/tw.svg',
+    mask: '#-####-####',
+    // mask: [
+    //     "####-####",
+    //     "#-####-####"
+    // ]
+  },
   {
     name: 'Tajikistan',
     code: '+992',
@@ -1654,16 +1661,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/tz.svg',
     mask: '##-###-####',
   },
-  // {
-  //     name: "Thailand",
-  //     code: "+66",
-  //     iso: "TH",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/th.svg",
-  //     mask: [
-  //         "##-###-###",
-  //         "##-###-####"
-  //     ]
-  // },
+  {
+    name: 'Thailand',
+    code: '+66',
+    iso: 'TH',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/th.svg',
+    mask: '##-###-####',
+    // mask: [
+    //     "##-###-###",
+    //     "##-###-####"
+    // ]
+  },
   // {
   //     name: "Timor-Leste",
   //     code: "+670",
@@ -1755,16 +1763,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/ua.svg',
     mask: '(##)###-##-##',
   },
-  // {
-  //     name: "United Arab Emirates",
-  //     code: "+971",
-  //     iso: "AE",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/ae.svg",
-  //     mask: [
-  //         "#-###-####",
-  //         "5#-###-####"
-  //     ]
-  // },
+  {
+    name: 'United Arab Emirates',
+    code: '+971',
+    iso: 'AE',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/ae.svg',
+    mask: '5#-###-####',
+    // mask: [
+    //     "#-###-####",
+    //     "5#-###-####"
+    // ]
+  },
   {
     name: 'United Kingdom',
     code: '+44',
@@ -1810,16 +1819,17 @@ export const phoneMasks: PhoneMask[] = [
     flag: 'https://cdn.kcak11.com/CountryFlags/countries/ve.svg',
     mask: '(###)###-####',
   },
-  // {
-  //     name: "Vietnam",
-  //     code: "+84",
-  //     iso: "VN",
-  //     flag: "https://cdn.kcak11.com/CountryFlags/countries/vn.svg",
-  //     mask: [
-  //         "##-####-###",
-  //         "(###)####-###"
-  //     ]
-  // },
+  {
+    name: 'Vietnam',
+    code: '+84',
+    iso: 'VN',
+    flag: 'https://cdn.kcak11.com/CountryFlags/countries/vn.svg',
+    mask: '(###)####-###',
+    // mask: [
+    //     "##-####-###",
+    //     "(###)####-###"
+    // ]
+  },
   {
     name: 'Virgin Islands, British',
     code: '+1',
