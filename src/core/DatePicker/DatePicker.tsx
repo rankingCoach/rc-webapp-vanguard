@@ -5,12 +5,14 @@ import { getDatePatternFromLocale } from '@helpers/locale';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DatePicker as DatePickerBase } from '@mui/x-date-pickers/DatePicker';
+import { uuidv4 } from '@helpers/generate-uid';
 import { datePickerValueParser } from '@vanguard/DatePicker/date-picker-value-parser';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Input } from '@vanguard/Input/Input';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import moment from 'moment';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import styles from './DatePicker.module.scss';
 
@@ -47,6 +49,29 @@ export const DatePicker = (props: DatePickerProps) => {
   const [internalValue, setInternalValue] = useState<string | undefined>(datePickerValueParser(value));
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * Calendar popper stacking
+   * -------
+   * MUI X renders the calendar in a Popper portaled to <body> with no z-index, so
+   * inside a stacked modal/drawer it paints *behind* the surface that opened it.
+   * Register a 'popover' slot on open (sitting above everything mounted) and
+   * release it on close — same pattern as the Select dropdown in InputBase.
+   */
+  const popperIdRef = useRef<string>(`date-picker-popper-${uuidv4()}`);
+  const [popperZIndex, setPopperZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const handleOpen = () => {
+    setPopperZIndex(OverlayStackingService.register(popperIdRef.current, 'popover'));
+    setIsOpen(true);
+  };
+  const handleClose = () => {
+    OverlayStackingService.unregister(popperIdRef.current);
+    setPopperZIndex(OVERLAY_BASE_Z_INDEX);
+    setIsOpen(false);
+  };
+  // Release the slot if the picker unmounts while the calendar is still open.
+  useEffect(() => () => OverlayStackingService.unregister(popperIdRef.current), []);
   // Helper function to ensure date is in seconds, convert if in milliseconds
   const ensureUnixInSeconds = (date: number | undefined) => {
     if (!date) return undefined;
@@ -83,7 +108,7 @@ export const DatePicker = (props: DatePickerProps) => {
     const clickedInsideCalendar = allowedClasses.some((className) => target?.closest(`.${className}`));
 
     if (!clickedInsideCalendar && popoverRef.current && !popoverRef.current.contains(target)) {
-      setIsOpen(false);
+      handleClose();
     }
   });
   /**
@@ -100,9 +125,12 @@ export const DatePicker = (props: DatePickerProps) => {
         <DatePickerBase
           inputFormat={datePattern}
           open={isOpen}
-          onOpen={() => setIsOpen(true)}
-          onClose={() => setIsOpen(false)}
+          onOpen={handleOpen}
+          onClose={handleClose}
           PopperProps={{
+            // Override MUI's static z-index so the calendar stacks above any
+            // modal/drawer it was opened from (see OverlayStackingService).
+            sx: { zIndex: popperZIndex },
             popperOptions: {
               placement: 'bottom-end',
             },
@@ -131,7 +159,7 @@ export const DatePicker = (props: DatePickerProps) => {
                 disabled={params.disabled}
                 required={required}
                 value={internalValue}
-                onClick={() => setIsOpen(true)}
+                onClick={handleOpen}
                 label={label}
               />
             );
