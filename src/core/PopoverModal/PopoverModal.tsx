@@ -15,7 +15,7 @@ const Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS = 1030;
 
 export interface PopoverModalProps {
   content: React.ReactNode;
-  placement?: 'top' | 'auto' | 'bottom';
+  placement?: 'top' | 'top-start' | 'top-end' | 'auto' | 'bottom' | 'bottom-start' | 'bottom-end';
   isOpen: boolean;
   centerPopover?: boolean;
   openOnHover?: boolean;
