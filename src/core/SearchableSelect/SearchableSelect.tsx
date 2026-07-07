@@ -1,11 +1,13 @@
 import './SearchableSelect.scss';
 
 import { classNames } from '@helpers/classNames';
+import { uuidv4 } from '@helpers/generate-uid';
 import { Box, FormControl, InputAdornment, MenuItem, Select } from '@mui/material';
 import createFuzzer from '@nozbe/microfuzz';
 import { InputBase } from '@vanguard/_internal/InputBase/InputBase';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { SelectOptionProp } from '@vanguard/Select/Select';
 import { Text, TextTypes } from '@vanguard/Text/Text';
 import React, { useEffect, useRef, useState } from 'react';
@@ -50,6 +52,19 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
   const [searchText, setSearchText] = useState<string>('');
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
+  /**
+   * Menu popper stacking
+   * -------
+   * MUI's Select menu portals to <body> pinned to the static `theme.zIndex.modal`
+   * (1300), so inside a stacked modal/drawer it paints *behind* the surface
+   * that opened it. Register a 'popover' slot on open and release it on close
+   * — same pattern as the Select dropdown in InputBase.
+   */
+  const menuIdRef = useRef<string>(`searchable-select-menu-${uuidv4()}`);
+  const [menuZIndex, setMenuZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+  // Release the slot if the select unmounts while the menu is still open.
+  useEffect(() => () => OverlayStackingService.unregister(menuIdRef.current), []);
+
   const search = React.useMemo(() => {
     return createFuzzer(options, {
       getText: (item) =>
@@ -93,6 +108,9 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
                 width: inputRef && inputRef.current ? inputRef.current.offsetWidth - 8 : '',
               },
             },
+            // Override MUI's static z-index so the menu stacks above any
+            // modal/drawer it was opened from (see OverlayStackingService).
+            slotProps: { root: { style: { zIndex: menuZIndex } } },
           }}
           style={isOpen ? { background: 'var(--n000)' } : { background: 'transparent' }}
           ref={inputRef}
@@ -106,8 +124,13 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
           onClose={() => {
             setSearchText('');
             setIsOpen(false);
+            OverlayStackingService.unregister(menuIdRef.current);
+            setMenuZIndex(OVERLAY_BASE_Z_INDEX);
           }}
-          onOpen={() => setIsOpen(true)}
+          onOpen={() => {
+            setIsOpen(true);
+            setMenuZIndex(OverlayStackingService.register(menuIdRef.current, 'popover'));
+          }}
           // This prevents rendering empty string in Select's value
           // if search text would exclude currently selected option.
           renderValue={(value) => {

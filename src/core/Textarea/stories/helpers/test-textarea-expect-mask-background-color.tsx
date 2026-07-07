@@ -5,6 +5,5 @@ export const testTextareaExpectMaskBackgroundColor = async (canvasElement: HTMLE
   // Check if backdrop is null
   const urlElement = await within(canvasElement).findByText(url);
 
-  console.log(urlElement);
   await expectElementValueToBeCssVar(urlElement, 'background-color', color);
 };

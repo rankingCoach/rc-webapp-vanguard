@@ -16,7 +16,7 @@ interface ModalContextType {
   modalRootState: ModalRootState;
   addModal: (modalId: string, animation: ModalTransition, component: any) => void;
   removeModal: (modalId: string) => void;
-  getModalOrder: (modalId: string) => number;
+  getModalZIndex: (modalId: string) => number;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -46,8 +46,8 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     return modalsRef.current.get(modalId);
   }, []);
 
-  const getModalOrder = useCallback((modalId: string) => {
-    return OverlayStackingService.getOrder(modalId);
+  const getModalZIndex = useCallback((modalId: string) => {
+    return OverlayStackingService.getZIndex(modalId);
   }, []);
 
   const addModal = useCallback((modalId: string, animation: ModalTransition, component: any) => {
@@ -97,7 +97,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     modalRootState,
     addModal,
     removeModal,
-    getModalOrder,
+    getModalZIndex,
   };
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;

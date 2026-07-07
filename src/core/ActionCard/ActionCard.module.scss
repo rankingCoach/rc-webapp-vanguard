@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 .card {
   border-radius: 8px;
   background-color: var(--fn-bg);
@@ -8,7 +9,7 @@
 
 .transparent {
 
-  background-color: rgba(var(--n000-rgb), 0.6);
+  background-color: rc_transparent(--fn-bg, 0.6);
 }
 
 .card-body {

@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import "../../../styles/spacings";
 @import '../../../styles/media-mixins';
 
@@ -12,18 +13,18 @@
     margin: 0 auto;
 
     &:hover {
-      background-color: var(--n100);
+      background-color: rc_transparent(--fn-bg-hov-n-gl, 0.15);
     }
 
     &.selected {
-      background-color: var(--p100);
+      background-color: var(--i100);
     }
   }
 
   // STYLES FOR UNDERLINE THEME
   &.underline {
     padding: 0;
-    border-bottom: 2px solid var(--n200);
+    border-bottom: 2px solid var(--fn-divider-gl);
 
     &:hover {
       .tab-label {
@@ -37,7 +38,7 @@
     }
 
     &.selected {
-      border-color: var(--p500);
+      border-color: var(--i400);
     }
   }
 

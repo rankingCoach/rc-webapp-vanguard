@@ -48,7 +48,7 @@
   .vanguard-checkbox {
     width: 20px;
     height: 20px;
-    border: 2px solid var(--n400);
+    border: 2px solid var(--fn-brd-gl);
     border-radius: 4px;
     box-sizing: border-box;
     transition: background-color 250ms, border-color 100ms;
@@ -73,14 +73,14 @@
   // Hover state (unchecked)
   &:hover {
     .vanguard-checkbox {
-      border: 2px solid var(--p500);
+      border: 2px solid var(--fn-bg-cta);
     }
   }
 
   &.hover-mode-check {
     &:hover {
       .vanguard-checkbox {
-        border: 2px solid var(--n400);
+        border: 2px solid var(--fn-brd-gl);
       }
     }
   }
@@ -89,14 +89,14 @@
   &:disabled {
     .vanguard-checkbox {
       cursor: not-allowed;
-      border: 2px solid var(--p300);
+      border: 2px solid var(--fn-bg-cta);
     }
   }
 
   // Focus state (unchecked)
   input[type='checkbox'] {
     &:focus ~ .vanguard-checkbox {
-      border: 2px solid var(--p500);
+      border: 2px solid var(--fn-bg-cta);
     }
   }
 
@@ -105,23 +105,23 @@
    */
   &.vanguard-checkbox-checked {
     .vanguard-checkbox {
-      background: var(--p500);
-      border: 2px solid var(--p500);
+      background: var(--fn-bg-cta);
+      border: 2px solid var(--fn-bg-cta);
     }
 
     // Hover state (checked)
     &:hover {
       .vanguard-checkbox {
-        background: var(--p600);
-        border: 2px solid var(--p600);
+        background: var(--fn-bg-cta-hov);
+        border: 2px solid var(--fn-bg-cta-hov);
       }
     }
 
     // Focus state (checked)
     input[type='checkbox'] {
       &:focus ~ .vanguard-checkbox {
-        background: var(--p600);
-        border: 2px solid var(--p600);
+        background: var(--fn-bg-cta-hov);
+        border: 2px solid var(--fn-bg-cta-hov);
       }
     }
   }
@@ -134,7 +134,7 @@
     opacity: 0.8;
 
     .vanguard-checkbox {
-      border: 2px solid var(--n400);
+      border: 2px solid var(--fn-brd-gl);
     }
   }
 }

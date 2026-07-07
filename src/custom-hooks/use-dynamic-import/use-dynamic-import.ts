@@ -55,37 +55,52 @@ export const useDynamicImport = (assetName: string, opts: DynamicRequestOpts = {
 
   useEffect(() => {
     if (!opts.shouldRequest) return;
-    if (assetName.includes('assets/ads')) {
-      // Adjust asset name for ads to avoid errors
-      assetName = assetName.replace('assets/ads', 'assets/ads_');
+
+    let cancelled = false;
+    let subscription: { unsubscribe(): void } | undefined;
+
+    const resolvedAssetName = assetName.includes('assets/ads')
+      ? // Adjust asset name for ads to avoid errors
+        assetName.replace('assets/ads', 'assets/ads_')
+      : assetName;
+
+    const cachedSvgIcon = cache.get(resolvedAssetName);
+    if (cachedSvgIcon) {
+      setState({ error: null, loading: false, SvgIcon: cachedSvgIcon });
+      return;
     }
 
-    getAssetUrl(assetName)
+    getAssetUrl(resolvedAssetName)
       .then((path) => {
+        if (cancelled) return;
         if (!path) {
-          console.error(`useDynamicImport: Asset not found: ${assetName}`);
+          console.error(`useDynamicImport: Asset not found: ${resolvedAssetName}`);
           setState({ error: new Error('Asset not found'), loading: false, SvgIcon: '' });
           return;
         }
 
-        const subscription = fetchSvgIcon(path).subscribe({
+        subscription = fetchSvgIcon(path).subscribe({
           next: (svgUrl: string) => {
             //console.log("SVG URL FETCHED:", svgUrl);
-            cache.set(assetName, svgUrl);
-            setState({ error: null, loading: false, SvgIcon: svgUrl });
+            cache.set(resolvedAssetName, svgUrl);
+            if (!cancelled) setState({ error: null, loading: false, SvgIcon: svgUrl });
           },
-          error: (err) => {
-            console.error(`useDynamicImport: Failed to load asset: ${assetName}`, err);
-            setState({ error: new Error('Failed to load asset'), loading: false, SvgIcon: '' });
+          error: (err: unknown) => {
+            console.error(`useDynamicImport: Failed to load asset: ${resolvedAssetName}`, err);
+            if (!cancelled) setState({ error: new Error('Failed to load asset'), loading: false, SvgIcon: '' });
           },
         });
-
-        return () => subscription.unsubscribe();
       })
       .catch((err) => {
-        console.error(`useDynamicImport: Failed to get asset URL: ${assetName}`, err);
+        if (cancelled) return;
+        console.error(`useDynamicImport: Failed to get asset URL: ${resolvedAssetName}`, err);
         setState({ error: new Error('Failed to load asset'), loading: false, SvgIcon: '' });
       });
+
+    return () => {
+      cancelled = true;
+      subscription?.unsubscribe();
+    };
   }, [assetName, opts.shouldRequest]);
 
   return state;
