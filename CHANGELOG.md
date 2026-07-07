@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.15.0...v1.16.0) (2026-07-07)
+
+
+### Features
+
+* add close button on Modal component ([515674d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/515674d146714e3b1e2263c79ab8146e786a9eb4))
+* add dashboard widget primitives (CircularGauge, AnimatedNumber, TrendIndicator, SegmentBar) ([9370cce](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9370ccefe6f06b3097fbbee5897abc3c6f467c13))
+* **modal-split-view:** introduce collapse mode variants and responsive stories ([7a8eb6b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/7a8eb6b6531eff66ce5b077e04e3f0f36c82f21f))
+* **ModalSplitView:** enlarge collapse FAB (40→52px, chevron 24px) ([b8a0d57](https://github.com/rankingCoach/rc-webapp-vanguard/commit/b8a0d57bef188c4441b854f579a0fe05627d417a))
+* **ModalSplitView:** opt-in animateOnSlideEnd to avoid per-frame left-panel reflow ([cb0da34](https://github.com/rankingCoach/rc-webapp-vanguard/commit/cb0da343b68aba1d0d0c4b3d03a34bbfe51d46e3))
+* **ModalSplitView:** optional divider collapse FAB (both overlay variants) ([4e34420](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4e344208cf4ad255cc16cca6a9ac393dacbfc3f7))
+* support overridable base z-index in OverlayStackingService ([38e9943](https://github.com/rankingCoach/rc-webapp-vanguard/commit/38e9943f0eff52beabfa9a20275c3f42de792b11))
+* update ModalSplitView collapseMode type to also contain null ([bd70953](https://github.com/rankingCoach/rc-webapp-vanguard/commit/bd709538446806318469f2a643b8d9adecbb6c2a))
+
+
+### Bug Fixes
+
+* **Button:** muted on dark mode ([6d95f28](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6d95f2839071c98086fe1e86f3565079a8f53dae))
+* **Drawer:** dark-aware paper surface ([e44605c](https://github.com/rankingCoach/rc-webapp-vanguard/commit/e44605c23d8f5ed6a6a858aca585c1431f24a941)), closes [#18212](https://github.com/rankingCoach/rc-webapp-vanguard/issues/18212)
+* **gallery:** restore translucent media-item hover overlay ([751880c](https://github.com/rankingCoach/rc-webapp-vanguard/commit/751880c78c9a81ce57272cf404b6dd2518335bc0))
+* issues with dark mode ([5a35014](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5a35014f8ca447b7c55eb0e34365fc64c5217018))
+* issues with dark mode ([49814fc](https://github.com/rankingCoach/rc-webapp-vanguard/commit/49814fc92efbfc0c512dc94233b37efe56018a1c))
+* **modal-split-view:** ensure `bottom` value defaults to a string type ([60895c5](https://github.com/rankingCoach/rc-webapp-vanguard/commit/60895c5505a9afb9c4ede81f6e6d6e8b4317e3ab))
+* resolve top gap on Modal due to absolute position ([c5d72e4](https://github.com/rankingCoach/rc-webapp-vanguard/commit/c5d72e4c5516efe50788181dc942aedd4bbac81b))
+* **Select:** dropdown z-index from OverlayStackingService ([00592da](https://github.com/rankingCoach/rc-webapp-vanguard/commit/00592daed34f3c436ef1be7363ed47273ecf7719))
+* **Skeleton:** derive shimmer from base surface token via color-mix ([dc68697](https://github.com/rankingCoach/rc-webapp-vanguard/commit/dc686975516c78c36423547c9c5143ead581ead3))
+* **storybook:** mock missing Inter woff2 fonts in missing-assets plugin ([25d25ee](https://github.com/rankingCoach/rc-webapp-vanguard/commit/25d25eeba0c6a7973931fd8d7e019c2e4a9b4e00))
+* **styles:** make remaining components dark-mode aware ([cd2fcfa](https://github.com/rankingCoach/rc-webapp-vanguard/commit/cd2fcfaf570b0104da8170eb53bbb7609d8aca03))
+* **vanguard:** stack overlay poppers above modals/drawers ([5b2e4f8](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5b2e4f883079ce87a3f9041178e57d6305e8c2d4))
+
 ## [1.15.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.14.13...v1.15.0) (2026-07-02)
 
 
