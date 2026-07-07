@@ -1,0 +1,13 @@
+.bar {
+    display: flex;
+    width: 100%;
+    gap: 1px;
+    overflow: hidden;
+    border-radius: 999px;
+
+    .segment {
+        flex-basis: 0;
+        min-width: 0;
+        transition: flex-grow 0.5s cubic-bezier(0.23, 1, 0.32, 1), background 0.25s ease;
+    }
+}

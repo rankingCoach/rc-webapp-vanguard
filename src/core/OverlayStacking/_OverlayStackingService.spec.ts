@@ -44,6 +44,78 @@ describe('OverlayStackingService.register / unregister', () => {
   });
 });
 
+describe('OverlayStackingService — sticky baseZIndex override', () => {
+  beforeEach(() => {
+    OverlayStackingService.__resetForTests();
+  });
+
+  it('stacks from the supplied base instead of the default floor', () => {
+    expect(OverlayStackingService.register('a', 'drawer', 9000)).toBe(9001);
+  });
+
+  it('keeps the order counter dense — base only raises the floor', () => {
+    OverlayStackingService.register('a', 'modal'); // order 1
+    OverlayStackingService.register('b', 'drawer', 9000); // order 2
+    expect(OverlayStackingService.getOrder('b')).toBe(2);
+    expect(OverlayStackingService.getZIndex('b')).toBe(9002);
+  });
+
+  it('subsequent overlays inherit the raised floor without re-passing it', () => {
+    // Mirrors the documented sequence.
+    expect(OverlayStackingService.register('d1', 'drawer')).toBe(BASE + 1); // 1101
+    expect(OverlayStackingService.register('m2', 'modal')).toBe(BASE + 2); // 1102
+    expect(OverlayStackingService.register('d3', 'drawer', 9000)).toBe(9003); // 9003
+    expect(OverlayStackingService.register('m4', 'modal')).toBe(9004); // inherits 9000 -> 9004
+  });
+
+  it('a lower base passed after the floor is raised does not lower the floor', () => {
+    OverlayStackingService.register('a', 'drawer', 9000); // floor -> 9000
+    // explicit BASE is below the current floor, so it is clamped up
+    expect(OverlayStackingService.register('b', 'modal', BASE)).toBe(9002);
+  });
+
+  it('floor falls back once every overlay holding the higher base closes', () => {
+    OverlayStackingService.register('d1', 'drawer'); // order 1, floor 1100
+    OverlayStackingService.register('d3', 'drawer', 9000); // order 2, floor 9000
+    expect(OverlayStackingService.register('m4', 'modal')).toBe(9003); // inherits 9000
+
+    OverlayStackingService.unregister('d3');
+    OverlayStackingService.unregister('m4');
+    // only the default-base drawer (order 1) remains, so the floor drops back
+    // to 1100 and the freed top orders compact — next slot is order 2.
+    expect(OverlayStackingService.register('m5', 'modal')).toBe(BASE + 2);
+  });
+
+  it('getTopmostZIndex reflects the raised base', () => {
+    OverlayStackingService.register('a', 'modal'); // BASE + 1
+    OverlayStackingService.register('b', 'drawer', 9000); // 9002
+    expect(OverlayStackingService.getTopmostZIndex()).toBe(9002);
+    expect(OverlayStackingService.getTopmostZIndex('modal')).toBe(BASE + 1);
+  });
+
+  it('frees the base override on unregister', () => {
+    OverlayStackingService.register('a', 'drawer', 9000);
+    OverlayStackingService.unregister('a');
+    expect(OverlayStackingService.getZIndex('a')).toBe(BASE);
+  });
+});
+
+describe('OverlayStackingService.getZIndex', () => {
+  beforeEach(() => {
+    OverlayStackingService.__resetForTests();
+  });
+
+  it('returns BASE for an unknown id', () => {
+    expect(OverlayStackingService.getZIndex('nope')).toBe(BASE);
+  });
+
+  it('returns base + order for a registered overlay', () => {
+    OverlayStackingService.register('a', 'modal'); // 1
+    OverlayStackingService.register('b', 'modal'); // 2
+    expect(OverlayStackingService.getZIndex('b')).toBe(BASE + 2);
+  });
+});
+
 describe('OverlayStackingService.getTopmostZIndex', () => {
   beforeEach(() => {
     OverlayStackingService.__resetForTests();

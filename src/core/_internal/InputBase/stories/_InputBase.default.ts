@@ -58,5 +58,5 @@ export const urlMaskTestData = {
 export const urlHighlightColors = {
   default: '--e100',
   positive: '--s100',
-  info: '--p100',
+  info: '--i100',
 } as const;

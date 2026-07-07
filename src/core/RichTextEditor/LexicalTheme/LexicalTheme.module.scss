@@ -45,7 +45,7 @@
 }
 
 .link {
-  color: var(--p500);
+  color: var(--fn-fg-cta);
   text-decoration: none;
 }
 .link:hover {
@@ -57,8 +57,8 @@
   margin-left: 20px;
   margin-bottom: 10px;
   font-size: 15px;
-  color: rgb(101, 103, 107);
-  border-left-color: rgb(206, 208, 212);
+  color: var(--fn-fg);
+  border-left-color: var(--fn-brd-gl);
   border-left-width: 4px;
   border-left-style: solid;
   padding-left: 16px;
@@ -90,7 +90,7 @@
   vertical-align: super;
 }
 .textCode {
-  background-color: rgb(240, 242, 245);
+  background-color: var(--fn-bg-var);
   padding: 1px 0.25rem;
   font-family: Menlo, Consolas, Monaco, monospace;
   font-size: 94%;
@@ -101,7 +101,7 @@
 }
 
 .code {
-  background-color: rgb(240, 242, 245);
+  background-color: var(--fn-bg-var);
   font-family: Menlo, Consolas, Monaco, monospace;
   display: block;
   padding: 8px 8px 8px 52px;
@@ -117,12 +117,12 @@
 .code:before {
   content: attr(data-gutter);
   position: absolute;
-  background-color: #eee;
+  background-color: var(--fn-bg-var);
   left: 0;
   top: 0;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--fn-brd-gl);
   padding: 8px;
-  color: #777;
+  color: var(--fn-fg-light);
   white-space: pre-wrap;
   text-align: right;
   min-width: 25px;
@@ -144,7 +144,7 @@
   outline: 2px solid var(--p500);
 }
 .tableCell {
-  border: 1px solid #bbb;
+  border: 1px solid var(--fn-brd-gl);
   width: 75px;
   min-width: 75px;
   vertical-align: top;
@@ -173,7 +173,7 @@
   top: 0;
 }
 .tableCellHeader {
-  background-color: #f2f3f5;
+  background-color: var(--fn-bg-var);
   text-align: start;
 }
 .tableCellSelected {
@@ -219,17 +219,17 @@
   height: 20px;
 }
 .tableCellActionButton {
-  background-color: #eee;
+  background-color: var(--fn-bg-var);
   display: block;
   border: 0;
   border-radius: 20px;
   width: 20px;
   height: 20px;
-  color: #222;
+  color: var(--fn-fg);
   cursor: pointer;
 }
 .tableCellActionButton:hover {
-  background-color: #ddd;
+  background-color: var(--fn-bg-hov-n-gl);
 }
 
 .characterLimit {
@@ -310,7 +310,7 @@
   border-radius: 2px;
 }
 .listItemUnchecked:before {
-  border: 1px solid #999;
+  border: 1px solid var(--fn-brd-gl);
   border-radius: 2px;
 }
 .listItemChecked:before {
@@ -345,7 +345,7 @@
   color: slategray;
 }
 .tokenPunctuation {
-  color: #999;
+  color: var(--fn-fg-light);
 }
 .tokenProperty {
   color: #905;
@@ -394,6 +394,6 @@
   margin: 10px 0;
 }
 .layoutItem {
-  border: 1px dashed #ddd;
+  border: 1px dashed var(--fn-brd-gl);
   padding: 8px 16px;
 }

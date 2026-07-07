@@ -2,6 +2,9 @@ import { Popper } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
 import React, { useEffect, useRef, useState } from 'react';
 
+import { uuidv4 } from '@helpers/generate-uid';
+import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
+
 import styles from './PopoverModal.module.scss';
 
 /**
@@ -12,7 +15,7 @@ const Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS = 1030;
 
 export interface PopoverModalProps {
   content: React.ReactNode;
-  placement?: 'top' | 'auto' | 'bottom';
+  placement?: 'top' | 'top-start' | 'top-end' | 'auto' | 'bottom' | 'bottom-start' | 'bottom-end';
   isOpen: boolean;
   centerPopover?: boolean;
   openOnHover?: boolean;
@@ -41,6 +44,16 @@ export const PopoverModal = (props: PopoverModalProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement | HTMLElement>(props.anchorEl ?? null);
   const [offset, setOffset] = useState<[number, number]>([0, 0]);
   const containerRef = useRef<HTMLElement | null>(null);
+
+  /**
+   * Popper stacking (same pattern as Popover / the Select dropdown in InputBase): the popper portals to
+   * <body> with only a static z-index, so inside a stacked modal/drawer (e.g. a widget opened with a raised
+   * baseZIndex) it paints *behind* the surface that opened it. Register a 'popover' slot while open and
+   * release it on close/unmount; the resolved slot z participates in the OverlayStackingService ledger and
+   * therefore stacks above whatever modal/drawer is currently topmost.
+   */
+  const popperIdRef = useRef<string>(`popover-modal-${uuidv4()}`);
+  const [stackZIndex, setStackZIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setAnchorEl(props.anchorEl ?? null);
@@ -120,7 +133,21 @@ export const PopoverModal = (props: PopoverModalProps) => {
 
   const open = isOpen || Boolean(anchorEl);
 
-  console.log('anchorEl', anchorEl);
+  useEffect(() => {
+    if (open) {
+      setStackZIndex(OverlayStackingService.register(popperIdRef.current, 'popover'));
+    } else {
+      OverlayStackingService.unregister(popperIdRef.current);
+      setStackZIndex(null);
+    }
+  }, [open]);
+  // Release the slot if the popover unmounts while still open.
+  useEffect(() => () => OverlayStackingService.unregister(popperIdRef.current), []);
+
+  // The ledger slot wins when something below raised the stacking floor (e.g. a widget modal with a huge
+  // baseZIndex); the legacy `zIndex + 1030` floor is kept so existing callers keep their guaranteed minimum.
+  const popperZIndex = Math.max(zIndex + Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS + 1, stackZIndex ?? 0);
+
   if (!anchorEl) {
     return null;
   }
@@ -131,7 +158,7 @@ export const PopoverModal = (props: PopoverModalProps) => {
           open={open}
           className={styles.backdrop}
           onMouseDown={handleBackdropMouseDown}
-          sx={{ zIndex: zIndex + Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS }}
+          sx={{ zIndex: popperZIndex - 1 }}
         />
       )}
       <Popper
@@ -139,7 +166,7 @@ export const PopoverModal = (props: PopoverModalProps) => {
         anchorEl={anchorEl}
         placement={placement}
         disablePortal={!renderInPortal}
-        style={{ zIndex: zIndex + Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS + 1 }} // Set z-index higher than backdrop
+        style={{ zIndex: popperZIndex }} // Set z-index higher than backdrop
         modifiers={[...centerPopoverModifiers]}
       >
         <span ref={containerRef} style={{ position: 'relative', zIndex: zIndex + 1 }}>

@@ -1,19 +1,20 @@
-import { appScreen, render, wait } from '@test-utils/test-utils';
+import { wait } from '@helpers/wait';
+import { appScreen, render } from '@test-utils/test-utils';
 import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import moment from 'moment/moment';
 import React, { useState } from 'react';
+import { describe, expect, test } from 'vitest';
 
 import { DateRangePicker, DateRangePickerProps, DateRangePickerReturn } from './DateRangePicker';
 
-const mockRangeSelectorLabels = [
-  'Last 24 hours',
-  'Last 7 days',
-  'Last 30 days',
-  'Last 6 months',
-  'Last 12 months',
-  'Full timeline',
-];
+const isElementVisible = (element: HTMLElement): boolean => {
+  const style = getComputedStyle(element);
+  return document.body.contains(element) && style.display !== 'none' && style.visibility !== 'hidden';
+};
+
+// Mirrors useDateRangePickerStaticRanges() in DateRangePicker.config.tsx.
+const mockRangeSelectorLabels = ['Last 14 days', 'Last 30 days', 'Last 6 months', 'Last 12 months', 'Last 18 months', 'Full timeline'];
 
 /**
  * Helper function
@@ -153,14 +154,16 @@ describe('DateRangePicker component tests', () => {
        * Check if date range is visible and has default value
        */
       const rangeInputContainer = await appScreen.getByTestId('daterangepicker-test-id-rangeselector-reference-input');
-      await expect(rangeInputContainer).toBeVisible();
+      expect(isElementVisible(rangeInputContainer)).toBe(true);
 
       await wait(1000);
       /**
        * First value
        */
       const rangeInput = await appScreen.getByTestId('rangeselector-reference-input');
-      expect(rangeInput.getAttribute('value')).toBe('Last 24 hours');
+      // minDate (now - 2 days) filters out every dated preset whose startDate is earlier
+      // (see DateRangePicker.tsx's minDate effect), leaving only the undated 'Full timeline' range.
+      expect(rangeInput.getAttribute('value')).toBe('Full timeline');
     });
   });
   //
@@ -195,7 +198,7 @@ describe('DateRangePicker component tests', () => {
 
         const tooltip = await appScreen.getByRole('tooltip');
         const datePicker = tooltip.getElementsByClassName('date-range-picker-dropdown');
-        await expect(tooltip).toBeVisible();
+        expect(isElementVisible(tooltip)).toBe(true);
         await expect(datePicker.length).toBe(1);
       });
     });
@@ -212,7 +215,7 @@ describe('DateRangePicker component tests', () => {
       await waitFor(async () => {
         const tooltip = await appScreen.getByRole('tooltip');
         const rangeSelector = tooltip.getElementsByClassName('date-range-picker-dropdown-predefined');
-        await expect(tooltip).toBeVisible();
+        expect(isElementVisible(tooltip)).toBe(true);
         await expect(rangeSelector.length).toBe(1);
       });
     });
@@ -235,31 +238,27 @@ describe('DateRangePicker component tests', () => {
     await user.click(rightInputRef);
 
     await act(async () => {
-      const ranges: string[] = [];
       await waitFor(async () => {
+        const ranges: string[] = [];
         const tooltip = await appScreen.getByRole('tooltip');
         const buttons = tooltip.querySelectorAll('button');
         buttons.forEach((b) => {
           if (b.type === 'button' && b.className?.indexOf('rdrStaticRange') !== -1) {
-            //console.log(b.className, "==>", b.textContent);
             ranges.push(String(b.textContent));
           }
         });
 
-        ['Last 24 hours', 'Last 7 days', 'Last 30 days', 'Last 6 months', 'Last 12 months', 'Full timeline'].map(
-          (a) => {
-            const idx = ranges.indexOf(a);
-            if (idx !== 1) expect(ranges[idx]).toBe(a);
-          },
-        );
+        mockRangeSelectorLabels.forEach((a) => {
+          expect(ranges).toContain(a);
+        });
       });
     });
 
     await user.click(leftOnCLick);
 
     await act(async () => {
-      const days: number[] = [];
       await waitFor(async () => {
+        const days: number[] = [];
         const tooltip = await appScreen.getByRole('tooltip');
         const buttons = tooltip.querySelectorAll('button');
         buttons.forEach((b) => {
@@ -268,7 +267,6 @@ describe('DateRangePicker component tests', () => {
             b.className?.indexOf('rdrDayPassive') == -1 &&
             b.className?.indexOf('rdrDay') !== -1
           ) {
-            //console.log(b.className, "===>", b.textContent);
             days.push(parseInt(String(b.textContent)));
           }
         });

@@ -2,6 +2,7 @@ import './Autocomplete.scss';
 
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { classNames } from '@helpers/classNames';
+import { uuidv4 } from '@helpers/generate-uid';
 import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason, Chip } from '@mui/material';
 import {
   AutocompleteProps as MUIAutocompleteProps,
@@ -17,6 +18,7 @@ import {
 } from '@vanguard/_internal/InputBase/InputBase';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
@@ -105,6 +107,27 @@ export const Autocomplete = (props: AutocompleteProps) => {
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
   const [adornmentIndex, setAdornmentIndex] = useState<number | undefined>(undefined);
+
+  /**
+   * Listbox popper stacking
+   * -------
+   * MUI's Autocomplete listbox portals to <body> with no z-index, so inside a
+   * stacked modal/drawer it paints *behind* the surface that opened it.
+   * Register a 'popover' slot on open and release it on close — same pattern
+   * as the Select dropdown in InputBase.
+   */
+  const listboxIdRef = useRef<string>(`autocomplete-listbox-${uuidv4()}`);
+  const [listboxZIndex, setListboxZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const onListboxOpen = () => {
+    setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
+  };
+  const onListboxClose = () => {
+    OverlayStackingService.unregister(listboxIdRef.current);
+    setListboxZIndex(OVERLAY_BASE_Z_INDEX);
+  };
+  // Release the slot if the autocomplete unmounts while the listbox is still open.
+  useEffect(() => () => OverlayStackingService.unregister(listboxIdRef.current), []);
 
   /**
    * FormConfig @todo test integration when using "multiple" tags...
@@ -431,6 +454,13 @@ export const Autocomplete = (props: AutocompleteProps) => {
         clearIcon={<Icon color={'--n400'}>{IconNames.close}</Icon>}
         popupIcon={<Icon color={'--n400'}>{IconNames.caretDown}</Icon>}
         disabled={disabled}
+        onOpen={onListboxOpen}
+        onClose={onListboxClose}
+        slotProps={{
+          // Override MUI's static z-index so the listbox stacks above any
+          // modal/drawer it was opened from (see OverlayStackingService).
+          popper: { style: { zIndex: listboxZIndex } },
+        }}
         renderInput={(params) => {
           return (
             <InputBase

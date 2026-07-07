@@ -68,12 +68,12 @@ export const Discrepancy = (props: DiscrepancyProps) => {
     }
 
     companyOptions.push({
-      labelText: getTextDifferences(locationBusinessName, directoryBusinessName, 'rgba(var(--w400-rgb),0.4)'),
+      labelText: getTextDifferences(locationBusinessName, directoryBusinessName, 'color-mix(in srgb, var(--w400) 40%, transparent)'),
       infoText: locationLabel,
       value: DiscrepancySelectionType.LOCATION,
     });
     companyOptions.push({
-      labelText: getTextDifferences(directoryBusinessName, locationBusinessName, 'rgba(var(--e400-rgb),0.4)'),
+      labelText: getTextDifferences(directoryBusinessName, locationBusinessName, 'color-mix(in srgb, var(--e400) 40%, transparent)'),
       infoText: directoryLabel,
       value: DiscrepancySelectionType.DIRECTORY,
       disabled: directoryBusinessName.search(/[#<>\[\]\{\}*?!`’±;]+|(\.){2,}/g) >= 0 ? true : false,
@@ -99,7 +99,7 @@ export const Discrepancy = (props: DiscrepancyProps) => {
           labelText: getTextDifferences(
             locationContactInfo?.value ?? '',
             directoryContactInfo.value ?? '',
-            'rgba(var(--w400-rgb),0.4)',
+            'color-mix(in srgb, var(--w400) 40%, transparent)',
           ),
           infoText: locationLabel,
           value: DiscrepancySelectionType.LOCATION,
@@ -109,7 +109,7 @@ export const Discrepancy = (props: DiscrepancyProps) => {
           labelText: getTextDifferences(
             directoryContactInfo.value ?? '',
             locationContactInfo?.value ?? '',
-            'rgba(var(--e400-rgb),0.4)',
+            'color-mix(in srgb, var(--e400) 40%, transparent)',
           ),
           infoText: directoryLabel,
           value: DiscrepancySelectionType.DIRECTORY,
@@ -147,13 +147,13 @@ export const Discrepancy = (props: DiscrepancyProps) => {
           if (locationContactInfo) {
             const options: RadioData[] = [];
             options.push({
-              labelText: getTextDifferences(locationContactInfo.value ?? '', '', 'rgba(var(--w400-rgb),0.4)'),
+              labelText: getTextDifferences(locationContactInfo.value ?? '', '', 'color-mix(in srgb, var(--w400) 40%, transparent)'),
               infoText: locationLabel,
               value: DiscrepancySelectionType.LOCATION,
             });
 
             options.push({
-              labelText: getTextDifferences('', locationContactInfo.value ?? '', 'rgba(var(--e400-rgb),0.4)'),
+              labelText: getTextDifferences('', locationContactInfo.value ?? '', 'color-mix(in srgb, var(--e400) 40%, transparent)'),
               infoText: directoryLabel,
               value: DiscrepancySelectionType.DIRECTORY,
             });
@@ -185,12 +185,12 @@ export const Discrepancy = (props: DiscrepancyProps) => {
     ].join('');
 
     websiteOptions.push({
-      labelText: getTextDifferences(locationWebsiteName, directoryWebsiteName, 'rgba(var(--w400-rgb),0.4)'),
+      labelText: getTextDifferences(locationWebsiteName, directoryWebsiteName, 'color-mix(in srgb, var(--w400) 40%, transparent)'),
       infoText: locationLabel,
       value: DiscrepancySelectionType.LOCATION,
     });
     websiteOptions.push({
-      labelText: getTextDifferences(directoryWebsiteName, locationWebsiteName, 'rgba(var(--e400-rgb),0.4)'),
+      labelText: getTextDifferences(directoryWebsiteName, locationWebsiteName, 'color-mix(in srgb, var(--e400) 40%, transparent)'),
       infoText: directoryLabel,
       value: DiscrepancySelectionType.DIRECTORY,
     });
@@ -207,7 +207,7 @@ export const Discrepancy = (props: DiscrepancyProps) => {
         labelText: getTextDifferences(
           locationDescriptionName?.long ?? '',
           directoryDescriptionName?.long ?? '',
-          'rgba(var(--w400-rgb),0.4)',
+          'color-mix(in srgb, var(--w400) 40%, transparent)',
         ),
         infoText: locationLabel,
         value: DiscrepancySelectionType.LOCATION,
@@ -216,7 +216,7 @@ export const Discrepancy = (props: DiscrepancyProps) => {
         labelText: getTextDifferences(
           directoryDescriptionName?.long ?? '',
           locationDescriptionName?.long ?? '',
-          'rgba(var(--e400-rgb),0.4)',
+          'color-mix(in srgb, var(--e400) 40%, transparent)',
         ),
         infoText: directoryLabel,
         value: DiscrepancySelectionType.DIRECTORY,
@@ -232,7 +232,7 @@ export const Discrepancy = (props: DiscrepancyProps) => {
         labelText: getTextDifferences(
           locationDescriptionName?.short ?? '',
           directoryDescriptionName?.short ?? '',
-          'rgba(var(--w400-rgb),0.4)',
+          'color-mix(in srgb, var(--w400) 40%, transparent)',
         ),
         infoText: locationLabel,
         value: DiscrepancySelectionType.LOCATION,
@@ -241,7 +241,7 @@ export const Discrepancy = (props: DiscrepancyProps) => {
         labelText: getTextDifferences(
           directoryDescriptionName?.short ?? '',
           locationDescriptionName?.short ?? '',
-          'rgba(var(--e400-rgb),0.4)',
+          'color-mix(in srgb, var(--e400) 40%, transparent)',
         ),
         infoText: directoryLabel,
         value: DiscrepancySelectionType.DIRECTORY,
@@ -322,12 +322,12 @@ export const Discrepancy = (props: DiscrepancyProps) => {
     const directoryPostalAddressName = (divergency.dataOnDirectory as PostalAddress)?.formattedAddress ?? '';
 
     postalAddressOptions.push({
-      labelText: getTextDifferences(locationPostalAddressName, directoryPostalAddressName, 'rgba(var(--w400-rgb),0.4)'),
+      labelText: getTextDifferences(locationPostalAddressName, directoryPostalAddressName, 'color-mix(in srgb, var(--w400) 40%, transparent)'),
       infoText: locationLabel,
       value: DiscrepancySelectionType.LOCATION,
     });
     postalAddressOptions.push({
-      labelText: getTextDifferences(directoryPostalAddressName, locationPostalAddressName, 'rgba(var(--e400-rgb),0.4)'),
+      labelText: getTextDifferences(directoryPostalAddressName, locationPostalAddressName, 'color-mix(in srgb, var(--e400) 40%, transparent)'),
       infoText: directoryLabel,
       value: DiscrepancySelectionType.DIRECTORY,
     });

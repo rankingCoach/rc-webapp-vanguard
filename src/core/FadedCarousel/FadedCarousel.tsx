@@ -236,7 +236,7 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
           type={IconSize.small}
           color={'--n000'}
           hasCircle={true}
-          fillColor={arrows?.color ?? 'rgba(4, 5, 6, 0.7)'}
+          fillColor={arrows?.color ?? 'color-mix(in srgb, var(--fn-fg) 70%, transparent)'}
           circleSize={arrows?.circleSize ?? 48}
           style={{ '--arrow-hover-color': arrows?.hoverColor } as React.CSSProperties}
         >
@@ -290,7 +290,7 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
           type={IconSize.small}
           color={'--n000'}
           hasCircle={true}
-          fillColor={arrows?.color ?? 'rgba(4, 5, 6, 0.7)'}
+          fillColor={arrows?.color ?? 'color-mix(in srgb, var(--fn-fg) 70%, transparent)'}
           circleSize={arrows?.circleSize ?? 48}
           style={{ '--arrow-hover-color': arrows?.hoverColor } as React.CSSProperties}
         >

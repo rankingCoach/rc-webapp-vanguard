@@ -6,6 +6,7 @@ import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
 import { debounce } from '@helpers/debounce';
+import { uuidv4 } from '@helpers/generate-uid';
 import { preventInput } from '@helpers/input-preventions/prevent-input';
 import { isBlockedNumericKey, numericPasteIsInvalid } from '@helpers/input-preventions/prevent-numeric-input';
 import { sanitizeHtml } from '@helpers/sanitize-html';
@@ -17,6 +18,7 @@ import { translationService } from '@services/translation.service';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Link } from '@vanguard/Link/Link';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Popover } from '@vanguard/Popover/Popover';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
@@ -284,6 +286,28 @@ export const InputBase = (props: rcInputBaseProps) => {
 
   // Length field
   const [length, setLength] = useState((value && typeof value === 'string' && value.length) ?? 0);
+
+  /**
+   * Select dropdown stacking
+   * -------
+   * MUI renders the Select dropdown as a Menu (a Modal/Popover portal) pinned to
+   * the static `theme.zIndex.modal` (1300). That ignores the OverlayStackingService
+   * ledger, so when the Select lives inside a stacked modal/drawer the dropdown
+   * paints *behind* the surface that opened it. We register as a 'popover' on open
+   * (sitting above everything currently mounted) and release the slot on close.
+   */
+  const selectMenuIdRef = useRef<string>(`select-menu-${uuidv4()}`);
+  const [selectMenuZIndex, setSelectMenuZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const onSelectMenuOpen = () => {
+    setSelectMenuZIndex(OverlayStackingService.register(selectMenuIdRef.current, 'popover'));
+  };
+  const onSelectMenuClose = () => {
+    OverlayStackingService.unregister(selectMenuIdRef.current);
+    setSelectMenuZIndex(OVERLAY_BASE_Z_INDEX);
+  };
+  // Release the slot if the input unmounts while the menu is still open.
+  useEffect(() => () => OverlayStackingService.unregister(selectMenuIdRef.current), []);
 
   // A number input reports value="" for an invalid intermediate (e.g. a lone
   // "-"), which makes MUI drop the floating label onto that character. Track
@@ -682,7 +706,14 @@ export const InputBase = (props: rcInputBaseProps) => {
       select,
       SelectProps: {
         renderValue: selectRenderValue,
+        onOpen: onSelectMenuOpen,
+        onClose: onSelectMenuClose,
         MenuProps: {
+          // Override MUI's static theme.zIndex.modal so the dropdown stacks above
+          // any modal/drawer it was opened from (see OverlayStackingService).
+          sx: {
+            zIndex: selectMenuZIndex,
+          },
           PaperProps: {
             style: {
               maxHeight: menuItemHeight * maxMenuItemsUntilScroll,

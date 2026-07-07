@@ -43,6 +43,13 @@ export type ModalOpts = {
   onContentClick?: (event: React.MouseEvent) => void;
   onOutsideClick?: (event: React.MouseEvent) => void;
   backgroundColor?: string;
+  /**
+   * Floor to stack this modal from. Defaults to the shared stacking floor.
+   * Pass a higher value to force the modal above content outside the overlay
+   * ledger (e.g. injected 3rd-party widgets). Layering against other overlays
+   * is still managed by OverlayStackingService.
+   */
+  baseZIndex?: number;
 };
 
 export interface OpenConfirmModalOptions {
@@ -489,7 +496,7 @@ class ModalServiceClass {
       modalId: id,
     });
 
-    OverlayStackingService.register(id, 'modal');
+    OverlayStackingService.register(id, 'modal', opts?.baseZIndex);
 
     pubSubService.$pub(PUB_SUB_EVENTS.reactModalOpen, {
       modalId: id,

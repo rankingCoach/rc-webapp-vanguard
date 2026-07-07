@@ -6,7 +6,7 @@ export const HighlightDefault: Story = {
     children: 'contact@grenierbrasserie.com',
     highlightWords: ['con'],
     translate: false,
-    highlightColor: 'rgba(var(--w400-rgb),0.4)',
+    highlightColor: 'color-mix(in srgb, var(--w400) 40%, transparent)',
   },
   play: async ({ canvasElement }) => {
     const highlighted = canvasElement.querySelector<HTMLElement>('span[style*="background-color"]');

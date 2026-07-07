@@ -30,11 +30,11 @@
 }
 
 .white-background {
-    background-color: var(--n000);
+    background-color: var(--fn-bg-surface);
 }
 
 .component-container {
-    background-color: var(--n100);
+    background-color: var(--fn-bg-var);
     position: relative;
     height: 4 * $x9;
     width: 100%;

@@ -1,7 +1,8 @@
 @import "../../styles/spacings";
+@import "@styles/color-functions";
 
 @mixin rgba-background($hexcolor, $opacity) {
-  background-color: rgba(var($hexcolor), $opacity);
+  background-color: rc_transparent($hexcolor, $opacity);
 }
 
 @mixin disabledState($name, $prefix : '-') {
@@ -16,15 +17,21 @@
   }
   
   @if (#{$name} == "default" or #{$name} == "secondary") {
-    color: rgba(var(--#{$prefix}button-#{$name}-disabled-text-color-rgb), 0.5);
+    // color-mix instead of the rgba+-rgb-token pair: the -rgb tokens are
+    // light-mode-only, color-mix works directly off the light-dark() color.
+    color: color-mix(in srgb, var(--#{$prefix}button-#{$name}-disabled-text-color) 50%, transparent);
     .button-text {
-      color: rgba(var(--#{$prefix}button-#{$name}-disabled-text-color-rgb), 0.5);
+      color: color-mix(in srgb, var(--#{$prefix}button-#{$name}-disabled-text-color) 50%, transparent);
     }
   }
 
-  @if (#{$name} != "muted" and #{$name} != "muted-inverted") {
+  @if (#{$name} == "default") {
+    // default is a text-style button: keep its normal (transparent) background,
+    // the disabled look comes from the 0.5 text opacity above
+    background-color: var(--#{$prefix}button-#{$name}-background-color);
+  } @else if (#{$name} != "muted" and #{$name} != "muted-inverted") {
     @include rgba-background(--#{$prefix}button-#{$name}-disabled-background-color-rgb, 0.5);
-    
+
     border: $x0_125 solid var(--#{$prefix}button-#{$name}-disabled-border-color);
   }
 

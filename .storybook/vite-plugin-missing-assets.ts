@@ -22,6 +22,9 @@ const DEFAULT_CONFIG: MissingAssetConfig = {
     "/vanguard/assets/fonts/Roboto-Regular.ttf": "/vanguard/assets/fonts/Roboto-Regular.ttf",
     "/vanguard/assets/fonts/Roboto-Medium.ttf": "/vanguard/assets/fonts/Roboto-Medium.ttf",
     "/vanguard/assets/fonts/Roboto-Bold.ttf": "/vanguard/assets/fonts/Roboto-Bold.ttf",
+    "/vanguard/assets/fonts/Inter-Regular.woff2": "/vanguard/assets/fonts/Inter-Regular.woff2",
+    "/vanguard/assets/fonts/Inter-Medium.woff2": "/vanguard/assets/fonts/Inter-Medium.woff2",
+    "/vanguard/assets/fonts/Inter-Bold.woff2": "/vanguard/assets/fonts/Inter-Bold.woff2",
   },
 };
 
@@ -62,7 +65,7 @@ export function createMissingAssetsPlugin(config: Partial<MissingAssetConfig> = 
           const escapedPath = searchPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
           // Handle font files differently - remove the entire @font-face declaration
-          if (searchPath.includes("/fonts/") && searchPath.endsWith(".ttf")) {
+          if (searchPath.includes("/fonts/") && (searchPath.endsWith(".ttf") || searchPath.endsWith(".woff2"))) {
             // Remove the entire @font-face block that contains this font
             const fontFaceRegex = new RegExp(`@font-face\\s*{[^}]*url\\(['"]?${escapedPath}['"]?\\)[^}]*}`, "g");
             transformedCode = transformedCode.replace(fontFaceRegex, "");

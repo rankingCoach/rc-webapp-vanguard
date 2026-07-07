@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background: var(--n100);
+  background: var(--fn-bg-var);
   text-align: center;
   padding: 2px;
   cursor: pointer;
@@ -22,12 +22,12 @@
   }
 
   &:hover {
-    background: var(--n200);
+    background: var(--fn-bg-var);
     text-decoration: none;
   }
 
   .PhotoPlaceholder-multiple-icons-container {
-    background-color: var(--p500);
+    background-color: var(--fn-bg-cta);
     width: 58px;
     height: 58px;
     border-radius: 100%;

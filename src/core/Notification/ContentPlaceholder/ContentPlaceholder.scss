@@ -15,11 +15,11 @@
 
   /* Accent 01/$a1-100 */
 
-  background: #C9C3F3;
+  background: var(--a1100);
   opacity: 0.8;
   /* Accent 01/$a1-500 */
 
-  border: 1px dashed #3C28CC;
+  border: 1px dashed var(--a1500);
   box-sizing: border-box;
   border-radius: 8px;
 
