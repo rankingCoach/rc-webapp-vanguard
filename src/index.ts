@@ -447,12 +447,24 @@ export { FadedCarousel } from './core/FadedCarousel';
 
 //FileSelect
 export { MediaItemSelectInput } from './core/FileSelect';
+export { MediaItemTransformer } from './core/FileSelect';
 export { ImageCompressorTransformer } from './core/FileSelect';
 export { ImageCropperTransformer } from './core/FileSelect';
-export { MediaItemTransformer } from './core/FileSelect';
-export { POST_VIDEO_VALIDATION_REQUIREMENTS } from './core/FileSelect';
+export { VideoTrimmerTransformer } from './core/FileSelect';
+export { MediaItemProcessor } from './core/FileSelect';
 export { DocumentContentProcessor } from './core/FileSelect';
+export { ImageContentProcessor } from './core/FileSelect';
+export { ImageMetadataProcessor } from './core/FileSelect';
+export { VideoMetadataProcessor } from './core/FileSelect';
+export { VideoThumbnailProcessor } from './core/FileSelect';
+export { MediaItemValidator } from './core/FileSelect';
 export { CsvContentValidator } from './core/FileSelect';
+export { FileSizeValidator } from './core/FileSelect';
+export { FileTypeValidator } from './core/FileSelect';
+export { ImageResolutionValidator } from './core/FileSelect';
+export { VideoDurationValidator } from './core/FileSelect';
+export { VideoResolutionValidator } from './core/FileSelect';
+export { POST_VIDEO_VALIDATION_REQUIREMENTS } from './core/FileSelect';
 
 //FlagAdornment
 export type { FlagAdornmentProps } from './core/FlagAdornment';
@@ -490,7 +502,7 @@ export { MarkerF } from './core/GoogleMaps';
 export { GoogleMapsMarker } from './core/GoogleMaps';
 export { GoogleMapsMarkerDefault } from './core/GoogleMaps';
 export { defaultGoogleMarker, defaultMarkerIcon } from './core/GoogleMaps';
-export { AdvancedMarkerF, AdvancedMarker } from './core/GoogleMaps';
+export { AdvancedMarker, AdvancedMarkerF } from './core/GoogleMaps';
 export { GoogleMapsAdvancedMarker } from './core/GoogleMaps';
 export { GoogleMapsAdvancedMarkerContent } from './core/GoogleMaps';
 
