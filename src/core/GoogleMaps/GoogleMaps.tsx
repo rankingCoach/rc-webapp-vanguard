@@ -48,8 +48,14 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
 
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
-  // Load Google Maps API internally if apiKey is provided and external loading is not used
-  const { isLoaded: internalIsJsApiLoaded } = useGoogleMapApiLoader([], apiKey);
+  // Load Google Maps API internally only when the host app does not manage
+  // loading itself (isJsApiLoaded prop absent) — never start a competing Loader
+  const { isLoaded: internalIsJsApiLoaded } = useGoogleMapApiLoader(
+    [],
+    apiKey,
+    undefined,
+    externalIsJsApiLoaded === undefined,
+  );
 
   // Use external loading if provided, otherwise use internal loading
   const isJsApiLoaded = externalIsJsApiLoaded !== undefined ? externalIsJsApiLoaded : internalIsJsApiLoaded;

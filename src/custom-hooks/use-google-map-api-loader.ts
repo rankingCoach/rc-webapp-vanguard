@@ -1,40 +1,110 @@
 import { APIKEYS } from '@config/apiKeys';
-import { useJsApiLoader } from '@react-google-maps/api';
+import { type Libraries, Loader } from '@googlemaps/js-api-loader';
 import { useEffect, useRef, useState } from 'react';
 
+/**
+ * Must byte-match the options every host app passes to useJsApiLoader
+ * (id: 'google-map-script', libraries incl. 'marker' so AdvancedMarkerElement exists).
+ * Order matters: @googlemaps/js-api-loader compares options with an
+ * order-sensitive deep equal.
+ */
+const GOOGLE_MAPS_LIBRARIES: Libraries = ['places', 'marker'];
+
+const readJwtLanguageCode = (): string | undefined => {
+  // SSR-safe: runs at module evaluation time, where window/localStorage may not exist
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return undefined;
+    }
+    const raw = window.localStorage.getItem('userService');
+    if (!raw) {
+      return undefined;
+    }
+    const jwt = JSON.parse(raw);
+    return typeof jwt?.languageCode === 'string' && jwt.languageCode !== '' ? jwt.languageCode : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * Resolved ONCE at module scope. The Google Maps Loader is a page-lifetime
+ * singleton: every construction must use identical options or it throws
+ * "Loader must not be called again with different options". Reading the JWT
+ * language synchronously here guarantees the language is identical from the
+ * very first render — instead of racing redux hydration.
+ */
+const jwtLanguageCode = readJwtLanguageCode();
+
 export const useGoogleMapApiLoader = (
-  GoogleApiLibrariesToLoad?: any,
+  GoogleApiLibrariesToLoad?: any, // DEPRECATED & ignored (kept for call-site compat); libraries are always GOOGLE_MAPS_LIBRARIES
   apiKey: string = APIKEYS.googleMapsApiKey,
   languageCode?: string,
+  enabled: boolean = true,
 ): { isLoaded: boolean; loadError: Error | undefined } => {
-  const [isApiLoaded, setApiLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<Error | undefined>(undefined);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.google) {
-      setApiLoaded(true);
-    } else {
-      // Note: No hooks should be called here
-    }
-  }, []);
-
-  // Moved outside of useEffect to maintain proper hook usage
-  GoogleApiLibrariesToLoad = ['places', 'marker'];
-  const lib = useRef(GoogleApiLibrariesToLoad);
-
-  const { isLoaded, loadError: jsApiLoadError } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: apiKey,
-    language: languageCode,
-    libraries: lib.current,
-  });
+  // Freeze first-render values: the Loader singleton's options are immutable
+  // for the page lifetime, so a later render passing a different language
+  // (e.g. redux populating '' -> 'de' after hydration) must not re-run
+  // construction with new options.
+  const optionsRef = useRef({ apiKey, language: languageCode || jwtLanguageCode });
 
   useEffect(() => {
-    if (!isApiLoaded && jsApiLoadError) {
-      setLoadError(jsApiLoadError);
+    if (!enabled) {
+      return undefined;
     }
-    setApiLoaded(isLoaded);
-  }, [isLoaded, jsApiLoadError]);
 
-  return { isLoaded: isApiLoaded, loadError };
+    // Script already fully loaded (host app loader, raw <script> tag, or a
+    // previous mount) — nothing to do, and no Loader singleton to touch.
+    if (typeof window !== 'undefined' && window.google?.maps?.version) {
+      setIsLoaded(true);
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    try {
+      // Byte-identical to what @react-google-maps/api's useJsApiLoader would
+      // construct (its useMemo normalization + defaultLoadScriptProps), so it
+      // deep-equals the Loader options of host apps that use useJsApiLoader
+      // with id 'google-map-script' and the same libraries.
+      const loader = new Loader({
+        id: 'google-map-script',
+        apiKey: optionsRef.current.apiKey,
+        version: 'weekly',
+        libraries: GOOGLE_MAPS_LIBRARIES,
+        language: optionsRef.current.language || 'en',
+        region: 'US',
+        mapIds: [],
+        nonce: '',
+        authReferrerPolicy: 'origin',
+      });
+
+      loader
+        .load()
+        .then(() => {
+          if (!cancelled) {
+            setIsLoaded(true);
+          }
+          return undefined;
+        })
+        .catch((error: Error) => {
+          if (!cancelled) {
+            setLoadError(error);
+          }
+        });
+    } catch (error) {
+      // A Loader singleton already exists with different options (created by
+      // the host app). Degrade to loadError instead of crashing the render.
+      setLoadError(error as Error);
+    }
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, [enabled]);
+
+  return { isLoaded, loadError };
 };

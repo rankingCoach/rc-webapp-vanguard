@@ -1,3 +1,4 @@
+import { rcWindow } from '@stores/window.store';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -9,8 +10,13 @@ import { useGoogleMap } from '../map-context';
 export interface GoogleMapsAdvancedMarkerProps {
   /** Unique identifier for the marker */
   id: string;
-  /** Indicates if Google Maps JavaScript API is loaded */
-  isJsApiLoaded: boolean;
+  /**
+   * Indicates if Google Maps JavaScript API is loaded.
+   * An explicit `false` skips marker construction; omitting it falls back to
+   * the internal `window.google.maps.marker` existence check alone.
+   * @deprecated Superseded by the internal construction guard; removal is a next-major concern.
+   */
+  isJsApiLoaded?: boolean;
   /** Callback when marker is clicked, receives marker ID */
   onClick?: (id: string) => void;
   /** Callback when mouse enters marker area */
@@ -48,14 +54,15 @@ export interface GoogleMapsAdvancedMarkerProps {
  * @example
  * ```tsx
  * <GoogleMaps mapId="YOUR_MAP_ID" center={center} zoom={10}>
- *   <GoogleMapsAdvancedMarker id="marker-1" isJsApiLoaded={true} pos={{ lat: 40.7, lng: -74.0 }}>
+ *   <GoogleMapsAdvancedMarker id="marker-1" pos={{ lat: 40.7, lng: -74.0 }}>
  *     <GoogleMapsAdvancedMarkerContent color="#4285F4" />
  *   </GoogleMapsAdvancedMarker>
  * </GoogleMaps>
  * ```
  */
 export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) => {
-  const { onClick, onMouseOver, onMouseOut, id, zIndex, pos, title, draggable, onDragEnd, children } = props;
+  const { onClick, onMouseOver, onMouseOut, id, zIndex, pos, title, draggable, onDragEnd, children, isJsApiLoaded } =
+    props;
 
   const map = useGoogleMap();
 
@@ -66,6 +73,10 @@ export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) =
 
   // Create / destroy marker when map becomes available
   useEffect(() => {
+    if (isJsApiLoaded === false || !rcWindow.google?.maps?.marker?.AdvancedMarkerElement) {
+      return; // Maps script present without the marker library — render nothing instead of crashing
+    }
+
     if (isNaN(pos.lat) || isNaN(pos.lng)) return;
 
     const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -83,7 +94,7 @@ export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) =
       marker.map = null;
       setMarkerInstance(null);
     };
-  }, [map]);
+  }, [map, isJsApiLoaded]);
 
   // Sync position
   useEffect(() => {
