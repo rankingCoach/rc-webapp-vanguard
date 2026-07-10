@@ -13,7 +13,7 @@ import { ModalService } from '../ModalService';
 import { ModalTransition } from './ModalTransition/ModalTransition';
 
 export type ModalState = Record<string, any>;
-export type ModalResponseHandler<T> = (r: ModalResponse<T>) => void;
+export type ModalResponseHandler<T> = (r?: ModalResponse<T>) => void;
 export type StandardModalProps<T> = {
   close: ModalResponseHandler<T>;
   message?: string | React.ReactNode;
