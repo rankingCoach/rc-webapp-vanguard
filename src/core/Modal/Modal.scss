@@ -68,6 +68,31 @@
   }
 
   /**
+   * Outer content (rendered only when the `outerContent` prop is used)
+   * ---------------------------------------------------------------------------------------------------------------------
+   * A fit-content wrapper around the panel so slot content can be positioned
+   * against the panel bounds while the panel itself stays centered by the
+   * overlay flex layout.
+   */
+  .modal-content-wrapper {
+    position: relative;
+    display: flex;
+    height: max-content;
+    max-width: 100%;
+  }
+
+  .modal-outer-content {
+    position: absolute;
+    inset: 0;
+    // Let backdrop/panel clicks fall through; only the slot children are interactive.
+    pointer-events: none;
+
+    > * {
+      pointer-events: auto;
+    }
+  }
+
+  /**
    * Modal Position
    * ---------------------------------------------------------------------------------------------------------------------
    */
@@ -101,6 +126,16 @@
     .modal-content {
       margin: auto; // a fix for scrolling issue with flex
     }
+
+    // With the outer-content wrapper, the scroll fix belongs on the flex item
+    // (the wrapper), not on the panel inside it.
+    .modal-content-wrapper {
+      margin: auto;
+
+      .modal-content {
+        margin: 0;
+      }
+    }
   }
 
   /**
@@ -109,6 +144,11 @@
    */
   &.modal-fullscreen {
     padding: 0;
+
+    .modal-content-wrapper {
+      width: 100vw;
+      height: 100vh;
+    }
 
     .modal-content {
       border-radius: 0;

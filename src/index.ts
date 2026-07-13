@@ -116,6 +116,7 @@ export type { ModalResponse } from './core/Modal';
 export type { ModalResponseHandler, ModalState, StandardModalProps } from './core/Modal';
 export type { ComponentWithId, ModalOpts } from './core/Modal';
 export type { Step } from './core/Modal';
+export type { NavigationModalProps } from './core/Modal';
 export { FullScreenModalContainer } from './core/Modal';
 export { Modal } from './core/Modal';
 export { ModalBody } from './core/Modal';
@@ -126,6 +127,7 @@ export { ModalRoot } from './core/Modal';
 export { ModalService } from './core/Modal';
 export { ModalSplitView } from './core/Modal';
 export { ModalStepper } from './core/Modal';
+export { NavigationModal } from './core/Modal';
 // CustomModals
 export { BigAssEditModal } from './core/CustomModals';
 export { EditModal } from './core/CustomModals';

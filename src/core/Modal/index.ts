@@ -16,3 +16,5 @@ export { ModalService } from './ModalService';
 export { ModalSplitView } from './ModalSplitView/ModalSplitView';
 export type { Step } from './ModalStepper/ModalStepper';
 export { ModalStepper } from './ModalStepper/ModalStepper';
+export type { NavigationModalProps } from './NavigationModal/NavigationModal';
+export { NavigationModal } from './NavigationModal/NavigationModal';

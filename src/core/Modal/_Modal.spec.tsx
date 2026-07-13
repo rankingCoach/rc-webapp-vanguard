@@ -175,3 +175,46 @@ describe('Modal outside-click close', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 });
+
+describe('Modal outerContent slot', () => {
+  test('renders outer content outside the panel, inside the wrapper', () => {
+    const { container } = render(
+      <Modal outerContent={<button data-testid="outer-btn">nav</button>}>
+        <div>content</div>
+      </Modal>,
+    );
+
+    const outer = container.querySelector('.modal-content-wrapper > .modal-outer-content');
+    expect(outer).not.toBeNull();
+    expect(outer!.querySelector('[data-testid="outer-btn"]')).not.toBeNull();
+    // The slot is a sibling of the panel, not a child of it.
+    expect(container.querySelector('.modal-content [data-testid="outer-btn"]')).toBeNull();
+  });
+
+  test('does not render the wrapper without outerContent (backward-compatible DOM)', () => {
+    const { container } = render(
+      <Modal>
+        <div>content</div>
+      </Modal>,
+    );
+
+    expect(container.querySelector('.modal-content-wrapper')).toBeNull();
+    expect(container.querySelector('.modal-outer-content')).toBeNull();
+    expect(container.querySelector('.rc-modal > .modal-content')).not.toBeNull();
+  });
+
+  test('clicking outer content does not trigger outside-click close', () => {
+    const onClose = vi.fn();
+    render(
+      <Modal onClose={onClose} testId="overlay" outerContent={<button data-testid="outer-btn">nav</button>}>
+        <div>content</div>
+      </Modal>,
+    );
+
+    fireEvent.click(appScreen.getByTestId('outer-btn'));
+    expect(onClose).not.toHaveBeenCalled();
+
+    fireEvent.click(appScreen.getByTestId('overlay'));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
