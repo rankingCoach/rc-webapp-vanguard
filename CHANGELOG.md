@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.16.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.0...v1.16.1) (2026-07-14)
+
+
+### Bug Fixes
+
+* **tabs:** adjust tab component styles to use the correct color variables ([38ceebb](https://github.com/rankingCoach/rc-webapp-vanguard/commit/38ceebbce8e37b110e938e1b8f43dd1278168c4e)), closes [#VAN-68](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-68)
+* translate noOptionsText ([5d0de7f](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5d0de7f20887e580d6dbddac14563a5c16468822))
+
 ## [1.16.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.15.0...v1.16.0) (2026-07-07)
 
 
