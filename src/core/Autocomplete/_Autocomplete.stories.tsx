@@ -10,6 +10,7 @@ import { WithHighlightOptions as _WithHighlightOptions } from "./stories/WithHig
 import { WithRestrictToOptions as _WithRestrictToOptions } from "./stories/WithRestrictToOptions.story";
 import { WithLoading as _WithLoading } from "./stories/WithLoading.story";
 import { WithInfoText as _WithInfoText } from "./stories/WithInfoText.story";
+import { WithNoOptionsText as _WithNoOptionsText } from "./stories/WithNoOptionsText.story";
 
 export const Default: Story = { ..._Default };
 export const WithLabel: Story = { ..._WithLabel };
@@ -20,6 +21,7 @@ export const WithHighlightOptions: Story = { ..._WithHighlightOptions };
 export const WithRestrictToOptions: Story = { ..._WithRestrictToOptions };
 export const WithLoading: Story = { ..._WithLoading };
 export const WithInfoText: Story = { ..._WithInfoText };
+export const WithNoOptionsText: Story = { ..._WithNoOptionsText };
 
 export default {
   ...SbDecorator({
