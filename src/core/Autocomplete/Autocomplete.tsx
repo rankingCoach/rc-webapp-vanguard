@@ -423,10 +423,6 @@ export const Autocomplete = (props: AutocompleteProps) => {
     return classNames(...classes);
   };
 
-  const EmptyListComponent = () => {
-    return <div>No options available!!</div>;
-  };
-
   /**
    * Translate noOptionsText when it's a string, mirroring how the placeholder is handled in InputBase.
    * ReactNode values are passed through untouched.
@@ -459,7 +455,6 @@ export const Autocomplete = (props: AutocompleteProps) => {
         noOptionsText={getNoOptionsText()}
         renderTags={renderTags}
         renderOption={renderOption}
-        ListboxComponent={options.length === 0 ? EmptyListComponent : undefined}
         isOptionEqualToValue={isOptionEqualToValue}
         getOptionLabel={getOptionLabel}
         onChange={onAutocompleteChangeFn}
