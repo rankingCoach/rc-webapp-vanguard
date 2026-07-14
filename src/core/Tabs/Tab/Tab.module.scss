@@ -17,7 +17,7 @@
     }
 
     &.selected {
-      background-color: var(--i100);
+      background-color: rc_transparent(--fn-bg-cta, 0.1);
     }
   }
 
@@ -38,7 +38,7 @@
     }
 
     &.selected {
-      border-color: var(--i400);
+      border-color: var(--fn-bg-cta);
     }
   }
 
