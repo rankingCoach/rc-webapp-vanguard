@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.16.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.1...v1.16.2) (2026-07-15)
+
+
+### Bug Fixes
+
+* **GoogleMaps:** guard AdvancedMarkerElement construction and stop competing internal loader (BUF-3899) ([d16c989](https://github.com/rankingCoach/rc-webapp-vanguard/commit/d16c98988105f8f9bd48712de6f2e3b4f14b96ca))
+
 ### [1.16.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.0...v1.16.1) (2026-07-14)
 
 
