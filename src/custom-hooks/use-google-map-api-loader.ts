@@ -10,32 +10,6 @@ import { useEffect, useRef, useState } from 'react';
  */
 const GOOGLE_MAPS_LIBRARIES: Libraries = ['places', 'marker'];
 
-const readJwtLanguageCode = (): string | undefined => {
-  // SSR-safe: runs at module evaluation time, where window/localStorage may not exist
-  try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return undefined;
-    }
-    const raw = window.localStorage.getItem('userService');
-    if (!raw) {
-      return undefined;
-    }
-    const jwt = JSON.parse(raw);
-    return typeof jwt?.languageCode === 'string' && jwt.languageCode !== '' ? jwt.languageCode : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-/**
- * Resolved ONCE at module scope. The Google Maps Loader is a page-lifetime
- * singleton: every construction must use identical options or it throws
- * "Loader must not be called again with different options". Reading the JWT
- * language synchronously here guarantees the language is identical from the
- * very first render — instead of racing redux hydration.
- */
-const jwtLanguageCode = readJwtLanguageCode();
-
 export const useGoogleMapApiLoader = (
   GoogleApiLibrariesToLoad?: any, // DEPRECATED & ignored (kept for call-site compat); libraries are always GOOGLE_MAPS_LIBRARIES
   apiKey: string = APIKEYS.googleMapsApiKey,
@@ -47,9 +21,8 @@ export const useGoogleMapApiLoader = (
 
   // Freeze first-render values: the Loader singleton's options are immutable
   // for the page lifetime, so a later render passing a different language
-  // (e.g. redux populating '' -> 'de' after hydration) must not re-run
-  // construction with new options.
-  const optionsRef = useRef({ apiKey, language: languageCode || jwtLanguageCode });
+  // must not re-run construction with new options.
+  const optionsRef = useRef({ apiKey, language: languageCode });
 
   useEffect(() => {
     if (!enabled) {

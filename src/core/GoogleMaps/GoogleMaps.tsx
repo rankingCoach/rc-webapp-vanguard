@@ -19,6 +19,7 @@ import { MapContext } from './map-context';
 export type GoogleMapsProps = {
   apiKey?: string; // Google Maps API key - if not provided, will use default from config
   isJsApiLoaded?: boolean; // you can preload Google JS API before. See: useJsApiLoader() - takes precedence over apiKey
+  languageCode?: string; // language for the internally-loaded Maps script; only used when isJsApiLoaded is not provided (defaults to 'en')
   theme?: 'default' | 'blackWhite' | 'blackWhiteNoPoi' | 'coloured';
   testId?: string;
   onLoad?: ((map: google.maps.Map) => void | Promise<void>) | undefined;
@@ -39,6 +40,7 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
   const {
     apiKey,
     isJsApiLoaded: externalIsJsApiLoaded,
+    languageCode,
     theme = 'default',
     testId = 'presence-insights-competitors-map-google-itself-textid',
     onLoad,
@@ -53,7 +55,7 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
   const { isLoaded: internalIsJsApiLoaded } = useGoogleMapApiLoader(
     [],
     apiKey,
-    undefined,
+    languageCode,
     externalIsJsApiLoaded === undefined,
   );
 

@@ -1,6 +1,8 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useGoogleMapApiLoader } from './use-google-map-api-loader';
+
 // Hoisted spies shared between the vi.mock factory and the assertions.
 const { loaderCtorSpy, loadMock } = vi.hoisted(() => ({
   loaderCtorSpy: vi.fn(),
@@ -16,13 +18,6 @@ vi.mock('@googlemaps/js-api-loader', () => ({
   },
 }));
 
-// The JWT language is resolved at module scope, so every test re-evaluates
-// the module after seeding localStorage.
-const importHook = (): Promise<typeof import('./use-google-map-api-loader')> => {
-  vi.resetModules();
-  return import('./use-google-map-api-loader');
-};
-
 describe('useGoogleMapApiLoader', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -32,18 +27,15 @@ describe('useGoogleMapApiLoader', () => {
     delete (window as any).google;
   });
 
-  it('resolves the language from the userService localStorage entry at module scope', async () => {
-    localStorage.setItem('userService', JSON.stringify({ languageCode: 'de' }));
-    const { useGoogleMapApiLoader } = await importHook();
-
-    renderHook(() => useGoogleMapApiLoader([], 'test-key'));
+  it('passes the languageCode param through to the Loader', () => {
+    renderHook(() => useGoogleMapApiLoader([], 'test-key', 'fr'));
 
     expect(loaderCtorSpy).toHaveBeenCalledWith({
       id: 'google-map-script',
       apiKey: 'test-key',
       version: 'weekly',
       libraries: ['places', 'marker'],
-      language: 'de',
+      language: 'fr',
       region: 'US',
       mapIds: [],
       nonce: '',
@@ -51,27 +43,20 @@ describe('useGoogleMapApiLoader', () => {
     });
   });
 
-  it('lets an explicit languageCode win over the JWT language', async () => {
-    localStorage.setItem('userService', JSON.stringify({ languageCode: 'de' }));
-    const { useGoogleMapApiLoader } = await importHook();
+  it("defaults to 'en' when no languageCode is given", () => {
+    renderHook(() => useGoogleMapApiLoader([], 'test-key'));
 
-    renderHook(() => useGoogleMapApiLoader([], 'test-key', 'fr'));
-
-    expect(loaderCtorSpy.mock.calls[0][0]).toMatchObject({ language: 'fr' });
+    expect(loaderCtorSpy.mock.calls[0][0]).toMatchObject({ language: 'en' });
   });
 
-  it('falls back to the JWT language when the explicit languageCode is an empty string', async () => {
-    localStorage.setItem('userService', JSON.stringify({ languageCode: 'de' }));
-    const { useGoogleMapApiLoader } = await importHook();
-
+  it("defaults to 'en' when languageCode is an empty string", () => {
     renderHook(() => useGoogleMapApiLoader([], 'test-key', ''));
 
-    expect(loaderCtorSpy.mock.calls[0][0]).toMatchObject({ language: 'de' });
+    expect(loaderCtorSpy.mock.calls[0][0]).toMatchObject({ language: 'en' });
   });
 
-  it("falls back to 'en' when userService is missing or malformed", async () => {
-    localStorage.setItem('userService', '{not json');
-    const { useGoogleMapApiLoader } = await importHook();
+  it('ignores app-level state: a userService localStorage entry does not influence the language', () => {
+    localStorage.setItem('userService', JSON.stringify({ languageCode: 'de' }));
 
     renderHook(() => useGoogleMapApiLoader([], 'test-key'));
 
@@ -79,7 +64,6 @@ describe('useGoogleMapApiLoader', () => {
   });
 
   it('does nothing while enabled=false, then loads once enabled flips to true', async () => {
-    const { useGoogleMapApiLoader } = await importHook();
     loadMock.mockResolvedValue(undefined);
 
     const { result, rerender } = renderHook(
@@ -98,7 +82,6 @@ describe('useGoogleMapApiLoader', () => {
 
   it('reports loaded immediately without constructing a Loader when the script is already present', async () => {
     (window as any).google = { maps: { version: '3.58' } };
-    const { useGoogleMapApiLoader } = await importHook();
 
     const { result } = renderHook(() => useGoogleMapApiLoader([], 'test-key'));
 
@@ -111,7 +94,6 @@ describe('useGoogleMapApiLoader', () => {
     loaderCtorSpy.mockImplementation(() => {
       throw boom;
     });
-    const { useGoogleMapApiLoader } = await importHook();
 
     const { result } = renderHook(() => useGoogleMapApiLoader([], 'test-key'));
 
@@ -122,7 +104,6 @@ describe('useGoogleMapApiLoader', () => {
   it('surfaces a load() rejection as loadError', async () => {
     const boom = new Error('script failed');
     loadMock.mockRejectedValue(boom);
-    const { useGoogleMapApiLoader } = await importHook();
 
     const { result } = renderHook(() => useGoogleMapApiLoader([], 'test-key'));
 
