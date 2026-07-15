@@ -13,7 +13,7 @@ import {
   useState,
 } from 'react';
 
-import { rcWindow } from '@stores/window.store';
+import { isAdvancedMarkerElementAvailable } from '@vanguard/GoogleMaps/_helpers/google-maps-utils';
 
 import { applyUpdatersToPropsAndRegisterEvents, unregisterEvents } from './map-helper';
 
@@ -547,8 +547,8 @@ function MarkerFunctional({
   }, [onZindexChanged]);
 
   useEffect(() => {
-    if (!rcWindow.google?.maps?.marker?.AdvancedMarkerElement) {
-      return; // Maps script present without the marker library — render nothing instead of crashing
+    if (!isAdvancedMarkerElementAvailable()) {
+      return;
     }
 
     const markerOptions = {
@@ -816,8 +816,8 @@ export class Marker extends PureComponent<MarkerProps> {
   marker: google.maps.marker.AdvancedMarkerElement | undefined;
 
   override componentDidMount(): void {
-    if (!rcWindow.google?.maps?.marker?.AdvancedMarkerElement) {
-      return; // Maps script present without the marker library — render nothing instead of crashing
+    if (!isAdvancedMarkerElementAvailable()) {
+      return;
     }
 
     const markerOptions = {

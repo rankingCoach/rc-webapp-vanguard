@@ -1,7 +1,7 @@
-import { rcWindow } from '@stores/window.store';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { isAdvancedMarkerElementAvailable } from '../_helpers/google-maps-utils';
 import { useGoogleMap } from '../map-context';
 
 /**
@@ -73,8 +73,8 @@ export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) =
 
   // Create / destroy marker when map becomes available
   useEffect(() => {
-    if (isJsApiLoaded === false || !rcWindow.google?.maps?.marker?.AdvancedMarkerElement) {
-      return; // Maps script present without the marker library — render nothing instead of crashing
+    if (isJsApiLoaded === false || !isAdvancedMarkerElementAvailable()) {
+      return;
     }
 
     if (isNaN(pos.lat) || isNaN(pos.lng)) return;
