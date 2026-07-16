@@ -13,6 +13,8 @@ import {
   useState,
 } from 'react';
 
+import { isAdvancedMarkerElementAvailable } from '@vanguard/GoogleMaps/_helpers/google-maps-utils';
+
 import { applyUpdatersToPropsAndRegisterEvents, unregisterEvents } from './map-helper';
 
 export interface HasMarkerAnchor {
@@ -545,6 +547,10 @@ function MarkerFunctional({
   }, [onZindexChanged]);
 
   useEffect(() => {
+    if (!isAdvancedMarkerElementAvailable()) {
+      return;
+    }
+
     const markerOptions = {
       ...(options || defaultOptions),
       ...(clusterer ? defaultOptions : { map }),
@@ -810,6 +816,10 @@ export class Marker extends PureComponent<MarkerProps> {
   marker: google.maps.marker.AdvancedMarkerElement | undefined;
 
   override componentDidMount(): void {
+    if (!isAdvancedMarkerElementAvailable()) {
+      return;
+    }
+
     const markerOptions = {
       ...(this.props.options || defaultOptions),
       ...(this.props.clusterer ? defaultOptions : { map: this.context }),

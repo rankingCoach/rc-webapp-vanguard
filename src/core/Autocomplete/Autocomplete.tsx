@@ -9,6 +9,7 @@ import {
   AutocompleteRenderGetTagProps,
   AutocompleteRenderOptionState,
 } from '@mui/material/Autocomplete/Autocomplete';
+import { translationService } from '@services/translation.service';
 import {
   InputBase,
   InputFormConfigProps,
@@ -422,8 +423,15 @@ export const Autocomplete = (props: AutocompleteProps) => {
     return classNames(...classes);
   };
 
-  const EmptyListComponent = () => {
-    return <div>No options available!!</div>;
+  /**
+   * Translate noOptionsText when it's a string, mirroring how the placeholder is handled in InputBase.
+   * ReactNode values are passed through untouched.
+   */
+  const getNoOptionsText = (): string | React.ReactNode => {
+    if (typeof noOptionsText === 'string') {
+      return translationService.get(noOptionsText, replacements).value;
+    }
+    return noOptionsText;
   };
 
   /**
@@ -444,10 +452,9 @@ export const Autocomplete = (props: AutocompleteProps) => {
         autoSelect={autoSelect}
         multiple={multiple}
         options={options}
-        noOptionsText={noOptionsText}
+        noOptionsText={getNoOptionsText()}
         renderTags={renderTags}
         renderOption={renderOption}
-        ListboxComponent={options.length === 0 ? EmptyListComponent : undefined}
         isOptionEqualToValue={isOptionEqualToValue}
         getOptionLabel={getOptionLabel}
         onChange={onAutocompleteChangeFn}

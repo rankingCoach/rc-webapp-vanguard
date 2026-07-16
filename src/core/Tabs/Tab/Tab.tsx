@@ -52,7 +52,7 @@ export const Tab = (props: TabProps & InternalTabProps) => {
         <Text
           testId={testId}
           className={classNames(styles.tabLabel)}
-          color={selected ? 'var(--fn-bg-cta)' : 'var(--n700)'}
+          color={selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)'}
           fontWeight={selected ? FontWeights.bold : FontWeights.regular}
         >
           {label}
@@ -72,7 +72,7 @@ export const Tab = (props: TabProps & InternalTabProps) => {
           ))}
           {typeof label === 'string' ? (
             <div>
-              <Text className={classNames(ml1)} color={selected ? 'var(--p500)' : 'var(--n700)'}>
+              <Text className={classNames(ml1)} color={selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)'}>
                 {label}
               </Text>
               <Render if={hasError}>
@@ -97,7 +97,11 @@ export const Tab = (props: TabProps & InternalTabProps) => {
       return (
         <div className={classNames(classNames(dFlex, alignItemsCenter, gap1))}>
           <Avatar noHover={true} size={iconSize === 'small' ? 'xs' : 'small'} icon={tabIcons[0]} />
-          {typeof label === 'string' ? <Text color={selected ? 'var(--p500)' : 'var(--n700)'}>{label}</Text> : label}
+          {typeof label === 'string' ? (
+            <Text color={selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)'}>{label}</Text>
+          ) : (
+            label
+          )}
           <Render if={hasError}>
             <Icon fillColor={'var(--e100)'} hasCircle={true} color={'var(--e500)'}>
               {IconNames.exclamation}
