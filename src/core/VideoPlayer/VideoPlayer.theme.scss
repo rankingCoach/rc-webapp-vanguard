@@ -1,6 +1,7 @@
+@import "@styles/color-functions";
 .video-js {
   font-size: 10px;
-  color: var(--n000);
+  color: var(--fn-fg-on-dark);
 
   .vjs-default-skin .vjs-big-play-button {
 
@@ -17,24 +18,24 @@
 
   .vjs-slider {
     //background-color: rgba(168, 226, 255, 0.5);
-    background-color: rgba(var(--p200-rgb), 0.5);
+    background-color: rc_transparent(--p200, 0.5);
 
   }
 
   .vjs-volume-level,
   .vjs-play-progress,
   .vjs-slider-bar {
-    background: var(--n000);
+    background: var(--fn-fg-on-dark);
   }
 
   .vjs-load-progress {
     //background: rgba(168, 226, 255, 0.5);
-    background-color: rgba(var(--p200-rgb), 0.5);
+    background-color: rc_transparent(--p200, 0.5);
 
 
     div {
       //background: rgba(168, 226, 255, 0.75);
-      background-color: rgba(var(--p300-rgb), 0.75);
+      background-color: rc_transparent(--i400, 0.75);
 
     }
   }

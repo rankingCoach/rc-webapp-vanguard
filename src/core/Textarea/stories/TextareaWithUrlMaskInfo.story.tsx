@@ -10,7 +10,6 @@ export const TextareaWithUrlMaskInfo: Story = {
     highlightUrlType: "info",
   },
   play: async ({ canvasElement }) => {
-    await testTextareaExpectMaskBackgroundColor(canvasElement, "--p100", "www.google.ro");
+    await testTextareaExpectMaskBackgroundColor(canvasElement, "--i100", "www.google.ro");
   },
 };
-

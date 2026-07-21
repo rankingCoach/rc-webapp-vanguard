@@ -1,3 +1,4 @@
+@import "@styles/color-functions";
 @import "@styles/media-mixins";
 @import "@styles/spacings";
 
@@ -62,7 +63,7 @@
 
     &:hover {
       &::before {
-        background-color: var(--n100);
+        background-color: rc_transparent(--fn-bg-hov-n-gl, 0.15);
         transform: scale(1);
         transition: 150ms ease-in all;
       }

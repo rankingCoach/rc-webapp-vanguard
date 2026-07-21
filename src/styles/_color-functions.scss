@@ -1,0 +1,33 @@
+@use "sass:math";
+@use "sass:meta";
+@use "sass:string";
+
+// Syntactic sugar over color-mix() for "theme token at alpha":
+//   rc_transparent(--fn-shadow, 0.25)
+//   → color-mix(in srgb, var(--fn-shadow) 25%, transparent)
+// Replaces the old `rgba(var(--token-rgb), alpha)` pattern: the `-rgb` triplet
+// tokens carry light-mode values only, while color-mix() reads the actual
+// `light-dark()`-aware token, so the result follows dark mode.
+// Accepts the token with or without the `-rgb` suffix / `var()` wrapper,
+// alpha as 0..1 or a percentage, and an optional fallback color for the
+// `var()` lookup.
+@function rc_transparent($token, $alpha, $fallback: null) {
+  $tokenName: "#{$token}";
+  @if string.index($tokenName, "var(") == 1 {
+    $tokenName: string.slice($tokenName, 5, -2);
+  }
+  @if string.slice($tokenName, -4) == "-rgb" {
+    $tokenName: string.slice($tokenName, 1, -5);
+  }
+
+  $alphaPercent: $alpha;
+  @if meta.type-of($alpha) == "number" and math.is-unitless($alpha) {
+    $alphaPercent: $alpha * 100%;
+  }
+
+  $varExpression: "var(#{$tokenName})";
+  @if $fallback != null {
+    $varExpression: "var(#{$tokenName}, #{$fallback})";
+  }
+  @return string.unquote("color-mix(in srgb, #{$varExpression} #{$alphaPercent}, transparent)");
+}

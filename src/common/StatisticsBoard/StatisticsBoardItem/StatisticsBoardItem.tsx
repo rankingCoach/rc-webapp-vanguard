@@ -147,7 +147,7 @@ export const StatisticsBoardItem = (props: StatisticsBoardItemProps) => {
     <ComponentContainer testId={testId} className={classNames(styles.container, disabledStyle, emptyStyle)}>
       {empty && bgIcon && (
         <div className={styles.cardBg}>
-          <Icon type={IconSize.small} forceSize={'100%'} color={'rgba(var(--n900-rgb), 0.1)'}>
+          <Icon type={IconSize.small} forceSize={'100%'} color={'color-mix(in srgb, var(--n900) 10%, transparent)'}>
             {bgIcon}
           </Icon>
         </div>

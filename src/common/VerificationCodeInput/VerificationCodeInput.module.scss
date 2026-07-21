@@ -6,10 +6,10 @@
   }
   
   .verification-code-input > .input-container {
-    border: solid $x0_125 var(--n300);
+    border: solid $x0_125 var(--fn-brd-gl);
     font-family: 'Lato';
     font-size: $x2;
-    color: var(--n700);
+    color: var(--fn-fg);
     text-align: center;
     box-sizing: border-box;
     border-radius: $x0_5;
@@ -18,8 +18,8 @@
   
   .verification-code-input > .input-container:focus {
     outline: none;
-    border: $x0_125 solid var(--p500);
-    caret-color: var(--p500);
+    border: $x0_125 solid var(--fn-fg-cta);
+    caret-color: var(--fn-fg-cta);
   }
 
   .input-container { 

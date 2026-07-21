@@ -2,12 +2,14 @@ import './Autocomplete.scss';
 
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { classNames } from '@helpers/classNames';
+import { uuidv4 } from '@helpers/generate-uid';
 import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason, Chip } from '@mui/material';
 import {
   AutocompleteProps as MUIAutocompleteProps,
   AutocompleteRenderGetTagProps,
   AutocompleteRenderOptionState,
 } from '@mui/material/Autocomplete/Autocomplete';
+import { translationService } from '@services/translation.service';
 import {
   InputBase,
   InputFormConfigProps,
@@ -17,6 +19,7 @@ import {
 } from '@vanguard/_internal/InputBase/InputBase';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
@@ -105,6 +108,43 @@ export const Autocomplete = (props: AutocompleteProps) => {
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
   const [adornmentIndex, setAdornmentIndex] = useState<number | undefined>(undefined);
+
+  /**
+   * Listbox popper stacking
+   * -------
+   * MUI's Autocomplete listbox portals to <body> with no z-index, so inside a
+   * stacked modal/drawer it paints *behind* the surface that opened it.
+   * Register a 'popover' slot on open and release it on close — same pattern
+   * as the Select dropdown in InputBase.
+   */
+  const listboxIdRef = useRef<string>(`autocomplete-listbox-${uuidv4()}`);
+  const [listboxZIndex, setListboxZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const onListboxOpen = () => {
+    setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
+  };
+  const onListboxClose = () => {
+    // A force-open listbox (controlled `open`) is managed by the effect below —
+    // ignore MUI's transient close callbacks so we don't drop its slot.
+    if (props.open === true) return;
+    OverlayStackingService.unregister(listboxIdRef.current);
+    setListboxZIndex(OVERLAY_BASE_Z_INDEX);
+  };
+  // Release the slot if the autocomplete unmounts while the listbox is still open.
+  useEffect(() => () => OverlayStackingService.unregister(listboxIdRef.current), []);
+
+  // A controlled-open listbox never fires MUI's onOpen, so register its stacking
+  // slot directly off the `open` prop. This keeps a force-open listbox (e.g. the
+  // one AutocompleteWithAnchor renders) above the surface that opened it instead
+  // of stuck at the base z-index.
+  useEffect(() => {
+    if (props.open === true) {
+      setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
+    } else if (props.open === false) {
+      OverlayStackingService.unregister(listboxIdRef.current);
+      setListboxZIndex(OVERLAY_BASE_Z_INDEX);
+    }
+  }, [props.open]);
 
   /**
    * FormConfig @todo test integration when using "multiple" tags...
@@ -399,8 +439,15 @@ export const Autocomplete = (props: AutocompleteProps) => {
     return classNames(...classes);
   };
 
-  const EmptyListComponent = () => {
-    return <div>No options available!!</div>;
+  /**
+   * Translate noOptionsText when it's a string, mirroring how the placeholder is handled in InputBase.
+   * ReactNode values are passed through untouched.
+   */
+  const getNoOptionsText = (): string | React.ReactNode => {
+    if (typeof noOptionsText === 'string') {
+      return translationService.get(noOptionsText, replacements).value;
+    }
+    return noOptionsText;
   };
 
   /**
@@ -421,16 +468,27 @@ export const Autocomplete = (props: AutocompleteProps) => {
         autoSelect={autoSelect}
         multiple={multiple}
         options={options}
-        noOptionsText={noOptionsText}
+        noOptionsText={getNoOptionsText()}
         renderTags={renderTags}
         renderOption={renderOption}
-        ListboxComponent={options.length === 0 ? EmptyListComponent : undefined}
         isOptionEqualToValue={isOptionEqualToValue}
         getOptionLabel={getOptionLabel}
         onChange={onAutocompleteChangeFn}
         clearIcon={<Icon color={'--n400'}>{IconNames.close}</Icon>}
         popupIcon={<Icon color={'--n400'}>{IconNames.caretDown}</Icon>}
         disabled={disabled}
+        onOpen={onListboxOpen}
+        onClose={onListboxClose}
+        slotProps={{
+          popper: {
+            // Override MUI's static z-index via `sx` (not `style`) so the
+            // listbox stacks above any modal/drawer it was opened from (see
+            // OverlayStackingService) WITHOUT clobbering MUI's own inline
+            // `style={{ width: anchorEl.clientWidth }}`, which keeps the
+            // dropdown the same width as the input.
+            sx: { zIndex: listboxZIndex },
+          },
+        }}
         renderInput={(params) => {
           return (
             <InputBase

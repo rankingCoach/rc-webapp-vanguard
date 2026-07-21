@@ -1,11 +1,11 @@
 .step {
   width: 32px;
   height: 4px;
-  background-color: var(--n200);
+  background-color: var(--fn-bg-var);
   border-radius: 8px;
 
   &.active {
-    background-color: var(--p500);
+    background-color: var(--fn-bg-cta);
   }
 }
 

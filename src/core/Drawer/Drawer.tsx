@@ -35,6 +35,13 @@ export interface DrawerProps extends AllowedDrawerProps {
    * stacking guarantees. Leave it unset.
    */
   zIndex?: number;
+  /**
+   * Floor to stack this drawer from. Defaults to the shared stacking floor.
+   * Pass a higher value to force the drawer above content outside the overlay
+   * ledger (e.g. injected 3rd-party widgets) while still interleaving with
+   * other overlays. Prefer this over `zIndex`, which pins a static layer.
+   */
+  baseZIndex?: number;
 }
 
 export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
@@ -62,6 +69,11 @@ export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
       open={open}
       variant={variant}
       sx={zIndex !== undefined ? { zIndex } : { zIndex: 1099 }}
+      PaperProps={{
+        // MUI's paper defaults to white (+ an elevation background-image in dark themes).
+        // Force the dark-aware surface (light: white, dark: #18212f) and drop the overlay.
+        sx: { backgroundColor: 'var(--fn-bg-surface)', backgroundImage: 'none' },
+      }}
       ModalProps={{
         hideBackdrop: hideBackdrop,
         BackdropProps: {

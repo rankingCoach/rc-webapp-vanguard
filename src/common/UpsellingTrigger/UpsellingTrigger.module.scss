@@ -1,11 +1,12 @@
+@import '@styles/color-functions';
 @import '../../../styles/media-mixins';
 @import '../../../styles/spacings';
 
 .upselling-container {
-  background: linear-gradient(93.58deg, rgba(var(--i100-rgb), 0.2) 0%, var(--i100) 100%);
+  background: linear-gradient(93.58deg, rc_transparent(--i100, 0.2) 0%, var(--i100) 100%);
   padding: $x3 $x2 $x3 $x6;
-  border-top: $x0_25 solid rgba(var(--i500-rgb), 0.05);
-  border-bottom: $x0_25 solid rgba(var(--i500-rgb), 0.05);
+  border-top: $x0_25 solid rc_transparent(--i500, 0.05);
+  border-bottom: $x0_25 solid rc_transparent(--i500, 0.05);
 
   .upselling-button {
     &:hover{
