@@ -177,11 +177,14 @@
    */
   .vanguard-input-backdrop {
     position: absolute;
+    top: 0;
+    left: 0;
     z-index: 1;
     padding: 12px 18px;
     box-sizing: border-box;
     overflow: hidden;
     pointer-events: none;
+    border-radius: 4px;
 
     .vanguard-input-highlights {
       color: transparent;
@@ -208,7 +211,6 @@
 
       .vanguard-input-mark-blue {
         border-radius: 3px;
-        padding: 3px;
         color: transparent;
 
         background-color: var(--i100);

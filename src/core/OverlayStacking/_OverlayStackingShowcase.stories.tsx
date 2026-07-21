@@ -15,9 +15,11 @@ import { FullscreenModalDrawerModal as _FullscreenModalDrawerModal } from './sto
 import { FullscreenModalDrawerModalPopover as _FullscreenModalDrawerModalPopover } from './stories/FullscreenModalDrawerModalPopover.story';
 import { FullscreenModalFullscreenModalDatePicker as _FullscreenModalFullscreenModalDatePicker } from './stories/FullscreenModalFullscreenModalDatePicker.story';
 import { ModalOverDrawer as _ModalOverDrawer } from './stories/ModalOverDrawer.story';
+import { ModalOverDrawerWithHighlightInput as _ModalOverDrawerWithHighlightInput } from './stories/ModalOverDrawerWithHighlightInput.story';
 import { Story } from './stories/_OverlayStacking.default';
 
 export const ModalOverDrawer: Story = { ..._ModalOverDrawer };
+export const ModalOverDrawerWithHighlightInput: Story = { ..._ModalOverDrawerWithHighlightInput };
 export const DrawerOverFullscreenModal: Story = { ..._DrawerOverFullscreenModal };
 export const FullscreenModalDrawerModal: Story = { ..._FullscreenModalDrawerModal };
 export const FullscreenModalDrawerModalPopover: Story = { ..._FullscreenModalDrawerModalPopover };
