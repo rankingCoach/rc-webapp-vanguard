@@ -2,6 +2,7 @@ import { baseStore } from '@stores/redux-base.store';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { Modal } from '@vanguard/Modal/Modal';
 
+import { DrawerModalAnchoredAutocomplete as _DrawerModalAnchoredAutocomplete } from './stories/DrawerModalAnchoredAutocomplete.story';
 import { DrawerModalAutocomplete as _DrawerModalAutocomplete } from './stories/DrawerModalAutocomplete.story';
 import { DrawerModalDatePicker as _DrawerModalDatePicker } from './stories/DrawerModalDatePicker.story';
 import { DrawerModalDateRangePicker as _DrawerModalDateRangePicker } from './stories/DrawerModalDateRangePicker.story';
@@ -14,9 +15,11 @@ import { FullscreenModalDrawerModal as _FullscreenModalDrawerModal } from './sto
 import { FullscreenModalDrawerModalPopover as _FullscreenModalDrawerModalPopover } from './stories/FullscreenModalDrawerModalPopover.story';
 import { FullscreenModalFullscreenModalDatePicker as _FullscreenModalFullscreenModalDatePicker } from './stories/FullscreenModalFullscreenModalDatePicker.story';
 import { ModalOverDrawer as _ModalOverDrawer } from './stories/ModalOverDrawer.story';
+import { ModalOverDrawerWithHighlightInput as _ModalOverDrawerWithHighlightInput } from './stories/ModalOverDrawerWithHighlightInput.story';
 import { Story } from './stories/_OverlayStacking.default';
 
 export const ModalOverDrawer: Story = { ..._ModalOverDrawer };
+export const ModalOverDrawerWithHighlightInput: Story = { ..._ModalOverDrawerWithHighlightInput };
 export const DrawerOverFullscreenModal: Story = { ..._DrawerOverFullscreenModal };
 export const FullscreenModalDrawerModal: Story = { ..._FullscreenModalDrawerModal };
 export const FullscreenModalDrawerModalPopover: Story = { ..._FullscreenModalDrawerModalPopover };
@@ -25,6 +28,7 @@ export const DrawerModalDatePicker: Story = { ..._DrawerModalDatePicker };
 export const DrawerModalPopover: Story = { ..._DrawerModalPopover };
 export const DrawerModalMenu: Story = { ..._DrawerModalMenu };
 export const DrawerModalAutocomplete: Story = { ..._DrawerModalAutocomplete };
+export const DrawerModalAnchoredAutocomplete: Story = { ..._DrawerModalAnchoredAutocomplete };
 export const DrawerModalSearchableSelect: Story = { ..._DrawerModalSearchableSelect };
 export const DrawerModalDateRangePicker: Story = { ..._DrawerModalDateRangePicker };
 export const FullscreenModalFullscreenModalDatePicker: Story = { ..._FullscreenModalFullscreenModalDatePicker };

@@ -124,11 +124,27 @@ export const Autocomplete = (props: AutocompleteProps) => {
     setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
   };
   const onListboxClose = () => {
+    // A force-open listbox (controlled `open`) is managed by the effect below —
+    // ignore MUI's transient close callbacks so we don't drop its slot.
+    if (props.open === true) return;
     OverlayStackingService.unregister(listboxIdRef.current);
     setListboxZIndex(OVERLAY_BASE_Z_INDEX);
   };
   // Release the slot if the autocomplete unmounts while the listbox is still open.
   useEffect(() => () => OverlayStackingService.unregister(listboxIdRef.current), []);
+
+  // A controlled-open listbox never fires MUI's onOpen, so register its stacking
+  // slot directly off the `open` prop. This keeps a force-open listbox (e.g. the
+  // one AutocompleteWithAnchor renders) above the surface that opened it instead
+  // of stuck at the base z-index.
+  useEffect(() => {
+    if (props.open === true) {
+      setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
+    } else if (props.open === false) {
+      OverlayStackingService.unregister(listboxIdRef.current);
+      setListboxZIndex(OVERLAY_BASE_Z_INDEX);
+    }
+  }, [props.open]);
 
   /**
    * FormConfig @todo test integration when using "multiple" tags...
@@ -464,9 +480,14 @@ export const Autocomplete = (props: AutocompleteProps) => {
         onOpen={onListboxOpen}
         onClose={onListboxClose}
         slotProps={{
-          // Override MUI's static z-index so the listbox stacks above any
-          // modal/drawer it was opened from (see OverlayStackingService).
-          popper: { style: { zIndex: listboxZIndex } },
+          popper: {
+            // Override MUI's static z-index via `sx` (not `style`) so the
+            // listbox stacks above any modal/drawer it was opened from (see
+            // OverlayStackingService) WITHOUT clobbering MUI's own inline
+            // `style={{ width: anchorEl.clientWidth }}`, which keeps the
+            // dropdown the same width as the input.
+            sx: { zIndex: listboxZIndex },
+          },
         }}
         renderInput={(params) => {
           return (

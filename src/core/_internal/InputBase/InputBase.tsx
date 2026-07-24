@@ -308,16 +308,41 @@ export const InputBase = (props: rcInputBaseProps) => {
   // Release the slot if the input unmounts while the menu is still open.
   useEffect(() => () => OverlayStackingService.unregister(selectMenuIdRef.current), []);
 
-  const resizeBackdrop = () => {
-    if (useBackdrop && backDropRef && backDropRef.current && inputRef && inputRef.current) {
-      backDropRef.current.style.height = `${inputRef.current.getBoundingClientRect().height.toString()}px`;
-      backDropRef.current.style.width = `${inputRef.current.getBoundingClientRect().width.toString()}px`;
-      backDropRef.current.scrollTop = inputRef.current.scrollTop;
-      backDropRef.current.scrollLeft = inputRef.current.scrollLeft;
+  // Highlights backdrop
+  const useBackdrop = Boolean(highlightLengthExceeded || highlightWords || highlightUrl || prohibitedWords);
+  const backDropRef = useRef<HTMLDivElement>(null);
+  const highlightsRef = useRef<HTMLDivElement>(null);
+
+  const resizeBackdrop = React.useCallback(() => {
+    if (useBackdrop && backDropRef.current && inputRef && inputRef.current) {
+      const inputRect = inputRef.current.getBoundingClientRect();
+      const wrapperRect = backDropRef.current.parentElement?.getBoundingClientRect();
+      backDropRef.current.style.height = `${inputRect.height}px`;
+      backDropRef.current.style.width = `${inputRect.width}px`;
+      if (wrapperRect) {
+        // Align the backdrop with the input box (outer/hidden label variants shift the field down)
+        backDropRef.current.style.top = `${inputRect.top - wrapperRect.top}px`;
+        backDropRef.current.style.left = `${inputRect.left - wrapperRect.left}px`;
+      }
+      if (highlightsRef.current) {
+        // scrollTop/scrollLeft assignment clamps when the mirror is shorter than the
+        // textarea (trailing newlines render no final line box under pre-wrap);
+        // a transform tracks the textarea exactly
+        highlightsRef.current.style.transform = `translate(${-inputRef.current.scrollLeft}px, ${-inputRef.current.scrollTop}px)`;
+      }
     }
-  };
+  }, [useBackdrop, inputRef]);
 
   const debouncedResizeBackdrop = React.useMemo(() => debounce(resizeBackdrop, 100), [resizeBackdrop]);
+
+  // Keep the backdrop geometry in sync with the textarea whenever TextareaAutosize
+  // grows/shrinks (typing, programmatic value changes, container resize)
+  useEffect(() => {
+    if (!useBackdrop || !inputRef?.current) return;
+    const observer = new ResizeObserver(() => resizeBackdrop());
+    observer.observe(inputRef.current);
+    return () => observer.disconnect();
+  }, [useBackdrop, inputRef, resizeBackdrop]);
 
   useEffect(() => {
     if (typeof value === 'string') {
@@ -330,6 +355,14 @@ export const InputBase = (props: rcInputBaseProps) => {
   useEffect(() => {
     debouncedResizeBackdrop();
   }, [width, debouncedResizeBackdrop]);
+
+  // The textarea may have grown while the loading skeleton was shown
+  // (e.g. AI writing a post) — re-sync geometry once loading ends
+  useEffect(() => {
+    if (!isLoading) {
+      resizeBackdrop();
+    }
+  }, [isLoading, resizeBackdrop]);
 
   if (formconfig) {
     if (formconfig?.validation && 'maxLength' in formconfig?.validation) {
@@ -382,6 +415,9 @@ export const InputBase = (props: rcInputBaseProps) => {
 
   useEffect(() => {
     updateBackdrop(formconfig?.stateValue);
+    // Re-sync geometry and scroll position after programmatic value changes;
+    // the ResizeObserver picks up any later autosize adjustment
+    resizeBackdrop();
   }, [formconfig?.stateValue, prohibitedWords]);
   // Is Valid
   const doValidate = (formconfig?: FormConfigElement): boolean => {
@@ -391,6 +427,7 @@ export const InputBase = (props: rcInputBaseProps) => {
   useEffect(() => {
     if (value && highlightUrl && typeof value === 'string') {
       updateBackdrop(value);
+      resizeBackdrop();
     }
   }, [highlightUrl, value, highlightUrlType]);
   /**
@@ -590,13 +627,19 @@ export const InputBase = (props: rcInputBaseProps) => {
    * UI: Highlights
    * -------
    */
-  const useBackdrop = highlightLengthExceeded || highlightWords || highlightUrl || prohibitedWords;
-  const backDropRef = useRef<HTMLDivElement>(null);
   const [backdrop, setBackdrop] = useState<{ __html: string }>({ __html: '' });
+  const escapeHtml = (text: string) => text?.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
   const updateBackdrop = (content: string) => {
     if (!useBackdrop) {
       setBackdrop({ __html: '' });
+      return;
     }
+
+    // Escape user content so the backdrop text matches the textarea text
+    // character-for-character; otherwise sanitizeHtml strips tag-like text
+    // (e.g. "<b>") and every highlight after it drifts out of position
+    content = escapeHtml(content);
 
     if (highlightLengthExceeded && maxLength) {
       if (content?.length > maxLength) {
@@ -606,8 +649,9 @@ export const InputBase = (props: rcInputBaseProps) => {
 
     if (highlightWords && highlightWords.length) {
       highlightWords.forEach((word) => {
-        content = content?.replace(word, `<span class="vanguard-input-mark-green">${word}</span>`);
-        if (content?.includes(word) && onHighlightWordFound) {
+        const escapedWord = escapeHtml(word);
+        content = content?.replace(escapedWord, `<span class="vanguard-input-mark-green">${escapedWord}</span>`);
+        if (content?.includes(escapedWord) && onHighlightWordFound) {
           onHighlightWordFound(word, formconfig);
         }
       });
@@ -615,8 +659,9 @@ export const InputBase = (props: rcInputBaseProps) => {
 
     if (prohibitedWords && prohibitedWords.length) {
       prohibitedWords.forEach((word) => {
-        content = content?.replace(word, `<span class="vanguard-input-mark-red">${word}</span>`);
-        if (content?.includes(word) && onProhibitedWordFound) {
+        const escapedWord = escapeHtml(word);
+        content = content?.replace(escapedWord, `<span class="vanguard-input-mark-red">${escapedWord}</span>`);
+        if (content?.includes(escapedWord) && onProhibitedWordFound) {
           onProhibitedWordFound(word, formconfig);
         }
       });
@@ -849,16 +894,16 @@ export const InputBase = (props: rcInputBaseProps) => {
     }
     //setInnerValue(valueInChangeFn);
 
-    // Resize backdrops size according to textarea component itself, and it's content
-    if (useBackdrop && backDropRef && backDropRef.current && inputRef && inputRef.current) {
-      backDropRef.current.style.height = `${inputRef.current.getBoundingClientRect().height.toString()}px`;
-      backDropRef.current.style.width = `${inputRef.current.getBoundingClientRect().width.toString()}px`;
+    if (useBackdrop) {
       if (allowBreakLines) {
         updateBackdrop(e.currentTarget.value);
       } else {
         // remove breaklines if text was pasted
         updateBackdrop(e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, ' '));
       }
+      // Measuring synchronously here would read the pre-growth size; wait until
+      // TextareaAutosize has recomputed its height before syncing geometry/scroll
+      requestAnimationFrame(resizeBackdrop);
     }
   };
 
@@ -895,11 +940,11 @@ export const InputBase = (props: rcInputBaseProps) => {
       onClick={(e) => onClickFn(e)}
     >
       <div className={'vanguard-input-backdrop'} ref={backDropRef}>
-        <div className={'vanguard-input-highlights'} dangerouslySetInnerHTML={backdrop} />
+        <div className={'vanguard-input-highlights'} ref={highlightsRef} dangerouslySetInnerHTML={backdrop} />
       </div>
 
       <Render if={isLoading && formFieldType == 'Textarea'}>
-        <div className={'vanguard-input-skeleton'} ref={backDropRef}>
+        <div className={'vanguard-input-skeleton'}>
           {[...Array(Math.min(minRows, maxRows))].map((e, i) => (
             <Skeleton key={i} height={16} width={'100%'} />
           ))}
@@ -916,7 +961,7 @@ export const InputBase = (props: rcInputBaseProps) => {
             formFieldType == 'Autocomplete')
         }
       >
-        <div className={'vanguard-input-skeleton'} ref={backDropRef}>
+        <div className={'vanguard-input-skeleton'}>
           <Skeleton height={42} width={'100%'} />
         </div>
       </Render>

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.2...v1.17.0) (2026-07-21)
+
+
+### Features
+
+* **OverlayStacking:** add story for ModalOverDrawer with URL highlighting test ([4a52c75](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4a52c75c5da7d6bf4c43d37b15bfaea1081241e2)), closes [#VAN-67](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-67)
+* **SearchableSelect:** add story for HTML-encoded titles ([426a24b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/426a24bdb7367b89884f087dbaa99f611b3a905d)), closes [#VAN-63](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-63)
+* **Textarea:** add synchronization stories for URL highlighting and backdrop geometry ([f7b2526](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f7b2526cf593778887c2446f7b7d215387ce238e)), closes [#VAN-67](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-67)
+
+
+### Bug Fixes
+
+* **autocomplete:** left-align dropdown and fix overlay stacking ([84ec5a2](https://github.com/rankingCoach/rc-webapp-vanguard/commit/84ec5a23106fab86d158126045e3b03e182b4935)), closes [#VAN-71](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-71)
+* **SearchableSelect:** prevent translation of rendered value in renderValue callback ([ee515da](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ee515dabe8471b996080df9d9758a374261044b2)), closes [#VAN-63](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-63)
+
 ### [1.16.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.1...v1.16.2) (2026-07-15)
 
 
