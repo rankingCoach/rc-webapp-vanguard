@@ -29,6 +29,12 @@ type Props = {
   closeOnEsc?: boolean;
   /** Close on overlay / outside click. Defaults to `true`. */
   closeOnOutsideClick?: boolean;
+  /**
+   * Content rendered OUTSIDE the modal panel but inside the overlay, positioned
+   * relative to the panel bounds (e.g. lightbox navigation arrows / counter).
+   * Clicks on it do not trigger outside-click closing.
+   */
+  outerContent?: React.ReactNode;
 } & ModalOpts;
 
 /**
@@ -59,6 +65,7 @@ export const Modal = (props: Props) => {
     hideCloseButtonOnMobile = false,
     closeOnEsc = true,
     closeOnOutsideClick = true,
+    outerContent,
   } = props;
   let { fullscreen, width, maxWidth, minHeight } = props;
 
@@ -128,6 +135,33 @@ export const Modal = (props: Props) => {
    * Return view
    * ---
    */
+  const panel = (
+    <div
+      onClick={(e) => {
+        if (!disableOutsideClick) {
+          e.stopPropagation();
+          onContentClick && onContentClick(e);
+        }
+      }}
+      className={classNames('modal-content', modalContentClassName)}
+      style={getContentStyle()}
+    >
+      {shouldRenderCloseBtn ? (
+        <div className={classNames('modal-close-btn', hideCloseButtonOnMobile ? 'modal-close-btn-hidden-mobile' : '')}>
+          <Button
+            testId={'modal-close-cta'}
+            type={ButtonTypes.muted}
+            size={ButtonSizes.large}
+            icon={IconNames.close}
+            rounded
+            onClick={() => onClose?.()}
+          />
+        </div>
+      ) : null}
+      {children}
+    </div>
+  );
+
   return (
     <div
       onClick={(e) => {
@@ -139,32 +173,16 @@ export const Modal = (props: Props) => {
       data-testid={testId}
       className={classNames('rc-modal', getContainerClassName())}
     >
-      <div
-        onClick={(e) => {
-          if (!disableOutsideClick) {
-            e.stopPropagation();
-            onContentClick && onContentClick(e);
-          }
-        }}
-        className={classNames('modal-content', modalContentClassName)}
-        style={getContentStyle()}
-      >
-        {shouldRenderCloseBtn ? (
-          <div
-            className={classNames('modal-close-btn', hideCloseButtonOnMobile ? 'modal-close-btn-hidden-mobile' : '')}
-          >
-            <Button
-              testId={'modal-close-cta'}
-              type={ButtonTypes.muted}
-              size={ButtonSizes.large}
-              icon={IconNames.close}
-              rounded
-              onClick={() => onClose?.()}
-            />
+      {outerContent === undefined ? (
+        panel
+      ) : (
+        <div className={'modal-content-wrapper'}>
+          {panel}
+          <div className={'modal-outer-content'} onClick={(e) => e.stopPropagation()}>
+            {outerContent}
           </div>
-        ) : null}
-        {children}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
