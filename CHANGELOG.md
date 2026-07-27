@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.17.0...v1.18.0) (2026-07-27)
+
+
+### Features
+
+* export all media items transformers, processors and validators ([54f7735](https://github.com/rankingCoach/rc-webapp-vanguard/commit/54f77350631c0ebb26ef6ef6e55f720c059970e3))
+* implement NavigationModal ([388f16d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/388f16dc9a6f1ae84ae5264d88f3381f05cedd13))
+
 ## [1.17.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.2...v1.17.0) (2026-07-21)
 
 
