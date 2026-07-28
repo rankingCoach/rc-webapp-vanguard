@@ -19,6 +19,7 @@ import { MapContext } from './map-context';
 export type GoogleMapsProps = {
   apiKey?: string; // Google Maps API key - if not provided, will use default from config
   isJsApiLoaded?: boolean; // you can preload Google JS API before. See: useJsApiLoader() - takes precedence over apiKey
+  languageCode?: string; // language for the internally-loaded Maps script; only used when isJsApiLoaded is not provided (defaults to 'en')
   theme?: 'default' | 'blackWhite' | 'blackWhiteNoPoi' | 'coloured';
   testId?: string;
   onLoad?: ((map: google.maps.Map) => void | Promise<void>) | undefined;
@@ -39,6 +40,7 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
   const {
     apiKey,
     isJsApiLoaded: externalIsJsApiLoaded,
+    languageCode,
     theme = 'default',
     testId = 'presence-insights-competitors-map-google-itself-textid',
     onLoad,
@@ -48,8 +50,14 @@ export const GoogleMaps = (props: GoogleMapsProps) => {
 
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
-  // Load Google Maps API internally if apiKey is provided and external loading is not used
-  const { isLoaded: internalIsJsApiLoaded } = useGoogleMapApiLoader([], apiKey);
+  // Load Google Maps API internally only when the host app does not manage
+  // loading itself (isJsApiLoaded prop absent) — never start a competing Loader
+  const { isLoaded: internalIsJsApiLoaded } = useGoogleMapApiLoader(
+    [],
+    apiKey,
+    languageCode,
+    externalIsJsApiLoaded === undefined,
+  );
 
   // Use external loading if provided, otherwise use internal loading
   const isJsApiLoaded = externalIsJsApiLoaded !== undefined ? externalIsJsApiLoaded : internalIsJsApiLoaded;

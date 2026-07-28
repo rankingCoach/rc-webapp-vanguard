@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.17.0...v1.18.0) (2026-07-27)
+
+
+### Features
+
+* export all media items transformers, processors and validators ([54f7735](https://github.com/rankingCoach/rc-webapp-vanguard/commit/54f77350631c0ebb26ef6ef6e55f720c059970e3))
+* implement NavigationModal ([388f16d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/388f16dc9a6f1ae84ae5264d88f3381f05cedd13))
+
+## [1.17.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.2...v1.17.0) (2026-07-21)
+
+
+### Features
+
+* **OverlayStacking:** add story for ModalOverDrawer with URL highlighting test ([4a52c75](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4a52c75c5da7d6bf4c43d37b15bfaea1081241e2)), closes [#VAN-67](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-67)
+* **SearchableSelect:** add story for HTML-encoded titles ([426a24b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/426a24bdb7367b89884f087dbaa99f611b3a905d)), closes [#VAN-63](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-63)
+* **Textarea:** add synchronization stories for URL highlighting and backdrop geometry ([f7b2526](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f7b2526cf593778887c2446f7b7d215387ce238e)), closes [#VAN-67](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-67)
+
+
+### Bug Fixes
+
+* **autocomplete:** left-align dropdown and fix overlay stacking ([84ec5a2](https://github.com/rankingCoach/rc-webapp-vanguard/commit/84ec5a23106fab86d158126045e3b03e182b4935)), closes [#VAN-71](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-71)
+* **SearchableSelect:** prevent translation of rendered value in renderValue callback ([ee515da](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ee515dabe8471b996080df9d9758a374261044b2)), closes [#VAN-63](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-63)
+
+### [1.16.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.1...v1.16.2) (2026-07-15)
+
+
+### Bug Fixes
+
+* **GoogleMaps:** guard AdvancedMarkerElement construction and stop competing internal loader (BUF-3899) ([d16c989](https://github.com/rankingCoach/rc-webapp-vanguard/commit/d16c98988105f8f9bd48712de6f2e3b4f14b96ca))
+
+### [1.16.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.0...v1.16.1) (2026-07-14)
+
+
+### Bug Fixes
+
+* **tabs:** adjust tab component styles to use the correct color variables ([38ceebb](https://github.com/rankingCoach/rc-webapp-vanguard/commit/38ceebbce8e37b110e938e1b8f43dd1278168c4e)), closes [#VAN-68](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-68)
+* translate noOptionsText ([5d0de7f](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5d0de7f20887e580d6dbddac14563a5c16468822))
+
 ## [1.16.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.15.0...v1.16.0) (2026-07-07)
 
 
