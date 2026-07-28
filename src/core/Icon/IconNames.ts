@@ -134,6 +134,8 @@ export enum IconNames {
   high = 'high',
   ai = 'ai',
   aiReviews = 'ai-reviews',
+  aiVisibility = 'ai-visibility',
+  aiVisibilityFilled = 'ai-visibility-filled',
   audioMicrophone = 'audio-microphone',
   audioSettings = 'audio-settings',
   callTracking = 'call-tracking',
