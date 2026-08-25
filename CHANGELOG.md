@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.19.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.3...v1.19.0) (2026-08-25)
+
+
+### Features
+
+* add flag to hide the "Optional" from label ([f758df8](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f758df8e527f14b65b4f20e41ad9a92b91ad7088)), closes [#VAN-72](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-72)
+
 ### [1.18.3](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.2...v1.18.3) (2026-08-13)
 
 ### [1.18.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.1...v1.18.2) (2026-08-10)
