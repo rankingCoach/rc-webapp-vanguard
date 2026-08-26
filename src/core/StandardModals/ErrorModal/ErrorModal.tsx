@@ -1,8 +1,6 @@
 import './ErrorModal.scss';
 
 import { useDynamicImport } from '@custom-hooks/use-dynamic-import/use-dynamic-import';
-import { alignItemsCenter, dFlexColumn, mb3, mt2, mt5 } from '@globalStyles';
-import { classNames } from '@helpers/classNames';
 import { supportService } from '@services/support.service';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { ModalFooter } from '@vanguard/Modal/ModalFooter/ModalFooter';
@@ -14,6 +12,7 @@ import { Modal } from '../../Modal/Modal';
 import { ModalBody } from '../../Modal/ModalBody/ModalBody';
 import { StandardModalProps } from '../../Modal/ModalRoot/ModalRoot';
 import { FontWeights, Text, TextReplacements, TextTypes } from '../../Text/Text';
+import styles from './ErrorModal.module.scss';
 
 type Props = StandardModalProps<null> & {
   err?: any;
@@ -63,8 +62,8 @@ export const ErrorModal = (props: Props) => {
       </ModalHeader>
 
       <ModalBody>
-        <div className={classNames(dFlexColumn, alignItemsCenter)}>
-          <img className={classNames(mb3, mt5)} src={SvgIcon} alt="" />
+        <div className={styles.content}>
+          <img className={styles.icon} src={SvgIcon} alt="" />
           <Text
             type={TextTypes.textIntro}
             textAlign={'center'}
@@ -75,7 +74,7 @@ export const ErrorModal = (props: Props) => {
           </Text>
           {!!errorCodes?.length && (
             <Text
-              className={classNames(mt2)}
+              className={styles.errorCodes}
               type={TextTypes.textCaption}
               textAlign={'center'}
               color={'--n400'}
