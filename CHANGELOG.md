@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.19.0...v1.20.0) (2026-08-27)
+
+
+### Features
+
+* **ErrorModal:** add support for replacements and error codes display ([af58e84](https://github.com/rankingCoach/rc-webapp-vanguard/commit/af58e84635ce9a80f3635c3b8035e6426691b302)), closes [#VAN-73](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-73)
+
 ## [1.19.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.3...v1.19.0) (2026-08-25)
 
 
