@@ -385,6 +385,8 @@ class ModalServiceClass {
     title,
     ctaPositive,
     onClose,
+    replacements,
+    errorCodes,
   }: {
     err?: any;
     source: string;
@@ -392,6 +394,8 @@ class ModalServiceClass {
     title?: string;
     ctaPositive?: (ModalFooterAction & SubButtonProps) | null;
     onClose?: () => void;
+    replacements?: TextReplacements;
+    errorCodes?: string[];
   }) => {
     this.errorModalId = this.open(
       <ErrorModal
@@ -403,6 +407,8 @@ class ModalServiceClass {
         message={message}
         title={title}
         ctaPositive={ctaPositive}
+        replacements={replacements}
+        errorCodes={errorCodes}
       />,
     );
   };
