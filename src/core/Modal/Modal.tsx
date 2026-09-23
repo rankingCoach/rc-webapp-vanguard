@@ -6,9 +6,10 @@ import { deviceService } from '@services/device.service.ts';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { ModalOpts } from '@vanguard/Modal/ModalService';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 
 import { ModalResponse } from './ModalResponse';
+import { ModalPresentationContext } from './ModalPresentationContext';
 
 type Props = {
   children?: React.ReactNode;
@@ -50,6 +51,7 @@ const escStack: symbol[] = [];
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const Modal = (props: Props) => {
+  const { allowCompact, isCompact } = useContext(ModalPresentationContext);
   const {
     children,
     className,
@@ -124,7 +126,8 @@ export const Modal = (props: Props) => {
   const getContainerClassName = () => {
     const positionClass = `modal-position-${modalPosition}`;
     const fullscreenClass = fullscreen ? 'modal-fullscreen' : '';
-    return classNames(positionClass, fullscreenClass, className);
+    return classNames(positionClass, fullscreenClass, className,
+      allowCompact ? 'modal-compact-enabled' : '', isCompact ? 'modal-compact' : '');
   };
 
   const getContentStyle = () => {

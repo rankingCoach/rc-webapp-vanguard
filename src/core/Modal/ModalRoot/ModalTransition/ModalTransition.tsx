@@ -2,6 +2,7 @@ import React from 'react';
 import { animated, TransitionFn, useTransition } from 'react-spring';
 
 import { useModalContext } from '../../ModalContext';
+import { ModalPresentationContext } from '../../ModalPresentationContext';
 
 type TransitionPropertiesType = TransitionFn<string, { transform: string; bgOpacity: number; opacity: number }>;
 export type ModalTransition = 'slide' | 'grow' | 'pop';
@@ -13,7 +14,7 @@ interface Props {
 
 export const ModalTransition = (props: Props) => {
   const { modalsList, animation } = props;
-  const { getModal, getModalZIndex } = useModalContext();
+  const { getModal, getModalZIndex, compactModals } = useModalContext();
 
   let transition: TransitionPropertiesType;
   let animationDuration: number;
@@ -81,13 +82,18 @@ export const ModalTransition = (props: Props) => {
       modalComponent && (
         <animated.div
           style={{ opacity: animationProps.bgOpacity, zIndex }}
-          className={'modalRoot'}
+          className={compactModals[modalId] ? 'modalRoot modalRoot-compact' : 'modalRoot'}
         >
           <animated.div
             style={{ transform: animationProps.transform, opacity: animationProps.opacity }}
             className={'modalRoot-container'}
           >
-            {modalComponent}
+            <ModalPresentationContext.Provider value={{
+              allowCompact: !!modalComponent.props.allowCompact,
+              isCompact: !!compactModals[modalId],
+            }}>
+              {modalComponent}
+            </ModalPresentationContext.Provider>
           </animated.div>
         </animated.div>
       )

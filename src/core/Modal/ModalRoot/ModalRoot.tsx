@@ -16,6 +16,10 @@ export type ModalState = Record<string, any>;
 export type ModalResponseHandler<T> = (r: ModalResponse<T>) => void;
 export type StandardModalProps<T> = {
   close: ModalResponseHandler<T>;
+  /** Injected only when ModalService.open opts into allowCompact. */
+  compact?: () => void;
+  /** Restore the original presentation without losing component state. */
+  expand?: () => void;
   message?: string | React.ReactNode;
   title?: string;
   negativeCtaText?: string;
@@ -30,10 +34,11 @@ export type StandardModalProps<T> = {
 };
 
 export const ModalRoot = () => {
-  const { modalRootState, addModal, removeModal } = useModalContext();
+  const { modalRootState, addModal, removeModal, compactModals, setModalCompact } = useModalContext();
   const subscriptionsRef = useRef<any[]>([]);
 
   const { growModals, slideModals, popModals } = useGetModals(modalRootState);
+  const hasBlockingModal = [...growModals, ...slideModals, ...popModals].some((id) => !compactModals[id]);
 
   useEffect(() => {
     // Clean up previous subscriptions
@@ -55,29 +60,30 @@ export const ModalRoot = () => {
       removeModal(modalId);
     });
 
-    subscriptionsRef.current = [openSub, closeSub];
+    const compactSub = pubSubService.$sub(PUB_SUB_EVENTS.reactModalCompactChange, ({ modalId, isCompact }) => {
+      setModalCompact(modalId, isCompact);
+    });
+
+    subscriptionsRef.current = [openSub, closeSub, compactSub];
 
     return () => {
       subscriptionsRef.current.forEach((sub) => sub?.unsubscribe());
       subscriptionsRef.current = [];
     };
-  }, [addModal, removeModal]);
+  }, [addModal, removeModal, setModalCompact]);
 
   /**
    * Handle no scroll on page body
    */
   useEffect(() => {
-    if (
-      (growModals || slideModals || popModals) &&
-      (growModals.length ?? 0) + (slideModals.length ?? 0) + (popModals.length ?? 0) >= 1
-    ) {
+    if (hasBlockingModal) {
       document.body.style.marginRight = `${window.innerWidth - document.body.offsetWidth}px`;
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.marginRight = '';
       document.body.style.overflow = '';
     }
-  }, [growModals, slideModals, popModals]);
+  }, [hasBlockingModal]);
 
   /**
    * Return View

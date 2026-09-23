@@ -26,6 +26,8 @@ import { ModalResponse } from './ModalResponse';
 export type ComponentWithId = any;
 
 export type ModalOpts = {
+  /** Opt into compact()/expand() controls. Existing modals remain unchanged when omitted. */
+  allowCompact?: boolean;
   testId?: string;
   className?: string;
   padding?: string;
@@ -425,6 +427,24 @@ class ModalServiceClass {
     });
   }
 
+  /** Shrink an opted-in modal to a floating panel without closing or remounting it. */
+  compactEv(modalId?: string | null) {
+    this.setCompact(modalId, true);
+  }
+
+  /** Restore an opted-in modal to its original presentation. */
+  expandEv(modalId?: string | null) {
+    this.setCompact(modalId, false);
+  }
+
+  private setCompact(modalId: string | null | undefined, isCompact: boolean) {
+    if (!modalId) return;
+    const component = this.modalComponents.get(modalId);
+    if (!component?.props.allowCompact || Boolean(component.isCompact) === isCompact) return;
+    component.isCompact = isCompact;
+    pubSubService.$pub(PUB_SUB_EVENTS.reactModalCompactChange, { modalId, isCompact });
+  }
+
   /** Test-only: wipe internal state. Not for production code paths. */
   __resetForTests() {
     this.loadingModalId = null;
@@ -463,6 +483,10 @@ class ModalServiceClass {
       this.closeEv(id, r);
     };
 
+    const compactControls = opts?.allowCompact
+      ? { compact: () => this.compactEv(id), expand: () => this.expandEv(id) }
+      : {};
+
     if (opts?.wrapInModal) {
       component = (
         <WrapperModal<ResponseModel>
@@ -476,6 +500,7 @@ class ModalServiceClass {
             ? React.cloneElement(component, {
                 modalId: id,
                 close: closeFn,
+                ...compactControls,
               } as any)
             : component}
         </WrapperModal>
@@ -489,6 +514,7 @@ class ModalServiceClass {
       ...component.props,
       close: closeFn,
       ...opts,
+      ...compactControls,
     };
 
     /**

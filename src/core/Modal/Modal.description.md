@@ -37,4 +37,32 @@ Modals are typically opened using the ModalService:
 import { ModalService } from '@vanguard/Modal';
 
 // Open a modal
-ModalService.openModal('my-modal-id', { /* modal props */ });
+ModalService.open(<MyModal close={() => {}} />, { /* modal options */ });
+```
+
+### Opt-in compact mode
+
+Open a fullscreen modal with `{ allowCompact: true }` to enable a floating,
+bottom-right presentation. The consumer receives optional `compact()` and
+`expand()` methods alongside `close`; no buttons are added automatically.
+
+```tsx
+const Editor = ({ close, compact, expand }: StandardModalProps<unknown>) => (
+  <Modal fullscreen onClose={close}>
+    <button onClick={compact}>Compact</button>
+    <button onClick={expand}>Expand</button>
+    <EditorContent />
+  </Modal>
+);
+
+const id = ModalService.open(<Editor close={() => {}} />, { allowCompact: true });
+ModalService.compactEv(id);
+ModalService.expandEv(id);
+```
+
+The panel is 480px wide and at most 760px tall, bounded by the viewport with a
+16px gutter. Its content stays mounted while switching modes. Compact mode
+allows page interaction and scrolling; other open, non-compact modals still lock
+page scrolling. Closing keeps the existing callbacks and cleanup behavior.
+Calls for a closed modal or one without `allowCompact` have no effect. Mode is
+not persisted: each new modal opens in its original presentation.
