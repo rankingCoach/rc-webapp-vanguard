@@ -93,3 +93,71 @@ focusing an exposed tab lifts the rear card and shows “Bring to front” with 
 the tab promotes that card without remounting its content. Background cards are
 inert until activated. Ordinary dialogs and drawers keep their overlay slots.
 Reduced-motion preferences disable the layout transitions.
+
+### Optional moving and resizing of compact BAMs
+
+```ts
+ModalService.setCompactWindowControlsEnabled(true); // Separate flag; defaults to false.
+ModalService.setCompactMode(true);
+ModalService.setStackingEnabled(true); // Optional: also works with independent compact windows.
+```
+
+Only compact fullscreen BAMs receive invisible movement areas and edge/corner resize handles.
+The top 48px acts as an invisible title band (the outer 8px remains available for resizing).
+Dragging the sides moves an individual BAM; the center 96px moves the attached stack.
+Buttons, links, inputs, and focusable controls in the band remain interactive. Add
+`data-modal-no-drag` to a custom CTA or region to exclude it from dragging. Resizing the front attached BAM resizes the shared stack; resizing a
+floating BAM affects only that window. Drop onto another BAM to rejoin a stack.
+`returnCompactWindowToStack(id)` and `stackAllCompactWindows()` remain available for
+consumer-owned controls; no action button row is rendered inside the modal. Components stay mounted,
+so drafts and local state survive these operations. Arrow keys on the movement/resize
+handles offer keyboard control (10px steps, or 40px with Shift).
+
+Positions and sizes are constrained to the viewport, with preferred minimum dimensions
+of 320 × 240px. Geometry is kept in memory and restored when switching back from fullscreen.
+Window resize events keep compact windows reachable.
+
+`ModalService.setCompactWindowControlsEnabled(false)` removes all movement controls,
+resize handles, their listeners, and custom geometry, returning to the existing compact
+presentation. When never enabled, no window controls are mounted and geometry APIs do
+nothing. Fullscreen BAMs and regular dialogs are unaffected. Applications can also call
+`returnCompactWindowToStack(modalId)` or `stackAllCompactWindows()` while the flag is enabled.
+
+Dragging an individual compact BAM over another window highlights and slightly lifts the
+destination when at least 50% of the smaller window's area overlaps. Dropping two detached
+BAMs creates a new, independent stack at the destination. Existing stacks keep their
+members, order, position, and size. Each stack has its own center drag band, resize bounds,
+and active front window. New BAMs opened through the service join the original stack.
+
+Dropping a window onto an existing stack joins that stack. Dropping an entire stack onto
+another stack merges only those two groups, preserving the internal order of each. A
+stack can also be dropped onto a detached BAM. Windows within the dragged stack cannot
+become drop targets. Resizing and cancelled drags do not dock.
+
+`stackAllCompactWindows()` explicitly gathers every group and detached BAM into the
+original stack; `returnCompactWindowToStack(id)` returns one BAM to that original stack.
+Expanding to fullscreen temporarily presents one stack; compacting again restores the
+separate groups. Disabling window controls discards the groups and custom geometry.
+
+The threshold can be configured with `ModalService.setCompactWindowDockThreshold(50)`
+(percentage greater than 0 and at most 100). Drop-to-stack uses the same disabled-by-default
+`setCompactWindowControlsEnabled` flag.
+
+With compact window controls enabled, exposed rear strips also support dragging. A press
+keeps the window in place; release without movement brings it forward. Moving at least
+4px detaches that individual window, including a window in the middle of the stack.
+
+
+### Optional stack limit
+
+```ts
+ModalService.setMaxStackSize(3); // Keep at most three attached BAMs when stacking is enabled.
+ModalService.setMaxStackSize(); // Restore the default: no limit (null also clears it).
+```
+
+The limit applies independently to each compact stack. Opening or attaching a BAM
+beyond that stack’s limit closes its backmost BAM, keeping the incoming BAM. Promoting windows changes that order. Detached
+compact windows and ordinary dialogs do not count. The limit also applies when enabling
+stacking, lowering the maximum, gathering windows, or expanding detached compact BAMs
+back into a fullscreen stack. Closing follows the normal injected close callback and
+close-listener path with `{ isOk: false }`. The maximum must be a positive integer.

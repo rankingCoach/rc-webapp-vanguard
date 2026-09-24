@@ -80,9 +80,172 @@
     width: min(calc(480px - 2 * var(--modal-stack-depth)), calc(100vw - 2 * var(--modal-stack-side)));
   }
 
+  &:not(.modalRoot-compact) .modal-stack-activate {
+    top: 0;
+    transform: translate3d(0, var(--modal-stack-top), 0);
+    transition: transform 0.24s cubic-bezier(0.2, 0, 0, 1);
+  }
+
   &.modalRoot-stack-back .rc-modal .modal-content { pointer-events: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .modalRoot-stacked .modal-stack-activate { transition: none; }
+  .modalRoot-stacked .modal-stack-activate,
+  .modalRoot-stacked:not(.modalRoot-compact) .modal-stack-activate { transition: none; }
 }
+
+// Scoped to the independent compact-window opt-in; no controls or geometry when disabled.
+.modalRoot.modalRoot-window-controls {
+  .rc-modal.modal-compact > .modal-content,
+  .rc-modal.modal-compact > .modal-content-wrapper {
+    position: fixed;
+    box-sizing: border-box;
+    top: calc(var(--compact-window-y) - var(--modal-stack-lift, 0px));
+    left: var(--compact-window-x);
+    right: auto;
+    bottom: auto;
+    width: var(--compact-window-width);
+    max-width: var(--compact-window-width);
+    height: var(--compact-window-height);
+    max-height: none;
+    min-height: 0;
+    padding-top: 0;
+    transition: top .2s ease, left .2s ease, width .2s ease, height .2s ease;
+  }
+  &.modalRoot-stacked .rc-modal.modal-compact > .modal-content,
+  &.modalRoot-stacked .rc-modal.modal-compact > .modal-content-wrapper {
+    width: var(--compact-window-width);
+    max-width: var(--compact-window-width);
+  }
+  &.modalRoot-compact .modal-stack-activate {
+    left: var(--compact-window-x);
+    right: auto;
+    top: calc(var(--compact-window-y) - var(--modal-stack-lift, 0px));
+    width: var(--compact-window-width);
+  }
+  .compact-window-controls {
+    position: fixed;
+    z-index: 2;
+    left: var(--compact-window-x);
+    top: var(--compact-window-y);
+    width: var(--compact-window-width);
+    height: var(--compact-window-height);
+    transition: top .2s ease, left .2s ease, width .2s ease, height .2s ease;
+    pointer-events: none;
+  }
+  .modal-header { touch-action: none; }
+  .compact-window-move {
+    position: absolute;
+    top: 12px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    padding: 7px;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 10px;
+    color: var(--fn-fg);
+    background: transparent;
+    pointer-events: none;
+    touch-action: none;
+    cursor: move;
+    &-left { left: 16px; }
+    &-right { right: 16px; }
+    &-stack { left: 50%; transform: translateX(-50%); width: 48px; }
+    &:focus-visible { outline: 2px solid var(--fn-fg); outline-offset: 2px; }
+  }
+  .compact-window-resize {
+    position: absolute;
+    pointer-events: auto;
+    touch-action: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    &:focus-visible { outline: 2px solid var(--fn-fg); outline-offset: -2px; }
+    &-n, &-s { left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+    &-n { top: 0; } &-s { bottom: 0; }
+    &-e, &-w { top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+    &-e { right: 0; } &-w { left: 0; }
+    &-ne, &-nw, &-se, &-sw { width: 14px; height: 14px; }
+    &-ne { right: 0; top: 0; cursor: nesw-resize; }
+    &-nw { left: 0; top: 0; cursor: nwse-resize; }
+    &-se { right: 0; bottom: 0; cursor: nwse-resize; }
+    &-sw { left: 0; bottom: 0; cursor: nesw-resize; }
+  }
+}
+
+.modalRoot.modalRoot-window-controls.modalRoot-window-interacting .rc-modal.modal-compact {
+  > .modal-content, > .modal-content-wrapper { transition: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modalRoot.modalRoot-window-controls .rc-modal.modal-compact {
+    > .modal-content, > .modal-content-wrapper { transition: none; }
+  }
+}
+
+.modalRoot.modalRoot-window-controls.modalRoot-window-interacting {
+  .compact-window-controls,
+  .modal-stack-activate { transition: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modalRoot.modalRoot-window-controls .compact-window-controls { transition: none; }
+}
+
+// Match the move cursor's scope without changing geometry or covering actions.
+.modalRoot-window-controls.modalRoot-move-highlight {
+  .rc-modal.modal-compact > .modal-content,
+  .rc-modal.modal-compact > .modal-content-wrapper,
+  .modal-stack-activate {
+    outline: 2px solid color-mix(in srgb, var(--fn-fg-cta) 45%, transparent);
+    outline-offset: -2px;
+  }
+}
+
+.modalRoot-window-controls.modalRoot-drop-target .rc-modal.modal-compact > .modal-content,
+.modalRoot-window-controls.modalRoot-drop-target .rc-modal.modal-compact > .modal-content-wrapper {
+  outline: 2px solid var(--fn-fg-cta);
+  outline-offset: -2px;
+}
+.compact-window-drop-preview {
+  display: none;
+  position: fixed;
+  z-index: 4;
+  left: calc(var(--compact-window-x) + 12px);
+  top: calc(var(--compact-window-y) + 12px);
+  width: calc(var(--compact-window-width) - 24px);
+  height: calc(var(--compact-window-height) - 24px);
+  box-sizing: border-box;
+  border: 2px dashed var(--fn-fg-cta);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--fn-fg-cta) 10%, transparent);
+  pointer-events: none;
+}
+.modalRoot-drop-target .compact-window-drop-preview { display: block; }
+
+// Lift the destination slightly to show where the dragged window will join.
+.modalRoot.modalRoot-window-controls.modalRoot-drop-target {
+  .rc-modal.modal-compact > .modal-content,
+  .rc-modal.modal-compact > .modal-content-wrapper,
+  .compact-window-controls,
+  .modal-stack-activate,
+  .compact-window-drop-preview {
+    translate: 0 calc(-1 * min(8px, var(--compact-window-y)));
+    transition: translate .15s ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modalRoot.modalRoot-window-controls.modalRoot-drop-target {
+    .rc-modal.modal-compact > .modal-content,
+    .rc-modal.modal-compact > .modal-content-wrapper,
+    .compact-window-controls,
+    .modal-stack-activate,
+    .compact-window-drop-preview { transition: none; }
+  }
+}
+
+.modalRoot-window-controls.modalRoot-band-hover {
+  &, .rc-modal, .modal-content, .modal-content-wrapper, .modal-header { cursor: move; }
+}
+
+.modalRoot-window-controls .modal-stack-activate { touch-action: none; cursor: move; }

@@ -23,6 +23,15 @@ import { ConfirmModal } from '../StandardModals/ConfirmModal/ConfirmModal';
 import { LoadingModal } from '../StandardModals/LoadingModal/LoadingModal';
 import { ModalResponse } from './ModalResponse';
 
+export type CompactWindowBounds = { x: number; y: number; width: number; height: number };
+
+/** Keep the whole window reachable, including on viewports smaller than its preferred minimum. */
+export const clampCompactWindowBounds = (bounds: CompactWindowBounds, viewportWidth: number, viewportHeight: number): CompactWindowBounds => {
+  const width = Math.min(viewportWidth, Math.max(Math.min(320, viewportWidth), bounds.width));
+  const height = Math.min(viewportHeight, Math.max(Math.min(240, viewportHeight), bounds.height));
+  return { width, height, x: Math.max(0, Math.min(bounds.x, viewportWidth - width)), y: Math.max(0, Math.min(bounds.y, viewportHeight - height)) };
+};
+
 export type ComponentWithId = any;
 
 export type ModalOpts = {
@@ -127,6 +136,196 @@ const WrapperModal = <ResponseModel,>(
 
 class ModalServiceClass {
   private compactMode = false;
+  private compactWindowControlsEnabled = false;
+  private compactWindowInteracting = false;
+  setCompactWindowInteracting(active: boolean) {
+    if (!this.compactWindowControlsEnabled || active === this.compactWindowInteracting) return;
+    this.compactWindowInteracting = active;
+    this.notifyPresentation();
+  }
+  isCompactWindowInteracting() { return this.compactWindowInteracting; }
+  private floatingWindows = new Map<string, CompactWindowBounds>();
+  // Unassigned BAMs belong to the original stack; docked groups have their own identity.
+  private compactWindowGroups = new Map<string, string>();
+  private compactStackBounds = new Map<string, CompactWindowBounds>();
+  private compactGroupKey(id?: string) {
+    return id ? this.compactWindowGroups.get(id) ?? 'default' : 'default';
+  }
+
+  private pruneCompactGroups() {
+    const used = new Set(this.compactWindowGroups.values());
+    for (const key of this.compactStackBounds.keys()) {
+      if (key !== 'default' && !used.has(key)) this.compactStackBounds.delete(key);
+    }
+  }
+
+  /** Independent opt-in. Disabling discards custom geometry and restores the existing presentation. */
+  setCompactWindowControlsEnabled(enabled: boolean) {
+    if (this.compactWindowControlsEnabled === enabled) return;
+    this.compactWindowControlsEnabled = enabled;
+    if (!enabled) {
+      this.compactWindowInteracting = false;
+      this.floatingWindows.clear();
+      this.compactStackBounds.clear();
+      this.compactWindowGroups.clear();
+    }
+    this.enforceStackLimit();
+    this.notifyPresentation();
+  }
+
+  isCompactWindowControlsEnabled() { return this.compactWindowControlsEnabled; }
+
+  private canManageCompactWindow(id: string) {
+    const component = this.modalComponents.get(id);
+    return this.compactWindowControlsEnabled && !!component?.isCompact && !!component?.isFullscreen;
+  }
+
+  isCompactWindowDetached(id: string) {
+    return this.canManageCompactWindow(id) && this.floatingWindows.has(id);
+  }
+
+  private compactWindowDockThreshold = 50;
+
+  /** Percentage of the smaller window covered before a drop can form a stack. */
+  setCompactWindowDockThreshold(percentage: number) {
+    if (Number.isFinite(percentage) && percentage > 0 && percentage <= 100) this.compactWindowDockThreshold = percentage;
+  }
+
+  findCompactWindowDropTarget(id: string, candidates: { id: string; bounds: CompactWindowBounds }[], group = false) {
+    if (!this.canManageCompactWindow(id)) return undefined;
+    if (group && (!this.stackingEnabled || this.isCompactWindowDetached(id))) return undefined;
+    const source = group ? this.getCompactStackBounds(id) : this.floatingWindows.get(id);
+    const members = new Set(group ? this.getStackedBamIds(id) : [id]);
+    if (!source) return undefined;
+    return candidates.filter((candidate) => {
+      if (members.has(candidate.id) || !this.canManageCompactWindow(candidate.id)) return false;
+      const target = candidate.bounds;
+      const overlap = Math.max(0, Math.min(source.x + source.width, target.x + target.width) - Math.max(source.x, target.x)) *
+        Math.max(0, Math.min(source.y + source.height, target.y + target.height) - Math.max(source.y, target.y));
+      const area = Math.min(source.width * source.height, target.width * target.height);
+      return area > 0 && overlap / area >= this.compactWindowDockThreshold / 100;
+    }).sort((a, b) => OverlayStackingService.getZIndex(b.id) - OverlayStackingService.getZIndex(a.id))[0];
+  }
+
+  dockCompactWindow(id: string, candidates: { id: string; bounds: CompactWindowBounds }[], group = false) {
+    const target = this.findCompactWindowDropTarget(id, candidates, group);
+    if (!target) return;
+    const sourceMembers = group ? this.getStackedBamIds(id) : [id];
+    const targetIsStacked = this.stackingEnabled && !this.isCompactWindowDetached(target.id);
+    const targetMembers = targetIsStacked ? this.getStackedBamIds(target.id) : [target.id];
+    const groupKey = targetIsStacked ? this.compactGroupKey(target.id) : uuidv4();
+    const targetBounds = targetIsStacked ? this.getCompactStackBounds(target.id) : target.bounds;
+
+    if (!this.stackingEnabled) {
+      // Independent windows not participating in the drop must stay independent.
+      for (const candidate of candidates) {
+        if (!sourceMembers.includes(candidate.id) && !targetMembers.includes(candidate.id) && this.canManageCompactWindow(candidate.id)) {
+          this.floatingWindows.set(candidate.id, candidate.bounds);
+          this.compactWindowGroups.delete(candidate.id);
+        }
+      }
+    }
+    const combined = [...targetMembers, ...sourceMembers];
+    for (const member of combined) {
+      this.floatingWindows.delete(member);
+      this.compactWindowGroups.set(member, groupKey);
+    }
+    if (targetBounds) this.compactStackBounds.set(groupKey, clampCompactWindowBounds(targetBounds, window.innerWidth, window.innerHeight));
+    this.stackingEnabled = true;
+    // Only the participating windows change slots; other stacks keep their order and geometry.
+    OverlayStackingService.reorder(combined);
+    this.pruneCompactGroups();
+    this.enforceStackLimit();
+    this.notifyPresentation();
+  }
+
+  getCompactWindowBounds(id: string) { return this.floatingWindows.get(id); }
+  getCompactStackBounds(id?: string) { return this.compactStackBounds.get(this.compactGroupKey(id)); }
+
+  setCompactWindowBounds(id: string, bounds: CompactWindowBounds, group = false) {
+    if (!this.canManageCompactWindow(id) || !Object.values(bounds).every(Number.isFinite)) return;
+    const next = clampCompactWindowBounds(bounds, window.innerWidth, window.innerHeight);
+    if (group && this.stackingEnabled && !this.floatingWindows.has(id)) this.compactStackBounds.set(this.compactGroupKey(id), next);
+    else {
+      this.floatingWindows.set(id, next);
+      this.compactWindowGroups.delete(id);
+      this.pruneCompactGroups();
+    }
+    this.notifyPresentation();
+  }
+
+  focusCompactWindow(id: string) {
+    if (!this.canManageCompactWindow(id)) return;
+    const ids = this.getBamIds();
+    const members = this.stackingEnabled && !this.isCompactWindowDetached(id) ? this.getStackedBamIds(id) : [id];
+    const next = [...ids.filter((other) => !members.includes(other)), ...members.filter((other) => other !== id), id];
+    if (next.every((other, index) => ids[index] === other)) return;
+    OverlayStackingService.reorder(next);
+    this.notifyPresentation();
+  }
+
+  returnCompactWindowToStack(id: string) {
+    if (!this.canManageCompactWindow(id)) return;
+    this.floatingWindows.delete(id);
+    this.compactWindowGroups.delete(id);
+    this.pruneCompactGroups();
+    this.stackingEnabled = true;
+    this.focusCompactWindow(id);
+    this.enforceStackLimit();
+    this.notifyPresentation();
+  }
+
+  stackAllCompactWindows() {
+    if (!this.compactWindowControlsEnabled || !this.compactMode) return;
+    this.floatingWindows.clear();
+    this.compactWindowGroups.clear();
+    this.pruneCompactGroups();
+    this.stackingEnabled = true;
+    this.enforceStackLimit();
+    this.notifyPresentation();
+  }
+
+  /** All attached BAMs, or only the stack containing a specified BAM. */
+  getStackedBamIds(modalId?: string) {
+    const ids = this.getBamIds().filter((id) => !this.isCompactWindowDetached(id));
+    if (!modalId || !this.compactWindowControlsEnabled || !this.compactMode) return ids;
+    if (this.isCompactWindowDetached(modalId)) return [];
+    const key = this.compactGroupKey(modalId);
+    return ids.filter((id) => this.compactGroupKey(id) === key);
+  }
+
+  private maxStackSize: number | undefined;
+  private stackEvictions = new Set<string>();
+
+  /** Maximum attached BAMs. Omit/undefined/null restores unlimited stacking. */
+  setMaxStackSize(max?: number | null) {
+    if (max != null && (!Number.isInteger(max) || max < 1)) {
+      throw new RangeError('Maximum BAM stack size must be a positive integer.');
+    }
+    this.maxStackSize = max ?? undefined;
+    this.enforceStackLimit();
+  }
+
+  getMaxStackSize() { return this.maxStackSize; }
+
+  private enforceStackLimit() {
+    if (!this.stackingEnabled || this.maxStackSize === undefined) return;
+    const ids = this.getStackedBamIds().filter((id) => !this.stackEvictions.has(id));
+    const groups = new Map<string, string[]>();
+    for (const id of ids) {
+      const key = this.compactWindowControlsEnabled && this.compactMode ? this.compactGroupKey(id) : 'default';
+      const members = groups.get(key) ?? [];
+      members.push(id);
+      groups.set(key, members);
+    }
+    const closing = [...groups.values()].flatMap((members) => members.slice(0, Math.max(0, members.length - this.maxStackSize!)));
+    // Reserve the entire batch before callbacks, which may themselves open windows.
+    closing.forEach((id) => this.stackEvictions.add(id));
+    for (const id of closing) {
+      this.modalComponents.get(id)?.props.close({ isOk: false });
+    }
+  }
+
   private stackingEnabled = false;
   private presentationListeners = new Set<() => void>();
   private presentationRevision = 0;
@@ -179,7 +378,11 @@ class ModalServiceClass {
   }
 
   removeModalComponent(id: string) {
+    this.stackEvictions.delete(id);
     this.modalComponents.delete(id);
+    this.floatingWindows.delete(id);
+    this.compactWindowGroups.delete(id);
+    this.pruneCompactGroups();
     OverlayStackingService.unregister(id);
     this.notifyPresentation();
   }
@@ -453,12 +656,14 @@ class ModalServiceClass {
     this.modalComponents.forEach((component, id) => {
       if (component.isFullscreen || component.props.allowCompact) this.setCompact(id, enabled);
     });
+    this.enforceStackLimit();
     this.notifyPresentation();
   }
 
   /** Opt into the visual card stack. Disabled by default. */
   setStackingEnabled(enabled: boolean) {
     this.stackingEnabled = enabled;
+    this.enforceStackLimit();
     this.notifyPresentation();
   }
 
@@ -471,6 +676,7 @@ class ModalServiceClass {
     component.isFullscreen = fullscreen;
     if (fullscreen && this.compactMode) this.setCompact(modalId, true);
     if (!fullscreen && !component.props.allowCompact) this.setCompact(modalId, false);
+    this.enforceStackLimit();
     this.notifyPresentation();
   }
 
@@ -483,6 +689,10 @@ class ModalServiceClass {
   /** Promote within the BAM stack; unrelated dialogs/drawers retain their overlay slots. */
   bringToFront(modalId: string) {
     if (!this.stackingEnabled) return;
+    if (this.canManageCompactWindow(modalId)) {
+      this.focusCompactWindow(modalId);
+      return;
+    }
     const ids = this.getBamIds();
     if (!ids.includes(modalId) || ids.at(-1) === modalId) return;
     OverlayStackingService.reorder([...ids.filter((id) => id !== modalId), modalId]);
@@ -509,7 +719,15 @@ class ModalServiceClass {
 
   /** Test-only: wipe internal state. Not for production code paths. */
   __resetForTests() {
+    this.maxStackSize = undefined;
+    this.stackEvictions.clear();
     this.compactMode = false;
+    this.compactWindowControlsEnabled = false;
+    this.compactWindowDockThreshold = 50;
+    this.compactWindowInteracting = false;
+    this.floatingWindows.clear();
+    this.compactStackBounds.clear();
+    this.compactWindowGroups.clear();
     this.stackingEnabled = false;
     this.loadingModalId = null;
     this.confirmModalId = null;
@@ -601,6 +819,7 @@ class ModalServiceClass {
       modalId: id,
       animation: opts?.animation || 'grow',
     });
+    this.enforceStackLimit();
     this.notifyPresentation();
     return id;
   }

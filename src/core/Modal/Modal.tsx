@@ -118,14 +118,14 @@ export const Modal = (props: Props) => {
         return;
       }
       // Only the topmost Esc-enabled modal reacts.
-      const isTopmost = modalId && ModalService.isStackingEnabled()
+      const isTopmost = modalId && (ModalService.isStackingEnabled() || (isCompact && ModalService.isCompactWindowControlsEnabled()))
         ? OverlayStackingService.getZIndex(modalId) === OverlayStackingService.getTopmostZIndex('modal')
         : escStack[escStack.length - 1] === escTokenRef.current;
       if (!isTopmost) {
         return;
       }
       onClose();
-    }, [shouldCloseOnEsc, onClose, modalId]),
+    }, [shouldCloseOnEsc, onClose, modalId, isCompact]),
   );
 
   /**

@@ -279,6 +279,15 @@
 
   > .modal-content-wrapper > .modal-content { width: 100%; height: 100%; border-radius: var(--modal-stack-radius); }
 
+  // Expanded BAMs span the viewport. Interpolating their top/height reflows the
+  // entire editor every frame. Commit the new size once and animate only movement.
+  &:not(.modal-compact) > .modal-content,
+  &:not(.modal-compact) > .modal-content-wrapper {
+    top: 0;
+    transform: translate3d(0, var(--modal-stack-top), 0);
+    transition: transform 0.24s cubic-bezier(0.2, 0, 0, 1);
+  }
+
   &.modal-compact > .modal-content,
   &.modal-compact > .modal-content-wrapper {
     width: min(calc(480px - 2 * var(--modal-stack-depth)), calc(100vw - 2 * var(--modal-stack-side)));
@@ -294,6 +303,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    > .modal-content, > .modal-content-wrapper { transition: none; }
+    > .modal-content, > .modal-content-wrapper,
+    &:not(.modal-compact) > .modal-content,
+    &:not(.modal-compact) > .modal-content-wrapper { transition: none; }
   }
 }

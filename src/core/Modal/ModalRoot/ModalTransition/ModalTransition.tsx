@@ -1,4 +1,5 @@
 import React, { useSyncExternalStore } from 'react';
+import { compactWindowLayout, CompactWindowControls } from '../CompactWindowControls';
 import { ModalService } from '../../ModalService';
 import { Text } from '@vanguard/Text/Text';
 import { animated, TransitionFn, useTransition } from 'react-spring';
@@ -14,10 +15,17 @@ interface Props {
   animation: ModalTransition;
 }
 
+// Geometry updates must not invalidate every modal consumer's context on each pointer frame.
+const ModalPresentation = ({ children, allowCompact, isCompact, modalId, stacked, active }:
+  React.ContextType<typeof ModalPresentationContext> & { children: React.ReactNode }) => {
+  const value = React.useMemo(() => ({ allowCompact, isCompact, modalId, stacked, active }),
+    [allowCompact, isCompact, modalId, stacked, active]);
+  return <ModalPresentationContext.Provider value={value}>{children}</ModalPresentationContext.Provider>;
+};
+
 export const ModalTransition = (props: Props) => {
   const { modalsList, animation } = props;
   useSyncExternalStore(ModalService.subscribePresentation, ModalService.getPresentationRevision, ModalService.getPresentationRevision);
-  const bamIds = ModalService.getBamIds();
   const { getModal, getModalZIndex } = useModalContext();
 
   let transition: TransitionPropertiesType;
@@ -81,10 +89,17 @@ export const ModalTransition = (props: Props) => {
   return transition((animationProps, modalId: string) => {
     const modalComponent = getModal(modalId);
     const zIndex = getModalZIndex(modalId);
+    const bamIds = ModalService.getStackedBamIds(modalId);
     const index = bamIds.indexOf(modalId);
     const stacked = ModalService.isStackingEnabled() && index >= 0 && bamIds.length > 1;
     const active = !stacked || index === bamIds.length - 1;
     const compact = !!modalComponent?.isCompact;
+    const windowControls = ModalService.isCompactWindowControlsEnabled() && compact && !!modalComponent?.isFullscreen;
+    const layout = windowControls ? compactWindowLayout(modalId, index, bamIds.length, stacked) : undefined;
+    const windowStyle = layout ? {
+      '--compact-window-x': `${layout.panel.x}px`, '--compact-window-y': `${layout.panel.y}px`,
+      '--compact-window-width': `${layout.panel.width}px`, '--compact-window-height': `${layout.panel.height}px`,
+    } : {};
     const step = Math.min(28, 140 / Math.max(1, bamIds.length - 1));
     const stackStyle = stacked ? {
       '--modal-stack-offset': `${index * step}px`,
@@ -97,11 +112,14 @@ export const ModalTransition = (props: Props) => {
       modalId &&
       modalComponent && (
         <animated.div
-          style={{ opacity: animationProps.bgOpacity, zIndex, ...stackStyle } as any}
+          style={{ opacity: animationProps.bgOpacity, zIndex, ...stackStyle, ...windowStyle } as any}
           data-modal-id={modalId}
           data-stack-active={stacked ? active : undefined}
-          className={`modalRoot${compact ? ' modalRoot-compact' : ''}${stacked ? ' modalRoot-stacked' : ''}${stacked && !active ? ' modalRoot-stack-back' : ''}`}
+          className={`modalRoot${compact ? ' modalRoot-compact' : ''}${stacked ? ' modalRoot-stacked' : ''}${stacked && !active ? ' modalRoot-stack-back' : ''}${windowControls ? ' modalRoot-window-controls' : ''}${windowControls && ModalService.isCompactWindowInteracting() ? ' modalRoot-window-interacting' : ''}`}
+          onPointerDownCapture={windowControls && active ? () => ModalService.focusCompactWindow(modalId) : undefined}
         >
+          {windowControls && <div className="compact-window-drop-preview" aria-hidden="true" />}
+          {windowControls && <CompactWindowControls id={modalId} title={title} index={index} count={bamIds.length} stacked={stacked} active={active} />}
           {stacked && !active && (
             <button className="modal-stack-activate" onClick={() => ModalService.bringToFront(modalId)}>
               <Text replacements={{ title }}>Bring to front %title%</Text>
@@ -112,13 +130,11 @@ export const ModalTransition = (props: Props) => {
             style={{ transform: animationProps.transform, opacity: animationProps.opacity }}
             className={'modalRoot-container'}
           >
-            <ModalPresentationContext.Provider value={{
-              allowCompact: !!modalComponent.props.allowCompact || !!modalComponent.compactManaged,
-              isCompact: compact,
-              modalId, stacked, active,
-            }}>
+            <ModalPresentation
+              allowCompact={!!modalComponent.props.allowCompact || !!modalComponent.compactManaged}
+              isCompact={compact} modalId={modalId} stacked={stacked} active={active}>
               {modalComponent}
-            </ModalPresentationContext.Provider>
+            </ModalPresentation>
           </animated.div>
         </animated.div>
       )
