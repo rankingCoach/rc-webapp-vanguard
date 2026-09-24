@@ -32,3 +32,57 @@
   background-color: transparent;
   pointer-events: none;
 }
+
+.modalRoot-stacked {
+  --modal-stack-lift: 0px;
+  --modal-stack-top: calc(16px + var(--modal-stack-offset) - var(--modal-stack-lift));
+  --modal-stack-side: 0px;
+  --modal-stack-bottom: 0px;
+  --modal-stack-radius: 24px 24px 0 0;
+  pointer-events: none;
+
+  &.modalRoot-compact {
+    --modal-stack-top: calc(max(16px, 100dvh - 776px) + var(--modal-stack-offset) - var(--modal-stack-lift));
+    --modal-stack-side: calc(16px + var(--modal-stack-depth));
+    --modal-stack-bottom: 16px;
+    --modal-stack-radius: 24px;
+  }
+
+  &.modalRoot-stack-back:has(.modal-stack-activate:hover),
+  &.modalRoot-stack-back:has(.modal-stack-activate:focus-visible) {
+    --modal-stack-lift: 12px;
+  }
+
+  .modal-stack-activate {
+    position: fixed;
+    z-index: 1;
+    top: var(--modal-stack-top);
+    right: var(--modal-stack-side);
+    width: calc(100vw - 2 * var(--modal-stack-side));
+    height: var(--modal-stack-tab-height);
+    padding: 0 16px;
+    border: 0;
+    border-radius: 24px 24px 0 0;
+    background: var(--fn-bg-var);
+    color: var(--fn-fg);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: top 0.3s ease, height 0.3s ease;
+
+    .rc-text { opacity: 0; transition: opacity 0.15s ease; }
+    &:hover, &:focus-visible {
+      height: calc(var(--modal-stack-tab-height) + 12px);
+      .rc-text { opacity: 1; }
+    }
+  }
+
+  &.modalRoot-compact .modal-stack-activate {
+    width: min(calc(480px - 2 * var(--modal-stack-depth)), calc(100vw - 2 * var(--modal-stack-side)));
+  }
+
+  &.modalRoot-stack-back .rc-modal .modal-content { pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modalRoot-stacked .modal-stack-activate { transition: none; }
+}

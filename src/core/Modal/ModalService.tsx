@@ -28,6 +28,8 @@ export type ComponentWithId = any;
 export type ModalOpts = {
   /** Opt into compact()/expand() controls. Existing modals remain unchanged when omitted. */
   allowCompact?: boolean;
+  /** Label shown on the exposed stacking tab. */
+  stackTitle?: string;
   testId?: string;
   className?: string;
   padding?: string;
@@ -124,6 +126,23 @@ const WrapperModal = <ResponseModel,>(
  */
 
 class ModalServiceClass {
+  private compactMode = false;
+  private stackingEnabled = false;
+  private presentationListeners = new Set<() => void>();
+  private presentationRevision = 0;
+
+  subscribePresentation = (listener: () => void) => {
+    this.presentationListeners.add(listener);
+    return () => { this.presentationListeners.delete(listener); };
+  };
+
+  getPresentationRevision = () => this.presentationRevision;
+
+  private notifyPresentation() {
+    this.presentationRevision++;
+    this.presentationListeners.forEach((listener) => listener());
+  }
+
   private loadingModalId: null | string;
   private confirmModalId: null | string;
   private errorModalId: null | string;
@@ -162,6 +181,7 @@ class ModalServiceClass {
   removeModalComponent(id: string) {
     this.modalComponents.delete(id);
     OverlayStackingService.unregister(id);
+    this.notifyPresentation();
   }
 
   openConfirmModal(options: OpenConfirmModalOptions): string;
@@ -427,26 +447,70 @@ class ModalServiceClass {
     });
   }
 
-  /** Shrink an opted-in modal to a floating panel without closing or remounting it. */
-  compactEv(modalId?: string | null) {
-    this.setCompact(modalId, true);
+  /** Enable/disable the shared compact presentation for ALL fullscreen BAMs. */
+  setCompactMode(enabled: boolean) {
+    this.compactMode = enabled;
+    this.modalComponents.forEach((component, id) => {
+      if (component.isFullscreen || component.props.allowCompact) this.setCompact(id, enabled);
+    });
+    this.notifyPresentation();
   }
 
-  /** Restore an opted-in modal to its original presentation. */
-  expandEv(modalId?: string | null) {
-    this.setCompact(modalId, false);
+  /** Opt into the visual card stack. Disabled by default. */
+  setStackingEnabled(enabled: boolean) {
+    this.stackingEnabled = enabled;
+    this.notifyPresentation();
   }
 
-  private setCompact(modalId: string | null | undefined, isCompact: boolean) {
-    if (!modalId) return;
+  isStackingEnabled() { return this.stackingEnabled; }
+
+  /** Fullscreen Modal reports its actual presentation, even through consumer wrappers. */
+  registerFullscreen(modalId: string, fullscreen: boolean) {
     const component = this.modalComponents.get(modalId);
-    if (!component?.props.allowCompact || Boolean(component.isCompact) === isCompact) return;
+    if (!component || component.isFullscreen === fullscreen) return;
+    component.isFullscreen = fullscreen;
+    if (fullscreen && this.compactMode) this.setCompact(modalId, true);
+    if (!fullscreen && !component.props.allowCompact) this.setCompact(modalId, false);
+    this.notifyPresentation();
+  }
+
+  getBamIds() {
+    return [...this.modalComponents.keys()]
+      .filter((id) => this.modalComponents.get(id)?.isFullscreen)
+      .sort((a, b) => OverlayStackingService.getZIndex(a) - OverlayStackingService.getZIndex(b));
+  }
+
+  /** Promote within the BAM stack; unrelated dialogs/drawers retain their overlay slots. */
+  bringToFront(modalId: string) {
+    if (!this.stackingEnabled) return;
+    const ids = this.getBamIds();
+    if (!ids.includes(modalId) || ids.at(-1) === modalId) return;
+    OverlayStackingService.reorder([...ids.filter((id) => id !== modalId), modalId]);
+    this.notifyPresentation();
+  }
+
+  /** Consumer control: compact the entire BAM group. */
+  compactEv(modalId?: string | null) {
+    if (modalId && this.modalComponents.get(modalId)?.props.allowCompact) this.setCompactMode(true);
+  }
+
+  /** Consumer control: expand the entire BAM group. */
+  expandEv(modalId?: string | null) {
+    if (modalId && this.modalComponents.get(modalId)?.props.allowCompact) this.setCompactMode(false);
+  }
+
+  private setCompact(modalId: string, isCompact: boolean) {
+    const component = this.modalComponents.get(modalId);
+    if (!component || Boolean(component.isCompact) === isCompact) return;
+    component.compactManaged = true;
     component.isCompact = isCompact;
     pubSubService.$pub(PUB_SUB_EVENTS.reactModalCompactChange, { modalId, isCompact });
   }
 
   /** Test-only: wipe internal state. Not for production code paths. */
   __resetForTests() {
+    this.compactMode = false;
+    this.stackingEnabled = false;
     this.loadingModalId = null;
     this.confirmModalId = null;
     this.errorModalId = null;
@@ -526,6 +590,9 @@ class ModalServiceClass {
         ...props,
       },
       modalId: id,
+      isFullscreen: !!opts?.fullscreen,
+      isCompact: this.compactMode && !!(opts?.fullscreen || opts?.allowCompact),
+      compactManaged: this.compactMode && !!(opts?.fullscreen || opts?.allowCompact),
     });
 
     OverlayStackingService.register(id, 'modal', opts?.baseZIndex);
@@ -534,6 +601,7 @@ class ModalServiceClass {
       modalId: id,
       animation: opts?.animation || 'grow',
     });
+    this.notifyPresentation();
     return id;
   }
 

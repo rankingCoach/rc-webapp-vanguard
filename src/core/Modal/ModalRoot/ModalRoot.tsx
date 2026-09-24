@@ -5,7 +5,7 @@ import { IconNames } from '@vanguard/Icon/IconNames';
 import { ModalFooterAction, SubButtonProps } from '@vanguard/Modal/ModalFooter/ModalFooter';
 import { ModalType } from '@vanguard/Modal/Modalheader/ModalHeader';
 import { useGetModals } from '@vanguard/Modal/ModalRoot/use-get-modals';
-import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useSyncExternalStore } from 'react';
 
 import { useModalContext } from '../ModalContext';
 import { ModalResponse } from '../ModalResponse';
@@ -34,11 +34,12 @@ export type StandardModalProps<T> = {
 };
 
 export const ModalRoot = () => {
-  const { modalRootState, addModal, removeModal, compactModals, setModalCompact } = useModalContext();
+  const { modalRootState, addModal, removeModal, setModalCompact } = useModalContext();
+  useSyncExternalStore(ModalService.subscribePresentation, ModalService.getPresentationRevision, ModalService.getPresentationRevision);
   const subscriptionsRef = useRef<any[]>([]);
 
   const { growModals, slideModals, popModals } = useGetModals(modalRootState);
-  const hasBlockingModal = [...growModals, ...slideModals, ...popModals].some((id) => !compactModals[id]);
+  const hasBlockingModal = [...growModals, ...slideModals, ...popModals].some((id) => !ModalService.getModalComponent(id)?.isCompact);
 
   useEffect(() => {
     // Clean up previous subscriptions

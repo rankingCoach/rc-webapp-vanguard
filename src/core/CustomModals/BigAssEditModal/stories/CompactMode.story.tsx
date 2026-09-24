@@ -37,7 +37,7 @@ const CompactEditor = ({ close, compact, expand }: StandardModalProps<unknown>) 
 };
 
 const BlockingSibling = ({ close }: StandardModalProps<unknown>) => (
-  <Modal onClose={close} testId="compact-sibling"><span>Blocking sibling</span></Modal>
+  <Modal fullscreen={false} onClose={close} testId="compact-sibling"><span>Blocking sibling</span></Modal>
 );
 
 const Demo = ({ allowCompact = true }: { allowCompact?: boolean }) => {

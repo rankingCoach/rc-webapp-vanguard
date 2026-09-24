@@ -5,11 +5,12 @@ import { classNames } from '@helpers/classNames';
 import { deviceService } from '@services/device.service.ts';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { IconNames } from '@vanguard/Icon/IconNames';
-import { ModalOpts } from '@vanguard/Modal/ModalService';
+import { ModalService, ModalOpts } from '@vanguard/Modal/ModalService';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 
 import { ModalResponse } from './ModalResponse';
 import { ModalPresentationContext } from './ModalPresentationContext';
+import { OverlayStackingService } from '../OverlayStacking/OverlayStackingService';
 
 type Props = {
   children?: React.ReactNode;
@@ -51,7 +52,7 @@ const escStack: symbol[] = [];
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const Modal = (props: Props) => {
-  const { allowCompact, isCompact } = useContext(ModalPresentationContext);
+  const { allowCompact, isCompact, modalId, stacked, active } = useContext(ModalPresentationContext);
   const {
     children,
     className,
@@ -84,11 +85,15 @@ export const Modal = (props: Props) => {
     maxWidth = undefined;
   }
 
+  useEffect(() => {
+    if (modalId) ModalService.registerFullscreen(modalId, !!fullscreen);
+  }, [modalId, fullscreen]);
+
   /**
    * Close behavior
    */
   const shouldRenderCloseBtn = !!onClose && showCloseButton;
-  const shouldCloseOnEsc = !!onClose && closeOnEsc;
+  const shouldCloseOnEsc = !!onClose && closeOnEsc && (!stacked || active);
   const shouldCloseOnOutsideClick = !!onClose && closeOnOutsideClick;
 
   // Register this instance on the Esc stack while Esc-to-close is enabled.
@@ -113,11 +118,14 @@ export const Modal = (props: Props) => {
         return;
       }
       // Only the topmost Esc-enabled modal reacts.
-      if (escStack[escStack.length - 1] !== escTokenRef.current) {
+      const isTopmost = modalId && ModalService.isStackingEnabled()
+        ? OverlayStackingService.getZIndex(modalId) === OverlayStackingService.getTopmostZIndex('modal')
+        : escStack[escStack.length - 1] === escTokenRef.current;
+      if (!isTopmost) {
         return;
       }
       onClose();
-    }, [shouldCloseOnEsc, onClose]),
+    }, [shouldCloseOnEsc, onClose, modalId]),
   );
 
   /**
@@ -127,7 +135,7 @@ export const Modal = (props: Props) => {
     const positionClass = `modal-position-${modalPosition}`;
     const fullscreenClass = fullscreen ? 'modal-fullscreen' : '';
     return classNames(positionClass, fullscreenClass, className,
-      allowCompact ? 'modal-compact-enabled' : '', isCompact ? 'modal-compact' : '');
+      allowCompact ? 'modal-compact-enabled' : '', isCompact ? 'modal-compact' : '', stacked ? 'modal-stacked' : '');
   };
 
   const getContentStyle = () => {

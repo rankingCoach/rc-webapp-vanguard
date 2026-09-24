@@ -40,7 +40,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const modalsRef = useRef<Map<string, any>>(new Map());
   const [compactModals, setCompactModals] = useState<Record<string, boolean>>({});
   const setModalCompact = useCallback((modalId: string, isCompact: boolean) => {
-    if (!modalsRef.current.get(modalId)?.props.allowCompact) return;
+    if (!modalsRef.current.has(modalId)) return;
     setCompactModals((prev) => ({ ...prev, [modalId]: isCompact }));
   }, []);
   const [modalRootState, setModalRootState] = useState<ModalRootState>({

@@ -60,9 +60,36 @@ ModalService.compactEv(id);
 ModalService.expandEv(id);
 ```
 
+Compact and expand controls now switch **all fullscreen BAMs together**, including
+BAMs inside consumer wrappers and BAMs opened while compact mode is active.
+Ordinary non-fullscreen dialogs retain their existing presentation.
+
 The panel is 480px wide and at most 760px tall, bounded by the viewport with a
 16px gutter. Its content stays mounted while switching modes. Compact mode
 allows page interaction and scrolling; other open, non-compact modals still lock
 page scrolling. Closing keeps the existing callbacks and cleanup behavior.
 Calls for a closed modal or one without `allowCompact` have no effect. Mode is
-not persisted: each new modal opens in its original presentation.
+not persisted to storage. It remains active for this service until explicitly expanded.
+
+### Service-level presentation modes
+
+```tsx
+ModalService.setCompactMode(true); // Compact all current and future BAMs
+ModalService.setCompactMode(false); // Expand all BAMs
+
+ModalService.setStackingEnabled(true); // Opt into overlapping cards
+const id = ModalService.open(<BusinessProfile close={() => {}} />, {
+  allowCompact: true,
+  stackTitle: "Business profile",
+});
+ModalService.bringToFront(id);
+ModalService.setStackingEnabled(false); // Return to ordinary modal presentation
+```
+
+Stacking is disabled by default and works in both fullscreen and compact mode.
+Each newer card sits slightly lower, exposing the cards behind it. Hovering or
+focusing an exposed tab lifts the rear card and shows “Bring to front” with its
+`stackTitle` (falling back to its string `title`). Clicking or pressing Enter on
+the tab promotes that card without remounting its content. Background cards are
+inert until activated. Ordinary dialogs and drawers keep their overlay slots.
+Reduced-motion preferences disable the layout transitions.
