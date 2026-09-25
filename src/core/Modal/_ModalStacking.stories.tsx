@@ -109,6 +109,41 @@ const exerciseStack = async ({ canvasElement }: { canvasElement: HTMLElement }) 
 };
 
 export const FullscreenStack = { render: () => <Demo />, play: exerciseStack };
+export const FullscreenTabs = { render: () => <Demo />, play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement);
+  await userEvent.click(canvas.getByRole('button', { name: 'Open three BAMs' }));
+  const assistant = await canvas.findByTestId('stack-Assistant');
+  expect(canvas.queryByRole('tablist')).toBeNull();
+  await userEvent.type(within(assistant).getByRole('textbox'), 'Preserved across tabs');
+  await userEvent.click(within(assistant).getByRole('button', { name: 'Open another BAM' }));
+  const tabs = await canvas.findByRole('tablist', { name: 'Open windows' });
+  const labels = () => within(tabs).getAllByRole('tab').map((tab) => tab.textContent);
+  const order = labels();
+  expect(order).toEqual(['Business profile', 'Website', 'Assistant', 'New window']);
+  expect(canvas.queryByRole('button', { name: /Bring to front/ })).toBeNull();
+  await userEvent.click(within(tabs).getByRole('tab', { name: 'Assistant' }));
+  expect(within(assistant).getByRole('textbox')).toHaveValue('Preserved across tabs');
+  expect(labels()).toEqual(order);
+  await userEvent.keyboard('{Home}');
+  expect(within(tabs).getByRole('tab', { name: 'Business profile' })).toHaveAttribute('aria-selected', 'true');
+  await userEvent.keyboard('{End}');
+  expect(within(tabs).getByRole('tab', { name: 'New window' })).toHaveAttribute('aria-selected', 'true');
+  const added = canvas.getByTestId('stack-New window');
+  await waitFor(() => {
+    const rect = added.querySelector('.modal-content')!.getBoundingClientRect();
+    expect(rect.top).toBe(48);
+    expect(rect.bottom).toBe(window.innerHeight);
+    expect(rect.width).toBe(window.innerWidth);
+  });
+  await userEvent.click(within(added).getByRole('button', { name: 'Compact all BAMs' }));
+  expect(canvas.queryByRole('tablist')).toBeNull();
+  await userEvent.click(within(added).getByRole('button', { name: 'Expand all BAMs' }));
+  expect(canvas.getAllByRole('tab')).toHaveLength(4);
+  await userEvent.click(within(added).getByRole('button', { name: 'Cancel', exact: true }));
+  await waitFor(() => expect(canvas.queryByRole('tablist')).toBeNull());
+  expect(canvas.getAllByRole('button', { name: /Bring to front/ })).toHaveLength(2);
+  ModalService.closeAllModals();
+} };
 export const CompactStack = { render: () => <Demo compact />, play: exerciseStack };
 export const MovableCompactWindows = { render: () => <Demo compact windowControls />, play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const canvas = within(canvasElement);

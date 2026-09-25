@@ -11,7 +11,7 @@ export type { ModalResponse } from './ModalResponse';
 export type { ModalState } from './ModalRoot/ModalRoot';
 export type { ModalResponseHandler, StandardModalProps } from './ModalRoot/ModalRoot';
 export { ModalRoot } from './ModalRoot/ModalRoot';
-export type { ComponentWithId, ModalOpts } from './ModalService';
+export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './ModalService';
 export { ModalService } from './ModalService';
 export { ModalSplitView } from './ModalSplitView/ModalSplitView';
 export type { Step } from './ModalStepper/ModalStepper';

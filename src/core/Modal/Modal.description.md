@@ -87,6 +87,11 @@ ModalService.setStackingEnabled(false); // Return to ordinary modal presentation
 ```
 
 Stacking is disabled by default and works in both fullscreen and compact mode.
+With more than three expanded fullscreen BAMs, a single horizontal tab bar replaces
+the overlapping rear strips. Tabs preserve their order when switching, scroll
+horizontally when necessary, and support Left/Right arrows and Home/End. Closing
+back down to three restores the overlapping stack. Compact BAMs always retain
+their card stacks, regardless of count.
 Each newer card sits slightly lower, exposing the cards behind it. Hovering or
 focusing an exposed tab lifts the rear card and shows “Bring to front” with its
 `stackTitle` (falling back to its string `title`). Clicking or pressing Enter on
@@ -161,3 +166,105 @@ compact windows and ordinary dialogs do not count. The limit also applies when e
 stacking, lowering the maximum, gathering windows, or expanding detached compact BAMs
 back into a fullscreen stack. Closing follows the normal injected close callback and
 close-listener path with `{ isOk: false }`. The maximum must be a positive integer.
+
+## Optional window metadata and lifecycle events
+
+Pass `windowMetadata` to `ModalService.open` to register a window for consumer-owned
+routing or workspace integration. Omitting it leaves the modal outside this API.
+This opt-in is independent of compact/stacking flags. Vanguard never reads the
+metadata, changes the URL, accesses browser history, or persists window state.
+
+```tsx
+const id = ModalService.open(<BusinessProfile close={() => {}} />, {
+  allowCompact: true,
+  stackTitle: 'Business profile',
+  windowMetadata: {
+    route: '/customer/app/projects/42/presence/profile',
+    projectId: 42,
+    kind: 'business-profile',
+  },
+});
+
+ModalService.getWindow(id);      // { id, metadata } | undefined
+ModalService.getWindows();       // opted-in windows, in opening order
+ModalService.getActiveWindow();  // highest opted-in window in the overlay order, or null
+
+// Replace the entire metadata record (does not activate or rerender the window).
+ModalService.setWindowMetadata(id, {
+  route: '/customer/app/projects/42/presence/profile?section=hours',
+  projectId: 42,
+  kind: 'business-profile',
+});
+```
+
+`ModalWindowMetadata`, `ModalWindow`, and `ModalWindowEvent` are exported types.
+Metadata is an opaque read-only record with unknown values. Records are shallow
+copied/frozen; treat nested values as immutable too. Prefer plain serializable
+route/record identifiers if your application will persist them. Setting metadata
+on an unknown or non-opted-in modal is a no-op.
+
+`subscribeWindowEvents(callback)` returns an unsubscribe function. Events are
+synchronous notifications with these discriminated shapes:
+
+| `type` | Fields | Meaning |
+| --- | --- | --- |
+| `activated` | `window`, `previousWindowId`, `reason` | Active opted-in window changed. Reason is `open`, `focus`, `dock`, or `close`. |
+| `closed` | `window`, `wasActive`, `activeWindow` | Window removed from the service; includes its last metadata and the remaining active window or `null`. |
+| `metadataChanged` | `window`, `isActive` | Consumer explicitly replaced a window's metadata. |
+
+Opening emits activation before `open()` returns: use the event's `window.id`,
+not a variable assigned from the return value. Subscribing does not replay events;
+read the snapshots after subscribing to initialize a coordinator. Closing emits
+`closed` first, then `activated` if the active window was replaced. Closing a
+background window emits only `closed`. Duplicate removal does not emit again.
+The close notification means service removal, not completion of the exit animation.
+It covers normal close, `closeAllModals`, and stack-limit eviction. Bulk close can
+emit intermediate activations; a coordinator clearing a workspace should suppress
+URL writes until its bulk operation completes. Subscriber exceptions are logged
+and isolated from modal operations and other subscribers.
+
+Activation means the highest **opted-in window**, not DOM focus or the highest
+arbitrary dialog. An ordinary confirmation dialog does not take over its URL.
+Repeated focus, dragging/resizing, hovering, compact/expand, and geometry-only
+stack changes do not emit activation. Existing bring-to-front controls, fullscreen
+tabs, and compact-window focus report actual changes in active window identity.
+Geometry subscriptions (`subscribePresentation`) should not drive routing.
+
+### Consumer routing example
+
+Install one coordinator inside the application's router. The following function
+accepts the application's URL writer; Vanguard has no router dependency:
+
+```ts
+import { ModalService, type ModalWindow } from 'vanguard';
+
+function connectWindowRoutes(
+  writeRoute: (route: string, mode: 'push' | 'replace') => void,
+  baseRoute: string,
+) {
+  const reflect = (window: ModalWindow | null, mode: 'push' | 'replace') => {
+    const route = window?.metadata.route;
+    if (typeof route === 'string') writeRoute(route, mode);
+    else if (!window) writeRoute(baseRoute, 'replace');
+  };
+  const unsubscribe = ModalService.subscribeWindowEvents((event) => {
+    if (event.type === 'activated') {
+      reflect(event.window, event.reason === 'open' ? 'push' : 'replace');
+    } else if (event.type === 'metadataChanged' && event.isActive) {
+      reflect(event.window, 'replace');
+    } else if (event.type === 'closed' && event.wasActive && !event.activeWindow) {
+      reflect(null, 'replace');
+    }
+  });
+  reflect(ModalService.getActiveWindow(), 'replace');
+  return unsubscribe; // return from the consumer's effect cleanup
+}
+```
+
+The application must validate route metadata, preserve unrelated URL parameters,
+avoid writing an already-current URL, and guard URL-driven restoration against
+writing back into history. Back/Forward, deep-link resolution, duplicate-window
+policy, account/project scope, unsaved drafts, and reload restoration remain
+application responsibilities. Do not use an application navigation helper that
+closes every modal when reflecting a window's URL. Layout/group geometry belongs
+in workspace/session state, not the active window's shareable URL.

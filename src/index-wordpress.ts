@@ -95,7 +95,7 @@ export type { ModalResponseHandler, ModalState, StandardModalProps } from './cor
 export { ModalRoot } from './core/Modal/ModalRoot/ModalRoot.tsx';
 
 // ModalService
-export type { ComponentWithId, ModalOpts } from './core/Modal/ModalService.tsx';
+export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './core/Modal/ModalService.tsx';
 export { ModalService } from './core/Modal/ModalService.tsx';
 
 // PageSectionLoading

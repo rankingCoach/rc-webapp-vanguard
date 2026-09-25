@@ -6,6 +6,7 @@ import { animated, TransitionFn, useTransition } from 'react-spring';
 
 import { useModalContext } from '../../ModalContext';
 import { ModalPresentationContext } from '../../ModalPresentationContext';
+import { useGetModals } from '../use-get-modals';
 
 type TransitionPropertiesType = TransitionFn<string, { transform: string; bgOpacity: number; opacity: number }>;
 export type ModalTransition = 'slide' | 'grow' | 'pop';
@@ -26,7 +27,13 @@ const ModalPresentation = ({ children, allowCompact, isCompact, modalId, stacked
 export const ModalTransition = (props: Props) => {
   const { modalsList, animation } = props;
   useSyncExternalStore(ModalService.subscribePresentation, ModalService.getPresentationRevision, ModalService.getPresentationRevision);
-  const { getModal, getModalZIndex } = useModalContext();
+  const { getModal, getModalZIndex, modalRootState } = useModalContext();
+  // Keep browser-style tabs stable, independent of the overlay order.
+  const visibleIds = Object.values(useGetModals(modalRootState)).flat();
+  const expandedIds = ModalService.getBamIds().filter((id) => visibleIds.includes(id) && !getModal(id)?.isCompact);
+  const tabbed = ModalService.isStackingEnabled() && expandedIds.length > 3;
+  const tabIds = tabbed ? visibleIds.filter((id) => expandedIds.includes(id)) : [];
+  const activeTabId = expandedIds.at(-1);
 
   let transition: TransitionPropertiesType;
   let animationDuration: number;
@@ -86,7 +93,7 @@ export const ModalTransition = (props: Props) => {
    * Return Animated Modal
    * -------------------------------------------------------------------------------------------------------------------
    */
-  return transition((animationProps, modalId: string) => {
+  return <>{transition((animationProps, modalId: string) => {
     const modalComponent = getModal(modalId);
     const zIndex = getModalZIndex(modalId);
     const bamIds = ModalService.getStackedBamIds(modalId);
@@ -94,6 +101,7 @@ export const ModalTransition = (props: Props) => {
     const stacked = ModalService.isStackingEnabled() && index >= 0 && bamIds.length > 1;
     const active = !stacked || index === bamIds.length - 1;
     const compact = !!modalComponent?.isCompact;
+    const hasTabs = tabbed && tabIds.includes(modalId);
     const windowControls = ModalService.isCompactWindowControlsEnabled() && compact && !!modalComponent?.isFullscreen;
     const layout = windowControls ? compactWindowLayout(modalId, index, bamIds.length, stacked) : undefined;
     const windowStyle = layout ? {
@@ -115,17 +123,20 @@ export const ModalTransition = (props: Props) => {
           style={{ opacity: animationProps.bgOpacity, zIndex, ...stackStyle, ...windowStyle } as any}
           data-modal-id={modalId}
           data-stack-active={stacked ? active : undefined}
-          className={`modalRoot${compact ? ' modalRoot-compact' : ''}${stacked ? ' modalRoot-stacked' : ''}${stacked && !active ? ' modalRoot-stack-back' : ''}${windowControls ? ' modalRoot-window-controls' : ''}${windowControls && ModalService.isCompactWindowInteracting() ? ' modalRoot-window-interacting' : ''}`}
+          className={`modalRoot${compact ? ' modalRoot-compact' : ''}${stacked ? ' modalRoot-stacked' : ''}${hasTabs ? ' modalRoot-tabbed' : ''}${stacked && !active ? ' modalRoot-stack-back' : ''}${windowControls ? ' modalRoot-window-controls' : ''}${windowControls && ModalService.isCompactWindowInteracting() ? ' modalRoot-window-interacting' : ''}`}
           onPointerDownCapture={windowControls && active ? () => ModalService.focusCompactWindow(modalId) : undefined}
         >
           {windowControls && <div className="compact-window-drop-preview" aria-hidden="true" />}
           {windowControls && <CompactWindowControls id={modalId} title={title} index={index} count={bamIds.length} stacked={stacked} active={active} />}
-          {stacked && !active && (
+          {stacked && !active && !hasTabs && (
             <button className="modal-stack-activate" onClick={() => ModalService.bringToFront(modalId)}>
               <Text replacements={{ title }}>Bring to front %title%</Text>
             </button>
           )}
           <animated.div
+            id={hasTabs ? `bam-panel-${modalId}` : undefined}
+            role={hasTabs ? 'tabpanel' : undefined}
+            aria-labelledby={hasTabs ? `bam-tab-${modalId}` : undefined}
             inert={stacked && !active ? true : undefined}
             style={{ transform: animationProps.transform, opacity: animationProps.opacity }}
             className={'modalRoot-container'}
@@ -139,5 +150,29 @@ export const ModalTransition = (props: Props) => {
         </animated.div>
       )
     );
-  });
+  })}
+    {animation === 'grow' && tabbed && activeTabId && <div className="modal-stack-tabs" role="tablist" aria-label="Open windows"
+      style={{ zIndex: getModalZIndex(activeTabId) }}>
+      {tabIds.map((id, tabIndex) => {
+        const modal = getModal(id);
+        const label = modal?.props.stackTitle || (typeof modal?.props.title === 'string' ? modal.props.title : 'Window');
+        return <button key={id} id={`bam-tab-${id}`} type="button" role="tab"
+          style={{ '--modal-tab-delay': `${40 + Math.min(tabIndex, 5) * 25}ms` } as React.CSSProperties}
+          aria-selected={id === activeTabId} aria-controls={`bam-panel-${id}`}
+          tabIndex={id === activeTabId ? 0 : -1} title={label}
+          onClick={() => ModalService.bringToFront(id)}
+          onFocus={(event) => event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'nearest' })}
+          onKeyDown={(event) => {
+            const index = tabIds.indexOf(id);
+            const next = event.key === 'ArrowRight' ? (index + 1) % tabIds.length
+              : event.key === 'ArrowLeft' ? (index + tabIds.length - 1) % tabIds.length
+              : event.key === 'Home' ? 0 : event.key === 'End' ? tabIds.length - 1 : -1;
+            if (next < 0) return;
+            event.preventDefault();
+            ModalService.bringToFront(tabIds[next]);
+            event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+          }}><Text>{label}</Text></button>;
+      })}
+    </div>}
+  </>;
 };

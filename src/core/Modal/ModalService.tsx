@@ -34,7 +34,17 @@ export const clampCompactWindowBounds = (bounds: CompactWindowBounds, viewportWi
 
 export type ComponentWithId = any;
 
+/** Opaque consumer-owned values. Vanguard never reads or navigates a route. */
+export type ModalWindowMetadata = Readonly<Record<string, unknown>>;
+export type ModalWindow = Readonly<{ id: string; metadata: ModalWindowMetadata }>;
+export type ModalWindowEvent =
+  | { type: 'activated'; window: ModalWindow; previousWindowId: string | null; reason: 'open' | 'focus' | 'dock' | 'close' }
+  | { type: 'closed'; window: ModalWindow; wasActive: boolean; activeWindow: ModalWindow | null }
+  | { type: 'metadataChanged'; window: ModalWindow; isActive: boolean };
+
 export type ModalOpts = {
+  /** Opt into window lifecycle events. Omit to retain ordinary modal behavior. */
+  windowMetadata?: ModalWindowMetadata;
   /** Opt into compact()/expand() controls. Existing modals remain unchanged when omitted. */
   allowCompact?: boolean;
   /** Label shown on the exposed stacking tab. */
@@ -135,6 +145,41 @@ const WrapperModal = <ResponseModel,>(
  */
 
 class ModalServiceClass {
+  private windows = new Map<string, ModalWindow>();
+  private activeWindowId: string | null = null;
+  private windowListeners = new Set<(event: ModalWindowEvent) => void>();
+
+  /** No initial event; read getActiveWindow()/getWindows() after subscribing. */
+  subscribeWindowEvents(listener: (event: ModalWindowEvent) => void) {
+    this.windowListeners.add(listener);
+    return () => { this.windowListeners.delete(listener); };
+  }
+
+  getWindows(): ModalWindow[] { return [...this.windows.values()]; }
+  getWindow(id: string): ModalWindow | undefined { return this.windows.get(id); }
+  getActiveWindow(): ModalWindow | null { return this.activeWindowId ? this.windows.get(this.activeWindowId) ?? null : null; }
+
+  /** Replace metadata on an already opted-in window, without changing its focus or presentation. */
+  setWindowMetadata(id: string, metadata: ModalWindowMetadata) {
+    if (!this.windows.has(id)) return;
+    const window = Object.freeze({ id, metadata: Object.freeze({ ...metadata }) });
+    this.windows.set(id, window);
+    this.emitWindowEvent({ type: 'metadataChanged', window, isActive: id === this.activeWindowId });
+  }
+
+  private emitWindowEvent(event: ModalWindowEvent) {
+    for (const listener of [...this.windowListeners]) {
+      try { listener(event); } catch (error) { console.error('Modal window listener failed', error); }
+    }
+  }
+
+  private syncActiveWindow(reason: Extract<ModalWindowEvent, { type: 'activated' }>['reason']) {
+    if (!this.windows.size && this.activeWindowId === null) return;
+    const window = [...this.windows.values()].sort((a, b) => OverlayStackingService.getZIndex(b.id) - OverlayStackingService.getZIndex(a.id))[0];
+    const previousWindowId = this.activeWindowId;
+    this.activeWindowId = window?.id ?? null;
+    if (window && previousWindowId !== window.id) this.emitWindowEvent({ type: 'activated', window, previousWindowId, reason });
+  }
   private compactMode = false;
   private compactWindowControlsEnabled = false;
   private compactWindowInteracting = false;
@@ -234,6 +279,7 @@ class ModalServiceClass {
     this.stackingEnabled = true;
     // Only the participating windows change slots; other stacks keep their order and geometry.
     OverlayStackingService.reorder(combined);
+    this.syncActiveWindow('dock');
     this.pruneCompactGroups();
     this.enforceStackLimit();
     this.notifyPresentation();
@@ -261,6 +307,7 @@ class ModalServiceClass {
     const next = [...ids.filter((other) => !members.includes(other)), ...members.filter((other) => other !== id), id];
     if (next.every((other, index) => ids[index] === other)) return;
     OverlayStackingService.reorder(next);
+    this.syncActiveWindow('focus');
     this.notifyPresentation();
   }
 
@@ -378,12 +425,25 @@ class ModalServiceClass {
   }
 
   removeModalComponent(id: string) {
+    const closedWindow = this.windows.get(id);
+    const wasActive = this.activeWindowId === id;
     this.stackEvictions.delete(id);
     this.modalComponents.delete(id);
     this.floatingWindows.delete(id);
     this.compactWindowGroups.delete(id);
     this.pruneCompactGroups();
     OverlayStackingService.unregister(id);
+    this.windows.delete(id);
+    if (closedWindow) {
+      // Close first, then announce any replacement. The close event already carries
+      // the replacement so consumers never need to clear the URL between windows.
+      const activeWindow = [...this.windows.values()].sort((a, b) => OverlayStackingService.getZIndex(b.id) - OverlayStackingService.getZIndex(a.id))[0] ?? null;
+      this.activeWindowId = activeWindow?.id ?? null;
+      this.emitWindowEvent({ type: 'closed', window: closedWindow, wasActive, activeWindow });
+      if (wasActive && activeWindow && this.activeWindowId === activeWindow.id) {
+        this.emitWindowEvent({ type: 'activated', window: activeWindow, previousWindowId: id, reason: 'close' });
+      }
+    }
     this.notifyPresentation();
   }
 
@@ -696,6 +756,7 @@ class ModalServiceClass {
     const ids = this.getBamIds();
     if (!ids.includes(modalId) || ids.at(-1) === modalId) return;
     OverlayStackingService.reorder([...ids.filter((id) => id !== modalId), modalId]);
+    this.syncActiveWindow('focus');
     this.notifyPresentation();
   }
 
@@ -719,6 +780,9 @@ class ModalServiceClass {
 
   /** Test-only: wipe internal state. Not for production code paths. */
   __resetForTests() {
+    this.windows.clear();
+    this.activeWindowId = null;
+    this.windowListeners.clear();
     this.maxStackSize = undefined;
     this.stackEvictions.clear();
     this.compactMode = false;
@@ -814,6 +878,9 @@ class ModalServiceClass {
     });
 
     OverlayStackingService.register(id, 'modal', opts?.baseZIndex);
+    if (opts?.windowMetadata !== undefined) {
+      this.windows.set(id, Object.freeze({ id, metadata: Object.freeze({ ...opts.windowMetadata }) }));
+    }
 
     pubSubService.$pub(PUB_SUB_EVENTS.reactModalOpen, {
       modalId: id,
@@ -821,6 +888,7 @@ class ModalServiceClass {
     });
     this.enforceStackLimit();
     this.notifyPresentation();
+    this.syncActiveWindow('open');
     return id;
   }
 

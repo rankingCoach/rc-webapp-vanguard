@@ -114,7 +114,7 @@ export type { ModalFooterAction, ModalFooterProps, SubButtonProps } from './core
 export type { ModalType } from './core/Modal';
 export type { ModalResponse } from './core/Modal';
 export type { ModalResponseHandler, ModalState, StandardModalProps } from './core/Modal';
-export type { ComponentWithId, ModalOpts } from './core/Modal';
+export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './core/Modal';
 export type { Step } from './core/Modal';
 export type { NavigationModalProps } from './core/Modal';
 export { FullScreenModalContainer } from './core/Modal';
