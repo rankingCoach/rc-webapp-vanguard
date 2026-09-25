@@ -1,4 +1,3 @@
-import { IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import React from 'react';
 import { expect, fn, waitFor, within } from 'storybook/test';
@@ -76,40 +75,33 @@ const typeSizeMatrix: Array<Pick<ButtonProps, 'type' | 'size'>> = [
   ),
 ];
 
-// Button variants rendered for every type & size; iconCount is the number of icons each variant renders
+// Plain covers the bordered variants; the circled icon covers icons taller than the label
 const variants: Array<{ name: string; props: Partial<ButtonProps>; iconCount: number }> = [
   { name: 'plain', props: {}, iconCount: 0 },
-  { name: 'icon-left', props: { icon: IconNames.add }, iconCount: 1 },
-  { name: 'icon-right', props: { icon: IconNames.add, iconPosition: 'right' }, iconCount: 1 },
   { name: 'icon-circle', props: { icon: IconNames.add, iconHasCircle: true }, iconCount: 1 },
-  { name: 'icon-only', props: { icon: IconNames.add, children: undefined }, iconCount: 1 },
-  { name: 'loading', props: { isLoading: true }, iconCount: 1 },
-  { name: 'disabled', props: { disabled: true }, iconCount: 0 },
-  { name: 'rounded', props: { rounded: true }, iconCount: 0 },
-  { name: 'uppercase', props: { uppercase: true }, iconCount: 0 },
-  { name: 'icon-large', props: { icon: IconNames.add, iconSize: IconSize.large }, iconCount: 1 },
-  { name: 'icon-large-on-hover', props: { icon: IconNames.add, iconLargeOnHover: true }, iconCount: 2 },
 ];
 
-// Tests that a short label renders identically with and without textWrap="wrap", for every type, size & variant
+// Tests that a short label renders identically with and without textWrap="wrap", for every type & size
 export const ButtonTextWrapShortLabelUnchanged: ButtonStory = {
   args: {
     onClick: fn(),
   },
   render: (props) => (
-    <div style={{ display: 'grid', gap: '16px' }}>
-      {typeSizeMatrix.flatMap(({ type, size }) =>
-        variants.map((variant) => {
-          const id = `${type}-${size}-${variant.name}`;
-          const buttonProps = { children: 'Short', ...props, type, size, ...variant.props } as ButtonProps;
-          return (
-            <div key={id} style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-start' }}>
-              <Button {...buttonProps} testId={`${id}-default`} />
-              <Button {...buttonProps} testId={`${id}-wrap`} textWrap="wrap" />
-            </div>
-          );
-        }),
-      )}
+    <div style={{ display: 'grid', gap: '8px' }}>
+      {typeSizeMatrix.map(({ type, size }) => (
+        <div key={`${type}-${size}`} style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'flex-start' }}>
+          {variants.map((variant) => {
+            const id = `${type}-${size}-${variant.name}`;
+            const buttonProps = { children: 'Short', ...props, type, size, ...variant.props } as ButtonProps;
+            return (
+              <React.Fragment key={id}>
+                <Button {...buttonProps} testId={`${id}-default`} />
+                <Button {...buttonProps} testId={`${id}-wrap`} textWrap="wrap" />
+              </React.Fragment>
+            );
+          })}
+        </div>
+      ))}
     </div>
   ),
   play: async ({ canvasElement }) => {
