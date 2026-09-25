@@ -8,7 +8,7 @@ export type Story = StoryObj<typeof DateRangeInput>;
 export const createMockFormConfig = (initialValue?: string) => ({
   stateValue: initialValue || '',
   setStateValue: fn(),
-  _inputRef: null,
+  _inputRef: { current: null },
 });
 
 export const selectors = {
