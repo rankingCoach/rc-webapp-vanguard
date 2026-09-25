@@ -1,0 +1,393 @@
+import { PublicWidgetData } from '@stores/public-widgets-data.store';
+import { appScreen, cleanup, render } from '@test-utils/test-utils';
+import { act } from '@testing-library/react';
+import React from 'react';
+import { Globals } from 'react-spring';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
+
+import { Modal } from '../Modal';
+import { ModalProvider } from '../ModalContext';
+import { ModalService } from '../ModalService';
+import { ModalRoot } from './ModalRoot';
+
+beforeAll(() => {
+  // Deterministic, instant transitions instead of driving react-spring frame by frame.
+  Globals.assign({ skipAnimation: true });
+  // jsdom does not implement scrollIntoView; the tab row's onFocus calls it.
+  Element.prototype.scrollIntoView = vi.fn();
+});
+
+afterEach(async () => {
+  // ModalRoot subscribes to pubSubService's reactModalOpen/reactModalClose ReplaySubjects,
+  // which replay their FULL history to every new subscriber (pubSubService has no reset
+  // and is a module-level singleton — see report). Left-open modals from one test would
+  // therefore "ghost-reopen" into the next test's freshly-mounted ModalRoot. Publish a
+  // matching close for everything still open so replay nets to empty before the next test.
+  await act(async () => {
+    ModalService.closeAllModals();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+  cleanup();
+  ModalService.__resetForTests();
+  document.body.style.overflow = '';
+  document.body.style.marginRight = '';
+  vi.restoreAllMocks();
+});
+
+const renderRoot = () =>
+  render(
+    <ModalProvider>
+      <ModalRoot />
+    </ModalProvider>,
+  );
+
+const rootFor = (id: string) => document.querySelector(`[data-modal-id="${id}"]`) as HTMLElement | null;
+
+describe('animation lanes', () => {
+  test('grow/slide/pop modals each render their own .modalRoot with the matching data-modal-id', () => {
+    renderRoot();
+    let grow: string, slide: string, pop: string;
+    act(() => {
+      grow = ModalService.open(<div>grow</div>, { animation: 'grow' });
+      slide = ModalService.open(<div>slide</div>, { animation: 'slide' });
+      pop = ModalService.open(<div>pop</div>, { animation: 'pop' });
+    });
+    expect(rootFor(grow!)).toBeTruthy();
+    expect(rootFor(slide!)).toBeTruthy();
+    expect(rootFor(pop!)).toBeTruthy();
+  });
+
+  test('z-index follows overlay registration/open order', () => {
+    renderRoot();
+    let first: string, second: string;
+    act(() => {
+      first = ModalService.open(<div>a</div>);
+      second = ModalService.open(<div>b</div>);
+    });
+    const firstZ = Number(rootFor(first!)!.style.zIndex);
+    const secondZ = Number(rootFor(second!)!.style.zIndex);
+    expect(secondZ).toBeGreaterThan(firstZ);
+  });
+
+  test('closing a modal removes its .modalRoot from the DOM', async () => {
+    renderRoot();
+    let id: string;
+    act(() => {
+      id = ModalService.open(<div>x</div>);
+    });
+    expect(rootFor(id!)).toBeTruthy();
+    await act(async () => {
+      await ModalService.closeEv(id);
+    });
+    await vi.waitFor(() => expect(rootFor(id)).toBeNull());
+  });
+});
+
+describe('body scroll lock', () => {
+  test('locks overflow to hidden for a normal (non-compact) modal', () => {
+    renderRoot();
+    act(() => {
+      ModalService.open(<div />);
+    });
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+
+  test('does not lock when only compact modals are open', () => {
+    renderRoot();
+    act(() => {
+      ModalService.setCompactMode(true);
+      ModalService.open(<Modal fullscreen />, { fullscreen: true });
+    });
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  test('restores overflow after the blocking modal closes', async () => {
+    renderRoot();
+    let id: string;
+    act(() => {
+      id = ModalService.open(<div />);
+    });
+    expect(document.body.style.overflow).toBe('hidden');
+    await act(async () => {
+      await ModalService.closeEv(id);
+    });
+    await vi.waitFor(() => expect(document.body.style.overflow).toBe(''));
+  });
+});
+
+describe('flags off', () => {
+  test('root className is exactly "modalRoot" with no stacking/tabs/window-controls classes', () => {
+    renderRoot();
+    let id: string;
+    act(() => {
+      id = ModalService.open(<div />);
+    });
+    const root = rootFor(id!)!;
+    // classNames() joins unconditionally with a space, so falsy modifiers leave trailing
+    // whitespace tokens; assert on the actual class TOKEN set, not the raw string.
+    expect(root.className.split(/\s+/).filter(Boolean)).toEqual(['modalRoot']);
+    expect(document.querySelector('.modal-stack-tabs')).toBeNull();
+    expect(document.querySelector('.compact-window-controls')).toBeNull();
+    expect(document.querySelector('.modal-stack-activate')).toBeNull();
+  });
+});
+
+describe('stacking', () => {
+  const openBam = () => ModalService.open(<Modal fullscreen />, { fullscreen: true });
+
+  test('back BAMs get modalRoot-stacked/modalRoot-stack-back + inert, the active one gets data-stack-active', () => {
+    renderRoot();
+    let first: string, second: string, third: string;
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      first = openBam();
+      second = openBam();
+      third = openBam();
+    });
+    const firstRoot = rootFor(first!)!;
+    const secondRoot = rootFor(second!)!;
+    const thirdRoot = rootFor(third!)!;
+    expect(thirdRoot.className).toContain('modalRoot-stacked');
+    expect(thirdRoot.className).not.toContain('modalRoot-stack-back');
+    expect(thirdRoot.getAttribute('data-stack-active')).toBe('true');
+    expect(firstRoot.className).toContain('modalRoot-stack-back');
+    expect(firstRoot.querySelector('.modalRoot-container')?.getAttribute('inert')).not.toBeNull();
+    expect(secondRoot.className).toContain('modalRoot-stack-back');
+  });
+
+  test('"Bring to front" button calls bringToFront and reorders the stack', () => {
+    renderRoot();
+    let first: string, second: string;
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      first = openBam();
+      second = openBam();
+    });
+    const spy = vi.spyOn(ModalService, 'bringToFront');
+    const button = rootFor(first!)!.querySelector('.modal-stack-activate') as HTMLButtonElement;
+    expect(button).toBeTruthy();
+    act(() => {
+      button.click();
+    });
+    expect(spy).toHaveBeenCalledWith(first);
+    expect(ModalService.getBamIds()).toEqual([second, first]);
+  });
+
+  test('a compact back card (index 0, compact) still gets a transparent stack background', () => {
+    renderRoot();
+    let first: string;
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ModalService.setCompactMode(true);
+      first = openBam();
+      openBam();
+    });
+    expect(rootFor(first!)!.style.backgroundColor).toBe('transparent');
+  });
+});
+
+describe('tabs (>3 expanded stacked BAMs)', () => {
+  const openBam = (title?: string) => ModalService.open(<Modal fullscreen />, { fullscreen: true, title });
+
+  const setupFour = () => {
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ids = [openBam('One'), openBam('Two'), openBam('Three'), openBam('Four')];
+    });
+    return ids;
+  };
+
+  test('renders a tablist with a tab per expanded BAM, labeled from title, and marks the active one', () => {
+    renderRoot();
+    const ids = setupFour();
+    const tablist = appScreen.getByRole('tablist');
+    expect(tablist).toBeTruthy();
+    const tabs = appScreen.getAllByRole('tab');
+    expect(tabs).toHaveLength(4);
+    expect(tabs.map((tab) => tab.getAttribute('aria-selected'))).toEqual(['false', 'false', 'false', 'true']);
+    expect(tabs[3].id).toBe(`bam-tab-${ids[3]}`);
+  });
+
+  test('falls back to the translated "Window" label when no title/stackTitle is set', () => {
+    renderRoot();
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      [0, 1, 2, 3].forEach(() => openBam());
+    });
+    const tabs = appScreen.getAllByRole('tab');
+    expect(tabs.every((tab) => tab.getAttribute('title') === 'Window')).toBe(true);
+  });
+
+  test('prefers stackTitle over the string title', () => {
+    renderRoot();
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      [0, 1, 2].forEach(() => openBam('Ignored'));
+      ModalService.open(<Modal fullscreen />, { fullscreen: true, title: 'Ignored', stackTitle: 'Custom tab' });
+    });
+    const tabs = appScreen.getAllByRole('tab');
+    expect(tabs.at(-1)!.getAttribute('title')).toBe('Custom tab');
+  });
+
+  test('ArrowRight/ArrowLeft/Home/End move focus and bring the target to front, wrapping at the ends', () => {
+    renderRoot();
+    const ids = setupFour();
+    const spy = vi.spyOn(ModalService, 'bringToFront');
+    const firstTab = document.getElementById(`bam-tab-${ids[0]}`) as HTMLButtonElement;
+    act(() => {
+      firstTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }));
+    });
+    expect(spy).toHaveBeenCalledWith(ids[3]);
+
+    const lastTab = document.getElementById(`bam-tab-${ids[3]}`) as HTMLButtonElement;
+    act(() => {
+      lastTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
+    });
+    expect(spy).toHaveBeenCalledWith(ids[0]);
+
+    act(() => {
+      lastTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+    });
+    expect(spy).toHaveBeenCalledWith(ids[0]);
+    act(() => {
+      lastTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+    });
+    expect(spy).toHaveBeenCalledWith(ids[3]);
+  });
+
+  test('clicking a tab brings that BAM to front', () => {
+    renderRoot();
+    const ids = setupFour();
+    const spy = vi.spyOn(ModalService, 'bringToFront');
+    const tab = document.getElementById(`bam-tab-${ids[0]}`) as HTMLButtonElement;
+    act(() => {
+      tab.click();
+    });
+    expect(spy).toHaveBeenCalledWith(ids[0]);
+  });
+
+  test('3 or fewer expanded stacked BAMs render the rear-card button instead of tabs', () => {
+    renderRoot();
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      [0, 1, 2].forEach(() => openBam());
+    });
+    expect(document.querySelector('.modal-stack-tabs')).toBeNull();
+    expect(document.querySelectorAll('.modal-stack-activate').length).toBeGreaterThan(0);
+  });
+});
+
+describe('compact window controls', () => {
+  const setup = () => {
+    let id: string;
+    act(() => {
+      ModalService.setCompactWindowControlsEnabled(true);
+      ModalService.setCompactMode(true);
+      id = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+    });
+    return id!;
+  };
+
+  test('renders window-controls class, CompactWindowControls markup and CSS geometry vars', () => {
+    renderRoot();
+    const id = setup();
+    const root = rootFor(id)!;
+    expect(root.className).toContain('modalRoot-window-controls');
+    expect(root.querySelector('.compact-window-controls')).toBeTruthy();
+    expect(root.style.getPropertyValue('--compact-window-x')).not.toBe('');
+    expect(root.style.getPropertyValue('--compact-window-y')).not.toBe('');
+    expect(root.style.getPropertyValue('--compact-window-width')).not.toBe('');
+    expect(root.style.getPropertyValue('--compact-window-height')).not.toBe('');
+  });
+
+  test('a pointer press anywhere on an active window-controlled root focuses that compact window', () => {
+    renderRoot();
+    const id = setup();
+    const spy = vi.spyOn(ModalService, 'focusCompactWindow');
+    const root = rootFor(id)!;
+    root.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(spy).toHaveBeenCalledWith(id);
+  });
+
+  test('adds modalRoot-window-interacting while ModalService reports interaction', () => {
+    renderRoot();
+    const id = setup();
+    act(() => {
+      ModalService.setCompactWindowInteracting(true, id);
+    });
+    expect(rootFor(id)!.className).toContain('modalRoot-window-interacting');
+    act(() => {
+      ModalService.setCompactWindowInteracting(false, id);
+    });
+    expect(rootFor(id)!.className).not.toContain('modalRoot-window-interacting');
+  });
+});
+
+describe('compact/expand prop injection', () => {
+  test('injects compact/expand functions only when allowCompact is opted in', () => {
+    renderRoot();
+    let withCompact: string, without: string;
+    act(() => {
+      withCompact = ModalService.open(<div />, { allowCompact: true });
+      without = ModalService.open(<div />);
+    });
+    expect(typeof ModalService.getModalComponent(withCompact!).props.compact).toBe('function');
+    expect(typeof ModalService.getModalComponent(withCompact!).props.expand).toBe('function');
+    expect(ModalService.getModalComponent(without!).props.compact).toBeUndefined();
+    expect(ModalService.getModalComponent(without!).props.expand).toBeUndefined();
+  });
+});
+
+describe('Esc handling', () => {
+  const pressEsc = () =>
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+
+  test('with flags off, only the topmost modal closes on Esc', () => {
+    renderRoot();
+    const closeA = vi.fn();
+    const closeB = vi.fn();
+    act(() => {
+      ModalService.open(<Modal fullscreen={false} onClose={closeA} />);
+      ModalService.open(<Modal fullscreen={false} onClose={closeB} />);
+    });
+    act(() => {
+      pressEsc();
+    });
+    expect(closeB).toHaveBeenCalledTimes(1);
+    expect(closeA).not.toHaveBeenCalled();
+  });
+
+  test('with stacking enabled, only the topmost BAM closes on Esc', () => {
+    renderRoot();
+    const closeA = vi.fn();
+    const closeB = vi.fn();
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ModalService.open(<Modal fullscreen onClose={closeA} />, { fullscreen: true });
+      ModalService.open(<Modal fullscreen onClose={closeB} />, { fullscreen: true });
+    });
+    act(() => {
+      pressEsc();
+    });
+    expect(closeB).toHaveBeenCalledTimes(1);
+    expect(closeA).not.toHaveBeenCalled();
+  });
+});
+
+// MUST run last: PublicWidgetData.set() can only assign its widgetId ONCE per
+// process (see src/stores/public-widgets-data.store.ts — it silently refuses a
+// second `set`, no reset exists), and once set, ModalService.open() suffixes
+// every id with it for the rest of this test file's lifetime.
+describe('widget scoping (useGetModals)', () => {
+  test('once a widgetId is set, opened ids carry the suffix and still render through useGetModals', () => {
+    PublicWidgetData.getInstance().set({ token: '', host: '', locationId: '', widgetId: 'w1' });
+    renderRoot();
+    let id: string;
+    act(() => {
+      id = ModalService.open(<div />);
+    });
+    expect(id!.endsWith('_w1')).toBe(true);
+    expect(rootFor(id!)).toBeTruthy();
+  });
+});
