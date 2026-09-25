@@ -1,3 +1,5 @@
+import { translationService } from '@services/translation.service';
+import { modalLayoutCss, modalStackStep, modalStackDepth } from '../../modal-layout';
 import React, { useSyncExternalStore } from 'react';
 import { compactWindowLayout, CompactWindowControls } from '../CompactWindowControls';
 import { ModalService } from '../../ModalService';
@@ -5,7 +7,8 @@ import { Text } from '@vanguard/Text/Text';
 import { animated, TransitionFn, useTransition } from 'react-spring';
 
 import { useModalContext } from '../../ModalContext';
-import { ModalPresentationContext } from '../../ModalPresentationContext';
+import { ModalPresentation } from './ModalPresentation';
+import { classNames } from '@helpers/classNames';
 import { useGetModals } from '../use-get-modals';
 
 type TransitionPropertiesType = TransitionFn<string, { transform: string; bgOpacity: number; opacity: number }>;
@@ -15,14 +18,6 @@ interface Props {
   modalsList: string[];
   animation: ModalTransition;
 }
-
-// Geometry updates must not invalidate every modal consumer's context on each pointer frame.
-const ModalPresentation = ({ children, allowCompact, isCompact, modalId, stacked, active }:
-  React.ContextType<typeof ModalPresentationContext> & { children: React.ReactNode }) => {
-  const value = React.useMemo(() => ({ allowCompact, isCompact, modalId, stacked, active }),
-    [allowCompact, isCompact, modalId, stacked, active]);
-  return <ModalPresentationContext.Provider value={value}>{children}</ModalPresentationContext.Provider>;
-};
 
 export const ModalTransition = (props: Props) => {
   const { modalsList, animation } = props;
@@ -108,22 +103,28 @@ export const ModalTransition = (props: Props) => {
       '--compact-window-x': `${layout.panel.x}px`, '--compact-window-y': `${layout.panel.y}px`,
       '--compact-window-width': `${layout.panel.width}px`, '--compact-window-height': `${layout.panel.height}px`,
     } : {};
-    const step = Math.min(28, 140 / Math.max(1, bamIds.length - 1));
+    const step = modalStackStep(bamIds.length);
     const stackStyle = stacked ? {
       '--modal-stack-offset': `${index * step}px`,
-      '--modal-stack-depth': `${Math.min(4, bamIds.length - 1 - index) * 10}px`,
+      '--modal-stack-depth': `${modalStackDepth(index, bamIds.length)}px`,
       '--modal-stack-tab-height': `${step}px`,
       backgroundColor: index > 0 || compact ? 'transparent' : undefined,
     } : {};
-    const title = modalComponent?.props.stackTitle || (typeof modalComponent?.props.title === 'string' ? modalComponent.props.title : 'window');
+    const title = modalComponent?.props.stackTitle || (typeof modalComponent?.props.title === 'string' ? modalComponent.props.title : translationService.get('Window').value);
     return (
       modalId &&
       modalComponent && (
         <animated.div
-          style={{ opacity: animationProps.bgOpacity, zIndex, ...stackStyle, ...windowStyle } as any}
+          style={{ opacity: animationProps.bgOpacity, zIndex, ...modalLayoutCss, ...stackStyle, ...windowStyle }}
           data-modal-id={modalId}
           data-stack-active={stacked ? active : undefined}
-          className={`modalRoot${compact ? ' modalRoot-compact' : ''}${stacked ? ' modalRoot-stacked' : ''}${hasTabs ? ' modalRoot-tabbed' : ''}${stacked && !active ? ' modalRoot-stack-back' : ''}${windowControls ? ' modalRoot-window-controls' : ''}${windowControls && ModalService.isCompactWindowInteracting() ? ' modalRoot-window-interacting' : ''}`}
+          className={classNames('modalRoot',
+            compact ? 'modalRoot-compact' : '',
+            stacked ? 'modalRoot-stacked' : '',
+            hasTabs ? 'modalRoot-tabbed' : '',
+            stacked && !active ? 'modalRoot-stack-back' : '',
+            windowControls ? 'modalRoot-window-controls' : '',
+            windowControls && ModalService.isCompactWindowInteracting() ? 'modalRoot-window-interacting' : '')}
           onPointerDownCapture={windowControls && active ? () => ModalService.focusCompactWindow(modalId) : undefined}
         >
           {windowControls && <div className="compact-window-drop-preview" aria-hidden="true" />}
@@ -151,11 +152,11 @@ export const ModalTransition = (props: Props) => {
       )
     );
   })}
-    {animation === 'grow' && tabbed && activeTabId && <div className="modal-stack-tabs" role="tablist" aria-label="Open windows"
-      style={{ zIndex: getModalZIndex(activeTabId) }}>
+    {animation === 'grow' && tabbed && activeTabId && <div className="modal-stack-tabs" role="tablist" aria-label={translationService.get('Open windows').value}
+      style={{ ...modalLayoutCss, zIndex: getModalZIndex(activeTabId) } as React.CSSProperties}>
       {tabIds.map((id, tabIndex) => {
         const modal = getModal(id);
-        const label = modal?.props.stackTitle || (typeof modal?.props.title === 'string' ? modal.props.title : 'Window');
+        const label = modal?.props.stackTitle || (typeof modal?.props.title === 'string' ? modal.props.title : translationService.get('Window').value);
         return <button key={id} id={`bam-tab-${id}`} type="button" role="tab"
           style={{ '--modal-tab-delay': `${40 + Math.min(tabIndex, 5) * 25}ms` } as React.CSSProperties}
           aria-selected={id === activeTabId} aria-controls={`bam-panel-${id}`}
@@ -171,7 +172,7 @@ export const ModalTransition = (props: Props) => {
             event.preventDefault();
             ModalService.bringToFront(tabIds[next]);
             event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
-          }}><Text>{label}</Text></button>;
+          }}><Text translate={false}>{label}</Text></button>;
       })}
     </div>}
   </>;

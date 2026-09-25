@@ -2,12 +2,45 @@ import { appScreen, cleanup, fireEvent, render } from '@test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import { Modal } from '@vanguard/Modal/Modal';
 import React from 'react';
+import { ModalService } from './ModalService';
+import { ModalPresentation } from './ModalRoot/ModalTransition/ModalPresentation';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 const CLOSE_BTN = 'modal-close-cta';
 
 afterEach(() => {
   cleanup();
+  ModalService.__resetForTests();
+});
+
+describe('nested service modals', () => {
+  test.each([false, true])('an inner modal cannot change the BAM and only it closes on Escape (initial: %s)', (initial) => {
+    ModalService.setStackingEnabled(true);
+    const id = ModalService.open(<div />, { fullscreen: true });
+    ModalService.setCompactMode(true);
+    const outerClose = vi.fn();
+    const innerClose = vi.fn();
+    const tree = (inner: boolean) => <div className="modalRoot" data-modal-id={id}>
+      <ModalPresentation modalId={id} allowCompact isCompact stacked active>
+        <Modal fullscreen onClose={outerClose} testId="outer-bam">
+          {inner && <Modal fullscreen={false} onClose={innerClose} testId="inner-modal" />}
+        </Modal>
+      </ModalPresentation>
+    </div>;
+    const { rerender } = render(tree(initial));
+    if (!initial) rerender(tree(true));
+    expect(ModalService.getModalComponent(id).isFullscreen).toBe(true);
+    expect(ModalService.getModalComponent(id).isCompact).toBe(true);
+    expect(ModalService.getBamIds()).toContain(id);
+    expect(appScreen.getByTestId('inner-modal').classList.contains('modal-compact')).toBe(false);
+    expect(appScreen.getByTestId('inner-modal').classList.contains('modal-stacked')).toBe(false);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(innerClose).toHaveBeenCalledTimes(1);
+    expect(outerClose).not.toHaveBeenCalled();
+    rerender(tree(false));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(outerClose).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('Modal close button', () => {

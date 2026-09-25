@@ -5,11 +5,13 @@ import { classNames } from '@helpers/classNames';
 import { deviceService } from '@services/device.service.ts';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { IconNames } from '@vanguard/Icon/IconNames';
-import { ModalService, ModalOpts } from '@vanguard/Modal/ModalService';
+import type { ModalOpts } from '@vanguard/Modal/ModalService';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 
+import { ModalLifecycleContext } from './ModalLifecycleContext';
+import { modalLayoutCss } from './modal-layout';
 import { ModalResponse } from './ModalResponse';
-import { ModalPresentationContext } from './ModalPresentationContext';
+import { defaultModalPresentation, ModalPresentationContext } from './ModalPresentationContext';
 import { OverlayStackingService } from '../OverlayStacking/OverlayStackingService';
 
 type Props = {
@@ -46,12 +48,16 @@ type Props = {
  * last-registered token is the topmost modal and the only one allowed to close.
  */
 const escStack: symbol[] = [];
+const escElements = new Map<symbol, HTMLDivElement>();
+const handledEscapeEvents = new WeakSet<KeyboardEvent>();
 
 /**
  * Component
  * ---------------------------------------------------------------------------------------------------------------------
  */
 export const Modal = (props: Props) => {
+  const lifecycle = useContext(ModalLifecycleContext);
+  const modalElement = useRef<HTMLDivElement>(null);
   const { allowCompact, isCompact, modalId, stacked, active } = useContext(ModalPresentationContext);
   const {
     children,
@@ -86,8 +92,8 @@ export const Modal = (props: Props) => {
   }
 
   useEffect(() => {
-    if (modalId) ModalService.registerFullscreen(modalId, !!fullscreen);
-  }, [modalId, fullscreen]);
+    if (modalId) lifecycle.registerFullscreen(modalId, !!fullscreen);
+  }, [modalId, fullscreen, lifecycle]);
 
   /**
    * Close behavior
@@ -104,7 +110,9 @@ export const Modal = (props: Props) => {
     }
     const token = escTokenRef.current;
     escStack.push(token);
+    if (modalElement.current) escElements.set(token, modalElement.current);
     return () => {
+      escElements.delete(token);
       const index = escStack.indexOf(token);
       if (index !== -1) {
         escStack.splice(index, 1);
@@ -113,19 +121,29 @@ export const Modal = (props: Props) => {
   }, [shouldCloseOnEsc]);
 
   useOnEscapeKyePress(
-    useCallback(() => {
-      if (!shouldCloseOnEsc || !onClose) {
+    useCallback((event: KeyboardEvent) => {
+      if (!shouldCloseOnEsc || !onClose || handledEscapeEvents.has(event)) {
         return;
       }
       // Only the topmost Esc-enabled modal reacts.
-      const isTopmost = modalId && (ModalService.isStackingEnabled() || (isCompact && ModalService.isCompactWindowControlsEnabled()))
-        ? OverlayStackingService.getZIndex(modalId) === OverlayStackingService.getTopmostZIndex('modal')
-        : escStack[escStack.length - 1] === escTokenRef.current;
+      const ownerId = modalId || modalElement.current?.closest<HTMLElement>('.modalRoot')?.dataset.modalId;
+      let isTopmost = escStack[escStack.length - 1] === escTokenRef.current;
+      if (ownerId && lifecycle.isManagedEscape()) {
+        // Overlay order chooses the service window; DOM nesting chooses the one
+        // Esc handler inside it, even when parent/child effects mount together.
+        const tokens = escStack.filter((token) => escElements.get(token)?.closest<HTMLElement>('.modalRoot')?.dataset.modalId === ownerId);
+        const topToken = tokens.reduce<symbol | undefined>((selected, token) => {
+          if (selected && escElements.get(token)?.contains(escElements.get(selected)!)) return selected;
+          return token;
+        }, undefined);
+        isTopmost = OverlayStackingService.getZIndex(ownerId) === OverlayStackingService.getTopmostZIndex('modal') && topToken === escTokenRef.current;
+      }
       if (!isTopmost) {
         return;
       }
+      handledEscapeEvents.add(event);
       onClose();
-    }, [shouldCloseOnEsc, onClose, modalId, isCompact]),
+    }, [shouldCloseOnEsc, onClose, modalId, lifecycle]),
   );
 
   /**
@@ -174,13 +192,16 @@ export const Modal = (props: Props) => {
   );
 
   return (
+    <ModalPresentationContext.Provider value={defaultModalPresentation}>
     <div
+      ref={modalElement}
       onClick={(e) => {
         onOutsideClick && onOutsideClick(e);
         if (shouldCloseOnOutsideClick && onClose) {
           onClose();
         }
       }}
+      style={allowCompact || stacked ? modalLayoutCss as React.CSSProperties : undefined}
       data-testid={testId}
       className={classNames('rc-modal', getContainerClassName())}
     >
@@ -195,6 +216,7 @@ export const Modal = (props: Props) => {
         </div>
       )}
     </div>
+    </ModalPresentationContext.Provider>
   );
 };
 export type { Props as ModalProps };

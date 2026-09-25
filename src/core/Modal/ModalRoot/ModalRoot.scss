@@ -1,4 +1,5 @@
 @import "@styles/color-functions";
+@import "@styles/spacings";
 /**
  * A div that stores all the modals
  * ---------------------------------------------------------------------------------------------------------------------
@@ -35,7 +36,7 @@
 
 // Large expanded stacks share one tab row instead of accumulating rear strips.
 .modalRoot.modalRoot-tabbed {
-  --modal-stack-top: 48px;
+  --modal-stack-top: var(--modal-title-band);
   --modal-stack-radius: 0px;
 
   &.modalRoot-stack-back > .modalRoot-container {
@@ -51,23 +52,23 @@
 }
 
 @keyframes modal-tabs-reveal {
-  from { opacity: 0; transform: translate3d(0, -12px, 0); }
+  from { opacity: 0; transform: translate3d(0, #{-$x1_5}, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes modal-tab-reveal {
-  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  from { opacity: 0; transform: translate3d(0, #{0.75 * $x1}, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 .modal-stack-tabs {
   position: fixed;
   inset: 0 0 auto;
-  height: 48px;
+  height: var(--modal-title-band);
   display: flex;
   align-items: stretch;
-  gap: 4px;
-  padding: 6px 8px 0;
+  gap: #{$x0_5};
+  padding: #{0.75 * $x1} #{$x1} 0;
   box-sizing: border-box;
   overflow-x: auto;
   background: var(--fn-bg-var);
@@ -75,12 +76,12 @@
   animation: modal-tabs-reveal 280ms cubic-bezier(0.2, 0, 0, 1) both;
 
   > button {
-    flex: 1 0 120px;
-    max-width: 240px;
+    flex: 1 0 #{15 * $x1};
+    max-width: #{30 * $x1};
     min-width: 0;
-    padding: 0 16px;
+    padding: 0 #{$x2};
     border: 0;
-    border-radius: 10px 10px 0 0;
+    border-radius: #{1.25 * $x1} #{1.25 * $x1} 0 0;
     background: transparent;
     color: var(--fn-fg);
     cursor: pointer;
@@ -89,8 +90,8 @@
     animation-delay: var(--modal-tab-delay, 40ms);
     .rc-text { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     &:hover { background: color-mix(in srgb, var(--fn-fg) 6%, transparent); }
-    &[aria-selected='true'] { background: var(--fn-bg-surface); box-shadow: inset 0 2px var(--fn-fg-cta); }
-    &:focus-visible { outline: 2px solid var(--fn-fg-cta); outline-offset: -3px; }
+    &[aria-selected='true'] { background: var(--fn-bg-surface); box-shadow: inset 0 #{$x0_25} var(--fn-fg-cta); }
+    &:focus-visible { outline: #{$x0_25} solid var(--fn-fg-cta); outline-offset: #{-0.375 * $x1}; }
   }
 }
 
@@ -105,22 +106,22 @@
 
 .modalRoot-stacked {
   --modal-stack-lift: 0px;
-  --modal-stack-top: calc(16px + var(--modal-stack-offset) - var(--modal-stack-lift));
+  --modal-stack-top: calc(var(--modal-inset) + var(--modal-stack-offset) - var(--modal-stack-lift));
   --modal-stack-side: 0px;
   --modal-stack-bottom: 0px;
-  --modal-stack-radius: 24px 24px 0 0;
+  --modal-stack-radius: #{$x3} #{$x3} 0 0;
   pointer-events: none;
 
   &.modalRoot-compact {
-    --modal-stack-top: calc(max(16px, 100dvh - 776px) + var(--modal-stack-offset) - var(--modal-stack-lift));
-    --modal-stack-side: calc(16px + var(--modal-stack-depth));
-    --modal-stack-bottom: 16px;
-    --modal-stack-radius: 24px;
+    --modal-stack-top: calc(max(var(--modal-inset), 100dvh - var(--modal-preferred-height) - var(--modal-inset)) + var(--modal-stack-offset) - var(--modal-stack-lift));
+    --modal-stack-side: calc(var(--modal-inset) + var(--modal-stack-depth));
+    --modal-stack-bottom: var(--modal-inset);
+    --modal-stack-radius: #{$x3};
   }
 
   &.modalRoot-stack-back:has(.modal-stack-activate:hover),
   &.modalRoot-stack-back:has(.modal-stack-activate:focus-visible) {
-    --modal-stack-lift: 12px;
+    --modal-stack-lift: #{$x1_5};
   }
 
   .modal-stack-activate {
@@ -130,9 +131,9 @@
     right: var(--modal-stack-side);
     width: calc(100vw - 2 * var(--modal-stack-side));
     height: var(--modal-stack-tab-height);
-    padding: 0 16px;
+    padding: 0 #{$x2};
     border: 0;
-    border-radius: 24px 24px 0 0;
+    border-radius: #{$x3} #{$x3} 0 0;
     background: var(--fn-bg-var);
     color: var(--fn-fg);
     cursor: pointer;
@@ -141,13 +142,13 @@
 
     .rc-text { opacity: 0; transition: opacity 0.15s ease; }
     &:hover, &:focus-visible {
-      height: calc(var(--modal-stack-tab-height) + 12px);
+      height: calc(var(--modal-stack-tab-height) + #{$x1_5});
       .rc-text { opacity: 1; }
     }
   }
 
   &.modalRoot-compact .modal-stack-activate {
-    width: min(calc(480px - 2 * var(--modal-stack-depth)), calc(100vw - 2 * var(--modal-stack-side)));
+    width: min(calc(var(--modal-preferred-width) - 2 * var(--modal-stack-depth)), calc(100vw - 2 * var(--modal-stack-side)));
   }
 
   &:not(.modalRoot-compact) .modal-stack-activate {
@@ -206,24 +207,24 @@
   .modal-header { touch-action: none; }
   .compact-window-move {
     position: absolute;
-    top: 12px;
-    width: 32px;
-    height: 32px;
+    top: #{$x1_5};
+    width: #{$x4};
+    height: #{$x4};
     display: grid;
     place-items: center;
-    padding: 7px;
+    padding: #{0.875 * $x1};
     box-sizing: border-box;
     border: 0;
-    border-radius: 10px;
+    border-radius: #{1.25 * $x1};
     color: var(--fn-fg);
     background: transparent;
     pointer-events: none;
     touch-action: none;
     cursor: move;
-    &-left { left: 16px; }
-    &-right { right: 16px; }
-    &-stack { left: 50%; transform: translateX(-50%); width: 48px; }
-    &:focus-visible { outline: 2px solid var(--fn-fg); outline-offset: 2px; }
+    &-left { left: #{$x2}; }
+    &-right { right: #{$x2}; }
+    &-stack { left: 50%; transform: translateX(-50%); width: #{$x6}; }
+    &:focus-visible { outline: #{$x0_25} solid var(--fn-fg); outline-offset: #{$x0_25}; }
   }
   .compact-window-resize {
     position: absolute;
@@ -232,12 +233,12 @@
     border: 0;
     padding: 0;
     background: transparent;
-    &:focus-visible { outline: 2px solid var(--fn-fg); outline-offset: -2px; }
-    &-n, &-s { left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+    &:focus-visible { outline: #{$x0_25} solid var(--fn-fg); outline-offset: #{-$x0_25}; }
+    &-n, &-s { left: #{$x1_75}; right: #{$x1_75}; height: var(--modal-resize-edge); cursor: ns-resize; }
     &-n { top: 0; } &-s { bottom: 0; }
-    &-e, &-w { top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+    &-e, &-w { top: #{$x1_75}; bottom: #{$x1_75}; width: var(--modal-resize-edge); cursor: ew-resize; }
     &-e { right: 0; } &-w { left: 0; }
-    &-ne, &-nw, &-se, &-sw { width: 14px; height: 14px; }
+    &-ne, &-nw, &-se, &-sw { width: #{$x1_75}; height: #{$x1_75}; }
     &-ne { right: 0; top: 0; cursor: nesw-resize; }
     &-nw { left: 0; top: 0; cursor: nwse-resize; }
     &-se { right: 0; bottom: 0; cursor: nwse-resize; }
@@ -267,27 +268,27 @@
   .rc-modal.modal-compact > .modal-content,
   .rc-modal.modal-compact > .modal-content-wrapper,
   .modal-stack-activate {
-    outline: 2px solid color-mix(in srgb, var(--fn-fg-cta) 45%, transparent);
-    outline-offset: -2px;
+    outline: #{$x0_25} solid color-mix(in srgb, var(--fn-fg-cta) 45%, transparent);
+    outline-offset: #{-$x0_25};
   }
 }
 
 .modalRoot-window-controls.modalRoot-drop-target .rc-modal.modal-compact > .modal-content,
 .modalRoot-window-controls.modalRoot-drop-target .rc-modal.modal-compact > .modal-content-wrapper {
-  outline: 2px solid var(--fn-fg-cta);
-  outline-offset: -2px;
+  outline: #{$x0_25} solid var(--fn-fg-cta);
+  outline-offset: #{-$x0_25};
 }
 .compact-window-drop-preview {
   display: none;
   position: fixed;
   z-index: 4;
-  left: calc(var(--compact-window-x) + 12px);
-  top: calc(var(--compact-window-y) + 12px);
-  width: calc(var(--compact-window-width) - 24px);
-  height: calc(var(--compact-window-height) - 24px);
+  left: calc(var(--compact-window-x) + #{$x1_5});
+  top: calc(var(--compact-window-y) + #{$x1_5});
+  width: calc(var(--compact-window-width) - #{$x3});
+  height: calc(var(--compact-window-height) - #{$x3});
   box-sizing: border-box;
-  border: 2px dashed var(--fn-fg-cta);
-  border-radius: 18px;
+  border: #{$x0_25} dashed var(--fn-fg-cta);
+  border-radius: #{2.25 * $x1};
   background: color-mix(in srgb, var(--fn-fg-cta) 10%, transparent);
   pointer-events: none;
 }
@@ -300,7 +301,7 @@
   .compact-window-controls,
   .modal-stack-activate,
   .compact-window-drop-preview {
-    translate: 0 calc(-1 * min(8px, var(--compact-window-y)));
+    translate: 0 calc(-1 * min(#{$x1}, var(--compact-window-y)));
     transition: translate .15s ease;
   }
 }

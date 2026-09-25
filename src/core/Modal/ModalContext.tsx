@@ -17,8 +17,6 @@ interface ModalContextType {
   addModal: (modalId: string, animation: ModalTransition, component: any) => void;
   removeModal: (modalId: string) => void;
   getModalZIndex: (modalId: string) => number;
-  compactModals: Record<string, boolean>;
-  setModalCompact: (modalId: string, isCompact: boolean) => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -38,11 +36,6 @@ interface ModalProviderProps {
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   // Use a ref to store components to avoid circular reference serialization issues
   const modalsRef = useRef<Map<string, any>>(new Map());
-  const [compactModals, setCompactModals] = useState<Record<string, boolean>>({});
-  const setModalCompact = useCallback((modalId: string, isCompact: boolean) => {
-    if (!modalsRef.current.has(modalId)) return;
-    setCompactModals((prev) => ({ ...prev, [modalId]: isCompact }));
-  }, []);
   const [modalRootState, setModalRootState] = useState<ModalRootState>({
     growModals: [],
     slideModals: [],
@@ -59,9 +52,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const addModal = useCallback((modalId: string, animation: ModalTransition, component: any) => {
     modalsRef.current.set(modalId, component);
-    if (component?.isCompact) {
-      setCompactModals((prev) => ({ ...prev, [modalId]: true }));
-    }
 
     setModalRootState((prev) => {
       const newState = { ...prev };
@@ -94,12 +84,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const removeModal = useCallback((modalId: string) => {
     modalsRef.current.delete(modalId);
-    setCompactModals((prev) => {
-      if (!(modalId in prev)) return prev;
-      const next = { ...prev };
-      delete next[modalId];
-      return next;
-    });
 
     setModalRootState((prev) => ({
       growModals: prev.growModals.filter((id) => id !== modalId),
@@ -114,8 +98,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     addModal,
     removeModal,
     getModalZIndex,
-    compactModals,
-    setModalCompact,
   };
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;

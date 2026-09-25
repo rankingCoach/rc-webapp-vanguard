@@ -7,6 +7,21 @@ import { OverlayStackingService } from '../OverlayStacking/OverlayStackingServic
 
 afterEach(() => ModalService.__resetForTests());
 
+test('viewport fitting preserves attached and detached membership while stacking is disabled', () => {
+  ModalService.setCompactMode(true);
+  ModalService.setCompactWindowControlsEnabled(true);
+  const attached = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+  const detached = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+  ModalService.setCompactWindowBounds(detached, { x: 20, y: 20, width: 400, height: 400 });
+  ModalService.fitCompactWindowToViewport(attached);
+  ModalService.fitCompactWindowToViewport(detached);
+  expect(ModalService.isCompactWindowDetached(attached)).toBe(false);
+  expect(ModalService.isCompactWindowDetached(detached)).toBe(true);
+  ModalService.setStackingEnabled(true);
+  expect(ModalService.getStackedBamIds()).toContain(attached);
+  expect(ModalService.getStackedBamIds()).not.toContain(detached);
+});
+
 describe('opt-in compact modal controls', () => {
   test('shared compact mode includes wrapped BAMs and future BAMs, but not ordinary dialogs', () => {
     const first = ModalService.open(<Modal fullscreen />, { fullscreen: true });

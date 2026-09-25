@@ -1,19 +1,22 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import { translationService } from '@services/translation.service';
+import { modalLayout, modalStackStep, modalStackDepth } from '../modal-layout';
 import { clampCompactWindowBounds, CompactWindowBounds, ModalService } from '../ModalService';
 
 export function compactWindowLayout(id: string, index: number, count: number, stacked: boolean) {
   const floating = ModalService.getCompactWindowBounds(id);
   const group = ModalService.isStackingEnabled() && !ModalService.isCompactWindowDetached(id);
   const bounds = clampCompactWindowBounds((group ? ModalService.getCompactStackBounds(id) : floating) ?? {
-    x: window.innerWidth - 496, y: Math.max(16, window.innerHeight - 776),
-    width: 480, height: Math.min(760, window.innerHeight - 32),
+    x: window.innerWidth - modalLayout.width - modalLayout.inset, y: Math.max(modalLayout.inset, window.innerHeight - modalLayout.height - modalLayout.inset),
+    width: modalLayout.width, height: Math.min(modalLayout.height, window.innerHeight - 2 * modalLayout.inset),
   }, window.innerWidth, window.innerHeight);
-  const offset = stacked ? index * Math.min(28, 140 / Math.max(1, count - 1)) : 0;
-  const depth = stacked ? Math.min(4, count - 1 - index) * 10 : 0;
+  const offset = stacked ? index * modalStackStep(count) : 0;
+  const depth = stacked ? modalStackDepth(index, count) : 0;
   return { bounds, panel: { x: bounds.x + depth, y: bounds.y + offset, width: bounds.width - depth * 2, height: bounds.height - offset }, group };
 }
 
-const edges = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+const edgeLabels: Record<string, string> = { n: 'top', ne: 'top right', e: 'right', se: 'bottom right', s: 'bottom', sw: 'bottom left', w: 'left', nw: 'top left' };
+const edges = Object.keys(edgeLabels);
 type DragPointer = Pick<React.PointerEvent, 'button' | 'pointerId' | 'clientX' | 'clientY' | 'preventDefault'> & { currentTarget: Element };
 type Gesture = { pointer: number; x: number; y: number; bounds: CompactWindowBounds; edge: string; group: boolean; moved: boolean; rear: boolean };
 
@@ -75,23 +78,22 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
     highlightMove(null);
     clearDropTarget();
     if (frame.current !== undefined) cancelAnimationFrame(frame.current);
-    ModalService.setCompactWindowInteracting(false);
+    ModalService.setCompactWindowInteracting(false, id);
     };
   }, [id]);
   useEffect(() => {
     if (!active) return;
     const resize = () => {
-      const { bounds, group } = layout();
-      ModalService.setCompactWindowBounds(id, bounds, group);
+      ModalService.fitCompactWindowToViewport(id);
     };
     window.addEventListener('resize', resize);
-    return () => { window.removeEventListener('resize', resize); if (frame.current !== undefined) cancelAnimationFrame(frame.current); };
-  }, [id, index, count, stacked, active]);
+    return () => { window.removeEventListener('resize', resize); };
+  }, [id, active]);
 
   const begin = (event: DragPointer, edge: string, moveGroup = false, rear = false) => {
     if (event.button !== 0) return;
     event.preventDefault();
-    ModalService.setCompactWindowInteracting(true);
+    ModalService.setCompactWindowInteracting(true, id);
     const current = layout();
     const group = current.group && (edge !== 'move' || moveGroup);
     const rearRect = rear ? controlsRef.current?.closest('.modalRoot')
@@ -112,7 +114,7 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
     const next = { ...g.bounds };
     if (g.edge === 'move') { next.x += dx; next.y += dy; }
     else {
-      const minWidth = Math.min(320, window.innerWidth), minHeight = Math.min(240, window.innerHeight);
+      const minWidth = Math.min(modalLayout.minWidth, window.innerWidth), minHeight = Math.min(modalLayout.minHeight, window.innerHeight);
       if (g.edge.includes('e')) next.width = Math.max(minWidth, Math.min(window.innerWidth - next.x, next.width + dx));
       if (g.edge.includes('s')) next.height = Math.max(minHeight, Math.min(window.innerHeight - next.y, next.height + dy));
       if (g.edge.includes('w')) { next.x = Math.max(0, Math.min(g.bounds.x + dx, g.bounds.x + g.bounds.width - minWidth)); next.width = g.bounds.width + g.bounds.x - next.x; }
@@ -128,13 +130,14 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
     flush();
     gesture.current = null;
     clearDropTarget();
-    ModalService.setCompactWindowInteracting(false);
+    ModalService.setCompactWindowInteracting(false, id);
     if (drop && current?.rear && !current.moved) ModalService.bringToFront(id);
     if (drop && current?.moved && current.edge === 'move') ModalService.dockCompactWindow(id, candidates(), current.group);
   };
+  const pointerHandlers = useRef<Record<string, (event: PointerEvent) => void>>({});
   // Listen on the existing window instead of covering its content with a drag overlay.
   // Native controls and custom opt-out regions retain their normal pointer behavior.
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = controlsRef.current?.closest<HTMLElement>('.modalRoot');
     if (!root) return;
     const hit = (event: PointerEvent) => {
@@ -145,8 +148,8 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
       const panel = root.querySelector('.rc-modal > .modal-content-wrapper, .rc-modal > .modal-content');
       if (!panel?.contains(target) || (interactive && panel.contains(interactive))) return null;
       const rect = panel.getBoundingClientRect();
-      if (event.clientY < rect.top + 8 || event.clientY > rect.top + 48 || event.clientX < rect.left + 8 || event.clientX > rect.right - 8) return null;
-      return { group: layout().group && Math.abs(event.clientX - (rect.left + rect.width / 2)) <= 48, rear: false };
+      if (event.clientY < rect.top + modalLayout.resizeEdge || event.clientY > rect.top + modalLayout.titleBand || event.clientX < rect.left + modalLayout.resizeEdge || event.clientX > rect.right - modalLayout.resizeEdge) return null;
+      return { group: layout().group && Math.abs(event.clientX - (rect.left + rect.width / 2)) <= modalLayout.stackMoveHalfWidth, rear: false };
     };
     const down = (event: PointerEvent) => {
       const area = hit(event);
@@ -171,21 +174,17 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
       root.classList.remove('modalRoot-band-hover');
       if (!bandGesture.current) highlightMove(null);
     };
-    root.addEventListener('pointerdown', down);
-    root.addEventListener('pointermove', motion);
-    root.addEventListener('pointerup', finish);
-    root.addEventListener('pointercancel', cancel);
-    root.addEventListener('lostpointercapture', cancel);
-    root.addEventListener('pointerleave', leave);
-    return () => {
-      root.removeEventListener('pointerdown', down);
-      root.removeEventListener('pointermove', motion);
-      root.removeEventListener('pointerup', finish);
-      root.removeEventListener('pointercancel', cancel);
-      root.removeEventListener('lostpointercapture', cancel);
-      root.removeEventListener('pointerleave', leave);
-    };
+    pointerHandlers.current = { pointerdown: down, pointermove: motion, pointerup: finish,
+      pointercancel: cancel, lostpointercapture: cancel, pointerleave: leave };
   });
+  useEffect(() => {
+    const root = controlsRef.current?.closest<HTMLElement>('.modalRoot');
+    if (!root) return;
+    const events = ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'lostpointercapture', 'pointerleave'];
+    const forward = (event: Event) => pointerHandlers.current[event.type]?.(event as PointerEvent);
+    events.forEach((event) => root.addEventListener(event, forward));
+    return () => events.forEach((event) => root.removeEventListener(event, forward));
+  }, [id]);
   const keyboard = (event: React.KeyboardEvent, edge: string, moveGroup = false) => {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
     event.preventDefault();
@@ -208,13 +207,13 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
   return <div ref={controlsRef} className="compact-window-controls">
     {active && <>
     <button type="button" className="compact-window-move compact-window-move-left"
-      aria-label={`Move ${title}`} title="Drag window · arrow keys to move" {...handlers('move')} />
+      aria-label={translationService.get('Move %title%', { title }).value} title={translationService.get('Drag window · arrow keys to move').value} {...handlers('move')} />
     <button type="button" className="compact-window-move compact-window-move-right"
-      aria-label={`Move ${title} from right corner`} title="Drag window · arrow keys to move" {...handlers('move')} />
+      aria-label={translationService.get('Move %title% from right corner', { title }).value} title={translationService.get('Drag window · arrow keys to move').value} {...handlers('move')} />
     {layout().group && <button type="button" className="compact-window-move compact-window-move-stack"
-      aria-label="Move stack" title="Drag entire stack · arrow keys to move" {...handlers('move', true)} />}
+      aria-label={translationService.get('Move stack').value} title={translationService.get('Drag entire stack · arrow keys to move').value} {...handlers('move', true)} />}
     {edges.map((edge) => <button key={edge} className={`compact-window-resize compact-window-resize-${edge}`}
-      aria-label={`Resize ${title} ${edge}`} title="Drag to resize. Arrow keys change width and height."
+      aria-label={translationService.get('Resize %title% %edge%', { title, edge: translationService.get(edgeLabels[edge]).value }).value} title={translationService.get('Drag to resize. Arrow keys change width and height.').value}
       {...handlers(edge)} />)}
     </>}
   </div>;

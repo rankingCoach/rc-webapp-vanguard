@@ -176,7 +176,7 @@ export const MovableCompactWindows = { render: () => <Demo compact windowControl
     expect(rect.right).toBeLessThanOrEqual(window.innerWidth + 1);
     expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + 1);
   });
-  const resize = within(root as HTMLElement).getByRole('button', { name: 'Resize Assistant se' });
+  const resize = within(root as HTMLElement).getByRole('button', { name: 'Resize Assistant bottom right' });
   resize.focus();
   await userEvent.keyboard('{ArrowRight}');
   await waitFor(() => expect(ModalService.getCompactWindowBounds(id)!.width).toBeGreaterThan(before.width));
@@ -189,7 +189,7 @@ export const MovableCompactWindows = { render: () => <Demo compact windowControl
   ]);
   await waitFor(() => expect(root).toHaveClass('modalRoot-stacked'));
   await expect(within(assistant).getByRole('textbox')).toHaveValue('Preserved floating draft');
-  const sharedResize = within(root as HTMLElement).getByRole('button', { name: 'Resize Assistant se' });
+  const sharedResize = within(root as HTMLElement).getByRole('button', { name: 'Resize Assistant bottom right' });
   sharedResize.focus();
   await userEvent.keyboard('{ArrowLeft}');
   await waitFor(() => expect(ModalService.getCompactStackBounds()).toBeDefined());
@@ -384,7 +384,7 @@ export const IndependentStacks = { render: () => <Demo compact windowControls />
   await pointer.keyboard('{ArrowRight}');
   const newBounds = ModalService.getCompactStackBounds(idOf(assistant))!;
   expect(newBounds.x).toBe(50);
-  within(newRoot).getByRole('button', { name: 'Resize Assistant se', exact: true }).focus();
+  within(newRoot).getByRole('button', { name: 'Resize Assistant bottom right', exact: true }).focus();
   await pointer.keyboard('{ArrowLeft}');
   expect(ModalService.getCompactStackBounds(idOf(fourth))!.width).toBe(newBounds.width - 10);
   expect(panelOf(website).getBoundingClientRect().left).toBe(originalLeft);

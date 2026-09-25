@@ -34,7 +34,7 @@ export type StandardModalProps<T> = {
 };
 
 export const ModalRoot = () => {
-  const { modalRootState, addModal, removeModal, setModalCompact } = useModalContext();
+  const { modalRootState, addModal, removeModal } = useModalContext();
   useSyncExternalStore(ModalService.subscribePresentation, ModalService.getPresentationRevision, ModalService.getPresentationRevision);
   const subscriptionsRef = useRef<any[]>([]);
 
@@ -61,17 +61,13 @@ export const ModalRoot = () => {
       removeModal(modalId);
     });
 
-    const compactSub = pubSubService.$sub(PUB_SUB_EVENTS.reactModalCompactChange, ({ modalId, isCompact }) => {
-      setModalCompact(modalId, isCompact);
-    });
-
-    subscriptionsRef.current = [openSub, closeSub, compactSub];
+    subscriptionsRef.current = [openSub, closeSub];
 
     return () => {
       subscriptionsRef.current.forEach((sub) => sub?.unsubscribe());
       subscriptionsRef.current = [];
     };
-  }, [addModal, removeModal, setModalCompact]);
+  }, [addModal, removeModal]);
 
   /**
    * Handle no scroll on page body

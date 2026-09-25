@@ -56,8 +56,8 @@ const Editor = ({ close, compact, expand }: StandardModalProps<unknown>) => (
 );
 
 const id = ModalService.open(<Editor close={() => {}} />, { allowCompact: true });
-ModalService.compactEv(id);
-ModalService.expandEv(id);
+ModalService.compact(id);
+ModalService.expand(id);
 ```
 
 Compact and expand controls now switch **all fullscreen BAMs together**, including
@@ -268,3 +268,19 @@ policy, account/project scope, unsaved drafts, and reload restoration remain
 application responsibilities. Do not use an application navigation helper that
 closes every modal when reflecting a window's URL. Layout/group geometry belongs
 in workspace/session state, not the active window's shareable URL.
+
+
+### Compact presentation event
+
+The public pub/sub event `PUB_SUB_EVENTS.reactModalCompactChange`
+(`REACT_MODAL_COMPACT_CHANGE`) carries `{ modalId: string; isCompact: boolean }`.
+It is published synchronously after an individual BAM's compact state changes;
+a shared compact/expand action can publish once for each affected BAM. Unchanged
+states do not publish. It reports presentation changes, not window activation,
+and should not drive routing. Publications before the first subscription are discarded. Once a subscription
+channel exists, the pub/sub service buffers subsequent events and replays that
+history to later subscribers; unsubscribe during consumer cleanup.
+
+The consumer controls `compact()` / `expand()` injected by `open()` and the
+service methods `compact(id)` / `expand(id)` retain the existing opt-in behavior.
+The older service names `compactEv(id)` / `expandEv(id)` remain deprecated aliases.
