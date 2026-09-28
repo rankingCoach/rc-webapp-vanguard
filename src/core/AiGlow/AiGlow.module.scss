@@ -1,6 +1,8 @@
 @use "@styles/ai_variables";
 
 .grad {
+  @include ai_variables.aiDerivedColors;
+
   display: inline-flex;
   justify-content: center;
 
@@ -29,15 +31,15 @@
     background: var(--ai-background);
     background: linear-gradient(
       var(--ai-bg-angle),
-      var(--ai-start-color) 0%,
+      var(--ai-glow-accent-color) 0%,
       var(--ai-base-color) 22%,
-      var(--ai-end-color) 33.3%,
-      var(--ai-end-color) 49%,
+      var(--ai-glow-light-color) 33.3%,
+      var(--ai-glow-light-color) 49%,
       hsla(0, 0%, 100%, 1) 50%,
-      var(--ai-start-color) 55%,
+      var(--ai-glow-accent-color) 55%,
       var(--ai-base-color) 66%,
       var(--ai-base-color) 88%,
-      var(--ai-end-color) 100%
+      var(--ai-glow-light-color) 100%
     );
 
     border-radius: calc(var(--ai-border-radius) + var(--ai-border-size-outside));

@@ -8,6 +8,7 @@ import { WithBorderWidth as _WithBorderWidth } from "./stories/WithBorderWidth.s
 import { WithBlurWidth as _WithBlurWidth } from "./stories/WithBlurWidth.story";
 import { WithClassName as _WithClassName } from "./stories/WithClassName.story";
 import { TwoAiGlowComponents as _TwoAiGlowComponents } from "./stories/TwoAiGlowComponents.story";
+import { DerivedFromBase as _DerivedFromBase } from "./stories/DerivedFromBase.story";
 
 export const Default: Story = { ..._Default };
 export const WithBorderRadius: Story = { ..._WithBorderRadius };
@@ -16,6 +17,7 @@ export const WithBorderWidth: Story = { ..._WithBorderWidth };
 export const WithBlurWidth: Story = { ..._WithBlurWidth };
 export const WithClassName: Story = { ..._WithClassName };
 export const TwoAiGlowComponents: Story = { ..._TwoAiGlowComponents };
+export const DerivedFromBase: Story = { ..._DerivedFromBase };
 
 export default {
   ...SbDecorator({
@@ -37,15 +39,8 @@ export default {
         },
         baseColor: {
           control: { type: "color" },
-          description: "Base color for the AI glow gradient",
-        },
-        startColor: {
-          control: { type: "color" },
-          description: "Start color for the AI glow gradient",
-        },
-        endColor: {
-          control: { type: "color" },
-          description: "End color for the AI glow gradient",
+          description:
+            "The glow's only color; the accent and light stops are derived from it. Defaults to the inherited `--ai-base-color`",
         },
         children: {
           control: false,

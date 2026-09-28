@@ -7,23 +7,20 @@ export interface AiGlowProps {
   className?: string;
   children: React.ReactNode;
   borderRadius?: number;
+  /** The glow's only colour; the other stops are derived from it. Defaults to the inherited `--ai-base-color`. */
   baseColor?: string;
-  startColor?: string;
-  endColor?: string;
   borderWidth?: number;
   blurWidth?: number;
 }
 
 export const AiGlow = (props: AiGlowProps) => {
-  const { className, children, borderRadius = 24, baseColor, startColor, endColor, borderWidth, blurWidth } = props;
+  const { className, children, borderRadius = 24, baseColor, borderWidth, blurWidth } = props;
 
   // Create style object with only defined props
   const style = {
     '--ai-border-radius': `${borderRadius}px`,
     ...(borderWidth && { '--ai-border-size-outside': `${borderWidth}px` }),
     ...(baseColor && { '--ai-base-color': baseColor }),
-    ...(startColor && { '--ai-start-color': startColor }),
-    ...(endColor && { '--ai-end-color': endColor }),
     ...(blurWidth && { '--ai-blur-width': `${blurWidth}px` }),
   } as React.CSSProperties;
 
