@@ -34,7 +34,8 @@ export const DerivedFromBase: Story = {
         story:
           "The glow takes one colour. The accent (0 %, 55 %) and light (33.3–49 %, 100 %) stops are derived from it in " +
           "OKLCH. Each row shows the derived colour next to the value the spec expects. The last glow has no " +
-          "`baseColor`, so it derives from the theme's `--ai-base-color`.",
+          "`baseColor`, so it derives from the theme's `--ai-base-color`. The expected values are sRGB-clipped, so on " +
+          "a wide-gamut display the derived accent and light colours can look more saturated than their hex swatches.",
       },
     },
   },
