@@ -44,7 +44,7 @@
 
     border-radius: 8px;
     background: var(--fn-bg-surface);
-    box-shadow: var(--shadow-large);
+    box-shadow: var(--modal-content-shadow, var(--shadow-large));
 
     display: flex;
     flex-direction: column;
@@ -116,7 +116,7 @@
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       background: var(--fn-bg-surface);
-      box-shadow: var(--shadow-large);
+      box-shadow: var(--modal-content-shadow, var(--shadow-large));
     }
   }
 
