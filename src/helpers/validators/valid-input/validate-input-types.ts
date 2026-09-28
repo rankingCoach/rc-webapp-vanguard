@@ -20,6 +20,11 @@ export type FormConfigValidation = { replacements?: TextReplacements } & FormCon
  */
 export type FormConfigBaseValidation = {
   required?: boolean;
+  /**
+   * Overrides the default `validation_required` message shown when a required field is empty.
+   * Accepts a translation key or a plain string; the value is rendered through `<Text>` like every other error.
+   */
+  requiredErrorMessage?: CustomErrorsKeys | string;
 };
 
 /**
