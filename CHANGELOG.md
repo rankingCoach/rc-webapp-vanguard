@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.21.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.20.0...v1.21.0) (2026-09-29)
+
+
+### Features
+
+* **Button:** add translate prop to render the label without translation ([a00ad66](https://github.com/rankingCoach/rc-webapp-vanguard/commit/a00ad666d58cc14469cdc09b56c3776ade091828))
+* **Button:** make textWrap="wrap" wrap long labels ([70de0d1](https://github.com/rankingCoach/rc-webapp-vanguard/commit/70de0d1f70dde3171facf1ef663bff13ebb16ef1))
+
+
+### Bug Fixes
+
+* **deps:** hoist ws@8 so vitest 4 can start ([13e9644](https://github.com/rankingCoach/rc-webapp-vanguard/commit/13e9644ff0cb4087c1c7157e76f92ae24a8372a6))
+
 ## [1.20.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.19.0...v1.20.0) (2026-08-27)
 
 
