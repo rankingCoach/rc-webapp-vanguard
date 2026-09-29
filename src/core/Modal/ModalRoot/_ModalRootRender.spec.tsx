@@ -324,6 +324,67 @@ describe('compact window controls', () => {
   });
 });
 
+describe('compact window expanded geometry', () => {
+  const tokens = (id: string) => rootFor(id)!.className.split(/\s+/).filter(Boolean);
+  const openWindow = (opts: { fullscreen: boolean; allowCompact?: boolean }) => {
+    let id: string;
+    act(() => {
+      id = ModalService.open(<Modal fullscreen={opts.fullscreen} />, { fullscreen: opts.fullscreen, allowCompact: opts.allowCompact ?? true });
+    });
+    return id!;
+  };
+
+  test('adds modalRoot-window-expanded to an expanded fullscreen allowCompact modal with window controls', () => {
+    renderRoot();
+    act(() => ModalService.setCompactWindowControlsEnabled(true));
+    const id = openWindow({ fullscreen: true });
+    expect(tokens(id)).toContain('modalRoot-window-expanded');
+    expect(tokens(id)).not.toContain('modalRoot-window-controls');
+  });
+
+  test('swaps to modalRoot-window-controls when compacted and back when expanded', () => {
+    renderRoot();
+    act(() => ModalService.setCompactWindowControlsEnabled(true));
+    const id = openWindow({ fullscreen: true });
+    act(() => ModalService.compact(id));
+    expect(tokens(id)).not.toContain('modalRoot-window-expanded');
+    expect(tokens(id)).toContain('modalRoot-window-controls');
+    act(() => ModalService.expand(id));
+    expect(tokens(id)).toContain('modalRoot-window-expanded');
+    expect(tokens(id)).not.toContain('modalRoot-window-controls');
+  });
+
+  test('flags modalRoot-window-morphing only briefly after a compact/expand flip, not on open', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      renderRoot();
+      act(() => ModalService.setCompactWindowControlsEnabled(true));
+      const id = openWindow({ fullscreen: true });
+      expect(tokens(id)).not.toContain('modalRoot-window-morphing');
+      for (const flip of [() => ModalService.compact(id), () => ModalService.expand(id)]) {
+        act(flip);
+        expect(tokens(id)).toContain('modalRoot-window-morphing');
+        await act(async () => { await vi.advanceTimersByTimeAsync(300); });
+        expect(tokens(id)).not.toContain('modalRoot-window-morphing');
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('is absent for non-fullscreen modals, modals without allowCompact, and when window controls are disabled', () => {
+    renderRoot();
+    act(() => ModalService.setCompactWindowControlsEnabled(true));
+    const dialog = openWindow({ fullscreen: false });
+    const plain = openWindow({ fullscreen: true, allowCompact: false });
+    expect(tokens(dialog)).not.toContain('modalRoot-window-expanded');
+    expect(tokens(plain)).not.toContain('modalRoot-window-expanded');
+    act(() => ModalService.setCompactWindowControlsEnabled(false));
+    const disabled = openWindow({ fullscreen: true });
+    expect(tokens(disabled)).not.toContain('modalRoot-window-expanded');
+  });
+});
+
 describe('compact/expand prop injection', () => {
   test('injects compact/expand functions only when allowCompact is opted in', () => {
     renderRoot();

@@ -181,8 +181,11 @@
     max-height: none;
     min-height: 0;
     padding-top: 0;
-    transition: top .2s ease, left .2s ease, width .2s ease, height .2s ease;
+    // `transform` covers the stacked expanded card's translateY, which compact windows drop.
+    transition: top .2s ease, left .2s ease, width .2s ease, max-width .2s ease, height .2s ease, border-radius .2s ease, transform .2s ease;
   }
+  // With outerContent the radius sits on the inner panel, not on the wrapper.
+  .rc-modal.modal-compact > .modal-content-wrapper > .modal-content { transition: border-radius .2s ease; }
   &.modalRoot-stacked .rc-modal.modal-compact > .modal-content,
   &.modalRoot-stacked .rc-modal.modal-compact > .modal-content-wrapper {
     width: var(--compact-window-width);
@@ -246,13 +249,79 @@
   }
 }
 
+// The expanded counterpart of the compact window box. Both states are `position: fixed` with explicit
+// top/left/width/height, so collapsing and expanding interpolate every box property instead of
+// snapping across a `relative` → `fixed`, `auto` → `<px>` boundary. Consumers that inset the expanded
+// modal set the --modal-expanded-* properties on the modal instead of offsetting `.rc-modal`.
+.modalRoot.modalRoot-window-expanded {
+  .rc-modal.modal-fullscreen:not(.modal-stacked) > .modal-content,
+  .rc-modal.modal-fullscreen:not(.modal-stacked) > .modal-content-wrapper {
+    position: fixed;
+    box-sizing: border-box;
+    top: var(--modal-expanded-top, 0px);
+    left: var(--modal-expanded-left, 0px);
+    right: auto;
+    bottom: auto;
+    width: var(--modal-expanded-width, 100vw);
+    max-width: var(--modal-expanded-width, 100vw);
+    height: var(--modal-expanded-height, calc(100dvh - var(--modal-expanded-top, 0px)));
+    margin: 0;
+    border-radius: 0;
+    transition: top .2s ease, left .2s ease, width .2s ease, max-width .2s ease, height .2s ease, border-radius .2s ease;
+  }
+  .rc-modal.modal-fullscreen:not(.modal-stacked) > .modal-content-wrapper > .modal-content {
+    width: 100%;
+    height: 100%;
+    transition: border-radius .2s ease;
+  }
+  // Same panel structure as the compact window (and the stacked card): sections sized by the box, a
+  // scrolling body and an in-flow footer. The fullscreen defaults size against the viewport (fixed
+  // 100vw footer, content-box body) and would jump out of the box on the first frame of a morph.
+  .rc-modal.modal-fullscreen:not(.modal-stacked) .modal-content {
+    overflow: hidden;
+    > .modal-header, > .modal-body, > .modal-footer { box-sizing: border-box; min-width: 0; }
+    > .modal-header, > .modal-footer { flex-shrink: 0; }
+    > .modal-body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: $x3; }
+    > .modal-footer { position: relative; width: 100%; }
+    .SplitView-left-component, .SplitView-right-component,
+    .SplitView-left-component .modal-body { height: 100%; }
+  }
+
+  // Stacked cards keep Modal.scss geometry, but anchor by `left` (not `right`) so the compact
+  // window's left can interpolate. Same box, as the card width is 100vw - 2 * side.
+  .rc-modal.modal-stacked.modal-fullscreen > .modal-content,
+  .rc-modal.modal-stacked.modal-fullscreen > .modal-content-wrapper {
+    left: var(--modal-stack-side);
+    right: auto;
+  }
+  // Reorders animate `transform` only (see Modal.scss); geometry interpolates just while morphing.
+  &.modalRoot-window-morphing .rc-modal.modal-stacked.modal-fullscreen > .modal-content,
+  &.modalRoot-window-morphing .rc-modal.modal-stacked.modal-fullscreen > .modal-content-wrapper {
+    transition: top .2s ease, left .2s ease, width .2s ease, max-width .2s ease, height .2s ease, border-radius .2s ease, transform .2s ease;
+  }
+  &.modalRoot-window-morphing .rc-modal.modal-stacked.modal-fullscreen > .modal-content-wrapper > .modal-content {
+    transition: border-radius .2s ease;
+  }
+  // The rear card's "bring to front" strip follows its card the same way.
+  &.modalRoot-stacked .modal-stack-activate { left: var(--modal-stack-side); right: auto; }
+}
+
+.modalRoot.modalRoot-window-morphing.modalRoot-stacked .modal-stack-activate {
+  transition: top .2s ease, left .2s ease, width .2s ease, height .2s ease, transform .2s ease;
+}
+
 .modalRoot.modalRoot-window-controls.modalRoot-window-interacting .rc-modal.modal-compact {
   > .modal-content, > .modal-content-wrapper { transition: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .modalRoot.modalRoot-window-controls .rc-modal.modal-compact {
-    > .modal-content, > .modal-content-wrapper { transition: none; }
+    > .modal-content, > .modal-content-wrapper, > .modal-content-wrapper > .modal-content { transition: none; }
   }
+  .modalRoot.modalRoot-window-expanded .rc-modal.modal-fullscreen:not(.modal-stacked),
+  .modalRoot.modalRoot-window-expanded.modalRoot-window-morphing .rc-modal.modal-stacked.modal-fullscreen {
+    > .modal-content, > .modal-content-wrapper, > .modal-content-wrapper > .modal-content { transition: none; }
+  }
+  .modalRoot.modalRoot-window-morphing.modalRoot-stacked .modal-stack-activate { transition: none; }
 }
 
 .modalRoot.modalRoot-window-controls.modalRoot-window-interacting {
