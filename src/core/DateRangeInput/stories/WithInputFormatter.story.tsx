@@ -11,9 +11,9 @@ export const WithInputFormatter: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const highlights = canvas.getByText("2023-01-01 to 2023-01-31");
+    const input = await canvas.findByDisplayValue("2023-01-01 to 2023-01-31");
     const button = canvas.getByRole("button");
-    await expect(highlights).toBeInTheDocument();
+    await expect(input).toBeInTheDocument();
     await expect(button).toBeInTheDocument();
   },
 };

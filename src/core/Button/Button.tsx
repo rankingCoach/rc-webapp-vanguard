@@ -54,6 +54,14 @@ interface CommonButtonProps {
   /** @deprecated use `rounded` prop instead */
   shape?: ButtonShape;
   rounded?: boolean;
+  /**
+   * Controls how a long label behaves.
+   * - `no-wrap` (default): the label stays on a single line.
+   * - `wrap`: the label wraps onto multiple lines and the button grows in height.
+   *   The button is capped to its parent's width so wrapping kicks in once the label no longer fits.
+   *   Words are only broken when a single word is wider than the button; inside a flex row, give the
+   *   button's parent `min-width: 0` if it must shrink below its longest word.
+   */
   textWrap?: 'wrap' | 'no-wrap';
 
   /** @deprecated use `icon` and `iconPosition` props instead */
@@ -82,6 +90,8 @@ interface CommonButtonProps {
   uppercase?: boolean;
 
   replacements?: TextReplacements;
+  /** Whether the label is translated (default `true`). Set to `false` for labels that must be shown as-is. */
+  translate?: boolean;
 
   onClick?: eventFn | simpleFn;
   onMouseDown?: eventFn | simpleFn;
@@ -116,7 +126,7 @@ export const Button = (props: ButtonProps) => {
     children,
     disabled,
     debounce,
-    textWrap,
+    textWrap = 'no-wrap',
     fontWeight,
     textType,
     className,
@@ -130,6 +140,7 @@ export const Button = (props: ButtonProps) => {
     isLoading,
     testId,
     replacements,
+    translate = true,
     type = ButtonTypes.primary,
     size = ButtonSizes.medium,
     onClick,
@@ -390,6 +401,7 @@ export const Button = (props: ButtonProps) => {
           icon && iconPosition === 'left' ? styles.hasIconLeft : '',
           icon && iconPosition === 'right' ? styles.hasIconRight : '',
           rounded ? styles.shapeRound : '',
+          textWrap === 'wrap' ? styles.buttonTextWrap : '',
           blurred ? styles.blurred : '',
           inverted ? styles.inverted : '',
         )}
@@ -413,7 +425,9 @@ export const Button = (props: ButtonProps) => {
           {children && (
             <Text
               replacements={replacements}
-              textWrap={textWrap}
+              translate={translate}
+              // Forward the raw prop (not the defaulted value) so the rendered Text markup stays unchanged for existing buttons
+              textWrap={props.textWrap}
               type={textType ? textType : undefined}
               fontWeight={fontWeight ? fontWeight : FontWeights.medium}
               className={styles.buttonText}

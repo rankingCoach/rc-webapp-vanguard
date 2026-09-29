@@ -28,11 +28,13 @@ export const ModalOverDrawerWithHighlightInput: Story = {
     const drawerLayer = getDrawerLayer()!;
     const textarea = drawerLayer.querySelector('textarea') as HTMLTextAreaElement;
     const backdrop = drawerLayer.querySelector('.vanguard-input-backdrop') as HTMLElement;
-    const chip = drawerLayer.querySelector('.vanguard-input-mark-blue') as HTMLElement;
+    // The highlights container is re-rendered via innerHTML on every keystroke,
+    // so mark nodes are replaced — always re-query instead of holding a stale ref
+    const getChip = () => drawerLayer.querySelector('.vanguard-input-mark-blue') as HTMLElement;
 
     // Highlighting works inside the portaled drawer
-    await expect(chip).not.toBeNull();
-    await expect(chip.textContent).toBe('www.google.ro');
+    await expect(getChip()).not.toBeNull();
+    await expect(getChip().textContent).toBe('www.google.ro');
 
     // Backdrop geometry holds inside the drawer (portal + slide transform)
     await expect(backdrop.getBoundingClientRect().height).toBeCloseTo(textarea.getBoundingClientRect().height, 0);
@@ -40,12 +42,13 @@ export const ModalOverDrawerWithHighlightInput: Story = {
     // The mirror must not leak into the overlay stacking range or block the input
     const backdropZ = readZ(backdrop);
     await expect(Number.isNaN(backdropZ) ? 0 : backdropZ).toBeLessThan(1100);
-    await expect(topmostElAt(chip)).toBe(textarea);
+    await expect(topmostElAt(getChip())).toBe(textarea);
 
     // Typing inside the drawer keeps highlighting alive
     await userEvent.type(textarea, ' and http://second-link.com', { delay: 1 });
     await new Promise((r) => setTimeout(r, 300));
     await expect(drawerLayer.querySelectorAll('.vanguard-input-mark-blue').length).toBe(2);
+    await expect(getChip().textContent).toBe('www.google.ro');
 
     // Modal over the drawer
     await userEvent.click(screen.getByRole('button', { name: /open modal over drawer/i }));
@@ -58,7 +61,7 @@ export const ModalOverDrawerWithHighlightInput: Story = {
 
     // The fullscreen modal layer covers the input — nothing from the input
     // (chips, backdrop, textarea) may paint above it at the chip's coords
-    const topAtChipWithModal = topmostElAt(chip);
+    const topAtChipWithModal = topmostElAt(getChip());
     await expect(topAtChipWithModal).not.toBe(textarea);
     await expect(drawerLayer.contains(topAtChipWithModal!)).toBe(false);
 
@@ -69,7 +72,7 @@ export const ModalOverDrawerWithHighlightInput: Story = {
     // Closing the modal hands the input back to the user, highlights intact
     ModalService.closeAllModals();
     await new Promise((r) => setTimeout(r, 350));
-    await expect(topmostElAt(chip)).toBe(textarea);
+    await expect(topmostElAt(getChip())).toBe(textarea);
     await expect(drawerLayer.querySelectorAll('.vanguard-input-mark-blue').length).toBe(2);
 
     await closeAllOverlays();
