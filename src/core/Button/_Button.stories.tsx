@@ -27,6 +27,7 @@ import {
 } from "./stories/ButtonTextWrap.story";
 import { ButtonIconHasCircle as _ButtonIconHasCircle } from "./stories/ButtonIconHasCircle.story";
 import { ButtonWithReplacements as _ButtonWithReplacements } from "./stories/ButtonWithReplacements.story";
+import { ButtonNoTranslate as _ButtonNoTranslate } from "./stories/ButtonNoTranslate.story";
 import { ButtonOnMouseDown as _ButtonOnMouseDown } from "./stories/ButtonOnMouseDown.story";
 import { ButtonDeprecatedProps as _ButtonDeprecatedProps } from "./stories/ButtonDeprecatedProps.story";
 import { ButtonTextAlignedCenter as _ButtonTextAlignedCenter } from "./stories/ButtonTextAlignedCenter.story";
@@ -53,6 +54,7 @@ export const ButtonTextWrapWithIcon: ButtonStory = { ..._ButtonTextWrapWithIcon 
 export const ButtonTextWrapShortLabelUnchanged: ButtonStory = { ..._ButtonTextWrapShortLabelUnchanged }
 export const ButtonIconHasCircle: ButtonStory = { ..._ButtonIconHasCircle }
 export const ButtonWithReplacements: ButtonStory = { ..._ButtonWithReplacements }
+export const ButtonNoTranslate: ButtonStory = { ..._ButtonNoTranslate }
 export const ButtonOnMouseDown: ButtonStory = { ..._ButtonOnMouseDown }
 export const ButtonDeprecatedProps: ButtonStory = { ..._ButtonDeprecatedProps }
 export const ButtonTextAlignedCenter: ButtonStory = { ..._ButtonTextAlignedCenter }

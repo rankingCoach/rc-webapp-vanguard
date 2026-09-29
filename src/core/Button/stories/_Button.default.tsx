@@ -64,6 +64,10 @@ export const buttonArgTypes = {
     options: ['wrap', 'no-wrap'],
     defaultValue: 'no-wrap',
   },
+  translate: {
+    control: 'boolean',
+    defaultValue: true,
+  },
   iconHasCircle: {
     control: 'boolean',
     defaultValue: false,

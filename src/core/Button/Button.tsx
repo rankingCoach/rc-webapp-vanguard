@@ -90,6 +90,8 @@ interface CommonButtonProps {
   uppercase?: boolean;
 
   replacements?: TextReplacements;
+  /** Whether the label is translated (default `true`). Set to `false` for labels that must be shown as-is. */
+  translate?: boolean;
 
   onClick?: eventFn | simpleFn;
   onMouseDown?: eventFn | simpleFn;
@@ -138,6 +140,7 @@ export const Button = (props: ButtonProps) => {
     isLoading,
     testId,
     replacements,
+    translate = true,
     type = ButtonTypes.primary,
     size = ButtonSizes.medium,
     onClick,
@@ -422,6 +425,7 @@ export const Button = (props: ButtonProps) => {
           {children && (
             <Text
               replacements={replacements}
+              translate={translate}
               // Forward the raw prop (not the defaulted value) so the rendered Text markup stays unchanged for existing buttons
               textWrap={props.textWrap}
               type={textType ? textType : undefined}
