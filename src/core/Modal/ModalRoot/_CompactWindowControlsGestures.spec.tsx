@@ -46,7 +46,7 @@ afterEach(() => {
 const openManagedWindow = () => {
   ModalService.setCompactWindowControlsEnabled(true);
   ModalService.setCompactMode(true);
-  return ModalService.open(<Modal fullscreen />, { fullscreen: true });
+  return ModalService.open(<Modal fullscreen />, { fullscreen: true, allowCompact: true, allowStacking: true });
 };
 
 const stubRect = (el: Element | null, rect: { x: number; y: number; width: number; height: number }) => {

@@ -21,9 +21,12 @@ let getPublicWidgetDataSpy: ReturnType<typeof vi.spyOn> | undefined;
 const openWindow = (label: string, opts = {}) =>
   ModalService.open(<div data-label={label} />, {
     fullscreen: true,
+    allowStacking: true,
     windowMetadata: { label },
     ...opts,
   });
+
+const compactable = { allowCompact: true };
 
 const compactEvents = (spy: ReturnType<typeof vi.spyOn>) =>
   spy.mock.calls.filter(([event]) => event === PUB_SUB_EVENTS.reactModalCompactChange);
@@ -53,6 +56,7 @@ describe('opening windowed modals', () => {
     const evictedClose = vi.fn(() => openWindow('reopened'));
     const evicted = ModalService.open(<Closable close={evictedClose} />, {
       fullscreen: true,
+      allowStacking: true,
       windowMetadata: { label: 'evicted' },
     });
     const keeper = openWindow('keeper');
@@ -96,8 +100,8 @@ describe('opening windowed modals', () => {
 
     expect(ModalService.getModalComponent(plain)).toMatchObject({
       isFullscreen: true,
-      isCompact: true,
-      compactManaged: true,
+      isCompact: false,
+      compactManaged: false,
     });
     expect(ModalService.getModalComponent(plain).props.compact).toBeUndefined();
     expect(ModalService.getModalComponent(controlled)).toMatchObject({
@@ -146,12 +150,10 @@ describe('compact state and publications', () => {
 
     expect(compactEvents(publishSpy!)).toEqual([
       [PUB_SUB_EVENTS.reactModalCompactChange, { modalId: managed, isCompact: true }],
-      [PUB_SUB_EVENTS.reactModalCompactChange, { modalId: fullscreen, isCompact: true }],
       [PUB_SUB_EVENTS.reactModalCompactChange, { modalId: managed, isCompact: false }],
-      [PUB_SUB_EVENTS.reactModalCompactChange, { modalId: fullscreen, isCompact: false }],
       [PUB_SUB_EVENTS.reactModalCompactChange, { modalId: managed, isCompact: true }],
-      [PUB_SUB_EVENTS.reactModalCompactChange, { modalId: fullscreen, isCompact: true }],
     ]);
+    expect(ModalService.getModalComponent(fullscreen).isCompact).toBe(false);
     expect(ModalService.getBamIds()).toEqual([fullscreen]);
     expect(ModalService.getModalComponent(managed)).toMatchObject({ isCompact: true, compactManaged: true });
   });
@@ -183,7 +185,7 @@ describe('compact window geometry and docking guards', () => {
   const setup = () => {
     ModalService.setCompactWindowControlsEnabled(true);
     ModalService.setCompactMode(true);
-    return [openWindow('a'), openWindow('b'), openWindow('c')];
+    return [openWindow('a', compactable), openWindow('b', compactable), openWindow('c', compactable)];
   };
 
   test('clamps bounds, ignores non-finite bounds and fits stacks to the viewport', () => {
@@ -204,7 +206,7 @@ describe('compact window geometry and docking guards', () => {
 
   test('invalid dock thresholds are ignored and grouping requires attached stacking', () => {
     const [source, target, detached] = setup();
-    const top = openWindow('top');
+    const top = openWindow('top', compactable);
     const candidates = [
       { id: target, bounds },
       { id: detached, bounds: { ...bounds, x: 600 } },
@@ -247,9 +249,9 @@ describe('focus, active removal and stack limits', () => {
     ModalService.setStackingEnabled(true);
     ModalService.setCompactWindowControlsEnabled(true);
     ModalService.setCompactMode(true);
-    const first = openWindow('first');
-    const second = openWindow('second');
-    const third = openWindow('third');
+    const first = openWindow('first', compactable);
+    const second = openWindow('second', compactable);
+    const third = openWindow('third', compactable);
     const zBefore = OverlayStackingService.getZIndex(second);
 
     ModalService.bringToFront(second);

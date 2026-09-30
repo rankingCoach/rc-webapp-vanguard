@@ -72,7 +72,8 @@ export class CompactWindowManager implements CompactWindowPort {
   }
 
   findCompactWindowDropTarget(id: string, candidates: { id: string; bounds: CompactWindowBounds }[], group = false) {
-    if (!this.canManageCompactWindow(id)) return undefined;
+    // Only windows opened with allowStacking dock or accept a drop.
+    if (!this.canManageCompactWindow(id) || !this.stack.isStackable(id)) return undefined;
     if (group && (!this.stack.isStackingEnabled() || this.isCompactWindowDetached(id))) return undefined;
     const source = group ? this.getCompactStackBounds(id) : this.floatingWindows.get(id);
     const members = new Set(group ? this.stack.getStackedBamIds(id) : [id]);
@@ -80,6 +81,7 @@ export class CompactWindowManager implements CompactWindowPort {
     return candidates
       .filter((candidate) => {
         if (members.has(candidate.id) || !this.canManageCompactWindow(candidate.id)) return false;
+        if (!this.stack.isStackable(candidate.id)) return false;
         return compactWindowOverlapRatio(source, candidate.bounds) >= this.dockThreshold / 100;
       })
       .sort((a, b) => OverlayStackingService.getZIndex(b.id) - OverlayStackingService.getZIndex(a.id))[0];
@@ -138,7 +140,7 @@ export class CompactWindowManager implements CompactWindowPort {
     if (!this.canManageCompactWindow(id)) return;
     const floating = this.floatingWindows.get(id);
     const key = this.groupKey(id);
-    const bounds = floating ?? this.compactStackBounds.get(key);
+    const bounds = floating ?? (this.stack.isStackable(id) ? this.compactStackBounds.get(key) : undefined);
     if (bounds) {
       const fitted = clampCompactWindowBounds(bounds, window.innerWidth, window.innerHeight);
       if (floating) this.floatingWindows.set(id, fitted);
@@ -150,7 +152,7 @@ export class CompactWindowManager implements CompactWindowPort {
   setCompactWindowBounds(id: string, bounds: CompactWindowBounds, group = false) {
     if (!this.canManageCompactWindow(id) || !Object.values(bounds).every(Number.isFinite)) return;
     const next = clampCompactWindowBounds(bounds, window.innerWidth, window.innerHeight);
-    if (group && this.stack.isStackingEnabled() && !this.floatingWindows.has(id))
+    if (group && this.stack.isStackingEnabled() && this.stack.isStackable(id) && !this.floatingWindows.has(id))
       this.compactStackBounds.set(this.groupKey(id), next);
     else {
       this.floatingWindows.set(id, next);
@@ -162,7 +164,8 @@ export class CompactWindowManager implements CompactWindowPort {
 
   focusCompactWindow(id: string) {
     if (!this.canManageCompactWindow(id)) return;
-    const ids = this.stack.getBamIds();
+    // Reorder stackable BAMs only, so a BAM without allowStacking keeps its slot above them.
+    const ids = this.stack.getBamIds().filter((other) => other === id || this.stack.isStackable(other));
     const members =
       this.stack.isStackingEnabled() && !this.isCompactWindowDetached(id) ? this.stack.getStackedBamIds(id) : [id];
     const next = [...ids.filter((other) => !members.includes(other)), ...members.filter((other) => other !== id), id];
@@ -173,7 +176,7 @@ export class CompactWindowManager implements CompactWindowPort {
   }
 
   returnCompactWindowToStack(id: string) {
-    if (!this.canManageCompactWindow(id)) return;
+    if (!this.canManageCompactWindow(id) || !this.stack.isStackable(id)) return;
     this.floatingWindows.delete(id);
     this.compactWindowGroups.delete(id);
     this.pruneGroups();
@@ -185,7 +188,9 @@ export class CompactWindowManager implements CompactWindowPort {
 
   stackAllCompactWindows() {
     if (!this.controlsEnabled || !this.stack.isCompactMode()) return;
-    this.floatingWindows.clear();
+    for (const id of [...this.floatingWindows.keys()]) {
+      if (this.stack.isStackable(id)) this.floatingWindows.delete(id);
+    }
     this.compactWindowGroups.clear();
     this.pruneGroups();
     this.stack.enableStacking();

@@ -60,9 +60,11 @@ ModalService.compact(id);
 ModalService.expand(id);
 ```
 
-Compact and expand controls now switch **all fullscreen BAMs together**, including
-BAMs inside consumer wrappers and BAMs opened while compact mode is active.
-Ordinary non-fullscreen dialogs retain their existing presentation.
+Compact and expand controls switch **every modal opened with `allowCompact`** together,
+including ones opened while compact mode is active. BAMs and dialogs opened without
+`allowCompact` never take the compact presentation: one opened while compact windows
+are showing opens fullscreen above them, and the compact windows keep their stacks,
+geometry and overlay slots.
 
 The panel is 480px wide and at most 760px tall, bounded by the viewport with a
 16px gutter. Its content stays mounted while switching modes. Compact mode
@@ -74,12 +76,13 @@ not persisted to storage. It remains active for this service until explicitly ex
 ### Service-level presentation modes
 
 ```tsx
-ModalService.setCompactMode(true); // Compact all current and future BAMs
-ModalService.setCompactMode(false); // Expand all BAMs
+ModalService.setCompactMode(true); // Compact all current and future allowCompact modals
+ModalService.setCompactMode(false); // Expand them
 
 ModalService.setStackingEnabled(true); // Opt into overlapping cards
 const id = ModalService.open(<BusinessProfile close={() => {}} />, {
   allowCompact: true,
+  allowStacking: true, // Only modals opened with allowStacking join a stack
   stackTitle: "Business profile",
 });
 ModalService.bringToFront(id);
@@ -87,7 +90,13 @@ ModalService.setStackingEnabled(false); // Return to ordinary modal presentation
 ```
 
 Stacking is disabled by default and works in both fullscreen and compact mode.
-With more than three expanded fullscreen BAMs, a single horizontal tab bar replaces
+It needs both the service switch and a per-modal opt-in: only modals opened with
+`allowStacking: true` join a stack. Any other BAM opens as a plain fullscreen modal
+above the stacks (open order decides the overlay slot) and leaves them untouched: it
+gets no rear strip or tab, does not count toward the stack limit, cannot be docked, and
+promoting or focusing stacked windows never reorders it. Compact windows and expanded
+BAMs never share a stack.
+With more than three expanded stacked BAMs, a single horizontal tab bar replaces
 the overlapping rear strips. Tabs preserve their order when switching, scroll
 horizontally when necessary, and support Left/Right arrows and Home/End. Closing
 back down to three restores the overlapping stack. Compact BAMs always retain
@@ -108,6 +117,8 @@ ModalService.setStackingEnabled(true); // Optional: also works with independent 
 ```
 
 Only compact fullscreen BAMs receive invisible movement areas and edge/corner resize handles.
+Only compact windows opened with `allowStacking` dock, join stacks or share stack geometry;
+any other compact window moves and resizes on its own.
 The top 48px acts as an invisible title band (the outer 8px remains available for resizing).
 Dragging the sides moves an individual BAM; the center 96px moves the attached stack.
 Buttons, links, inputs, and focusable controls in the band remain interactive. Add
@@ -160,9 +171,9 @@ ModalService.setMaxStackSize(3); // Keep at most three attached BAMs when stacki
 ModalService.setMaxStackSize(); // Restore the default: no limit (null also clears it).
 ```
 
-The limit applies independently to each compact stack. Opening or attaching a BAM
+The limit applies independently to each compact stack and to the stack of expanded BAMs. Opening or attaching a BAM
 beyond that stack’s limit closes its backmost BAM, keeping the incoming BAM. Promoting windows changes that order. Detached
-compact windows and ordinary dialogs do not count. The limit also applies when enabling
+compact windows, BAMs without `allowStacking` and ordinary dialogs do not count. The limit also applies when enabling
 stacking, lowering the maximum, gathering windows, or expanding detached compact BAMs
 back into a fullscreen stack. Closing follows the normal injected close callback and
 close-listener path with `{ isOk: false }`. The maximum must be a positive integer.

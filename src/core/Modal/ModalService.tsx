@@ -39,6 +39,11 @@ export type ModalOpts = {
   windowMetadata?: ModalWindowMetadata;
   /** Opt into compact()/expand() controls. Existing modals remain unchanged when omitted. */
   allowCompact?: boolean;
+  /**
+   * Opt into the BAM card stack (active while setStackingEnabled(true)). Omitted, the modal opens as a plain BAM
+   * above any stack and never joins, counts toward or reorders one.
+   */
+  allowStacking?: boolean;
   /** Label shown on the exposed stacking tab. */
   stackTitle?: string;
   testId?: string;
@@ -216,9 +221,13 @@ class ModalServiceClass {
     this.compactWindows.stackAllCompactWindows();
   }
 
-  /** All attached BAMs, or only the stack containing a specified BAM. */
+  /** All attached stackable BAMs, or only the stack containing a specified BAM. */
   getStackedBamIds(modalId?: string) {
     return this.stack.getStackedBamIds(modalId);
+  }
+  /** Whether the modal was opened with allowStacking. */
+  isModalStackable(modalId: string) {
+    return this.stack.isStackable(modalId);
   }
   /** Maximum attached BAMs. Omit/undefined/null restores unlimited stacking. */
   setMaxStackSize(max?: number | null) {
@@ -539,11 +548,11 @@ class ModalServiceClass {
     });
   }
 
-  /** Enable/disable the shared compact presentation for ALL fullscreen BAMs. */
+  /** Enable/disable the shared compact presentation for every modal opened with allowCompact. */
   setCompactMode(enabled: boolean) {
     this.stack.setCompactMode(enabled);
   }
-  /** Opt into the visual card stack. Disabled by default. */
+  /** Opt into the visual card stack for modals opened with allowStacking. Disabled by default. */
   setStackingEnabled(enabled: boolean) {
     this.stack.setStackingEnabled(enabled);
   }
@@ -561,11 +570,11 @@ class ModalServiceClass {
   bringToFront(modalId: string) {
     this.stack.bringToFront(modalId);
   }
-  /** Consumer control: compact the entire BAM group. */
+  /** Consumer control: compact every allowCompact modal. */
   compact(modalId?: string | null) {
     this.stack.compact(modalId);
   }
-  /** Consumer control: expand the entire BAM group. */
+  /** Consumer control: expand every allowCompact modal. */
   expand(modalId?: string | null) {
     this.stack.expand(modalId);
   }
@@ -665,8 +674,9 @@ class ModalServiceClass {
       },
       modalId: id,
       isFullscreen: !!opts?.fullscreen,
-      isCompact: this.stack.isCompactMode() && !!(opts?.fullscreen || opts?.allowCompact),
-      compactManaged: this.stack.isCompactMode() && !!(opts?.fullscreen || opts?.allowCompact),
+      // Only allowCompact modals take part in compact mode; any other BAM opens in its own presentation.
+      isCompact: this.stack.isCompactMode() && !!opts?.allowCompact,
+      compactManaged: this.stack.isCompactMode() && !!opts?.allowCompact,
     });
 
     OverlayStackingService.register(id, 'modal', opts?.baseZIndex);

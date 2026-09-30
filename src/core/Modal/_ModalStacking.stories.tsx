@@ -17,9 +17,10 @@ const Editor = ({ title, close, compact, expand }: StandardModalProps<unknown>) 
       {ModalService.isCompactWindowControlsEnabled() && <button aria-label={`Window action ${actionCount}`}
         style={{ position: 'absolute', top: 12, right: 16, zIndex: 1 }} onClick={() => setActionCount((count) => count + 1)}>⋯</button>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, paddingBottom: 24 }}>
-        <button onClick={compact ?? (() => ModalService.setCompactMode(true))}>Compact all BAMs</button>
-        <button onClick={expand ?? (() => ModalService.setCompactMode(false))}>Expand all BAMs</button>
+        <button onClick={compact ?? (() => ModalService.setCompactMode(true))}>Compact windows</button>
+        <button onClick={expand ?? (() => ModalService.setCompactMode(false))}>Expand windows</button>
         <button onClick={() => openEditor('New window')}>Open another BAM</button>
+        <button onClick={() => openEditor('Settings', false)}>Open a plain BAM</button>
         <button onClick={() => ModalService.setStackingEnabled(false)}>Disable stacking</button>
       </div>
       <button onClick={() => ModalService.setCompactWindowControlsEnabled(false)}>Disable moving and resizing</button>
@@ -29,8 +30,9 @@ const Editor = ({ title, close, compact, expand }: StandardModalProps<unknown>) 
   );
 };
 
-const openEditor = (title: string, allowCompact = true) => ModalService.open(
-  <Editor title={title} close={() => {}} />, { allowCompact, stackTitle: title },
+// A stacked window opts into compact mode and stacking, like an Ado conversation; a plain BAM opts into neither.
+const openEditor = (title: string, stackedWindow = true) => ModalService.open(
+  <Editor title={title} close={() => {}} />, { allowCompact: stackedWindow, allowStacking: stackedWindow, stackTitle: title },
 );
 
 const Demo = ({ compact = false, windowControls = false, maxStackSize }: { compact?: boolean; windowControls?: boolean; maxStackSize?: number }) => {
@@ -47,7 +49,7 @@ const Demo = ({ compact = false, windowControls = false, maxStackSize }: { compa
       ModalService.setCompactWindowControlsEnabled(windowControls);
       ModalService.setStackingEnabled(true);
       ModalService.setCompactMode(compact);
-      openEditor('Business profile', false);
+      openEditor('Business profile');
       openEditor('Website');
       openEditor('Assistant');
     }}>Open three BAMs</button>
@@ -89,7 +91,7 @@ const exerciseStack = async ({ canvasElement }: { canvasElement: HTMLElement }) 
   await userEvent.click(canvas.getByRole('button', { name: 'Bring to front Assistant' }));
   await waitFor(() => expect(root(assistant)).toHaveAttribute('data-stack-active', 'true'));
   await expect(within(assistant).getByRole('textbox')).toHaveValue('Keep this draft');
-  await userEvent.click(within(assistant).getByRole('button', { name: 'Compact all BAMs' }));
+  await userEvent.click(within(assistant).getByRole('button', { name: 'Compact windows' }));
   await waitFor(() => {
     for (const modal of canvasElement.querySelectorAll('.rc-modal')) expect(modal).toHaveClass('modal-compact');
   });
@@ -98,7 +100,7 @@ const exerciseStack = async ({ canvasElement }: { canvasElement: HTMLElement }) 
   const added = await canvas.findByTestId('stack-New window');
   await waitFor(() => expect(added).toHaveClass('modal-compact'));
   await expect(root(added)).toHaveAttribute('data-stack-active', 'true');
-  await userEvent.click(within(added).getByRole('button', { name: 'Expand all BAMs' }));
+  await userEvent.click(within(added).getByRole('button', { name: 'Expand windows' }));
   await waitFor(() => {
     for (const modal of canvasElement.querySelectorAll('.rc-modal')) expect(modal).not.toHaveClass('modal-compact');
   });
@@ -135,9 +137,9 @@ export const FullscreenTabs = { render: () => <Demo />, play: async ({ canvasEle
     expect(rect.bottom).toBe(window.innerHeight);
     expect(rect.width).toBe(window.innerWidth);
   });
-  await userEvent.click(within(added).getByRole('button', { name: 'Compact all BAMs' }));
+  await userEvent.click(within(added).getByRole('button', { name: 'Compact windows' }));
   expect(canvas.queryByRole('tablist')).toBeNull();
-  await userEvent.click(within(added).getByRole('button', { name: 'Expand all BAMs' }));
+  await userEvent.click(within(added).getByRole('button', { name: 'Expand windows' }));
   expect(canvas.getAllByRole('tab')).toHaveLength(4);
   await userEvent.click(within(added).getByRole('button', { name: 'Cancel', exact: true }));
   await waitFor(() => expect(canvas.queryByRole('tablist')).toBeNull());
@@ -389,6 +391,66 @@ export const IndependentStacks = { render: () => <Demo compact windowControls />
   expect(ModalService.getCompactStackBounds(idOf(fourth))!.width).toBe(newBounds.width - 10);
   expect(panelOf(website).getBoundingClientRect().left).toBe(originalLeft);
   expect(panelOf(website).getBoundingClientRect().width).toBe(originalWidth);
+  ModalService.closeAllModals();
+} };
+
+export const BamOverCompactWindows = { render: () => <Demo compact windowControls />, play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement);
+  const root = (el: HTMLElement) => el.closest('.modalRoot') as HTMLElement;
+  const idOf = (el: HTMLElement) => root(el).getAttribute('data-modal-id')!;
+  await userEvent.click(canvas.getByRole('button', { name: 'Open three BAMs' }));
+  const assistant = await canvas.findByTestId('stack-Assistant');
+  await expect(canvasElement.ownerDocument.body.style.overflow).toBe('');
+  await userEvent.click(within(assistant).getByRole('button', { name: 'Open a plain BAM' }));
+  const settings = await canvas.findByTestId('stack-Settings');
+  // A plain BAM opens fullscreen above the compact windows, never as one of them.
+  await expect(settings).not.toHaveClass('modal-compact');
+  await expect(root(settings)).not.toHaveClass('modalRoot-stacked');
+  await waitFor(() => {
+    const rect = settings.querySelector('.modal-content')!.getBoundingClientRect();
+    expect(rect.left).toBe(0);
+    expect(rect.width).toBe(window.innerWidth);
+    expect(Math.abs(rect.bottom - window.innerHeight)).toBeLessThan(1);
+  });
+  expect(Number(root(settings).style.zIndex)).toBeGreaterThan(Number(root(assistant).style.zIndex));
+  expect(ModalService.getStackedBamIds(idOf(settings))).toEqual([idOf(settings)]);
+  expect(ModalService.getStackedBamIds(idOf(assistant))).toHaveLength(3);
+  for (const title of ['Business profile', 'Website', 'Assistant']) {
+    await expect(canvas.getByTestId(`stack-${title}`)).toHaveClass('modal-compact');
+  }
+  await expect(canvasElement.ownerDocument.body.style.overflow).toBe('hidden');
+  ModalService.closeAllModals();
+} };
+
+export const BamOverFullscreenStack = { render: () => <Demo />, play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  const canvas = within(canvasElement);
+  const root = (el: HTMLElement) => el.closest('.modalRoot') as HTMLElement;
+  const idOf = (el: HTMLElement) => root(el).getAttribute('data-modal-id')!;
+  await userEvent.click(canvas.getByRole('button', { name: 'Open three BAMs' }));
+  const assistant = await canvas.findByTestId('stack-Assistant');
+  await waitFor(() => expect(root(assistant)).toHaveAttribute('data-stack-active', 'true'));
+  const stackedIds = ModalService.getStackedBamIds();
+  await userEvent.click(within(assistant).getByRole('button', { name: 'Open a plain BAM' }));
+  const settings = await canvas.findByTestId('stack-Settings');
+  // Four fullscreen BAMs are open, but only three are stacked: no tab bar, and the stack keeps its order and front.
+  await expect(canvas.queryByRole('tablist')).toBeNull();
+  await expect(root(settings)).not.toHaveClass('modalRoot-stacked');
+  await expect(root(settings)).not.toHaveAttribute('data-stack-active');
+  await waitFor(() => {
+    const rect = settings.querySelector('.modal-content')!.getBoundingClientRect();
+    expect(rect.top).toBe(0);
+    expect(rect.left).toBe(0);
+    expect(rect.width).toBe(window.innerWidth);
+    expect(Math.abs(rect.bottom - window.innerHeight)).toBeLessThan(1);
+  });
+  expect(Number(root(settings).style.zIndex)).toBeGreaterThan(Number(root(assistant).style.zIndex));
+  expect(ModalService.getStackedBamIds()).toEqual(stackedIds);
+  expect(ModalService.getStackedBamIds(idOf(settings))).toEqual([idOf(settings)]);
+  await expect(root(assistant)).toHaveAttribute('data-stack-active', 'true');
+  await userEvent.click(within(settings).getByRole('button', { name: 'Cancel', exact: true }));
+  await waitFor(() => expect(canvas.queryByTestId('stack-Settings')).not.toBeInTheDocument());
+  expect(ModalService.getStackedBamIds()).toEqual(stackedIds);
+  await expect(root(assistant)).toHaveAttribute('data-stack-active', 'true');
   ModalService.closeAllModals();
 } };
 

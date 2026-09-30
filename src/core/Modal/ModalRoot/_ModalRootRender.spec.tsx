@@ -96,7 +96,7 @@ describe('body scroll lock', () => {
     renderRoot();
     act(() => {
       ModalService.setCompactMode(true);
-      ModalService.open(<Modal fullscreen />, { fullscreen: true });
+      ModalService.open(<Modal fullscreen />, { fullscreen: true, allowCompact: true });
     });
     expect(document.body.style.overflow).toBe('');
   });
@@ -133,7 +133,9 @@ describe('flags off', () => {
 });
 
 describe('stacking', () => {
-  const openBam = () => ModalService.open(<Modal fullscreen />, { fullscreen: true });
+  const openBam = () => ModalService.open(<Modal fullscreen />, { fullscreen: true, allowStacking: true });
+  const openCompactableBam = () =>
+    ModalService.open(<Modal fullscreen />, { fullscreen: true, allowCompact: true, allowStacking: true });
 
   test('back BAMs get modalRoot-stacked/modalRoot-stack-back + inert, the active one gets data-stack-active', () => {
     renderRoot();
@@ -179,15 +181,16 @@ describe('stacking', () => {
     act(() => {
       ModalService.setStackingEnabled(true);
       ModalService.setCompactMode(true);
-      first = openBam();
-      openBam();
+      first = openCompactableBam();
+      openCompactableBam();
     });
     expect(rootFor(first!)!.style.backgroundColor).toBe('transparent');
   });
 });
 
 describe('tabs (>3 expanded stacked BAMs)', () => {
-  const openBam = (title?: string) => ModalService.open(<Modal fullscreen />, { fullscreen: true, title });
+  const openBam = (title?: string) =>
+    ModalService.open(<Modal fullscreen />, { fullscreen: true, allowStacking: true, title });
 
   const setupFour = () => {
     let ids: string[] = [];
@@ -224,7 +227,12 @@ describe('tabs (>3 expanded stacked BAMs)', () => {
     act(() => {
       ModalService.setStackingEnabled(true);
       [0, 1, 2].forEach(() => openBam('Ignored'));
-      ModalService.open(<Modal fullscreen />, { fullscreen: true, title: 'Ignored', stackTitle: 'Custom tab' });
+      ModalService.open(<Modal fullscreen />, {
+        fullscreen: true,
+        allowStacking: true,
+        title: 'Ignored',
+        stackTitle: 'Custom tab',
+      });
     });
     const tabs = appScreen.getAllByRole('tab');
     expect(tabs.at(-1)!.getAttribute('title')).toBe('Custom tab');
@@ -276,6 +284,23 @@ describe('tabs (>3 expanded stacked BAMs)', () => {
     expect(document.querySelector('.modal-stack-tabs')).toBeNull();
     expect(document.querySelectorAll('.modal-stack-activate').length).toBeGreaterThan(0);
   });
+
+  test('a BAM without allowStacking opens outside the stack: no tab, no stack classes, stack front unchanged', () => {
+    renderRoot();
+    let ids: string[] = [];
+    let plain: string;
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ids = [openBam('One'), openBam('Two'), openBam('Three')];
+      plain = ModalService.open(<Modal fullscreen />, { fullscreen: true, title: 'Plain' });
+    });
+    expect(document.querySelector('.modal-stack-tabs')).toBeNull();
+    expect(rootFor(plain!)!.className.split(/\s+/).filter(Boolean)).toEqual(['modalRoot']);
+    expect(rootFor(plain!)!.getAttribute('data-stack-active')).toBeNull();
+    expect(Number(rootFor(plain!)!.style.zIndex)).toBeGreaterThan(Number(rootFor(ids[2])!.style.zIndex));
+    expect(rootFor(ids[2])!.getAttribute('data-stack-active')).toBe('true');
+    expect(rootFor(ids[0])!.className).toContain('modalRoot-stack-back');
+  });
 });
 
 describe('compact window controls', () => {
@@ -284,7 +309,7 @@ describe('compact window controls', () => {
     act(() => {
       ModalService.setCompactWindowControlsEnabled(true);
       ModalService.setCompactMode(true);
-      id = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+      id = ModalService.open(<Modal fullscreen />, { fullscreen: true, allowCompact: true });
     });
     return id!;
   };
@@ -425,8 +450,8 @@ describe('Esc handling', () => {
     const closeB = vi.fn();
     act(() => {
       ModalService.setStackingEnabled(true);
-      ModalService.open(<Modal fullscreen onClose={closeA} />, { fullscreen: true });
-      ModalService.open(<Modal fullscreen onClose={closeB} />, { fullscreen: true });
+      ModalService.open(<Modal fullscreen onClose={closeA} />, { fullscreen: true, allowStacking: true });
+      ModalService.open(<Modal fullscreen onClose={closeB} />, { fullscreen: true, allowStacking: true });
     });
     act(() => {
       pressEsc();

@@ -16,7 +16,7 @@ afterEach(() => {
 describe('nested service modals', () => {
   test.each([false, true])('an inner modal cannot change the BAM and only it closes on Escape (initial: %s)', (initial) => {
     ModalService.setStackingEnabled(true);
-    const id = ModalService.open(<div />, { fullscreen: true });
+    const id = ModalService.open(<div />, { fullscreen: true, allowCompact: true });
     ModalService.setCompactMode(true);
     const outerClose = vi.fn();
     const innerClose = vi.fn();

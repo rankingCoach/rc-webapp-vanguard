@@ -4,9 +4,12 @@ import { ModalService, ModalWindowEvent } from './ModalService';
 
 afterEach(() => ModalService.__resetForTests());
 
-const openWindow = (route: string) => ModalService.open(<div />, {
-  fullscreen: true, windowMetadata: { route, projectId: 42 },
-});
+const openWindow = (route: string) =>
+  ModalService.open(<div />, {
+    fullscreen: true,
+    allowStacking: true,
+    windowMetadata: { route, projectId: 42 },
+  });
 
 test('metadata opts in; open and focus emit once, geometry and presentation do not', () => {
   const events: ModalWindowEvent[] = [];

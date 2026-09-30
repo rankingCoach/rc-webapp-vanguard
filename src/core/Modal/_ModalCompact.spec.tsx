@@ -5,13 +5,17 @@ import { Modal } from './Modal';
 import { ModalService } from './ModalService';
 import { OverlayStackingService } from '../OverlayStacking/OverlayStackingService';
 
+/** Opened like an Ado window: it may go compact and joins stacks. */
+const stackedWindowOpts = { fullscreen: true, allowCompact: true, allowStacking: true };
+const stackedBamOpts = { fullscreen: true, allowStacking: true };
+
 afterEach(() => ModalService.__resetForTests());
 
 test('viewport fitting preserves attached and detached membership while stacking is disabled', () => {
   ModalService.setCompactMode(true);
   ModalService.setCompactWindowControlsEnabled(true);
-  const attached = ModalService.open(<Modal fullscreen />, { fullscreen: true });
-  const detached = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+  const attached = ModalService.open(<Modal fullscreen />, stackedWindowOpts);
+  const detached = ModalService.open(<Modal fullscreen />, stackedWindowOpts);
   ModalService.setCompactWindowBounds(detached, { x: 20, y: 20, width: 400, height: 400 });
   ModalService.fitCompactWindowToViewport(attached);
   ModalService.fitCompactWindowToViewport(detached);
@@ -23,22 +27,102 @@ test('viewport fitting preserves attached and detached membership while stacking
 });
 
 describe('opt-in compact modal controls', () => {
-  test('shared compact mode includes wrapped BAMs and future BAMs, but not ordinary dialogs', () => {
-    const first = ModalService.open(<Modal fullscreen />, { fullscreen: true });
-    const wrapped = ModalService.open(<div />);
-    ModalService.registerFullscreen(wrapped, true);
+  test('shared compact mode switches current and future allowCompact modals only, never other BAMs or dialogs', () => {
+    const openWrappedBam = () => {
+      const id = ModalService.open(<div />);
+      ModalService.registerFullscreen(id, true);
+      return id;
+    };
+    const first = ModalService.open(<Modal fullscreen />, stackedWindowOpts);
+    const bam = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+    const wrapped = openWrappedBam();
     const dialog = ModalService.open(<Modal fullscreen={false} />);
-    ModalService.setCompactMode(true);
-    const added = ModalService.open(<Modal fullscreen />, { fullscreen: true });
-    for (const id of [first, wrapped, added]) expect(ModalService.getModalComponent(id).isCompact).toBe(true);
-    expect(ModalService.getModalComponent(dialog).isCompact).toBeFalsy();
+    ModalService.compact(first);
+    const added = ModalService.open(<Modal fullscreen />, stackedWindowOpts);
+    const addedBam = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+    const addedWrapped = openWrappedBam();
+    for (const id of [first, added]) expect(ModalService.getModalComponent(id).isCompact).toBe(true);
+    for (const id of [bam, wrapped, dialog, addedBam, addedWrapped]) {
+      expect(ModalService.getModalComponent(id).isCompact).toBeFalsy();
+      expect(ModalService.getModalComponent(id).compactManaged).toBeFalsy();
+    }
     ModalService.setCompactMode(false);
-    for (const id of [first, wrapped, added]) expect(ModalService.getModalComponent(id).isCompact).toBe(false);
+    for (const id of [first, added]) expect(ModalService.getModalComponent(id).isCompact).toBe(false);
+  });
+
+  test('compact windows and expanded BAMs keep separate stacks, limits and overlay slots', async () => {
+    ModalService.setStackingEnabled(true);
+    ModalService.setCompactWindowControlsEnabled(true);
+    ModalService.setCompactMode(true);
+    ModalService.setMaxStackSize(2);
+    const back = ModalService.open(<Modal fullscreen />, stackedBamOpts);
+    const front = ModalService.open(<Modal fullscreen />, stackedBamOpts);
+    const [firstWindow, secondWindow] = [0, 1].map(() => ModalService.open(<Modal fullscreen />, stackedWindowOpts));
+    expect(ModalService.getStackedBamIds(back)).toEqual([back, front]);
+    expect(ModalService.getStackedBamIds(secondWindow)).toEqual([firstWindow, secondWindow]);
+    // Four BAMs are open, but each stack holds two: nothing is closed (evictions close on the next task).
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    for (const id of [back, front, firstWindow, secondWindow]) expect(ModalService.getModalComponent(id)).toBeDefined();
+
+    ModalService.bringToFront(back);
+    expect(ModalService.getStackedBamIds(back)).toEqual([front, back]);
+    expect(OverlayStackingService.getZIndex(firstWindow)).toBeGreaterThan(OverlayStackingService.getZIndex(back));
+    expect(ModalService.getBamIds().slice(-2)).toEqual([firstWindow, secondWindow]);
+  });
+
+  test.each([false, true])(
+    'a BAM without allowStacking never joins, counts toward or reorders a stack (compact: %s)',
+    async (compact) => {
+      ModalService.setStackingEnabled(true);
+      ModalService.setCompactWindowControlsEnabled(true);
+      ModalService.setCompactMode(compact);
+      ModalService.setMaxStackSize(2);
+      const [first, second] = [0, 1].map(() => ModalService.open(<Modal fullscreen />, stackedWindowOpts));
+      const plain = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+      const wrapped = ModalService.open(<div />);
+      ModalService.registerFullscreen(wrapped, true);
+      expect(ModalService.isModalStackable(first)).toBe(true);
+      expect(ModalService.isModalStackable(plain)).toBe(false);
+      expect(ModalService.getStackedBamIds()).toEqual([first, second]);
+      expect(ModalService.getStackedBamIds(second)).toEqual([first, second]);
+      expect(ModalService.getStackedBamIds(plain)).toEqual([plain]);
+      expect(ModalService.getStackedBamIds(wrapped)).toEqual([wrapped]);
+      // Four BAMs are open, but only the two stacked windows count toward the limit of two.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      for (const id of [first, second, plain, wrapped]) expect(ModalService.getModalComponent(id)).toBeDefined();
+
+      const plainZ = OverlayStackingService.getZIndex(plain);
+      ModalService.bringToFront(first);
+      ModalService.bringToFront(plain);
+      expect(ModalService.getStackedBamIds(second)).toEqual([second, first]);
+      expect(OverlayStackingService.getZIndex(plain)).toBe(plainZ);
+      expect(ModalService.getBamIds().slice(-2)).toEqual([plain, wrapped]);
+    },
+  );
+
+  test('a compact window without allowStacking never docks or takes the stack geometry', () => {
+    ModalService.setStackingEnabled(true);
+    ModalService.setCompactWindowControlsEnabled(true);
+    ModalService.setCompactMode(true);
+    const bounds = { x: 0, y: 0, width: 400, height: 300 };
+    const stacked = ModalService.open(<Modal fullscreen />, stackedWindowOpts);
+    const single = ModalService.open(<Modal fullscreen />, { fullscreen: true, allowCompact: true });
+    ModalService.setCompactWindowBounds(stacked, bounds, true);
+    ModalService.setCompactWindowBounds(single, bounds, true);
+    expect(ModalService.getCompactStackBounds(stacked)).toEqual(bounds);
+    expect(ModalService.getCompactWindowBounds(single)).toEqual(bounds);
+    expect(ModalService.findCompactWindowDropTarget(single, [{ id: stacked, bounds }])).toBeUndefined();
+    ModalService.dockCompactWindow(single, [{ id: stacked, bounds }]);
+    ModalService.returnCompactWindowToStack(single);
+    ModalService.stackAllCompactWindows();
+    expect(ModalService.getStackedBamIds(stacked)).toEqual([stacked]);
+    expect(ModalService.getStackedBamIds(single)).toEqual([single]);
+    expect(ModalService.getCompactWindowBounds(single)).toEqual(bounds);
   });
 
   test('promotion is opt-in and leaves unrelated overlays above the BAM stack', () => {
-    const first = ModalService.open(<Modal fullscreen />, { fullscreen: true });
-    const second = ModalService.open(<Modal fullscreen />, { fullscreen: true });
+    const first = ModalService.open(<Modal fullscreen />, stackedBamOpts);
+    const second = ModalService.open(<Modal fullscreen />, stackedBamOpts);
     const dialog = ModalService.open(<Modal fullscreen={false} />);
     const dialogZ = OverlayStackingService.getZIndex(dialog);
     ModalService.bringToFront(first);
@@ -102,7 +186,7 @@ describe('opt-in compact modal controls', () => {
 
 describe('independent compact window management opt-in', () => {
   const bounds = { x: 40, y: 40, width: 400, height: 300 };
-  const open = () => ModalService.open(<Modal fullscreen />, { fullscreen: true });
+  const open = () => ModalService.open(<Modal fullscreen />, stackedWindowOpts);
   test('all management APIs are inert by default, including with stacking and compact enabled', () => {
     const id = open();
     ModalService.setCompactMode(true);
@@ -152,7 +236,7 @@ describe('independent compact window management opt-in', () => {
 describe('overlap docking', () => {
   const bounds = { x: 0, y: 0, width: 400, height: 300 };
   const setup = () => {
-    const ids = [0, 1, 2].map(() => ModalService.open(<Modal fullscreen />, { fullscreen: true }));
+    const ids = [0, 1, 2].map(() => ModalService.open(<Modal fullscreen />, stackedWindowOpts));
     ModalService.setCompactMode(true);
     ModalService.setCompactWindowControlsEnabled(true);
     return ids;
@@ -183,7 +267,7 @@ describe('overlap docking', () => {
 
 describe('optional BAM stack maximum', () => {
   const Window = ({ close }: { close: () => void }) => <Modal fullscreen onClose={close} />;
-  const open = (close = vi.fn()) => ModalService.open(<Window close={close} />, { fullscreen: true });
+  const open = (close = vi.fn()) => ModalService.open(<Window close={close} />, stackedWindowOpts);
   test('unconfigured is unlimited; enabling a maximum keeps newest and closes backmost once', async () => {
     ModalService.setStackingEnabled(true);
     const close = vi.fn();
@@ -224,7 +308,7 @@ describe('optional BAM stack maximum', () => {
     expect(ModalService.getBamIds()).toHaveLength(2);
     ModalService.setStackingEnabled(true);
     await vi.waitFor(() => expect(ModalService.getModalComponent(first)).toBeUndefined());
-    const wrapped = ModalService.open(<div />);
+    const wrapped = ModalService.open(<div />, { allowStacking: true });
     ModalService.registerFullscreen(wrapped, true);
     await vi.waitFor(() => expect(ModalService.getModalComponent(second)).toBeUndefined());
     expect(ModalService.getStackedBamIds()).toEqual([wrapped]);
@@ -240,7 +324,7 @@ describe('dropping an entire stack', () => {
     ModalService.setCompactWindowControlsEnabled(true);
     ModalService.setCompactMode(true);
     ModalService.setStackingEnabled(true);
-    const ids = [0, 1, 2, 3].map(() => ModalService.open(<Modal />, { fullscreen: true }));
+    const ids = [0, 1, 2, 3].map(() => ModalService.open(<Modal />, stackedWindowOpts));
     const [back, front, target, unrelated] = ids;
     const bounds = { x: 0, y: 0, width: 400, height: 400 };
     ModalService.setCompactWindowBounds(target, bounds);
@@ -259,7 +343,7 @@ describe('dropping an entire stack', () => {
     ModalService.setCompactWindowControlsEnabled(true);
     ModalService.setCompactMode(true);
     ModalService.setStackingEnabled(true);
-    const [back, front, target] = [0, 1, 2].map(() => ModalService.open(<Modal />, { fullscreen: true }));
+    const [back, front, target] = [0, 1, 2].map(() => ModalService.open(<Modal />, stackedWindowOpts));
     const bounds = { x: 0, y: 0, width: 400, height: 400 };
     ModalService.setCompactWindowBounds(target, bounds);
     ModalService.setMaxStackSize(2);
@@ -275,7 +359,7 @@ describe('preserving the remaining stack during extraction', () => {
     ModalService.setCompactWindowControlsEnabled(true);
     ModalService.setCompactMode(true);
     ModalService.setStackingEnabled(true);
-    const [back, middle, front, floating] = [0, 1, 2, 3].map(() => ModalService.open(<Modal />, { fullscreen: true }));
+    const [back, middle, front, floating] = [0, 1, 2, 3].map(() => ModalService.open(<Modal />, stackedWindowOpts));
     const bounds = { x: 0, y: 0, width: 400, height: 400 };
     const stackBounds = { x: 550, y: 20, width: 420, height: 500 };
     ModalService.setCompactWindowBounds(front, stackBounds, true);
@@ -304,7 +388,7 @@ describe('independent compact stacks', () => {
     ModalService.setCompactWindowControlsEnabled(true);
     ModalService.setCompactMode(true);
     ModalService.setStackingEnabled(true);
-    const ids = [0, 1, 2, 3].map(() => ModalService.open(<Modal />, { fullscreen: true }));
+    const ids = [0, 1, 2, 3].map(() => ModalService.open(<Modal />, stackedWindowOpts));
     const [a, b, c, d] = ids;
     ModalService.setCompactWindowBounds(b, original, true);
     ModalService.setCompactWindowBounds(c, separate);
@@ -334,7 +418,7 @@ describe('independent compact stacks', () => {
     const { a, b, c, d } = setup();
     ModalService.setMaxStackSize(2);
     expect(ModalService.getBamIds()).toHaveLength(4);
-    const added = ModalService.open(<Modal />, { fullscreen: true });
+    const added = ModalService.open(<Modal />, stackedWindowOpts);
     await vi.waitFor(() => expect(ModalService.getModalComponent(a)).toBeUndefined());
     expect(ModalService.getStackedBamIds(b)).toEqual([b, added]);
     expect(ModalService.getStackedBamIds(d)).toEqual([c, d]);

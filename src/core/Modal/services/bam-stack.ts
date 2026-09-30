@@ -57,13 +57,20 @@ export class BamStack {
       .sort((a, b) => OverlayStackingService.getZIndex(a) - OverlayStackingService.getZIndex(b));
   }
 
-  /** All attached BAMs, or only the stack containing a specified BAM. */
+  /** Opted in with ModalOpts.allowStacking. Any other modal never joins, counts toward or reorders a stack. */
+  isStackable(modalId: string) {
+    return !!this.registry.get(modalId)?.props.allowStacking;
+  }
+
+  /** All attached stackable BAMs, or only the stack containing a specified BAM; a BAM without allowStacking is alone. */
   getStackedBamIds(modalId?: string) {
-    const ids = this.getBamIds().filter((id) => !this.compactWindows.isCompactWindowDetached(id));
-    if (!modalId || !this.compactWindows.isCompactWindowControlsEnabled() || !this.compactMode) return ids;
+    const bamIds = this.getBamIds();
+    const ids = bamIds.filter((id) => this.isStackable(id) && !this.compactWindows.isCompactWindowDetached(id));
+    if (!modalId) return ids;
+    if (!this.isStackable(modalId)) return bamIds.includes(modalId) ? [modalId] : [];
     if (this.compactWindows.isCompactWindowDetached(modalId)) return [];
-    const key = this.compactWindows.groupKey(modalId);
-    return ids.filter((id) => this.compactWindows.groupKey(id) === key);
+    const key = this.stackKey(modalId);
+    return ids.filter((id) => this.stackKey(id) === key);
   }
 
   /** Maximum attached BAMs. Omit/undefined/null restores unlimited stacking. */
@@ -84,10 +91,7 @@ export class BamStack {
     const ids = this.getStackedBamIds().filter((id) => !this.stackEvictions.has(id));
     const groups = new Map<string, string[]>();
     for (const id of ids) {
-      const key =
-        this.compactWindows.isCompactWindowControlsEnabled() && this.compactMode
-          ? this.compactWindows.groupKey(id)
-          : 'default';
+      const key = this.stackKey(id);
       const members = groups.get(key) ?? [];
       members.push(id);
       groups.set(key, members);
@@ -102,11 +106,11 @@ export class BamStack {
     }
   }
 
-  /** Enable/disable the shared compact presentation for ALL fullscreen BAMs. */
+  /** Enable/disable the shared compact presentation for every modal opened with allowCompact. */
   setCompactMode(enabled: boolean) {
     this.compactMode = enabled;
     this.registry.forEach((component, id) => {
-      if (component.isFullscreen || component.props.allowCompact) this.setCompact(id, enabled);
+      if (component.props.allowCompact) this.setCompact(id, enabled);
     });
     this.enforceStackLimit();
     this.presentation.notify();
@@ -124,8 +128,6 @@ export class BamStack {
     const component = this.registry.get(modalId);
     if (!component || component.isFullscreen === fullscreen) return;
     component.isFullscreen = fullscreen;
-    if (fullscreen && this.compactMode) this.setCompact(modalId, true);
-    if (!fullscreen && !component.props.allowCompact) this.setCompact(modalId, false);
     this.enforceStackLimit();
     this.presentation.notify();
   }
@@ -137,19 +139,20 @@ export class BamStack {
       this.compactWindows.focusCompactWindow(modalId);
       return;
     }
-    const ids = this.getBamIds();
+    // Reorder only the modal's own stack, so compact windows and unstacked BAMs above it keep their slots.
+    const ids = this.getStackedBamIds(modalId);
     if (!ids.includes(modalId) || ids.at(-1) === modalId) return;
     OverlayStackingService.reorder([...ids.filter((id) => id !== modalId), modalId]);
     this.windowEvents.syncActive('focus');
     this.presentation.notify();
   }
 
-  /** Consumer control: compact the entire BAM group. */
+  /** Consumer control: compact every allowCompact modal. */
   compact(modalId?: string | null) {
     if (modalId && this.registry.get(modalId)?.props.allowCompact) this.setCompactMode(true);
   }
 
-  /** Consumer control: expand the entire BAM group. */
+  /** Consumer control: expand every allowCompact modal. */
   expand(modalId?: string | null) {
     if (modalId && this.registry.get(modalId)?.props.allowCompact) this.setCompactMode(false);
   }
@@ -163,6 +166,14 @@ export class BamStack {
     this.stackEvictions.clear();
     this.compactMode = false;
     this.stackingEnabled = false;
+  }
+
+  /** Among stackable BAMs: compact windows and expanded BAMs never share a stack; compact windows split by docked group. */
+  private stackKey(id: string) {
+    if (!this.registry.get(id)?.isCompact) return 'expanded';
+    return this.compactWindows.isCompactWindowControlsEnabled()
+      ? `compact:${this.compactWindows.groupKey(id)}`
+      : 'compact';
   }
 
   private setCompact(modalId: string, isCompact: boolean) {

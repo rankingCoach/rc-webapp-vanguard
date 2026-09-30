@@ -5,7 +5,8 @@ import { clampCompactWindowBounds, CompactWindowBounds, ModalService } from '../
 
 export function compactWindowLayout(id: string, index: number, count: number, stacked: boolean) {
   const floating = ModalService.getCompactWindowBounds(id);
-  const group = ModalService.isStackingEnabled() && !ModalService.isCompactWindowDetached(id);
+  const group =
+    ModalService.isStackingEnabled() && ModalService.isModalStackable(id) && !ModalService.isCompactWindowDetached(id);
   const bounds = clampCompactWindowBounds((group ? ModalService.getCompactStackBounds(id) : floating) ?? {
     x: window.innerWidth - modalLayout.width - modalLayout.inset, y: Math.max(modalLayout.inset, window.innerHeight - modalLayout.height - modalLayout.inset),
     width: modalLayout.width, height: Math.min(modalLayout.height, window.innerHeight - 2 * modalLayout.inset),

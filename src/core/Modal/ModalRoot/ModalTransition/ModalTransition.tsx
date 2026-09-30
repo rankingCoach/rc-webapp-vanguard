@@ -66,7 +66,9 @@ export const ModalTransition = (props: Props) => {
   const isMorphing = useCompactMorph(modalsList);
   // Keep browser-style tabs stable, independent of the overlay order.
   const visibleIds = Object.values(useGetModals(modalRootState)).flat();
-  const expandedIds = ModalService.getBamIds().filter((id) => visibleIds.includes(id) && !getModal(id)?.isCompact);
+  const expandedIds = ModalService.getStackedBamIds().filter(
+    (id) => visibleIds.includes(id) && !getModal(id)?.isCompact,
+  );
   const tabbed = ModalService.isStackingEnabled() && expandedIds.length > 3;
   const tabIds = tabbed ? visibleIds.filter((id) => expandedIds.includes(id)) : [];
   const activeTabId = expandedIds.at(-1);
