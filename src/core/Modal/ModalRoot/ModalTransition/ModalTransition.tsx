@@ -182,7 +182,7 @@ export const ModalTransition = (props: Props) => {
           {windowControls && <CompactWindowControls id={modalId} title={title} index={index} count={bamIds.length} stacked={stacked} active={active} />}
           {stacked && !active && !hasTabs && (
             <button className="modal-stack-activate" onClick={() => ModalService.bringToFront(modalId)}>
-              <Text replacements={{ title }}>Bring to front %title%</Text>
+              <Text replacements={{ title }}>Bring to front "%title%"</Text>
             </button>
           )}
           <animated.div

@@ -67,7 +67,7 @@ const exerciseStack = async ({ canvasElement }: { canvasElement: HTMLElement }) 
   await waitFor(() => expect(root(assistant)).toHaveAttribute('data-stack-active', 'true'));
   await expect(root(profile).querySelector('.modalRoot-container')).toHaveAttribute('inert');
   await userEvent.type(within(assistant).getByRole('textbox'), 'Keep this draft');
-  const backTab = canvas.getByRole('button', { name: 'Bring to front Business profile' });
+  const backTab = canvas.getByRole('button', { name: 'Bring to front "Business profile"' });
   await waitFor(() => expect(getComputedStyle(root(profile).querySelector('.modalRoot-container')!).transform).toBe('none'));
   if (!profile.classList.contains('modal-compact')) {
     // Expanded reordering must not interpolate layout properties on a full editor.
@@ -88,7 +88,7 @@ const exerciseStack = async ({ canvasElement }: { canvasElement: HTMLElement }) 
     expect(panel(profile).getBoundingClientRect().width).toBe(window.innerWidth);
   }
   await expect(root(assistant).querySelector('.modalRoot-container')).toHaveAttribute('inert');
-  await userEvent.click(canvas.getByRole('button', { name: 'Bring to front Assistant' }));
+  await userEvent.click(canvas.getByRole('button', { name: 'Bring to front "Assistant"' }));
   await waitFor(() => expect(root(assistant)).toHaveAttribute('data-stack-active', 'true'));
   await expect(within(assistant).getByRole('textbox')).toHaveValue('Keep this draft');
   await userEvent.click(within(assistant).getByRole('button', { name: 'Compact windows' }));
@@ -284,7 +284,7 @@ export const DragFromMiddleOfStack = { render: () => <Demo compact windowControl
   const website = await canvas.findByTestId('stack-Website');
   const root = website.closest('.modalRoot')!;
   const id = root.getAttribute('data-modal-id')!;
-  const tab = canvas.getByRole('button', { name: 'Bring to front Website' });
+  const tab = canvas.getByRole('button', { name: 'Bring to front "Website"' });
   await waitFor(() => expect(getComputedStyle(root.querySelector('.modalRoot-container')!).transform).toBe('none'));
   const rect = tab.getBoundingClientRect();
   const coords = { clientX: rect.left + 60, clientY: rect.top + 8 };
@@ -296,7 +296,7 @@ export const DragFromMiddleOfStack = { render: () => <Demo compact windowControl
   // The strip disappears after detaching; pointer capture continues on the stable root.
   await pointer.pointer({ keys: '[/MouseLeft]', target: website.querySelector('.modal-content')! });
   expect(ModalService.getStackedBamIds()).toHaveLength(2);
-  const back = canvas.getByRole('button', { name: 'Bring to front Business profile' });
+  const back = canvas.getByRole('button', { name: 'Bring to front "Business profile"' });
   const profile = canvas.getByTestId('stack-Business profile').closest('.modalRoot')!;
   await pointer.pointer({ keys: '[MouseLeft>]', target: back });
   expect(profile).toHaveAttribute('data-stack-active', 'false');
