@@ -8,6 +8,7 @@ import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { Modal } from '../Modal';
 import { ModalProvider } from '../ModalContext';
 import { ModalService } from '../ModalService';
+import { useModalPresentation } from '../use-modal-presentation';
 import { ModalRoot } from './ModalRoot';
 
 beforeAll(() => {
@@ -300,6 +301,146 @@ describe('tabs (>3 expanded stacked BAMs)', () => {
     expect(Number(rootFor(plain!)!.style.zIndex)).toBeGreaterThan(Number(rootFor(ids[2])!.style.zIndex));
     expect(rootFor(ids[2])!.getAttribute('data-stack-active')).toBe('true');
     expect(rootFor(ids[0])!.className).toContain('modalRoot-stack-back');
+  });
+});
+
+describe('setStackTitle', () => {
+  const openBam = (stackTitle: string) =>
+    ModalService.open(<Modal fullscreen />, { fullscreen: true, allowStacking: true, stackTitle });
+
+  test('relabels the rear-card strip and the stack tab of an open stacking modal', () => {
+    renderRoot();
+    let first: string;
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      first = openBam('Draft');
+      openBam('Other');
+    });
+    const strip = () => rootFor(first!)!.querySelector('.modal-stack-activate')!;
+    expect(strip().textContent).toContain('Draft');
+
+    act(() => ModalService.setStackTitle(first!, 'Renamed'));
+    expect(strip().textContent).toContain('Renamed');
+    expect(strip().textContent).not.toContain('Draft');
+
+    act(() => {
+      openBam('Three');
+      openBam('Four');
+    });
+    expect(document.getElementById(`bam-tab-${first!}`)!.getAttribute('title')).toBe('Renamed');
+    act(() => ModalService.setStackTitle(first!, 'Final'));
+    expect(document.getElementById(`bam-tab-${first!}`)!.getAttribute('title')).toBe('Final');
+    expect(document.getElementById(`bam-tab-${first!}`)!.textContent).toBe('Final');
+  });
+
+  test('ignores unknown ids and an unchanged title', () => {
+    renderRoot();
+    let id: string;
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      id = openBam('Same');
+    });
+    const revision = ModalService.getPresentationRevision();
+    ModalService.setStackTitle(id!, 'Same');
+    ModalService.setStackTitle('missing', 'Anything');
+    expect(ModalService.getPresentationRevision()).toBe(revision);
+  });
+});
+
+describe('presented state (isModalPresented / useModalPresentation)', () => {
+  /** Rendered inside <Modal>, so it also proves the hook survives Modal's presentation reset. */
+  const Probe = () => {
+    const { presented, modalId } = useModalPresentation();
+    return <span data-testid={`probe-${modalId}`} data-presented={String(presented)} />;
+  };
+  const windowOpts = { fullscreen: true, allowCompact: true, allowStacking: true };
+  const openWith = (opts: object) => ModalService.open(<Modal fullscreen><Probe /></Modal>, opts);
+  const hookPresented = (id: string) => appScreen.getByTestId(`probe-${id}`).getAttribute('data-presented') === 'true';
+  /** Service, hook and rendered stack-active state must all agree. */
+  const expectPresented = (expected: Record<string, boolean>) => {
+    for (const [id, presented] of Object.entries(expected)) {
+      expect(ModalService.isModalPresented(id)).toBe(presented);
+      expect(hookPresented(id)).toBe(presented);
+      expect(rootFor(id)!.className.includes('modalRoot-stack-back')).toBe(!presented);
+    }
+  };
+
+  test('outside a service modal the hook reports presented with no owner', () => {
+    const Outside = () => <span data-testid="outside" data-presented={String(useModalPresentation().presented)} />;
+    render(<Outside />);
+    expect(appScreen.getByTestId('outside').getAttribute('data-presented')).toBe('true');
+    expect(ModalService.isModalPresented('missing')).toBe(false);
+  });
+
+  test('a detached compact window is presented while its former stack keeps only its front window presented', () => {
+    renderRoot();
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ModalService.setCompactWindowControlsEnabled(true);
+      ModalService.setCompactMode(true);
+      ids = [openWith(windowOpts), openWith(windowOpts), openWith(windowOpts)];
+    });
+    const [first, second, detached] = ids;
+    expectPresented({ [first]: false, [second]: false, [detached]: true });
+
+    // Dragged out of the stack: no longer the stack front, but a free window of its own.
+    act(() => ModalService.setCompactWindowBounds(first, { x: 20, y: 20, width: 400, height: 400 }));
+    expect(ModalService.isCompactWindowDetached(first)).toBe(true);
+    expectPresented({ [first]: true, [second]: false, [detached]: true });
+
+    act(() => ModalService.returnCompactWindowToStack(first));
+    expectPresented({ [first]: true, [second]: false, [detached]: false });
+  });
+
+  test('a docked compact stack presents only its active window and follows bringToFront', () => {
+    renderRoot();
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ModalService.setCompactWindowControlsEnabled(true);
+      ModalService.setCompactMode(true);
+      ids = [openWith(windowOpts), openWith(windowOpts)];
+    });
+    const [back, front] = ids;
+    expect(ModalService.getModalComponent(back).isCompact).toBe(true);
+    expectPresented({ [back]: false, [front]: true });
+
+    act(() => ModalService.bringToFront(back));
+    expectPresented({ [back]: true, [front]: false });
+  });
+
+  test('an expanded stack presents only its front card, and every card once stacking is disabled', () => {
+    renderRoot();
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ids = [0, 1, 2].map(() => openWith({ fullscreen: true, allowStacking: true }));
+    });
+    const [first, second, third] = ids;
+    expectPresented({ [first]: false, [second]: false, [third]: true });
+
+    act(() => ModalService.bringToFront(second));
+    expectPresented({ [first]: false, [second]: true, [third]: false });
+
+    act(() => ModalService.setStackingEnabled(false));
+    expectPresented({ [first]: true, [second]: true, [third]: true });
+  });
+
+  test('a tabbed stack presents only the selected tab', () => {
+    renderRoot();
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ids = [0, 1, 2, 3].map(() => openWith({ fullscreen: true, allowStacking: true }));
+    });
+    expect(appScreen.getByRole('tablist')).toBeTruthy();
+    const presented = (selected: string) => Object.fromEntries(ids.map((id) => [id, id === selected]));
+    expectPresented(presented(ids[3]));
+    expect(document.getElementById(`bam-tab-${ids[3]}`)!.getAttribute('aria-selected')).toBe('true');
+
+    act(() => document.getElementById(`bam-tab-${ids[1]}`)!.click());
+    expectPresented(presented(ids[1]));
   });
 });
 

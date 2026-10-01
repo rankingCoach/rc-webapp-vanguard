@@ -86,6 +86,7 @@ const id = ModalService.open(<BusinessProfile close={() => {}} />, {
   stackTitle: "Business profile",
 });
 ModalService.bringToFront(id);
+ModalService.setStackTitle(id, "Business profile – Berlin"); // Relabel after open
 ModalService.setStackingEnabled(false); // Return to ordinary modal presentation
 ```
 
@@ -103,10 +104,33 @@ back down to three restores the overlapping stack. Compact BAMs always retain
 their card stacks, regardless of count.
 Each newer card sits slightly lower, exposing the cards behind it. Hovering or
 focusing an exposed tab lifts the rear card and shows “Bring to front” with its
-`stackTitle` (falling back to its string `title`). Clicking or pressing Enter on
+`stackTitle` (falling back to its string `title`). `ModalService.setStackTitle(id, title)`
+changes that label after open; the tab, the “Bring to front” strip and the compact
+window controls' labels update in place (unknown ids and unchanged titles are ignored). Clicking or pressing Enter on
 the tab promotes that card without remounting its content. Background cards are
 inert until activated. Ordinary dialogs and drawers keep their overlay slots.
 Reduced-motion preferences disable the layout transitions.
+
+A modal is *presented* when it is not stacked, or is the active card/tab of its
+stack; rear cards, background tabs and the non-front windows of a docked compact
+stack are not. Detached compact windows are always presented. Use it to pause
+work (polling, media, editors) while a window is hidden behind another:
+
+```tsx
+ModalService.isModalPresented(id); // false for unknown/closed ids; re-read on subscribePresentation
+
+const EditorBody = () => {
+  // Works anywhere inside the service modal, including inside <Modal>.
+  // Outside a service modal it reports presented: true.
+  const { presented, modalId } = useModalPresentation();
+  useEffect(() => {
+    if (!presented) return;
+    const timer = setInterval(fetchDraft, 5000);
+    return () => clearInterval(timer);
+  }, [presented]);
+  return <Editor />;
+};
+```
 
 ### Optional moving and resizing of compact BAMs
 

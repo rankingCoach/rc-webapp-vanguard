@@ -225,6 +225,17 @@ class ModalServiceClass {
   getStackedBamIds(modalId?: string) {
     return this.stack.getStackedBamIds(modalId);
   }
+  /** Stack membership and position ModalRoot renders a modal with. */
+  getStackPlacement(modalId: string) {
+    return this.stack.getStackPlacement(modalId);
+  }
+  /**
+   * Whether an open modal is currently presented: unstacked, or the active card/tab of its stack.
+   * Detached compact windows are always presented. Re-read on subscribePresentation.
+   */
+  isModalPresented(modalId: string) {
+    return this.modalComponents.has(modalId) && this.stack.getStackPlacement(modalId).active;
+  }
   /** Whether the modal was opened with allowStacking. */
   isModalStackable(modalId: string) {
     return this.stack.isStackable(modalId);
@@ -565,6 +576,13 @@ class ModalServiceClass {
   }
   getBamIds() {
     return this.stack.getBamIds();
+  }
+  /** Relabel an open modal's stack tab, rear-card strip and compact window controls. */
+  setStackTitle(modalId: string, title: string) {
+    const component = this.modalComponents.get(modalId);
+    if (!component || component.props.stackTitle === title) return;
+    component.props = { ...component.props, stackTitle: title };
+    this.presentation.notify();
   }
   /** Promote within the BAM stack; unrelated dialogs/drawers retain their overlay slots. */
   bringToFront(modalId: string) {
