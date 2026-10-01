@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.21.0...v2.0.0) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **aiglow:** AiGlow no longer accepts startColor / endColor. The accent
+and light stops are derived from baseColor or the inherited --ai-base-color,
+so every glow's colours change (no pink stop).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+### Features
+
+* **aiglow:** derive glow stops from a single baseColor ([91437fd](https://github.com/rankingCoach/rc-webapp-vanguard/commit/91437fdaa0f3ad98afad50911af26dd852652c59))
+* **aiglow:** stop animations under reduced motion and add parity custom properties ([d577b81](https://github.com/rankingCoach/rc-webapp-vanguard/commit/d577b8198a41a867b52828ee96426eb2b6f2485a))
+* **button:** restyle shimmer as a seamless base-colour sweep ([0d52957](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0d52957bb2015b9568c37c0d1419acbdfb464f56))
+* **Form:** allow custom required-field error message via useFormConfig ([6bf87a0](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6bf87a01768dbc1a087b7816f998755e0c5352bf))
+* **modal:** add --modal-content-shadow custom property ([9efdb3a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9efdb3a86f2f5a54b193d89d0ecb069ee84b2fb1))
+* **modal:** add fullscreen tabs and opt-in window lifecycle events ([07fce66](https://github.com/rankingCoach/rc-webapp-vanguard/commit/07fce66996c9ce5a6d3977ace952bec7c33f461e))
+* **modal:** add ModalService.setStackTitle to relabel open modals ([4f4378b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4f4378bff3abee74c7ba98e31ca739cfd1eaebbc))
+* **modal:** add opt-in BAM stacking and shared compact mode ([7c89776](https://github.com/rankingCoach/rc-webapp-vanguard/commit/7c89776d26b7edaf85b1d211346fb39cd9f3a2dc))
+* **modal:** add opt-in compact mode and upgrade Storybook ([654747a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/654747abef6ec9f8f6c0ab47fc8c3ccdc1ce47ed))
+* **modal:** add opt-in movable compact BAM stacks ([81058a6](https://github.com/rankingCoach/rc-webapp-vanguard/commit/81058a65ba0b725a8cd6e9e085a096f04ba117e6))
+* **modal:** expose per-modal presented state via useModalPresentation ([00d217b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/00d217bc0f6f2daa027b13baa3d54b4324cfa867))
+* **modal:** make stacking opt-in per modal and limit compact mode to allowCompact ([2b19353](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2b19353f5145e3f4917332ef5792c80533459b20))
+
+
+### Bug Fixes
+
+* **modal:** animate compact window collapse and expand in both directions ([0146370](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0146370b891788b104f683c136106d002ce589a3))
+* **modal:** isolate nested modals and harden compact window lifecycle ([bbc1661](https://github.com/rankingCoach/rc-webapp-vanguard/commit/bbc1661dc1ccb0efa567e5c8d0428e2b0dc9fc0c))
+* **modal:** keep standalone Esc precedence and translate stack titles ([470dca6](https://github.com/rankingCoach/rc-webapp-vanguard/commit/470dca6a9988405f0b4488ada724359de9e0781b))
+* **modal:** one translation key per resize handle ([84a7e55](https://github.com/rankingCoach/rc-webapp-vanguard/commit/84a7e55686166db17ee564d7f08773aa22ff0c9b))
+* **modal:** quote the title in the "Bring to front" label ([0c7a07e](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0c7a07e4430545aaaed54fb57c5c9e2ba49d731f))
+
 ## [1.21.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.20.0...v1.21.0) (2026-09-29)
 
 
