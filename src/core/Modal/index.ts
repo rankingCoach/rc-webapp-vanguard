@@ -18,3 +18,5 @@ export type { Step } from './ModalStepper/ModalStepper';
 export { ModalStepper } from './ModalStepper/ModalStepper';
 export type { NavigationModalProps } from './NavigationModal/NavigationModal';
 export { NavigationModal } from './NavigationModal/NavigationModal';
+export type { ModalPresentationState } from './use-modal-presentation';
+export { useModalPresentation } from './use-modal-presentation';

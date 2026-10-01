@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ModalPresentationContext } from '../../ModalPresentationContext';
+import { ModalOwnerPresentationContext, ModalPresentationContext } from '../../ModalPresentationContext';
 import { ModalLifecycleContext } from '../../ModalLifecycleContext';
 import { ModalService } from '../../ModalService';
 
@@ -14,6 +14,8 @@ export const ModalPresentation = ({ children, allowCompact, isCompact, modalId, 
   const value = useMemo(() => ({ allowCompact, isCompact, modalId, stacked, active }),
     [allowCompact, isCompact, modalId, stacked, active]);
   return <ModalLifecycleContext.Provider value={lifecycle}>
-    <ModalPresentationContext.Provider value={value}>{children}</ModalPresentationContext.Provider>
+    <ModalOwnerPresentationContext.Provider value={value}>
+      <ModalPresentationContext.Provider value={value}>{children}</ModalPresentationContext.Provider>
+    </ModalOwnerPresentationContext.Provider>
   </ModalLifecycleContext.Provider>;
 };

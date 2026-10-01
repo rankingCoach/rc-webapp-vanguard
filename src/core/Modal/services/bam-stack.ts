@@ -73,6 +73,15 @@ export class BamStack {
     return ids.filter((id) => this.stackKey(id) === key);
   }
 
+  /** Where a modal renders in its stack; inactive stacked cards and background tabs are not presented. */
+  getStackPlacement(modalId: string) {
+    const bamIds = this.getStackedBamIds(modalId);
+    const index = bamIds.indexOf(modalId);
+    const stacked = this.stackingEnabled && index >= 0 && bamIds.length > 1;
+    const active = !stacked || index === bamIds.length - 1;
+    return { bamIds, index, stacked, active };
+  }
+
   /** Maximum attached BAMs. Omit/undefined/null restores unlimited stacking. */
   setMaxStackSize(max?: number | null) {
     if (max !== null && max !== undefined && (!Number.isInteger(max) || max < 1)) {

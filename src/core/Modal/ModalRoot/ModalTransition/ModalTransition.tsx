@@ -134,10 +134,7 @@ export const ModalTransition = (props: Props) => {
   return <>{transition((animationProps, modalId: string) => {
     const modalComponent = getModal(modalId);
     const zIndex = getModalZIndex(modalId);
-    const bamIds = ModalService.getStackedBamIds(modalId);
-    const index = bamIds.indexOf(modalId);
-    const stacked = ModalService.isStackingEnabled() && index >= 0 && bamIds.length > 1;
-    const active = !stacked || index === bamIds.length - 1;
+    const { bamIds, index, stacked, active } = ModalService.getStackPlacement(modalId);
     const compact = !!modalComponent?.isCompact;
     const hasTabs = tabbed && tabIds.includes(modalId);
     const allowCompact = !!modalComponent?.props.allowCompact || !!modalComponent?.compactManaged;

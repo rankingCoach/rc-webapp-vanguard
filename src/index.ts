@@ -128,6 +128,8 @@ export { ModalService } from './core/Modal';
 export { ModalSplitView } from './core/Modal';
 export { ModalStepper } from './core/Modal';
 export { NavigationModal } from './core/Modal';
+export type { ModalPresentationState } from './core/Modal';
+export { useModalPresentation } from './core/Modal';
 // CustomModals
 export { BigAssEditModal } from './core/CustomModals';
 export { EditModal } from './core/CustomModals';

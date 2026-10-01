@@ -427,6 +427,63 @@ describe('presented state (isModalPresented / useModalPresentation)', () => {
     expectPresented({ [first]: true, [second]: true, [third]: true });
   });
 
+  test('closing the front card presents the next one, notifies subscribers and reports the closed id as not presented', async () => {
+    renderRoot();
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ids = [0, 1, 2].map(() => openWith({ fullscreen: true, allowStacking: true }));
+    });
+    const [first, second, third] = ids;
+    const listener = vi.fn();
+    const unsubscribe = ModalService.subscribePresentation(listener);
+    await act(async () => {
+      await ModalService.closeEv(third);
+    });
+    unsubscribe();
+    expect(listener).toHaveBeenCalled();
+    expect(ModalService.isModalPresented(third)).toBe(false);
+    expect(rootFor(third)).toBeNull();
+    expectPresented({ [first]: false, [second]: true });
+  });
+
+  test('each stack presents its own front window: expanded, default compact and a separately docked compact group', () => {
+    renderRoot();
+    const bounds = { x: 40, y: 40, width: 400, height: 400 };
+    let ids: string[] = [];
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ModalService.setCompactWindowControlsEnabled(true);
+      ModalService.setCompactMode(true);
+      ids = [
+        openWith({ fullscreen: true, allowStacking: true }),
+        openWith({ fullscreen: true, allowStacking: true }),
+        ...[0, 1, 2, 3].map(() => openWith(windowOpts)),
+      ];
+    });
+    const [expandedBack, expandedFront, compactBack, compactFront, groupBack, groupFront] = ids;
+    act(() => {
+      ModalService.setCompactWindowBounds(groupBack, bounds);
+      ModalService.setCompactWindowBounds(groupFront, bounds);
+      ModalService.dockCompactWindow(groupFront, [{ id: groupBack, bounds }]);
+    });
+    expect(ModalService.getStackedBamIds(groupFront)).toEqual([groupBack, groupFront]);
+    expect(ModalService.getStackedBamIds(compactFront)).toEqual([compactBack, compactFront]);
+    expectPresented({
+      [expandedBack]: false, [expandedFront]: true,
+      [compactBack]: false, [compactFront]: true,
+      [groupBack]: false, [groupFront]: true,
+    });
+
+    // Promoting inside one stack leaves the other stacks' front windows presented.
+    act(() => ModalService.bringToFront(compactBack));
+    expectPresented({
+      [expandedFront]: true,
+      [compactBack]: true, [compactFront]: false,
+      [groupBack]: false, [groupFront]: true,
+    });
+  });
+
   test('a tabbed stack presents only the selected tab', () => {
     renderRoot();
     let ids: string[] = [];
