@@ -16,8 +16,13 @@ export function compactWindowLayout(id: string, index: number, count: number, st
   return { bounds, panel: { x: bounds.x + depth, y: bounds.y + offset, width: bounds.width - depth * 2, height: bounds.height - offset }, group };
 }
 
-const edgeLabels: Record<string, string> = { n: 'top', ne: 'top right', e: 'right', se: 'bottom right', s: 'bottom', sw: 'bottom left', w: 'left', nw: 'top left' };
-const edges = Object.keys(edgeLabels);
+const resizeLabelByEdge: Record<string, string> = {
+  n: 'Resize %title% from the top edge', ne: 'Resize %title% from the top right corner',
+  e: 'Resize %title% from the right edge', se: 'Resize %title% from the bottom right corner',
+  s: 'Resize %title% from the bottom edge', sw: 'Resize %title% from the bottom left corner',
+  w: 'Resize %title% from the left edge', nw: 'Resize %title% from the top left corner',
+};
+const edges = Object.keys(resizeLabelByEdge);
 type DragPointer = Pick<React.PointerEvent, 'button' | 'pointerId' | 'clientX' | 'clientY' | 'preventDefault'> & { currentTarget: Element };
 type Gesture = { pointer: number; x: number; y: number; bounds: CompactWindowBounds; edge: string; group: boolean; moved: boolean; rear: boolean };
 
@@ -214,7 +219,7 @@ export const CompactWindowControls = ({ id, title, index, count, stacked, active
     {layout().group && <button type="button" className="compact-window-move compact-window-move-stack"
       aria-label={translationService.get('Move stack').value} title={translationService.get('Drag entire stack · arrow keys to move').value} {...handlers('move', true)} />}
     {edges.map((edge) => <button key={edge} className={`compact-window-resize compact-window-resize-${edge}`}
-      aria-label={translationService.get('Resize %title% %edge%', { title, edge: translationService.get(edgeLabels[edge]).value }).value} title={translationService.get('Drag to resize. Arrow keys change width and height.').value}
+      aria-label={translationService.get(resizeLabelByEdge[edge], { title }).value} title={translationService.get('Drag to resize. Arrow keys change width and height.').value}
       {...handlers(edge)} />)}
     </>}
   </div>;

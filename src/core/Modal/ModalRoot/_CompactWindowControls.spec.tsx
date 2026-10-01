@@ -11,14 +11,15 @@ test('move and resize descriptions use translated templates and directions', () 
   const original = translationService.get.bind(translationService);
   vi.spyOn(translationService, 'get').mockImplementation((key, replacements) => {
     const dictionary: Record<string, string> = {
-      'Move %title%': 'Déplacer %title%', 'Resize %title% %edge%': 'Redimensionner %title% %edge%',
-      'bottom right': 'en bas à droite', 'Drag window · arrow keys to move': 'Faire glisser',
+      'Move %title%': 'Déplacer %title%',
+      'Resize %title% from the bottom right corner': 'Redimensionner %title% depuis le coin inférieur droit',
+      'Drag window · arrow keys to move': 'Faire glisser',
     };
     return original(dictionary[key] ?? key, replacements);
   });
   render(<CompactWindowControls id="test" title="My title" index={0} count={1} stacked={false} active />);
   expect(appScreen.getByRole('button', { name: 'Déplacer My title' }).getAttribute('title')).toBe('Faire glisser');
-  expect(appScreen.getByRole('button', { name: 'Redimensionner My title en bas à droite' })).toBeTruthy();
+  expect(appScreen.getByRole('button', { name: 'Redimensionner My title depuis le coin inférieur droit' })).toBeTruthy();
 });
 
 test('rerendering drag geometry does not reinstall native pointer listeners', () => {
