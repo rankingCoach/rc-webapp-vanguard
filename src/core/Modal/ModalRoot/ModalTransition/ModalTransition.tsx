@@ -22,6 +22,10 @@ interface Props {
 // Floor for the morph flag: long enough for the geometry transitions in ModalRoot.scss to start.
 const WINDOW_MORPH_MS = 250;
 
+/** `stackTitle` is a literal (often dynamic) label; the string `title` is a translation key like the header's. */
+const getStackLabel = (props?: { stackTitle?: string; title?: unknown }) =>
+  props?.stackTitle || translationService.get(typeof props?.title === 'string' && props.title ? props.title : 'Window').value;
+
 /**
  * Flags a modal from the moment its compact state flips until its CSS transitions finish, so CSS can
  * interpolate geometry for the morph only. Stacked expanded BAMs otherwise animate `transform` alone,
@@ -155,7 +159,7 @@ export const ModalTransition = (props: Props) => {
       '--modal-stack-tab-height': `${step}px`,
       backgroundColor: index > 0 || compact ? 'transparent' : undefined,
     } : {};
-    const title = modalComponent?.props.stackTitle || (typeof modalComponent?.props.title === 'string' ? modalComponent.props.title : translationService.get('Window').value);
+    const title = getStackLabel(modalComponent?.props);
     return (
       modalId &&
       modalComponent && (
@@ -203,7 +207,7 @@ export const ModalTransition = (props: Props) => {
       style={{ ...modalLayoutCss, zIndex: getModalZIndex(activeTabId) } as React.CSSProperties}>
       {tabIds.map((id, tabIndex) => {
         const modal = getModal(id);
-        const label = modal?.props.stackTitle || (typeof modal?.props.title === 'string' ? modal.props.title : translationService.get('Window').value);
+        const label = getStackLabel(modal?.props);
         return <button key={id} id={`bam-tab-${id}`} type="button" role="tab"
           style={{ '--modal-tab-delay': `${40 + Math.min(tabIndex, 5) * 25}ms` } as React.CSSProperties}
           aria-selected={id === activeTabId} aria-controls={`bam-panel-${id}`}

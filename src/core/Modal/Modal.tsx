@@ -50,6 +50,9 @@ type Props = {
 const escStack: symbol[] = [];
 const escElements = new Map<symbol, HTMLDivElement>();
 const handledEscapeEvents = new WeakSet<KeyboardEvent>();
+/** The service-managed window (`.modalRoot`) an Esc token renders in; `undefined` for standalone modals. */
+const getEscOwner = (token: symbol | undefined) =>
+  token && escElements.get(token)?.closest<HTMLElement>('.modalRoot')?.dataset.modalId;
 
 /**
  * Component
@@ -127,11 +130,13 @@ export const Modal = (props: Props) => {
       }
       // Only the topmost Esc-enabled modal reacts.
       const ownerId = modalId || modalElement.current?.closest<HTMLElement>('.modalRoot')?.dataset.modalId;
-      let isTopmost = escStack[escStack.length - 1] === escTokenRef.current;
-      if (ownerId && lifecycle.isManagedEscape()) {
+      const lastToken = escStack[escStack.length - 1];
+      let isTopmost = lastToken === escTokenRef.current;
+      // A standalone modal opened above the service windows keeps LIFO precedence.
+      if (ownerId && lifecycle.isManagedEscape() && getEscOwner(lastToken)) {
         // Overlay order chooses the service window; DOM nesting chooses the one
         // Esc handler inside it, even when parent/child effects mount together.
-        const tokens = escStack.filter((token) => escElements.get(token)?.closest<HTMLElement>('.modalRoot')?.dataset.modalId === ownerId);
+        const tokens = escStack.filter((token) => getEscOwner(token) === ownerId);
         const topToken = tokens.reduce<symbol | undefined>((selected, token) => {
           if (selected && escElements.get(token)?.contains(escElements.get(selected)!)) return selected;
           return token;

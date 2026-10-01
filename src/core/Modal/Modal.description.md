@@ -104,7 +104,7 @@ back down to three restores the overlapping stack. Compact BAMs always retain
 their card stacks, regardless of count.
 Each newer card sits slightly lower, exposing the cards behind it. Hovering or
 focusing an exposed tab lifts the rear card and shows “Bring to front” with its
-`stackTitle` (falling back to its string `title`). `ModalService.setStackTitle(id, title)`
+`stackTitle` (falling back to its translated string `title`; `stackTitle` is shown literally). `ModalService.setStackTitle(id, title)`
 changes that label after open; the tab, the “Bring to front” strip and the compact
 window controls' labels update in place (unknown ids and unchanged titles are ignored). Clicking or pressing Enter on
 the tab promotes that card without remounting its content. Background cards are

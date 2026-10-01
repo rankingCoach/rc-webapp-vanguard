@@ -1,4 +1,5 @@
 import { PublicWidgetData } from '@stores/public-widgets-data.store';
+import { rcWindow } from '@stores/window.store';
 import { appScreen, cleanup, render } from '@test-utils/test-utils';
 import { act } from '@testing-library/react';
 import React from 'react';
@@ -221,6 +222,24 @@ describe('tabs (>3 expanded stacked BAMs)', () => {
     });
     const tabs = appScreen.getAllByRole('tab');
     expect(tabs.every((tab) => tab.getAttribute('title') === 'Window')).toBe(true);
+  });
+
+  test('translates the string title but keeps stackTitle literal', () => {
+    rcWindow.TranslationsData = { Settings: 'Einstellungen', 'Custom tab': 'Übersetzt' };
+    try {
+      renderRoot();
+      act(() => {
+        ModalService.setStackingEnabled(true);
+        [0, 1, 2].forEach(() => openBam('Settings'));
+        ModalService.open(<Modal fullscreen />, { fullscreen: true, allowStacking: true, stackTitle: 'Custom tab' });
+      });
+      const tabs = appScreen.getAllByRole('tab');
+      expect(tabs.slice(0, 3).map((tab) => tab.textContent)).toEqual(['Einstellungen', 'Einstellungen', 'Einstellungen']);
+      expect(tabs.slice(0, 3).every((tab) => tab.getAttribute('title') === 'Einstellungen')).toBe(true);
+      expect(tabs[3].textContent).toBe('Custom tab');
+    } finally {
+      delete rcWindow.TranslationsData;
+    }
   });
 
   test('prefers stackTitle over the string title', () => {
@@ -656,6 +675,27 @@ describe('Esc handling', () => {
     });
     expect(closeB).toHaveBeenCalledTimes(1);
     expect(closeA).not.toHaveBeenCalled();
+  });
+
+  test('with stacking enabled, a standalone modal above a service-managed BAM closes first', () => {
+    const { rerender } = renderRoot();
+    const closeManaged = vi.fn();
+    const closeStandalone = vi.fn();
+    act(() => {
+      ModalService.setStackingEnabled(true);
+      ModalService.open(<Modal fullscreen onClose={closeManaged} />, { fullscreen: true, allowStacking: true });
+    });
+    rerender(
+      <ModalProvider>
+        <ModalRoot />
+        <Modal fullscreen={false} onClose={closeStandalone} />
+      </ModalProvider>,
+    );
+    act(() => {
+      pressEsc();
+    });
+    expect(closeStandalone).toHaveBeenCalledTimes(1);
+    expect(closeManaged).not.toHaveBeenCalled();
   });
 });
 
