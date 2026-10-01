@@ -157,6 +157,8 @@ export enum IconNames {
   postsSeries = 'posts-series',
   event = 'event',
   like = 'like',
+  ado = 'ado',
+  adoActive = 'ado-active',
 }
 
 export const IconNamesArr = Object.values(IconNames);
