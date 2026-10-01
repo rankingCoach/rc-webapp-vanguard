@@ -22,7 +22,7 @@
  * • .button-default           - Default button style
  * • .button-primary           - Primary button style (default)
  * • .button-secondary         - Secondary button style
- * • .button-shimmer          - Shimmer effect button
+ * • .button-shimmer          - Shimmer: base-colour gradient with a sweeping light band
  * • .button-muted            - Muted button style
  * 
  * SIZE VARIANTS:
@@ -167,8 +167,10 @@
      border-radius: calc(var(--border-radius) * 3);
  
      &:not(:disabled) {
-       // Apply the Shimmer effect only if the button is not disabled
+       // Apply the shimmer only when the button is enabled; disabled keeps today's look
        @include shimmerEffect;
+       // Keep the base transitions; the hover darkening uses the spec's 150ms filter transition
+       transition: all $transitionTime ease-in-out, filter 150ms ease;
      }
    }
  
@@ -417,4 +419,10 @@
      left: 50%;
      transform: translate(-50%, -50%);
    }
+ }
+
+ // Used by shimmerEffect; it lives here because CSS Modules rename keyframes per stylesheet
+ @keyframes adoShimmer {
+   from { background-position: 162.5% 50%; }
+   to   { background-position: 0% 50%; }
  }

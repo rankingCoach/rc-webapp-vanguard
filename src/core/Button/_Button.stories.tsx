@@ -7,6 +7,7 @@ import { ButtonTypePrimary as _ButtonTypePrimary } from "./stories/ButtonTypePri
 import { ButtonTypeDefault as _ButtonTypeDefault } from "./stories/ButtonTypeDefault.story";
 import { ButtonTypeSecondary as _ButtonTypeSecondary } from "./stories/ButtonTypeSecondary.story";
 import { ButtonTypeShimmer as _ButtonTypeShimmer } from "./stories/ButtonTypeShimmer.story";
+import { ButtonShimmerShowcase as _ButtonShimmerShowcase } from "./stories/ButtonShimmerShowcase.story";
 import { ButtonTypeMuted as _ButtonTypeMuted } from "./stories/ButtonTypeMuted.story";
 import { ButtonTypeMutedInverted as _ButtonTypeMutedInverted } from "./stories/ButtonTypeMutedInverted.story";
 import { ButtonTypeMutedBlurred as _ButtonTypeMutedBlurred } from "./stories/ButtonTypeMutedBlurred.story";
@@ -36,6 +37,7 @@ export const ButtonTypePrimary: ButtonStory = { ..._ButtonTypePrimary }
 export const ButtonTypeDefault: ButtonStory = { ..._ButtonTypeDefault }
 export const ButtonTypeSecondary: ButtonStory = { ..._ButtonTypeSecondary }
 export const ButtonTypeShimmer: ButtonStory = { ..._ButtonTypeShimmer }
+export const ButtonShimmerShowcase: ButtonStory = { ..._ButtonShimmerShowcase }
 export const ButtonTypeMuted: ButtonStory = { ..._ButtonTypeMuted }
 export const ButtonTypeMutedInverted: ButtonStory = { ..._ButtonTypeMutedInverted }
 export const ButtonTypeMutedBlurred: ButtonStory = { ..._ButtonTypeMutedBlurred }
