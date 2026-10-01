@@ -28,13 +28,13 @@ export const ModalOverDrawerWithHighlightInput: Story = {
     const drawerLayer = getDrawerLayer()!;
     const textarea = drawerLayer.querySelector('textarea') as HTMLTextAreaElement;
     const backdrop = drawerLayer.querySelector('.vanguard-input-backdrop') as HTMLElement;
-    // Re-query on use: typing re-renders the backdrop innerHTML, detaching earlier chips
+    // The highlights container is re-rendered via innerHTML on every keystroke,
+    // so mark nodes are replaced — always re-query instead of holding a stale ref
     const getChip = () => drawerLayer.querySelector('.vanguard-input-mark-blue') as HTMLElement;
-    const chip = getChip();
 
     // Highlighting works inside the portaled drawer
-    await expect(chip).not.toBeNull();
-    await expect(chip.textContent).toBe('www.google.ro');
+    await expect(getChip()).not.toBeNull();
+    await expect(getChip().textContent).toBe('www.google.ro');
 
     // Backdrop geometry holds inside the drawer (portal + slide transform)
     await expect(backdrop.getBoundingClientRect().height).toBeCloseTo(textarea.getBoundingClientRect().height, 0);
@@ -48,6 +48,7 @@ export const ModalOverDrawerWithHighlightInput: Story = {
     await userEvent.type(textarea, ' and http://second-link.com', { delay: 1 });
     await new Promise((r) => setTimeout(r, 300));
     await expect(drawerLayer.querySelectorAll('.vanguard-input-mark-blue').length).toBe(2);
+    await expect(getChip().textContent).toBe('www.google.ro');
 
     // Modal over the drawer
     await userEvent.click(screen.getByRole('button', { name: /open modal over drawer/i }));

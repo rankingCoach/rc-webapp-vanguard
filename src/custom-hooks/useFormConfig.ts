@@ -31,6 +31,12 @@ export type FormFieldType =
   | 'Slider'
   | 'ColorPicker';
 
+/**
+ * A message shown under a form field. Usually one of the shared error keys, but a plain
+ * string (e.g. a context-specific translation key from `validation.requiredErrorMessage`) is allowed too.
+ */
+export type FormErrorMessage = ErrorsKeys | CustomErrorsKeys | string;
+
 export type FormConfigElement<T = any> = {
   fieldType?: FormFieldType;
   arrayPosition?: number;
@@ -60,8 +66,8 @@ export type FormConfigElement<T = any> = {
   prevention?: FormConfigTextPrevention;
   hasError?: boolean;
   setHasError?: Dispatch<SetStateAction<boolean>>;
-  errors?: (ErrorsKeys | CustomErrorsKeys)[] | null;
-  setErrors?: Dispatch<SetStateAction<(ErrorsKeys | CustomErrorsKeys)[]>>;
+  errors?: FormErrorMessage[] | null;
+  setErrors?: Dispatch<SetStateAction<FormErrorMessage[]>>;
   isDirty?: boolean;
   setIsDirty?: Dispatch<SetStateAction<boolean>>;
   passError?: string | Array<string | undefined | null>;
