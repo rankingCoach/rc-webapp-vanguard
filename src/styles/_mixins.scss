@@ -100,6 +100,7 @@
     transform: scale(0.75);
     overflow: hidden;
     transition: 200ms ease-in all;
+    mix-blend-mode: multiply;
   }
 
   &:hover {
