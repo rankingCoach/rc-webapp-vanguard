@@ -42,6 +42,22 @@
     }
   }
 
+  // STYLES FOR FLOATING THEME
+  &.floating {
+    min-height: 0;
+    padding: $x1 $x2;
+    border-radius: $x4 !important;
+    flex-grow: 0;
+
+    &:hover {
+      background-color: rc_transparent(--fn-fg-light, 0.15);
+    }
+
+    &.selected {
+      background-color: rc_transparent(--fn-fg-light, 0.2);
+    }
+  }
+
 }
 
 .tabs-directory-icons {

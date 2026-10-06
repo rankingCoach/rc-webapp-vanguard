@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import styles from './Tabs.module.scss';
 
 export type TabConfig = {
-  theme?: 'highlight' | 'underline';
+  theme?: 'highlight' | 'underline' | 'floating';
   tabNoMinWidth?: boolean;
   tabHeight?: 'tall' | 'small';
   padding?: 'default' | 'small';
@@ -47,7 +47,11 @@ export const Tabs = (props: TabsProps) => {
   return (
     <ComponentContainer>
       <MuiTabs
-        className={classNames(styles.tabsContainer, className)}
+        className={classNames(
+          styles.tabsContainer,
+          config?.theme === 'floating' ? styles.floating : undefined,
+          className,
+        )}
         scrollButtons="auto"
         ScrollButtonComponent={TabsCustomScroll}
         variant="scrollable"

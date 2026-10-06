@@ -128,6 +128,41 @@ export const UnderlineTheme: Story = {
   },
 };
 
+export const FloatingTheme: Story = {
+  name: "Theme: Floating",
+  render: () => <TabsDemo tabs={defaultTabs} tabConfig={{ theme: "floating" }} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tabs = canvas.getAllByRole("tab");
+    await expect(tabs).toHaveLength(3);
+    await userEvent.click(tabs[1]);
+    await expect(canvas.getByRole("heading", { name: "Negative keywords" })).toBeInTheDocument();
+  },
+};
+
+export const FloatingManyTabs: Story = {
+  name: "Scrollable: Floating Many Tabs",
+  render: () => (
+    <TabsDemo
+      tabs={Array.from({ length: 10 }, (_, i) => ({
+        label: `Tab ${i + 1}`,
+        component: (
+          <div style={{ padding: "24px" }}>
+            <h3>Content for Tab {i + 1}</h3>
+          </div>
+        ),
+        value: i,
+      }))}
+      tabConfig={{ theme: "floating" }}
+      wrapperStyle={{ width: "500px" }}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getAllByRole("tab")).toHaveLength(10);
+  },
+};
+
 // ─── Heights ─────────────────────────────────────────────────────────────────
 
 export const TallHeight: Story = {
