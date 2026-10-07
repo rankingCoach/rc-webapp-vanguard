@@ -45,6 +45,8 @@ export const Tab = (props: TabProps & InternalTabProps) => {
   const { selected, label, value } = tabProps;
 
   const { theme = 'highlight', iconSize = 'default', tabTextTransform = 'none' } = tabConfig || {};
+  const isFloating = theme === 'floating';
+  const labelColor = selected && !isFloating ? 'var(--fn-fg-cta)' : 'var(--fn-fg)';
 
   const renderLabel = () => {
     if (!tabIcons) {
@@ -52,8 +54,8 @@ export const Tab = (props: TabProps & InternalTabProps) => {
         <Text
           testId={testId}
           className={classNames(styles.tabLabel)}
-          color={selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)'}
-          fontWeight={selected ? FontWeights.bold : FontWeights.regular}
+          color={labelColor}
+          fontWeight={selected && !isFloating ? FontWeights.bold : FontWeights.regular}
         >
           {label}
         </Text>
@@ -72,7 +74,7 @@ export const Tab = (props: TabProps & InternalTabProps) => {
           ))}
           {typeof label === 'string' ? (
             <div>
-              <Text className={classNames(ml1)} color={selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)'}>
+              <Text className={classNames(ml1)} color={labelColor}>
                 {label}
               </Text>
               <Render if={hasError}>
@@ -97,11 +99,7 @@ export const Tab = (props: TabProps & InternalTabProps) => {
       return (
         <div className={classNames(classNames(dFlex, alignItemsCenter, gap1))}>
           <Avatar noHover={true} size={iconSize === 'small' ? 'xs' : 'small'} icon={tabIcons[0]} />
-          {typeof label === 'string' ? (
-            <Text color={selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)'}>{label}</Text>
-          ) : (
-            label
-          )}
+          {typeof label === 'string' ? <Text color={labelColor}>{label}</Text> : label}
           <Render if={hasError}>
             <Icon fillColor={'var(--e100)'} hasCircle={true} color={'var(--e500)'}>
               {IconNames.exclamation}
