@@ -1,8 +1,9 @@
 import { within, expect } from "storybook/test";
 import { Story, demoCardContent, demoCardStyle, demoTestId, getTopElementAtCenterOf } from "./_GlobalStateComponent.default";
 
-export const Default: Story = {
+export const Blurred: Story = {
   args: {
+    blurred: true,
     testId: demoTestId,
     style: demoCardStyle,
     children: demoCardContent,
@@ -11,14 +12,12 @@ export const Default: Story = {
     const canvas = within(canvasElement);
     const wrapper = canvas.getByTestId(demoTestId);
 
-    await expect(canvas.getByText("Business hours")).toBeInTheDocument();
+    const blurLayer = wrapper.querySelector('[class*="blurLayer"]') as HTMLElement;
+    await expect(blurLayer).toBeTruthy();
+    await expect(getComputedStyle(blurLayer).backdropFilter).toBe("blur(4px)");
 
-    // No state set: no layer is rendered and the content stays clickable
-    await expect(wrapper.className).not.toContain("hoverable");
-    await expect(wrapper.querySelector('[class*="blurLayer"]')).toBeNull();
-    await expect(wrapper.querySelector('[class*="shimmerLayer"]')).toBeNull();
-
+    // The blur layer covers the content, so a click lands on the layer, not the button
     const button = canvas.getByRole("button", { name: "Edit" });
-    await expect(getTopElementAtCenterOf(button)).toBe(button);
+    await expect(getTopElementAtCenterOf(button)).toBe(blurLayer);
   },
 };

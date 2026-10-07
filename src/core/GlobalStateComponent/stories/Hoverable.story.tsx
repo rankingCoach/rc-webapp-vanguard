@@ -1,8 +1,9 @@
 import { within, expect } from "storybook/test";
 import { Story, demoCardContent, demoCardStyle, demoTestId, getTopElementAtCenterOf } from "./_GlobalStateComponent.default";
 
-export const Default: Story = {
+export const Hoverable: Story = {
   args: {
+    hoverable: true,
     testId: demoTestId,
     style: demoCardStyle,
     children: demoCardContent,
@@ -11,13 +12,10 @@ export const Default: Story = {
     const canvas = within(canvasElement);
     const wrapper = canvas.getByTestId(demoTestId);
 
-    await expect(canvas.getByText("Business hours")).toBeInTheDocument();
+    await expect(wrapper.className).toContain("hoverable");
 
-    // No state set: no layer is rendered and the content stays clickable
-    await expect(wrapper.className).not.toContain("hoverable");
-    await expect(wrapper.querySelector('[class*="blurLayer"]')).toBeNull();
-    await expect(wrapper.querySelector('[class*="shimmerLayer"]')).toBeNull();
-
+    // The hover layer is drawn over the content but must not swallow its clicks
+    await expect(getComputedStyle(wrapper, "::before").pointerEvents).toBe("none");
     const button = canvas.getByRole("button", { name: "Edit" });
     await expect(getTopElementAtCenterOf(button)).toBe(button);
   },
