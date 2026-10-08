@@ -1,0 +1,105 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.6/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": [
+      "src/**/*.js",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "!src/models/swagger",
+      "!src/stores/swagger",
+      "!src/custom-hooks/use-dynamic-import/assets/index.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all",
+      "bracketSpacing": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "a11y": "off",
+      "complexity": {
+        "noBannedTypes": "warn",
+        "useOptionalChain": "off",
+        "useArrowFunction": "off",
+        "useLiteralKeys": "off"
+      },
+      "correctness": {
+        "useHookAtTopLevel": "warn",
+        "useExhaustiveDependencies": "warn",
+        "noUnusedVariables": "off",
+        "noUnusedImports": "off",
+        "noUnusedFunctionParameters": "off",
+        "noEmptyPattern": "warn",
+        "noSwitchDeclarations": "warn",
+        "noUnreachable": "warn",
+        "noChildrenProp": "warn",
+        "noVoidElementsWithChildren": "warn",
+        "useJsxKeyInIterable": "warn",
+        "noSelfAssign": "warn",
+        "noConstantCondition": "warn",
+        "noUnsafeOptionalChaining": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "style": {
+        "useImportType": "off",
+        "useTemplate": "off",
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "warn",
+        "noDoubleEquals": "warn",
+        "useIterableCallbackReturn": "warn",
+        "noEmptyInterface": "off",
+        "noTsIgnore": "off",
+        "noImplicitAnyLet": "warn",
+        "noAssignInExpressions": "warn",
+        "noAsyncPromiseExecutor": "warn",
+        "noShadowRestrictedNames": "warn",
+        "noSelfCompare": "warn"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.stories.tsx", "**/*.story.tsx", "**/window.store.ts"],
+      "linter": { "enabled": false }
+    }
+  ],
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ":STYLE:",
+              [":BUN:", ":NODE:"],
+              [":PACKAGE_WITH_PROTOCOL:", ":URL:"],
+              ":PACKAGE:",
+              ":ALIAS:",
+              ":PATH:"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

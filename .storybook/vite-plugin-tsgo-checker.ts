@@ -20,8 +20,8 @@ export function tsgoChecker(options: TsgoCheckerOptions = {}): Plugin {
 
     const configPath = path.resolve(root, tsconfigPath);
 
-    // Use npx tsgo for type checking
-    const tsgoProcess = spawn('npx', ['tsgo', '--noEmit', '--project', configPath], {
+    // Use npx tsc (TypeScript 7 = the native Go compiler) for type checking
+    const tsgoProcess = spawn('npx', ['tsc', '--noEmit', '--project', configPath], {
       cwd: root,
       stdio: 'pipe',
     });

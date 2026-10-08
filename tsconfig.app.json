@@ -4,12 +4,13 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ESNext",
     /* Bundler mode */
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["facebook-js-sdk"],
     "experimentalDecorators": true,
 
     /* TypeScript 7 / tsgo optimizations */

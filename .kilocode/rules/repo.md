@@ -41,7 +41,7 @@ A comprehensive React component library optimized for performance and flexibilit
 - Vite 6.3.5
 - Vitest 3.2.3
 - Storybook 9.1.2
-- ESLint 9.16.0
+- Biome 2.5.6 (lint + format + import organizing, `biome.json`)
 - Sass
 - TypeScript
 

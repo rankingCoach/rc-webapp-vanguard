@@ -10,6 +10,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["facebook-js-sdk"],
     "experimentalDecorators": true,
 
     /* TypeScript 7 / tsgo optimizations */
