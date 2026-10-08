@@ -5,7 +5,7 @@ import { IconNames } from '@vanguard/Icon/IconNames';
 import { ModalFooterAction, SubButtonProps } from '@vanguard/Modal/ModalFooter/ModalFooter';
 import { ModalType } from '@vanguard/Modal/Modalheader/ModalHeader';
 import { useGetModals } from '@vanguard/Modal/ModalRoot/use-get-modals';
-import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useSyncExternalStore } from 'react';
 
 import { useModalContext } from '../ModalContext';
 import { ModalResponse } from '../ModalResponse';
@@ -16,6 +16,10 @@ export type ModalState = Record<string, any>;
 export type ModalResponseHandler<T> = (r?: ModalResponse<T>) => void;
 export type StandardModalProps<T> = {
   close: ModalResponseHandler<T>;
+  /** Injected only when ModalService.open opts into allowCompact. */
+  compact?: () => void;
+  /** Restore the original presentation without losing component state. */
+  expand?: () => void;
   message?: string | React.ReactNode;
   title?: string;
   negativeCtaText?: string;
@@ -31,9 +35,11 @@ export type StandardModalProps<T> = {
 
 export const ModalRoot = () => {
   const { modalRootState, addModal, removeModal } = useModalContext();
+  useSyncExternalStore(ModalService.subscribePresentation, ModalService.getPresentationRevision, ModalService.getPresentationRevision);
   const subscriptionsRef = useRef<any[]>([]);
 
   const { growModals, slideModals, popModals } = useGetModals(modalRootState);
+  const hasBlockingModal = [...growModals, ...slideModals, ...popModals].some((id) => !ModalService.getModalComponent(id)?.isCompact);
 
   useEffect(() => {
     // Clean up previous subscriptions
@@ -67,17 +73,14 @@ export const ModalRoot = () => {
    * Handle no scroll on page body
    */
   useEffect(() => {
-    if (
-      (growModals || slideModals || popModals) &&
-      (growModals.length ?? 0) + (slideModals.length ?? 0) + (popModals.length ?? 0) >= 1
-    ) {
+    if (hasBlockingModal) {
       document.body.style.marginRight = `${window.innerWidth - document.body.offsetWidth}px`;
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.marginRight = '';
       document.body.style.overflow = '';
     }
-  }, [growModals, slideModals, popModals]);
+  }, [hasBlockingModal]);
 
   /**
    * Return View

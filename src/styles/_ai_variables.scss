@@ -8,6 +8,20 @@
   --ai-stroke-color: rgba(from var(--fn-bg) r g b / 0.6);
   --ai-blur-width: 24px;
 }
+
+// Colours derived from the --ai-base-color of the element this is included on: each has a fixed OKLCH lightness and
+// chroma and takes its hue as an offset from the base hue. Declared on the element itself (never on :root), so an
+// element whose --ai-base-color differs from the theme's derives from its own base.
+// Without relative colour syntax (Chrome < 119, Safari < 18, Firefox < 128) both fall back to the base.
+@mixin aiDerivedColors {
+  --ai-glow-accent-color: var(--ai-base-color);
+  --ai-glow-light-color: var(--ai-base-color);
+
+  @supports (color: oklch(from red l c h)) {
+    --ai-glow-accent-color: oklch(from var(--ai-base-color) 0.6471 0.247 calc(h - 10));
+    --ai-glow-light-color: oklch(from var(--ai-base-color) 0.8771 0.1392 calc(h - 30));
+  }
+}
 @property --ai-bg-angle {
   syntax: "<angle>";
   inherits: true;

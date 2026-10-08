@@ -134,6 +134,8 @@ export enum IconNames {
   high = 'high',
   ai = 'ai',
   aiReviews = 'ai-reviews',
+  aiVisibility = 'ai-visibility',
+  aiVisibilityActive = 'ai-visibility-active',
   audioMicrophone = 'audio-microphone',
   audioSettings = 'audio-settings',
   callTracking = 'call-tracking',
@@ -155,6 +157,8 @@ export enum IconNames {
   postsSeries = 'posts-series',
   event = 'event',
   like = 'like',
+  ado = 'ado',
+  adoActive = 'ado-active',
 }
 
 export const IconNamesArr = Object.values(IconNames);

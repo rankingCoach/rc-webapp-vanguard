@@ -9,6 +9,7 @@ import { WithCustomContent as _WithCustomContent } from "./stories/WithCustomCon
 import { CancelFlow as _CancelFlow } from "./stories/CancelFlow.story";
 import { WithTestId as _WithTestId } from "./stories/WithTestId.story";
 import { WithBodyClassName as _WithBodyClassName } from "./stories/WithBodyClassName.story";
+import { CompactMode as _CompactMode, CompactModeNotEnabled as _CompactModeNotEnabled } from "./stories/CompactMode.story";
 
 export const Default: Story = { ..._Default };
 export const SavingState: Story = { ..._SavingState };
@@ -18,6 +19,8 @@ export const WithCustomContent: Story = { ..._WithCustomContent };
 export const CancelFlow: Story = { ..._CancelFlow };
 export const WithTestId: Story = { ..._WithTestId };
 export const WithBodyClassName: Story = { ..._WithBodyClassName };
+export const CompactMode: Story = { ..._CompactMode };
+export const CompactModeNotEnabled: Story = { ..._CompactModeNotEnabled };
 
 export default {
   ...SbDecorator({

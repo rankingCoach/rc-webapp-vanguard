@@ -1,3 +1,4 @@
+@import '@styles/color-functions';
 @import 'src/styles/spacings';
 
 .tabs-container {
@@ -11,5 +12,32 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  // STYLES FOR FLOATING THEME
+  &.floating {
+    box-sizing: border-box;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 0;
+    margin-inline: auto;
+    padding: $x0_5;
+    border-radius: $x4;
+    background-color: rc_transparent(--fn-fg-light, 0.1);
+
+    // Scroll buttons (TabsCustomScroll) are the first/last children of the MUI root;
+    // round them fully so the pill's corners don't clip them
+    > :first-child:not(:global(.MuiTabs-scroller)),
+    > :last-child:not(:global(.MuiTabs-scroller)) {
+      border-radius: $x4;
+    }
+
+    > :first-child:not(:global(.MuiTabs-scroller)) {
+      left: $x0_5;
+    }
+
+    > :last-child:not(:global(.MuiTabs-scroller)) {
+      right: $x0_5;
+    }
   }
 }

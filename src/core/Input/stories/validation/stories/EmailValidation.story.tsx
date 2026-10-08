@@ -31,5 +31,9 @@ export const EmailValidation: Story = {
     // Test valid length clears error
     await clearAndInputAndBlur(input, "validemail@email.ro");
     await expectErrorToNotExist(canvas);
+
+    // Internationalised (IDN) domains are valid too
+    await clearAndInputAndBlur(input, "info@die-bänd.com");
+    await expectErrorToNotExist(canvas);
   },
 };
