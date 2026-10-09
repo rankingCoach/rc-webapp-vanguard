@@ -1,6 +1,8 @@
 # Flat, npm-style node_modules. This repo relies on undeclared (phantom)
 # dependencies and on @reduxjs/toolkit emitting portable .d.ts files; pnpm's
 # default isolated layout breaks both. Hoisting mirrors npm's behavior.
+# Note: `ws` is a direct devDependency only so ws@8 (needed by vitest 4) wins
+# the root slot instead of react-native's ws@7 — don't remove it as "unused".
 nodeLinker: hoisted
 
 # Dependency build scripts pnpm is allowed to run (it blocks them by default).

@@ -20,83 +20,37 @@
   text-overflow: ellipsis;
 }
 
-@mixin shimmerEffect($duration: 8s) {
-  z-index: 1;
-  background-color: var(--ai-base-color) !important;
+// Ado shimmer: a 110° gradient in --ai-base-color with a band of the derived light colour sweeping across it.
+// The image is 260% wide, so moving it by 162.5% is exactly one repeat and the loop has no seam.
+// The including stylesheet must define `@keyframes adoShimmer` (CSS Modules rename keyframes per file).
+@mixin shimmerEffect($duration: 6s) {
+  @include ai_variables.aiDerivedColors;
 
-  // Content stays above the gradient layers
-  >* {
-    position: relative;
-    z-index: 2;
+  background-image: linear-gradient(
+    110deg,
+    var(--ai-base-color) 0%,
+    var(--ai-base-color) 20%,
+    color-mix(in oklch, var(--ai-base-color) 82%, var(--ai-glow-light-color)) 34%,
+    color-mix(in oklch, var(--ai-base-color) 68%, var(--ai-glow-light-color)) 44%,
+    color-mix(in oklch, var(--ai-base-color) 55%, var(--ai-glow-light-color)) 50%,
+    color-mix(in oklch, var(--ai-base-color) 68%, var(--ai-glow-light-color)) 56%,
+    color-mix(in oklch, var(--ai-base-color) 82%, var(--ai-glow-light-color)) 66%,
+    var(--ai-base-color) 80%,
+    var(--ai-base-color) 100%
+  );
+  background-size: 260% 100%;
+  background-repeat: repeat-x;
+  background-position: 162.5% 50%;
+  animation: adoShimmer $duration linear infinite;
+
+  @media (hover: hover) {
+    &:hover { filter: brightness(0.92); }
   }
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-
-
-    background-size: 400% 400%;
-    background-position: center;
-
-
-  }
-
-  &::before {
-    background: linear-gradient(var(--ai-bg-angle), var(--ai-start-color-lighter), var(--ai-base-color));
-    animation:
-      fadeGradient1 6s ease-in-out infinite,
-      aiSpinAnimation 6s linear infinite;
-  }
-
-  &::after {
-    background: linear-gradient(var(--ai-bg-angle), var(--ai-base-color), var(--ai-end-color));
-    animation:
-      fadeGradient2 6s ease-in-out infinite,
-      aiSpinAnimation 6s linear infinite;
-  }
-
-
-}
-
-@keyframes fadeGradient1 {
-  0% {
-    opacity: .8;
-  }
-
-  50% {
-    opacity: 0;
-  }
-
-  70% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: .8;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 }
-
-@keyframes fadeGradient2 {
-  0% {
-    opacity: 0;
-  }
-
-  40% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: .8;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
 
 @mixin loaderSpinner($size: $x2, $timing: 850ms) {
   width: $size;
@@ -146,6 +100,7 @@
     transform: scale(0.75);
     overflow: hidden;
     transition: 200ms ease-in all;
+    mix-blend-mode: multiply;
   }
 
   &:hover {

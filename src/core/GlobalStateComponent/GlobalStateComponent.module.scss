@@ -1,2 +1,59 @@
+@import "@styles/mixins";
 
+// Anchors the absolutely positioned state layers.
+// Not named `.container`: the library build hashes class names to 2 characters
+// ([local]_[hash:base64:2]), and that name collided with AIAssistantPanel's `.container`.
+.globalStateComponent {
+  position: relative;
+}
 
+.hoverable {
+  @include hoverEffect;
+
+  // The hover layer sits above non-positioned children; let clicks reach them
+  &::before {
+    pointer-events: none;
+  }
+}
+
+.blurLayer,
+.shimmerLayer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+// Captures pointer events so the blurred content cannot be clicked
+.blurLayer {
+  background-color: rc_transparent(--fn-bg, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.shimmerLayer {
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 30%,
+    rc_transparent(--fn-bg-hov-n-gl, 0.7) 50%,
+    transparent 70%
+  );
+  background-size: 300% 100%;
+  animation: shimmerSweep 1.5s linear infinite;
+
+  // No moving band: a static tint still marks the content as loading
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-image: none;
+    background-color: rc_transparent(--fn-bg-hov-n-gl, 0.4);
+  }
+}
+
+// Moves the band from the left edge to the right edge
+@keyframes shimmerSweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}

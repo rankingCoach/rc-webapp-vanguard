@@ -1,6 +1,11 @@
 @use "@styles/ai_variables";
 
+// Parity options for matching a prototype, read with a fallback and never declared here, so a consumer's className
+// sets them without a specificity fight. The defaults render the standard glow:
+// --ai-glow-angle-offset (0deg), --ai-glow-background-size (300%), --ai-glow-after-blend-mode (overlay)
 .grad {
+  @include ai_variables.aiDerivedColors;
+
   display: inline-flex;
   justify-content: center;
 
@@ -28,21 +33,21 @@
     left: calc(var(--ai-border-size-outside) * -1);
     background: var(--ai-background);
     background: linear-gradient(
-      var(--ai-bg-angle),
-      var(--ai-start-color) 0%,
+      calc(var(--ai-glow-angle-offset, 0deg) + var(--ai-bg-angle)),
+      var(--ai-glow-accent-color) 0%,
       var(--ai-base-color) 22%,
-      var(--ai-end-color) 33.3%,
-      var(--ai-end-color) 49%,
+      var(--ai-glow-light-color) 33.3%,
+      var(--ai-glow-light-color) 49%,
       hsla(0, 0%, 100%, 1) 50%,
-      var(--ai-start-color) 55%,
+      var(--ai-glow-accent-color) 55%,
       var(--ai-base-color) 66%,
       var(--ai-base-color) 88%,
-      var(--ai-end-color) 100%
+      var(--ai-glow-light-color) 100%
     );
 
     border-radius: calc(var(--ai-border-radius) + var(--ai-border-size-outside));
 
-    background-size: 300% 300%;
+    background-size: var(--ai-glow-background-size, 300%) var(--ai-glow-background-size, 300%);
     animation:
       aiGradientAnimation 24s linear infinite,
       aiSpinAnimation 24s linear infinite;
@@ -51,12 +56,19 @@
   &:after {
     filter: blur(1px);
     z-index: -1;
-    mix-blend-mode: overlay;
+    mix-blend-mode: var(--ai-glow-after-blend-mode, overlay);
     opacity: 0.4;
   }
 
   &:before {
     filter: blur(var(--ai-blur-width));
     z-index: -10;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grad::before,
+  .grad::after {
+    animation: none;
   }
 }

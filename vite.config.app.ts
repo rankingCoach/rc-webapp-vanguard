@@ -1,6 +1,5 @@
 import { defineConfig, build, Connect, UserConfig, mergeConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tsPlugin from "vite-plugin-ts";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import { esbuildCommonjs } from "@originjs/vite-plugin-commonjs";
 // import { customConfigPlugin, onVIteBuildEnd } from "./scripts/rsync-config";
@@ -33,7 +32,6 @@ export const BaseViteConfig: UserConfig = {
   plugins: [
     // cssInjectedByJsPlugin({topExecutionPriority: false}),
     // onVIteBuildEnd(),
-    tsPlugin(),
     // react(),
     viteTsconfigPaths(),
     // customConfigPlugin(),

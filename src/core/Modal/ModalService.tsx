@@ -22,10 +22,30 @@ import { MediaItemFile } from '../Gallery/Gallery/Gallery';
 import { ConfirmModal } from '../StandardModals/ConfirmModal/ConfirmModal';
 import { LoadingModal } from '../StandardModals/LoadingModal/LoadingModal';
 import { ModalResponse } from './ModalResponse';
+import { BamStack, ModalRegistry } from './services/bam-stack';
+import { CompactWindowBounds } from './services/compact-window-geometry';
+import { CompactWindowManager } from './services/compact-window-manager';
+import { ModalWindow, ModalWindowEvent, ModalWindowEvents, ModalWindowMetadata } from './services/modal-window-events';
+import { PresentationStore } from './services/presentation-store';
+
+export type { CompactWindowBounds } from './services/compact-window-geometry';
+export { clampCompactWindowBounds } from './services/compact-window-geometry';
+export type { ModalWindow, ModalWindowEvent, ModalWindowMetadata } from './services/modal-window-events';
 
 export type ComponentWithId = any;
 
 export type ModalOpts = {
+  /** Opt into window lifecycle events. Omit to retain ordinary modal behavior. */
+  windowMetadata?: ModalWindowMetadata;
+  /** Opt into compact()/expand() controls. Existing modals remain unchanged when omitted. */
+  allowCompact?: boolean;
+  /**
+   * Opt into the BAM card stack (active while setStackingEnabled(true)). Omitted, the modal opens as a plain BAM
+   * above any stack and never joins, counts toward or reorders one.
+   */
+  allowStacking?: boolean;
+  /** Label shown on the exposed stacking tab. */
+  stackTitle?: string;
   testId?: string;
   className?: string;
   padding?: string;
@@ -122,6 +142,115 @@ const WrapperModal = <ResponseModel,>(
  */
 
 class ModalServiceClass {
+  private presentation = new PresentationStore();
+  private windowEvents = new ModalWindowEvents();
+  private registry: ModalRegistry = {
+    get: (id) => this.modalComponents.get(id),
+    ids: () => [...this.modalComponents.keys()],
+    forEach: (callback) => this.modalComponents.forEach(callback),
+    close: (id) => this.modalComponents.get(id)?.props.close({ isOk: false }),
+  };
+  private stack = new BamStack(this.registry, this.presentation, this.windowEvents);
+  private compactWindows = new CompactWindowManager(this.registry, this.stack, this.presentation, this.windowEvents);
+
+  /** No initial event; read getActiveWindow()/getWindows() after subscribing. */
+  subscribeWindowEvents(listener: (event: ModalWindowEvent) => void) {
+    return this.windowEvents.subscribe(listener);
+  }
+  getWindows(): ModalWindow[] {
+    return this.windowEvents.getWindows();
+  }
+  getWindow(id: string): ModalWindow | undefined {
+    return this.windowEvents.getWindow(id);
+  }
+  getActiveWindow(): ModalWindow | null {
+    return this.windowEvents.getActive();
+  }
+  /** Replace metadata on an already opted-in window, without changing its focus or presentation. */
+  setWindowMetadata(id: string, metadata: ModalWindowMetadata) {
+    this.windowEvents.setMetadata(id, metadata);
+  }
+
+  /** Scope interaction cleanup to its owner; omitted id retains the legacy shared control. */
+  setCompactWindowInteracting(active: boolean, modalId = 'legacy') {
+    this.compactWindows.setCompactWindowInteracting(active, modalId);
+  }
+  isCompactWindowInteracting() {
+    return this.compactWindows.isCompactWindowInteracting();
+  }
+  /** Independent opt-in. Disabling discards custom geometry and restores the existing presentation. */
+  setCompactWindowControlsEnabled(enabled: boolean) {
+    this.compactWindows.setCompactWindowControlsEnabled(enabled);
+  }
+  isCompactWindowControlsEnabled() {
+    return this.compactWindows.isCompactWindowControlsEnabled();
+  }
+  isCompactWindowDetached(id: string) {
+    return this.compactWindows.isCompactWindowDetached(id);
+  }
+  /** Percentage of the smaller window covered before a drop can form a stack. */
+  setCompactWindowDockThreshold(percentage: number) {
+    this.compactWindows.setCompactWindowDockThreshold(percentage);
+  }
+  findCompactWindowDropTarget(id: string, candidates: { id: string; bounds: CompactWindowBounds }[], group = false) {
+    return this.compactWindows.findCompactWindowDropTarget(id, candidates, group);
+  }
+  dockCompactWindow(id: string, candidates: { id: string; bounds: CompactWindowBounds }[], group = false) {
+    this.compactWindows.dockCompactWindow(id, candidates, group);
+  }
+  getCompactWindowBounds(id: string) {
+    return this.compactWindows.getCompactWindowBounds(id);
+  }
+  getCompactStackBounds(id?: string) {
+    return this.compactWindows.getCompactStackBounds(id);
+  }
+  /** Viewport changes clamp geometry without changing stack membership. */
+  fitCompactWindowToViewport(id: string) {
+    this.compactWindows.fitCompactWindowToViewport(id);
+  }
+  setCompactWindowBounds(id: string, bounds: CompactWindowBounds, group = false) {
+    this.compactWindows.setCompactWindowBounds(id, bounds, group);
+  }
+  focusCompactWindow(id: string) {
+    this.compactWindows.focusCompactWindow(id);
+  }
+  returnCompactWindowToStack(id: string) {
+    this.compactWindows.returnCompactWindowToStack(id);
+  }
+  stackAllCompactWindows() {
+    this.compactWindows.stackAllCompactWindows();
+  }
+
+  /** All attached stackable BAMs, or only the stack containing a specified BAM. */
+  getStackedBamIds(modalId?: string) {
+    return this.stack.getStackedBamIds(modalId);
+  }
+  /** Stack membership and position ModalRoot renders a modal with. */
+  getStackPlacement(modalId: string) {
+    return this.stack.getStackPlacement(modalId);
+  }
+  /**
+   * Whether an open modal is currently presented: unstacked, or the active card/tab of its stack.
+   * Detached compact windows are always presented. Re-read on subscribePresentation.
+   */
+  isModalPresented(modalId: string) {
+    return this.modalComponents.has(modalId) && this.stack.getStackPlacement(modalId).active;
+  }
+  /** Whether the modal was opened with allowStacking. */
+  isModalStackable(modalId: string) {
+    return this.stack.isStackable(modalId);
+  }
+  /** Maximum attached BAMs. Omit/undefined/null restores unlimited stacking. */
+  setMaxStackSize(max?: number | null) {
+    this.stack.setMaxStackSize(max);
+  }
+  getMaxStackSize() {
+    return this.stack.getMaxStackSize();
+  }
+
+  subscribePresentation = (listener: () => void) => this.presentation.subscribe(listener);
+  getPresentationRevision = () => this.presentation.getRevision();
+
   private loadingModalId: null | string;
   private confirmModalId: null | string;
   private errorModalId: null | string;
@@ -134,6 +263,7 @@ class ModalServiceClass {
     this.errorModalId = null;
     this.modalCloseListeners = new Map();
     this.modalComponents = new Map();
+    this.stack.attachCompactWindows(this.compactWindows);
   }
 
   on(event: any, callback: (details: any) => any) {
@@ -158,8 +288,12 @@ class ModalServiceClass {
   }
 
   removeModalComponent(id: string) {
+    this.stack.handleRemoved(id);
     this.modalComponents.delete(id);
+    this.compactWindows.handleRemoved(id);
     OverlayStackingService.unregister(id);
+    this.windowEvents.handleRemoved(id);
+    this.presentation.notify();
   }
 
   openConfirmModal(options: OpenConfirmModalOptions): string;
@@ -375,7 +509,7 @@ class ModalServiceClass {
 
   openSlide<ResponseModel>(component: ComponentWithId, opts?: ModalOpts) {
     opts = { ...opts, animation: 'slide' };
-    return this.open(component, opts);
+    return this.open<ResponseModel>(component, opts);
   }
 
   openErrorModal = ({
@@ -385,6 +519,8 @@ class ModalServiceClass {
     title,
     ctaPositive,
     onClose,
+    replacements,
+    errorCodes,
   }: {
     err?: any;
     source: string;
@@ -392,6 +528,8 @@ class ModalServiceClass {
     title?: string;
     ctaPositive?: (ModalFooterAction & SubButtonProps) | null;
     onClose?: () => void;
+    replacements?: TextReplacements;
+    errorCodes?: string[];
   }) => {
     this.errorModalId = this.open(
       <ErrorModal
@@ -403,6 +541,8 @@ class ModalServiceClass {
         message={message}
         title={title}
         ctaPositive={ctaPositive}
+        replacements={replacements}
+        errorCodes={errorCodes}
       />,
     );
   };
@@ -419,8 +559,59 @@ class ModalServiceClass {
     });
   }
 
+  /** Enable/disable the shared compact presentation for every modal opened with allowCompact. */
+  setCompactMode(enabled: boolean) {
+    this.stack.setCompactMode(enabled);
+  }
+  /** Opt into the visual card stack for modals opened with allowStacking. Disabled by default. */
+  setStackingEnabled(enabled: boolean) {
+    this.stack.setStackingEnabled(enabled);
+  }
+  isStackingEnabled() {
+    return this.stack.isStackingEnabled();
+  }
+  /** Fullscreen Modal reports its actual presentation, even through consumer wrappers. */
+  registerFullscreen(modalId: string, fullscreen: boolean) {
+    this.stack.registerFullscreen(modalId, fullscreen);
+  }
+  getBamIds() {
+    return this.stack.getBamIds();
+  }
+  /** Relabel an open modal's stack tab, rear-card strip and compact window controls. */
+  setStackTitle(modalId: string, title: string) {
+    const component = this.modalComponents.get(modalId);
+    if (!component || component.props.stackTitle === title) return;
+    component.props = { ...component.props, stackTitle: title };
+    this.presentation.notify();
+  }
+  /** Promote within the BAM stack; unrelated dialogs/drawers retain their overlay slots. */
+  bringToFront(modalId: string) {
+    this.stack.bringToFront(modalId);
+  }
+  /** Consumer control: compact every allowCompact modal. */
+  compact(modalId?: string | null) {
+    this.stack.compact(modalId);
+  }
+  /** Consumer control: expand every allowCompact modal. */
+  expand(modalId?: string | null) {
+    this.stack.expand(modalId);
+  }
+
+  /** @deprecated Use compact(modalId). */
+  compactEv(modalId?: string | null) {
+    this.compact(modalId);
+  }
+
+  /** @deprecated Use expand(modalId). */
+  expandEv(modalId?: string | null) {
+    this.expand(modalId);
+  }
+
   /** Test-only: wipe internal state. Not for production code paths. */
   __resetForTests() {
+    this.windowEvents.reset();
+    this.stack.reset();
+    this.compactWindows.reset();
     this.loadingModalId = null;
     this.confirmModalId = null;
     this.errorModalId = null;
@@ -457,6 +648,10 @@ class ModalServiceClass {
       this.closeEv(id, r);
     };
 
+    const compactControls = opts?.allowCompact
+      ? { compact: () => this.compact(id), expand: () => this.expand(id) }
+      : {};
+
     if (opts?.wrapInModal) {
       component = (
         <WrapperModal<ResponseModel>
@@ -470,6 +665,7 @@ class ModalServiceClass {
             ? React.cloneElement(component, {
                 modalId: id,
                 close: closeFn,
+                ...compactControls,
               } as any)
             : component}
         </WrapperModal>
@@ -483,6 +679,7 @@ class ModalServiceClass {
       ...component.props,
       close: closeFn,
       ...opts,
+      ...compactControls,
     };
 
     /**
@@ -494,14 +691,24 @@ class ModalServiceClass {
         ...props,
       },
       modalId: id,
+      isFullscreen: !!opts?.fullscreen,
+      // Only allowCompact modals take part in compact mode; any other BAM opens in its own presentation.
+      isCompact: this.stack.isCompactMode() && !!opts?.allowCompact,
+      compactManaged: this.stack.isCompactMode() && !!opts?.allowCompact,
     });
 
     OverlayStackingService.register(id, 'modal', opts?.baseZIndex);
+    if (opts?.windowMetadata !== undefined) {
+      this.windowEvents.register(id, opts.windowMetadata);
+    }
 
     pubSubService.$pub(PUB_SUB_EVENTS.reactModalOpen, {
       modalId: id,
       animation: opts?.animation || 'grow',
     });
+    this.stack.enforceStackLimit();
+    this.presentation.notify();
+    this.windowEvents.syncActive('open');
     return id;
   }
 

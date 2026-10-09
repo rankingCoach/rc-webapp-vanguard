@@ -50,6 +50,11 @@ export type InputLabelProps = {
   label?: string | false;
   labelType?: 'floating' | 'static' | 'outer' | 'hidden';
   labelStyle?: CSSProperties;
+  /**
+   * Hides the "Optional" hint appended to the label of non-required fields.
+   * Has no effect on required fields (they never show the hint).
+   */
+  hideOptionalLabel?: boolean;
 };
 
 /**
@@ -260,6 +265,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     helperLinkDisabled,
     helperLinkHref,
     labelStyle,
+    hideOptionalLabel = false,
   } = props;
 
   let { maxLength } = props;
@@ -454,7 +460,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     return (
       <>
         {translationService.get(label, replacements).value}
-        {!required && (
+        {!required && !hideOptionalLabel && (
           <span
             className={'vanguard-input-label-optional'}
             style={{ color: labelStyle?.color ? `rgb(from ${labelStyle.color} r g b / 0.7)` : undefined }}

@@ -1,4 +1,4 @@
-import { within, expect } from "storybook/test";
+import { within, expect, waitFor } from "storybook/test";
 import { Story, createMockFormConfig } from "./_DateRangeInput.default";
 
 export const WithInputFormatter: Story = {
@@ -11,9 +11,9 @@ export const WithInputFormatter: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const highlights = canvas.getByText("2023-01-01 to 2023-01-31");
+    const input = canvasElement.querySelector("input") as HTMLInputElement;
     const button = canvas.getByRole("button");
-    await expect(highlights).toBeInTheDocument();
+    await waitFor(() => expect(input).toHaveValue("2023-01-01 to 2023-01-31"));
     await expect(button).toBeInTheDocument();
   },
 };

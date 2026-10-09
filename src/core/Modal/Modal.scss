@@ -10,6 +10,7 @@
   --shadow-large: 0px 12px 40px #{rc_transparent(--fn-shadow, 0.0239911)}, 0px 8px 14px #{rc_transparent(--fn-shadow, 0.05)}, 0px 4px 4px #{rc_transparent(--fn-shadow, 0.08)};
 }
 
+
 /**
  * Modal container
  * ---------------------------------------------------------------------------------------------------------------------
@@ -43,7 +44,7 @@
 
     border-radius: 8px;
     background: var(--fn-bg-surface);
-    box-shadow: var(--shadow-large);
+    box-shadow: var(--modal-content-shadow, var(--shadow-large));
 
     display: flex;
     flex-direction: column;
@@ -115,7 +116,7 @@
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       background: var(--fn-bg-surface);
-      box-shadow: var(--shadow-large);
+      box-shadow: var(--modal-content-shadow, var(--shadow-large));
     }
   }
 
@@ -158,5 +159,152 @@
       overflow-y: auto;
       overflow-x: hidden;
     }
+  }
+}
+
+
+// Opt-in fullscreen ↔ floating presentation, migrated from rc-webapp's AgentModal.
+// No sizing, positioning or transitions change for existing modal consumers.
+.rc-modal.modal-compact-enabled {
+  justify-content: flex-end;
+  align-items: flex-end;
+  height: 100vh;
+  height: 100dvh;
+  transition: padding 0.3s ease-in-out;
+
+  > .modal-content,
+  > .modal-content-wrapper {
+    transition: width 0.3s ease-in-out, height 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+  }
+
+  &.modal-fullscreen > .modal-content,
+  &.modal-fullscreen > .modal-content-wrapper {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  &.modal-compact {
+    padding: var(--modal-inset);
+    box-sizing: border-box;
+    pointer-events: none;
+
+    > .modal-content,
+    > .modal-content-wrapper {
+      width: var(--modal-preferred-width);
+      max-width: calc(100vw - 2 * var(--modal-inset));
+      height: min(var(--modal-preferred-height), calc(100vh - 2 * var(--modal-inset)));
+      height: min(var(--modal-preferred-height), calc(100dvh - 2 * var(--modal-inset)));
+      min-height: 0;
+      margin: 0;
+    }
+
+    > .modal-content-wrapper > .modal-content {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      margin: 0;
+    }
+
+    > .modal-content,
+    > .modal-content-wrapper > .modal-content {
+      border-radius: $x3;
+      pointer-events: auto;
+      overflow: hidden;
+
+      > .modal-header,
+      > .modal-body,
+      > .modal-footer {
+        box-sizing: border-box;
+        min-width: 0;
+      }
+
+      .modal-header-title-container {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      > .modal-header,
+      > .modal-footer {
+        flex-shrink: 0;
+      }
+
+      > .modal-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding-bottom: $x3;
+      }
+
+      > .modal-footer {
+        position: relative;
+        width: 100%;
+      }
+
+      .SplitView-left-component,
+      .SplitView-right-component,
+      .SplitView-left-component .modal-body {
+        height: 100%;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    > .modal-content,
+    > .modal-content-wrapper {
+      transition: none;
+    }
+  }
+}
+
+// The stack owns panel geometry only while explicitly enabled by ModalService.
+.rc-modal.modal-stacked.modal-fullscreen {
+  pointer-events: none;
+
+  > .modal-content,
+  > .modal-content-wrapper {
+    position: fixed;
+    top: var(--modal-stack-top);
+    right: var(--modal-stack-side);
+    width: calc(100vw - 2 * var(--modal-stack-side));
+    max-width: calc(100vw - 2 * var(--modal-stack-side));
+    height: calc(100dvh - var(--modal-stack-top) - var(--modal-stack-bottom));
+    min-height: 0;
+    margin: 0;
+    border-radius: var(--modal-stack-radius);
+    overflow: hidden;
+    pointer-events: auto;
+    transition: top 0.3s ease, right 0.3s ease, width 0.3s ease, height 0.3s ease;
+  }
+
+  > .modal-content-wrapper > .modal-content { width: 100%; height: 100%; border-radius: var(--modal-stack-radius); }
+
+  // Expanded BAMs span the viewport. Interpolating their top/height reflows the
+  // entire editor every frame. Commit the new size once and animate only movement.
+  &:not(.modal-compact) > .modal-content,
+  &:not(.modal-compact) > .modal-content-wrapper {
+    top: 0;
+    transform: translate3d(0, var(--modal-stack-top), 0);
+    transition: transform 0.24s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  &.modal-compact > .modal-content,
+  &.modal-compact > .modal-content-wrapper {
+    width: min(calc(var(--modal-preferred-width) - 2 * var(--modal-stack-depth)), calc(100vw - 2 * var(--modal-stack-side)));
+  }
+
+  .modal-content {
+    > .modal-header, > .modal-body, > .modal-footer { box-sizing: border-box; min-width: 0; }
+    > .modal-header, > .modal-footer { flex-shrink: 0; }
+    > .modal-body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: $x3; }
+    > .modal-footer { position: relative; width: 100%; }
+    .SplitView-left-component, .SplitView-right-component,
+    .SplitView-left-component .modal-body { height: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    > .modal-content, > .modal-content-wrapper,
+    &:not(.modal-compact) > .modal-content,
+    &:not(.modal-compact) > .modal-content-wrapper { transition: none; }
   }
 }

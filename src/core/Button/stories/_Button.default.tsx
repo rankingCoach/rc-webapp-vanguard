@@ -62,7 +62,11 @@ export const buttonArgTypes = {
   textWrap: {
     control: 'radio',
     options: ['wrap', 'no-wrap'],
-    defaultValue: 'wrap',
+    defaultValue: 'no-wrap',
+  },
+  translate: {
+    control: 'boolean',
+    defaultValue: true,
   },
   iconHasCircle: {
     control: 'boolean',
