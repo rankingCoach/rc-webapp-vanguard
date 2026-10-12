@@ -42,6 +42,8 @@
   background-repeat: repeat-x;
   background-position: 162.5% 50%;
   animation: adoShimmer $duration linear infinite;
+  // A consumer freezes the shimmer on its current frame by setting `--ambient-play-state: paused` on an ancestor.
+  animation-play-state: var(--ambient-play-state, running);
 
   @media (hover: hover) {
     &:hover { filter: brightness(0.92); }
