@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.1.0...v2.2.0) (2026-10-07)
+
+
+### Features
+
+* **GlobalStateComponent:** introduce visual state management with hover, blur, and shimmer effects ([5b90c4b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5b90c4b3aceae75abed459ded740852293b20f92)), closes [#VAN-79](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-79)
+* **tabs:** add floating theme (VAN-80) ([f134e67](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f134e67e79583904a0bc242a2347e4646a21fb4e))
+
 ## [2.1.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.0.0...v2.1.0) (2026-10-05)
 
 
