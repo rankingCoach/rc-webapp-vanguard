@@ -1,6 +1,8 @@
 @import '@styles/color-functions';
 @import 'src/styles/spacings';
 
+$floating-padding: $x0_25;
+
 .tabs-container {
   position: relative;
 
@@ -21,23 +23,28 @@
     max-width: 100%;
     min-height: 0;
     margin-inline: auto;
-    padding: $x0_5;
-    border-radius: $x4;
+    padding: $floating-padding;
+    // Concentric corners: the tabs' radius plus the gap around them
+    border-radius: $rounded-border-radius + $floating-padding;
     background-color: rc_transparent(--fn-fg-light, 0.1);
 
     // Scroll buttons (TabsCustomScroll) are the first/last children of the MUI root;
-    // round them fully so the pill's corners don't clip them
+    // round them fully and fit them to the pill's inner height so they aren't clipped
     > :first-child:not(:global(.MuiTabs-scroller)),
     > :last-child:not(:global(.MuiTabs-scroller)) {
-      border-radius: $x4;
+      box-sizing: border-box;
+      height: calc(100% - #{2 * $floating-padding});
+      aspect-ratio: 1;
+      padding: 0;
+      border-radius: $rounded-border-radius;
     }
 
     > :first-child:not(:global(.MuiTabs-scroller)) {
-      left: $x0_5;
+      left: $floating-padding;
     }
 
     > :last-child:not(:global(.MuiTabs-scroller)) {
-      right: $x0_5;
+      right: $floating-padding;
     }
   }
 }

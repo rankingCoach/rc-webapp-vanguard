@@ -46,7 +46,7 @@
   &.floating {
     min-height: 0;
     padding: $x1 $x2;
-    border-radius: $x4 !important;
+    border-radius: $rounded-border-radius !important;
     flex-grow: 0;
 
     &:hover {
