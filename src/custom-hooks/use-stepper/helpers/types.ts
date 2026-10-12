@@ -1,5 +1,4 @@
-import { ReduxGenerator } from '@helpers/redux-common';
-import { createSlice } from '@reduxjs/toolkit';
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
 /**
  * Setup for slice
@@ -10,26 +9,7 @@ export type StepperState = {
   modalId: string | null;
   isValid: boolean;
   stepStatus: StepStatus;
-  [key: string]: any; //TODO: This is causing type problems. Comment it to see how it affects the code
 };
-
-const initialState: StepperState = {
-  step: '',
-  modalId: null,
-  isValid: true,
-  stepStatus: 'clean',
-};
-const G = new ReduxGenerator<StepperState>();
-
-const Slice = createSlice({
-  name: 'typeGeneratingSliceNotToBeUSedAnywhereElse',
-  initialState,
-  reducers: {
-    ...G.genAll(initialState),
-  },
-});
-
-const SetupSlice = Slice.actions;
 
 /**
  * Other types
@@ -37,6 +17,17 @@ const SetupSlice = Slice.actions;
 export type UseStepStatusPairs = Array<[unknown, unknown]>;
 export type StepStatus = 'dirty' | 'clean';
 export type SetupSelector<RootState> = (state: RootState) => any;
-export type SetupSliceType<Steps> = typeof SetupSlice;
+
+/**
+ * Structural type describing the slice actions the stepper hooks actually consume.
+ * Only `setStep` (use-go-to-step, ModalStepper) and `setStepStatus` (use-step-status)
+ * are ever read. Concrete consumer slices are distinct CaseReducerActions instances
+ * over their own state, so we match structurally on just these two action creators
+ * instead of pinning to a throwaway internal slice's `typeof`.
+ */
+export type SetupSliceType<Steps = unknown> = {
+  setStep: ActionCreatorWithPayload<any>;
+  setStepStatus: ActionCreatorWithPayload<any>;
+};
 
 export type StepsOrFN<Steps, T = unknown> = Steps | ((data?: T) => void);

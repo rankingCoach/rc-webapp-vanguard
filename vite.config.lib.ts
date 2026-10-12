@@ -1,6 +1,5 @@
 import { defineConfig, build, Connect, UserConfig, mergeConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tsPlugin from "vite-plugin-ts";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import { esbuildCommonjs } from "@originjs/vite-plugin-commonjs";
 // import { customConfigPlugin, onVIteBuildEnd } from "./scripts/rsync-config";
@@ -44,7 +43,6 @@ export const BaseViteConfig: UserConfig = {
     // cssInjectedByJsPlugin({topExecutionPriority: false}),
     // onVIteBuildEnd(),
     vitePluginAssetAnalyzer(),
-    tsPlugin(),
     // react(),
     viteTsconfigPaths(),
     // customConfigPlugin(),
@@ -59,7 +57,7 @@ export const BaseViteConfig: UserConfig = {
       outDir: "dist/types", // Where to output .d.ts files
       insertTypesEntry: true, // Creates a `types` entry in package.json
       tsconfigPath: resolve(__dirname, "./tsconfig.lib.json"),
-      // Note: vite-plugin-dts doesn't support tsgo yet, so it still uses tsc for .d.ts generation
+      // Note: vite-plugin-dts needs the TS JS compiler API, which TS 7 dropped -- it gets its own TS 5 copy via .pnpmfile.cjs
       // This is acceptable as .d.ts generation is separate from type checking
       compilerOptions: {
         declarationMap: false, // Disable .dts.map files
