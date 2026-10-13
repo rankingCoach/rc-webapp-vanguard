@@ -37,3 +37,22 @@ export const ClassNameOnBarRoot: Story = {
     await expect(bar.parentElement?.classList.contains('consumer-bar')).toBe(false);
   },
 };
+
+// C10 on the floating theme: consumer single-class rules on the bar root still win over the floating bar styles.
+export const ClassNameOnFloatingBar: Story = {
+  render: () => (
+    <div style={{ width: 600 }}>
+      <style>{'.consumer-floating-bar{padding:0 32px;margin-inline:0}'}</style>
+      <VisualHarness className="consumer-floating-bar" theme="floating" tabs={makeTabs(['Alpha', 'Beta'])} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const bar = within(canvasElement).getByRole('tablist').closest('.consumer-floating-bar') as HTMLElement;
+    await expect(bar).not.toBeNull();
+    const style = getComputedStyle(bar);
+    await expect(style.paddingLeft).toBe('32px');
+    await expect(style.marginLeft).toBe('0px');
+    // Floating look is otherwise preserved.
+    await expect(style.borderRadius).toBe('26px');
+  },
+};

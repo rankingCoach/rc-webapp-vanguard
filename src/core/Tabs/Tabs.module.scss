@@ -17,7 +17,9 @@ $floating-padding: $x0_25;
   }
 
   // STYLES FOR FLOATING THEME
-  &.floating {
+  // `:where()` keeps the bar rules at single-class specificity, like the base rules above, so a consumer
+  // className on the bar root (padding, margin, background, ...) still wins.
+  &:where(.floating) {
     box-sizing: border-box;
     width: fit-content;
     max-width: 100%;
@@ -27,9 +29,11 @@ $floating-padding: $x0_25;
     // Concentric corners: the tabs' radius plus the gap around them
     border-radius: $rounded-border-radius + $floating-padding;
     background-color: rc_transparent(--fn-fg-light, 0.1);
+  }
 
-    // Scroll buttons (TabsCustomScroll) are direct children of the bar root;
-    // round them fully and fit them to the pill's inner height so they aren't clipped
+  // Scroll buttons (TabsCustomScroll) are direct children of the bar root; round them fully and fit them to the
+  // pill's inner height so they aren't clipped. Full specificity: must beat TabsCustomScroll's own rules.
+  &.floating {
     > .scroll-button {
       box-sizing: border-box;
       height: calc(100% - #{2 * $floating-padding});

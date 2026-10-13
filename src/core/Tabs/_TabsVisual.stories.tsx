@@ -1,6 +1,9 @@
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 
-import { ClassNameOnBarRoot as _ClassNameOnBarRoot } from './stories/ClassNameOnBarRoot.story';
+import {
+  ClassNameOnBarRoot as _ClassNameOnBarRoot,
+  ClassNameOnFloatingBar as _ClassNameOnFloatingBar,
+} from './stories/ClassNameOnBarRoot.story';
 import { ConfigFloating as _ConfigFloating } from './stories/ConfigFloating.story';
 import { ConfigGrowCenteredIcons as _ConfigGrowCenteredIcons } from './stories/ConfigGrowCenteredIcons.story';
 import {
@@ -71,3 +74,4 @@ export const FlatConfigProps: Story = { ..._FlatConfigProps };
 export const SelectedVisibleAfterReorder: Story = { ..._SelectedVisibleAfterReorder };
 export const OverflowAfterTabSwap: Story = { ..._OverflowAfterTabSwap };
 export const NoScrollFightOnOtherTabResize: Story = { ..._NoScrollFightOnOtherTabResize };
+export const ClassNameOnFloatingBar: Story = { ..._ClassNameOnFloatingBar };
