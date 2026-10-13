@@ -25,7 +25,6 @@ import { Select } from '@vanguard/Select/Select';
 import { Slider } from '@vanguard/Slider/Slider';
 import { Snackbar } from '@vanguard/Snackbar/Snackbar';
 import { Tabs } from '@vanguard/Tabs/Tabs';
-import { Tab } from '@vanguard/Tabs/Tab/Tab';
 import { ToggleButton } from '@vanguard/ToggleButton/ToggleButton';
 import { ToggleButtonGroup } from '@vanguard/ToggleButtonGroup/ToggleButtonGroup';
 import { Toolbar } from '@vanguard/Toolbar/Toolbar';

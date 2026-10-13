@@ -2,12 +2,68 @@
 @import "../../../styles/spacings";
 @import '../../../styles/media-mixins';
 
+// Native <button> reset (formerly MUI ButtonBase + MuiTab-root defaults)
 .tab {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 90px;
+  max-width: 360px;
+  min-height: $x6;
+  margin: 0;
+  padding: $x1_5 $x2;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  // Former MUI `textColor="primary"` defaults; only visible for ReactNode labels (string labels use `Text` colours).
+  color: rgba(0, 0, 0, 0.6);
+  // Former MUI typography (button) font stack; only visible for ReactNode labels (string labels use `Text`).
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   font-size: $x2;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.02857em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  white-space: normal;
+  vertical-align: middle;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  outline: 0;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus-visible {
+    outline: 2px solid var(--fn-fg-cta);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  // ERROR STATE (selected tab only). Kept before the theme blocks with lower-or-equal specificity, like the former
+  // MUI `sx` rule: theme rules win on conflicts (underline keeps its 2px CTA underline, floating keeps its radius).
+  &.has-error {
+    border: 1px solid var(--e500);
+    border-radius: $x1;
+    color: var(--e500);
+  }
+
+  &.selected {
+    color: #1976d2;
+  }
 
   // STYLES FOR HIGHTLIGHT THEME
   &.highlight {
-    border-radius: $x1 !important;
+    border-radius: $x1;
     padding: $x1_75 $x2;
     flex-grow: 1;
     margin: 0 auto;
@@ -58,6 +114,36 @@
     }
   }
 
+  // CONFIG MODIFIERS: must stay AFTER the theme blocks. Same specificity (0,2,0) as
+  // `.tab.<theme>`, so later-wins reproduces the old inline styles beating theme values.
+  &.height-small {
+    min-height: 36px;
+    height: 36px;
+  }
+
+  &.no-min-width {
+    min-width: 0;
+  }
+
+  &.padding-small {
+    padding: $x1;
+  }
+
+  &.no-grow {
+    flex-grow: 0;
+  }
+
+  &.text-uppercase {
+    text-transform: uppercase;
+  }
+
+  &.text-capitalize {
+    text-transform: capitalize;
+  }
+
+  &.text-lowercase {
+    text-transform: lowercase;
+  }
 }
 
 .tabs-directory-icons {
