@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.2.0...v2.3.0) (2026-10-12)
+
+
+### Features
+
+* **ai-glow:** freeze AiGlow and shimmer on --ambient-play-state ([e6c6994](https://github.com/rankingCoach/rc-webapp-vanguard/commit/e6c69946898bb96ed9fa4651a269819128d62abb))
+
 ## [2.2.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.1.0...v2.2.0) (2026-10-07)
 
 

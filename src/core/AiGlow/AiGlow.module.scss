@@ -51,6 +51,8 @@
     animation:
       aiGradientAnimation 24s linear infinite,
       aiSpinAnimation 24s linear infinite;
+    // A consumer freezes the glow on its current frame by setting `--ambient-play-state: paused` on an ancestor.
+    animation-play-state: var(--ambient-play-state, running);
   }
 
   &:after {
