@@ -1,4 +1,4 @@
-import { Button, ButtonProps, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React from 'react';
 
@@ -31,14 +31,23 @@ export const ActionBarFooter = (props: ActionBarFooterProps) => {
       className={buttons.length === 2 ? styles.container : styles.containerCenter}
     >
       {buttons.map((footerButton, idx) => {
+        const buttonProps = footerButton.props;
+        // Defaults only apply when the consumer doesn't pick a type. Non-last buttons are muted, sized to keep the
+        // height the former secondary had (secondary small -> muted medium, otherwise -> muted extraLarge).
+        // Without a `type` the consumer props can only be the non-muted variant; TS can't narrow on the optional
+        // discriminant, hence the cast.
+        const resolvedProps: ButtonProps =
+          buttonProps && 'type' in buttonProps
+            ? buttonProps
+            : idx === buttons.length - 1
+              ? ({ ...buttonProps, type: ButtonTypes.primary } as ButtonProps)
+              : {
+                  ...buttonProps,
+                  type: ButtonTypes.muted,
+                  size: buttonProps?.size === ButtonSizes.small ? ButtonSizes.medium : ButtonSizes.extraLarge,
+                };
         return (
-          <Button
-            key={idx}
-            testId={`ActionBarFooter_${idx}`}
-            onClick={footerButton.onClick}
-            type={idx === buttons.length - 1 ? ButtonTypes.primary : ButtonTypes.secondary}
-            {...footerButton.props}
-          >
+          <Button key={idx} testId={`ActionBarFooter_${idx}`} onClick={footerButton.onClick} {...resolvedProps}>
             {footerButton.text}
           </Button>
         );

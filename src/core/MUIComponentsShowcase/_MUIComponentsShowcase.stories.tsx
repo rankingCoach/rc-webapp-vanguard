@@ -111,11 +111,12 @@ export const Showcase: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
               <h3>AppBar with Toolbar</h3>
-              <AppBar>
+              {/* Darker than MUI's default primary so the inverted muted Login keeps >= 4.5:1 contrast */}
+              <AppBar sx={{ backgroundColor: '#0d47a1' }}>
                 <Toolbar>
                   <div>Vanguard App</div>
                   <div style={{ marginLeft: 'auto' }}>
-                    <Button type={ButtonTypes.secondary} size={ButtonSizes.small}>
+                    <Button type={ButtonTypes.muted} size={ButtonSizes.medium} inverted>
                       Login
                     </Button>
                   </div>

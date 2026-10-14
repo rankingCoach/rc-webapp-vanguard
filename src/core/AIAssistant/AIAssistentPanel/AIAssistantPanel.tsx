@@ -227,8 +227,8 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
                         <Fade in={status === 'open'}>
                           <div className={styles.menu}>
                             <Button
-                              size={ButtonSizes.small}
-                              type={ButtonTypes.secondary}
+                              size={ButtonSizes.medium}
+                              type={ButtonTypes.muted}
                               iconLeft={IconNames.check}
                               onClick={() => {
                                 setStatus && setStatus('closed');
@@ -239,8 +239,8 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
                             </Button>
 
                             <Button
-                              size={ButtonSizes.small}
-                              type={ButtonTypes.secondary}
+                              size={ButtonSizes.medium}
+                              type={ButtonTypes.muted}
                               iconLeft={IconNames.audioSettings}
                               onClick={() => {
                                 setStatus && setStatus('adjust');
@@ -250,8 +250,8 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
                             </Button>
 
                             <Button
-                              size={ButtonSizes.small}
-                              type={ButtonTypes.secondary}
+                              size={ButtonSizes.medium}
+                              type={ButtonTypes.muted}
                               iconLeft={IconNames.refresh}
                               onClick={onTryAgainClick}
                             >
@@ -259,8 +259,8 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
                             </Button>
 
                             <Button
-                              size={ButtonSizes.small}
-                              type={ButtonTypes.secondary}
+                              size={ButtonSizes.medium}
+                              type={ButtonTypes.muted}
                               iconLeft={IconNames.trash}
                               onClick={onRemoveClick}
                             />

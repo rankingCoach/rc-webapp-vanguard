@@ -1,7 +1,7 @@
 import { alignItemsCenter, dFlexColumn, gap2, justifyContentCenter, p4 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { Accordion } from '@vanguard/Accordion/Accordion';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { IconSize } from '@vanguard/Icon/Icon';
 import { ErrorModal } from '@vanguard/StandardModals/ErrorModal/ErrorModal';
 import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
@@ -54,7 +54,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </Text>
             <Text>An error occurred while processing your request</Text>
             <Button
-              type={ButtonTypes.secondary}
+              type={ButtonTypes.muted}
+              size={ButtonSizes.extraLarge}
               onClick={() => {
                 window.location.reload();
               }}

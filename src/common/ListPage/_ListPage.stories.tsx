@@ -13,7 +13,7 @@ import { ListPageDateRangeFilter } from '@models/common/ListPageFilters/ListPage
 import moment from 'moment/moment';
 import { within } from 'storybook/test';
 import { IconNames } from '@vanguard/Icon';
-import { Button, ButtonTypes } from '@vanguard/Button';
+import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button';
 
 const Card: React.FC<{ item: { id: number; name: string } }> = ({ item }) => {
   return <div style={{ padding: '8px', border: '1px dashed gray', marginBottom: '8px' }}>{item.name}</div>;
@@ -489,7 +489,7 @@ export const _ListPageWithHeaderCustomSection2: Story = {
         <Button onClick={() => {
         }}>Create a series</Button>
         <Button onClick={() => {
-        }} type={ButtonTypes.secondary}>
+        }} type={ButtonTypes.muted} size={ButtonSizes.extraLarge}>
           Show drafts
         </Button>
       </div>
