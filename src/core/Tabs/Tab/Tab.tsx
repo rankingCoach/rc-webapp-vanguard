@@ -12,84 +12,12 @@ import type { TabConfig } from '../Tabs';
 import styles from './Tab.module.scss';
 
 /**
- * Props accepted for backwards compatibility with the former MUI-based `Tab`.
- * None of them has any effect; they are swallowed and never reach the DOM.
- */
-export interface TabMuiCompatProps {
-  /** @deprecated MUI `Tab` prop. Ignored; use `tabIcons` or a ReactNode `label`. */
-  icon?: any;
-  /** @deprecated MUI `Tab` prop. Ignored. */
-  iconPosition?: 'top' | 'bottom' | 'start' | 'end';
-  /** @deprecated MUI `Tab` prop. Ignored. */
-  wrapped?: boolean;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  disableRipple?: boolean;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  disableFocusRipple?: boolean;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  disableTouchRipple?: boolean;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  centerRipple?: boolean;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  focusRipple?: boolean;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  TouchRippleProps?: any;
-  /** @deprecated MUI ripple prop. Ignored (no ripple is rendered). */
-  touchRippleRef?: any;
-  /** @deprecated MUI `ButtonBase` prop. Ignored; style `:focus-visible` instead. */
-  focusVisibleClassName?: string;
-  /** @deprecated MUI `ButtonBase` prop. Ignored; use `onFocus`. */
-  onFocusVisible?: (event: React.FocusEvent<any>) => void;
-  /** @deprecated MUI `ButtonBase` prop. Ignored (tabs always render as buttons). */
-  LinkComponent?: React.ElementType;
-  /** @deprecated MUI `ButtonBase` prop. Ignored (tabs always render as buttons). */
-  href?: string;
-  /** @deprecated MUI system prop. Ignored; use `className` / `style`. */
-  sx?: any;
-  /** @deprecated MUI classes override. Ignored; use `className`. */
-  classes?: any;
-  /** @deprecated MUI `ButtonBase` action ref. Ignored. */
-  action?: any;
-  /** @deprecated Inherited from the former MUI `Tab` props. Ignored; use `Tabs.onChange`. */
-  onChange?: React.FormEventHandler<HTMLDivElement>;
-  /** @deprecated The former MUI `Tab` only accepted `null`. Ignored; use `label`. */
-  children?: React.ReactNode;
-  /** @deprecated Kept for type compatibility with the former MUI props (React `key`); ignored inside `tabs`. */
-  key?: React.Key | null;
-}
-
-/** Keys of {@link TabMuiCompatProps}, stripped before spreading props onto the DOM. */
-const TAB_MUI_COMPAT_KEYS: (keyof TabMuiCompatProps)[] = [
-  'icon',
-  'iconPosition',
-  'wrapped',
-  'disableRipple',
-  'disableFocusRipple',
-  'disableTouchRipple',
-  'centerRipple',
-  'focusRipple',
-  'TouchRippleProps',
-  'touchRippleRef',
-  'focusVisibleClassName',
-  'onFocusVisible',
-  'LinkComponent',
-  'href',
-  'sx',
-  'classes',
-  'action',
-  'onChange',
-  'children',
-];
-
-/**
  * A single tab definition, as passed to `<Tabs tabs={[...]} />`.
  * Any extra HTML attributes (`className`, `style`, `id`, `aria-*`, `onClick`, ...) are forwarded to the
  * rendered `<button role="tab">`. Event handlers keep the `HTMLDivElement` typing of the former MUI `Tab`
  * (whose default component type was `div`) so existing annotations keep compiling.
  */
-export interface TabProps<T = any>
-  extends TabMuiCompatProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
+export interface TabProps<T = any> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
   /** Ref to the rendered `<button role="tab">` element. */
   ref?: React.Ref<any>;
   /**
@@ -111,12 +39,6 @@ export interface TabProps<T = any>
   testId?: string;
   /** Selected state. Computed by `Tabs` from its `value`; only set it when rendering `Tab` standalone. */
   selected?: boolean;
-  /** @deprecated Has no effect. */
-  hasBorderBottom?: boolean;
-  /** @deprecated Has no effect. */
-  showBackgroundColor?: boolean;
-  /** @deprecated Has no effect. */
-  simple?: boolean;
 }
 
 /** Props set by `Tabs` on every rendered tab. */
@@ -144,9 +66,6 @@ const TAB_OWN_KEYS = [
   'hasError',
   'testId',
   'selected',
-  'hasBorderBottom',
-  'showBackgroundColor',
-  'simple',
   'tabConfig',
   'className',
 ] as const;
@@ -160,10 +79,7 @@ const TEXT_TRANSFORM_CLASSES: Record<string, string | undefined> = {
 export const Tab = (props: TabProps & InternalTabProps) => {
   const { hasError = false, tabIcons, testId, tabConfig, selected = false, label, className } = props;
   // Handlers are typed for `HTMLDivElement` (former MUI typing) but are attached to the button.
-  const buttonProps = omitProps(
-    omitProps(props, TAB_MUI_COMPAT_KEYS),
-    TAB_OWN_KEYS,
-  ) as unknown as React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  const buttonProps = omitProps(props, TAB_OWN_KEYS) as unknown as React.ButtonHTMLAttributes<HTMLButtonElement> & {
     ref?: React.Ref<HTMLButtonElement>;
   };
 

@@ -32,73 +32,6 @@ export type TabConfig = {
 /** Change handler of `Tabs`. `value` is the clicked tab's `value` (or its index when the tab has no value). */
 export type TabsChangeHandler = (event: React.SyntheticEvent, value: any) => void;
 
-/**
- * Props accepted for backwards compatibility with the former MUI-based `Tabs`.
- * None of them has any effect; they are swallowed and never reach the DOM.
- */
-export interface TabsMuiCompatProps {
-  /** @deprecated Ignored. Tabs are described by the `tabs` prop. */
-  children?: React.ReactNode;
-  /** @deprecated MUI `Tabs` prop. Ignored (tabs are always horizontal). */
-  orientation?: 'horizontal' | 'vertical';
-  /** @deprecated MUI `Tabs` prop. Ignored (the bar always scrolls when tabs overflow). */
-  variant?: 'standard' | 'scrollable' | 'fullWidth';
-  /** @deprecated MUI `Tabs` prop. Ignored (scroll buttons are shown automatically while overflowing). */
-  scrollButtons?: 'auto' | boolean;
-  /** @deprecated MUI `Tabs` prop. Ignored. */
-  allowScrollButtonsMobile?: boolean;
-  /** @deprecated MUI `Tabs` prop. Ignored; use `alignCenter`. */
-  centered?: boolean;
-  /** @deprecated MUI `Tabs` prop. Ignored (no indicator is rendered). */
-  indicatorColor?: string;
-  /** @deprecated MUI `Tabs` prop. Ignored. */
-  textColor?: string;
-  /** @deprecated MUI `Tabs` prop. Ignored (no indicator is rendered). */
-  TabIndicatorProps?: any;
-  /** @deprecated MUI `Tabs` prop. Ignored. */
-  TabScrollButtonProps?: any;
-  /** @deprecated MUI `Tabs` prop. Ignored (vanguard scroll buttons are always used). */
-  ScrollButtonComponent?: React.ElementType;
-  /** @deprecated MUI `Tabs` prop. Ignored (the scrollbar is always hidden). */
-  visibleScrollbar?: boolean;
-  /** @deprecated MUI `Tabs` action ref. Ignored. */
-  action?: any;
-  /** @deprecated MUI slots. Ignored. */
-  slots?: any;
-  /** @deprecated MUI slot props. Ignored. */
-  slotProps?: any;
-  /** @deprecated MUI system prop. Ignored; use `className` / `style`. */
-  sx?: any;
-  /** @deprecated MUI classes override. Ignored; use `className`, `wrapperClassName` or `tabListClassName`. */
-  classes?: any;
-  /** @deprecated MUI root component override. Ignored. */
-  component?: React.ElementType;
-  /** @deprecated Kept for type compatibility with the former MUI props (React `key`). */
-  key?: React.Key | null;
-}
-
-/** Keys of {@link TabsMuiCompatProps}, stripped before spreading props onto the DOM. */
-const TABS_MUI_COMPAT_KEYS: (keyof TabsMuiCompatProps)[] = [
-  'children',
-  'orientation',
-  'variant',
-  'scrollButtons',
-  'allowScrollButtonsMobile',
-  'centered',
-  'indicatorColor',
-  'textColor',
-  'TabIndicatorProps',
-  'TabScrollButtonProps',
-  'ScrollButtonComponent',
-  'visibleScrollbar',
-  'action',
-  'slots',
-  'slotProps',
-  'sx',
-  'classes',
-  'component',
-];
-
 /** Keys of {@link TabConfig}; each can also be passed as a flat prop on `Tabs`. */
 const TAB_CONFIG_KEYS: (keyof TabConfig)[] = [
   'theme',
@@ -135,10 +68,7 @@ const TABS_OWN_KEYS = [
  * the same key in `tabConfig` takes precedence. Remaining HTML attributes (`id`, `style`, `data-*`, ...) are
  * forwarded to the tab-bar root element (the element receiving `className`).
  */
-export interface TabsProps
-  extends TabsMuiCompatProps,
-    TabConfig,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
+export interface TabsProps extends TabConfig, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
   /** Ref to the tab-bar root element (the element receiving `className`). */
   ref?: React.Ref<HTMLDivElement>;
   /** Tab definitions. Disabled tabs are hidden from the bar. */
@@ -175,8 +105,8 @@ export interface TabsProps
 
 /** Tab-definition props forwarded to the tab button besides `aria-*`, `data-*` and `on*` event handlers. */
 const FORWARDED_TAB_KEYS = new Set(['className', 'style', 'title', 'ref', 'lang', 'dir']);
-/** Handled by `Tabs` itself (or MUI compat) even though they look like forwardable handlers. */
-const NON_FORWARDED_TAB_HANDLERS = new Set(['onClick', 'onFocus', 'onChange', 'onFocusVisible']);
+/** Handled by `Tabs` itself even though they look like forwardable handlers. */
+const NON_FORWARDED_TAB_HANDLERS = new Set(['onClick', 'onFocus']);
 
 /**
  * Picks the attributes of a tab definition that are forwarded to its `<button>`. Tab objects are often built from
@@ -211,7 +141,7 @@ export const Tabs = (props: TabsProps) => {
     tabListClassName,
   } = props;
   const rootProps: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> } = omitProps(
-    omitProps(props, TABS_MUI_COMPAT_KEYS),
+    props,
     TABS_OWN_KEYS,
   );
 

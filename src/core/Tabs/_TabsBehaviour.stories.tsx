@@ -10,7 +10,7 @@ import { DisabledHidden as _DisabledHidden } from './stories/DisabledHidden.stor
 import { IndexFallback as _IndexFallback } from './stories/IndexFallback.story';
 import { KeepInactiveTabsInDom as _KeepInactiveTabsInDom } from './stories/KeepInactiveTabsInDom.story';
 import { KeyboardNavigation as _KeyboardNavigation } from './stories/KeyboardNavigation.story';
-import { MuiCompatProps as _MuiCompatProps } from './stories/MuiCompatProps.story';
+import { EmptyChildren as _EmptyChildren } from './stories/EmptyChildren.story';
 import { OnChangeOnReclick as _OnChangeOnReclick } from './stories/OnChangeOnReclick.story';
 import { StringValuesControlled as _StringValuesControlled } from './stories/StringValuesControlled.story';
 import { TestIdFormat as _TestIdFormat } from './stories/TestIdFormat.story';
@@ -25,7 +25,7 @@ export const BarOnly: Story = { ..._BarOnly };
 export const ComponentNull: Story = { ..._ComponentNull };
 export const KeepInactiveTabsInDom: Story = { ..._KeepInactiveTabsInDom };
 export const TestIdFormat: Story = { ..._TestIdFormat };
-export const MuiCompatProps: Story = { ..._MuiCompatProps };
+export const EmptyChildren: Story = { ..._EmptyChildren };
 export const KeyboardNavigation: Story = { ..._KeyboardNavigation };
 export const SelectionFollowsFocus: Story = { ..._SelectionFollowsFocus };
 export const DomHygiene: Story = { ..._DomHygiene };

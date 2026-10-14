@@ -23,7 +23,7 @@ const domainTab = {
   'aria-describedby': 'domain-hint',
 } as unknown as TabProps;
 
-/** Compat props, flat config keys and unknown tab fields never leak to the DOM; allowed attributes are forwarded. */
+/** Flat config keys and unknown tab fields never leak to the DOM; allowed attributes are forwarded. */
 export const DomHygiene: Story = {
   render: () => (
     <div data-testid="hygiene">
@@ -31,9 +31,6 @@ export const DomHygiene: Story = {
       <Tabs
         value="domain"
         tabs={[domainTab, { label: 'Plain', value: 'plain' }]}
-        variant="scrollable"
-        sx={{ p: 1 }}
-        centered
         theme="underline"
         padding="small"
         tabHeight="small"
