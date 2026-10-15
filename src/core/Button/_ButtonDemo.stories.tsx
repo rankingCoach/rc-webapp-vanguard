@@ -6,6 +6,7 @@ import { classNames } from "@helpers/classNames";
 import { dFlex, dFlexColumn, gap1, gap2 } from "@globalStyles";
 import { Label } from "@vanguard/Label/Label";
 import { ButtonsDemoRendering, ButtonStory } from "./stories/_Button.default";
+import { Surface } from "./stories/_mutedSurfaces";
 
 export default {
   ...SbDecorator({
@@ -52,6 +53,31 @@ export const ButtonDemoMutedInverted: ButtonStory = {
       value: "dark",
     },
   },
+};
+
+export const ButtonDemoMutedOnDark: ButtonStory = {
+  args: {
+    type: ButtonTypes.muted,
+    onDark: true,
+  },
+  render: (args) => (
+    <Surface surface="teal" showCaption={false} style={{ padding: "24px" }}>
+      <ButtonsDemoRendering {...args} />
+    </Surface>
+  ),
+};
+
+export const ButtonDemoMutedInvertedOnDark: ButtonStory = {
+  args: {
+    type: ButtonTypes.muted,
+    inverted: true,
+    onDark: true,
+  },
+  render: (args) => (
+    <Surface surface="pale" showCaption={false} style={{ padding: "24px" }}>
+      <ButtonsDemoRendering {...args} />
+    </Surface>
+  ),
 };
 
 export const ButtonDemoShimmer: ButtonStory = {
