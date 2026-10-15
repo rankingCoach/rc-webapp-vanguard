@@ -1,4 +1,5 @@
 import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
+import { getRowButtonTypeAndSize } from '@vanguard/Button/button-row-size';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React from 'react';
 
@@ -32,11 +33,10 @@ export const ActionBarFooter = (props: ActionBarFooterProps) => {
     >
       {buttons.map((footerButton, idx) => {
         const buttonProps = footerButton.props;
-        // Defaults only apply when the consumer doesn't pick a type. Non-last buttons are muted, sized to keep the
-        // height the former secondary had (secondary small -> muted medium, otherwise -> muted extraLarge).
+        // Defaults only apply when the consumer doesn't pick a type: the last button is primary, the others muted.
         // Without a `type` the consumer props can only be the non-muted variant; TS can't narrow on the optional
         // discriminant, hence the cast.
-        const resolvedProps: ButtonProps =
+        const typedProps: ButtonProps =
           buttonProps && 'type' in buttonProps
             ? buttonProps
             : idx === buttons.length - 1
@@ -44,8 +44,14 @@ export const ActionBarFooter = (props: ActionBarFooterProps) => {
               : {
                   ...buttonProps,
                   type: ButtonTypes.muted,
-                  size: buttonProps?.size === ButtonSizes.small ? ButtonSizes.medium : ButtonSizes.extraLarge,
+                  // secondary small (32px) used to map to muted medium (32px); keep that for existing consumers
+                  size: buttonProps?.size === ButtonSizes.small ? ButtonSizes.medium : undefined,
                 };
+        // Unless the consumer sets a size, muted buttons get the row size so they match the others' height
+        const resolvedProps: ButtonProps =
+          typedProps.type === ButtonTypes.muted && !typedProps.size
+            ? { ...typedProps, size: getRowButtonTypeAndSize(ButtonTypes.muted).size }
+            : typedProps;
         return (
           <Button key={idx} testId={`ActionBarFooter_${idx}`} onClick={footerButton.onClick} {...resolvedProps}>
             {footerButton.text}

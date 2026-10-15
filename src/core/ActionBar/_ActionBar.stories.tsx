@@ -12,6 +12,7 @@ import { MessageWithTitle as _MessageWithTitle } from "./stories/MessageWithTitl
 import { MessageWithButton as _MessageWithButton } from "./stories/MessageWithButton.story";
 import { FooterSingleButton as _FooterSingleButton } from "./stories/FooterSingleButton.story";
 import { FooterMultipleButtons as _FooterMultipleButtons } from "./stories/FooterMultipleButtons.story";
+import { FooterButtonHeights as _FooterButtonHeights } from "./stories/FooterButtonHeights.story";
 import { ServiceUseCase as _ServiceUseCase } from "./stories/ServiceUseCase.story";
 
 export const Default: Story = { ..._Default };
@@ -25,6 +26,7 @@ export const MessageWithTitle: Story = { ..._MessageWithTitle };
 export const MessageWithButton: Story = { ..._MessageWithButton };
 export const FooterSingleButton: Story = { ..._FooterSingleButton };
 export const FooterMultipleButtons: Story = { ..._FooterMultipleButtons };
+export const FooterButtonHeights: Story = { ..._FooterButtonHeights };
 export const ServiceUseCase: Story = { ..._ServiceUseCase };
 
 export default {
