@@ -41,8 +41,16 @@
  * • .button-label-hidden      - Hide text label (icon-only)
  * • .has-icon-left            - Button has left icon
  * • .has-icon-right           - Button has right icon
- * • .blurred                - Apply blur effect (muted buttons)
- * • .inverted               - Inverted colors (muted buttons)
+ * • .blurred                - Backdrop blur on the ::before layer (muted buttons)
+ * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons)
+ * • .on-dark                - The other text colour: swaps text/icon/focus ring only (muted buttons)
+ * • [aria-pressed="true"]   - Pressed toggle, keeps the hover-strength fill (muted buttons)
+ *
+ * MUTED LAYERS (back to front):
+ * • ::before                 - Blur layer (only .blurred)
+ * • ::after                  - Fill layer, the only part that blends (multiply / plus-lighter)
+ * • .button-inner-container  - Content, positioned above both layers
+ * The muted button itself never isolates (no z-index, opacity, filter or backdrop-filter).
  * 
  * INNER ELEMENTS:
  * • .button-inner-container   - Flex container for button content
@@ -175,54 +183,117 @@
    }
  
    &.button-muted {
+     // Layers (back to front): ::before = blur (only .blurred), ::after = blended fill, .button-inner-container = content.
+     // The button itself must not isolate: no z-index, opacity, filter or backdrop-filter on it (incl. disabled/blurred),
+     // otherwise the fill can't blend with the page behind it.
+     //
+     // Theme tokens: --button-muted[-on-dark|-inverted|-inverted-on-dark]-* are all defined by the theme;
+     // the literals are the spec values, kept only as a safety net.
+     --muted-fill: var(--button-muted-background-color, rgba(185, 197, 216, 0.25));
+     --muted-fill-hover: var(--button-muted-hover-background-color, rgba(185, 197, 216, 0.4));
+     --muted-fg: var(--button-muted-text-color, #263349);
+     --muted-blend: var(--button-muted-blend-mode, multiply);
+     --muted-ring: var(--button-muted-focus-outline-color, #0062ff);
+
      position: relative;
      height: unset; // button height results from line-height & padding!!!
- 
-     @include buttonProps(muted);
+     background: none;
+     border: 0;
+     color: var(--muted-fg);
+     // explicit properties instead of the base `all`: only the colour changes between states
+     transition: color $transitionTime ease-in-out;
 
+     .button-text {
+       color: var(--muted-fg);
+     }
+
+     // blur layer: only for .blurred, kept off the button so it doesn't isolate the fill's blend
      &::before {
-       // hover element
-       position: absolute;
+       content: none;
+     }
+
+     &.blurred::before {
        content: '';
-       display: inline-flex;
-       border-radius: var(--border-radius);
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background-color: var(--button-muted-ripple-background-color, var(--fn-bg-hov-n-gl));
-       opacity: 0;
-       transform-origin: center;
-       transform: scale(0.5);
-       transition:
-         transform $transitionTimeLong cubic-bezier(.01,.74,.6,.98),
-         opacity $transitionTimeLong cubic-bezier(.01,.74,.6,.98);
-     }
-     
-     &.inverted {
-       @include buttonProps(muted-inverted);
-     }
- 
-     &.blurred {
+       position: absolute;
+       inset: 0;
+       border-radius: inherit;
+       pointer-events: none;
        backdrop-filter: blur(#{$x4});
-       -webkit-backdrop-filter: blur(#{$x4}); 
+       -webkit-backdrop-filter: blur(#{$x4});
      }
- 
+
+     // fill layer: the only part that blends
+     &::after {
+       content: '';
+       position: absolute;
+       inset: 0;
+       border-radius: inherit;
+       pointer-events: none;
+       background-color: var(--muted-fill);
+       mix-blend-mode: var(--muted-blend);
+       transition: background-color 150ms ease;
+     }
+
      .button-inner-container {
-       z-index: 1; // to ensure that the inner elements are above the ::before pseudo-element
+       position: relative;
+       z-index: 1; // content above the fill & blur layers
      }
- 
-     &:hover:not(:disabled),
-     &:focus:not(:disabled) {
-       &::before {
-         opacity: 16%;
-         transform: scale(1);
+
+     // surface flags: colours & blend only
+     &.on-dark {
+       --muted-fill: var(--button-muted-on-dark-background-color, rgba(185, 197, 216, 0.25));
+       --muted-fill-hover: var(--button-muted-on-dark-hover-background-color, rgba(185, 197, 216, 0.4));
+       --muted-fg: var(--button-muted-on-dark-text-color, #fff);
+       --muted-ring: var(--button-muted-on-dark-focus-outline-color, #fff);
+     }
+
+     &.inverted {
+       --muted-fill: var(--button-muted-inverted-background-color, rgba(255, 255, 255, 0.18));
+       --muted-fill-hover: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.28));
+       --muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
+       --muted-fg: var(--button-muted-inverted-text-color, #fff);
+       --muted-ring: var(--button-muted-inverted-focus-outline-color, #fff);
+     }
+
+     // inverted fills with dark text (the theme decides the dark-scheme value)
+     &.inverted.on-dark {
+       --muted-fg: var(--button-muted-inverted-on-dark-text-color, #263349);
+       --muted-ring: var(--button-muted-inverted-on-dark-focus-outline-color, #0062ff);
+     }
+
+     // states
+     &:hover:not(:disabled)::after,
+     &[aria-pressed="true"]::after {
+       background-color: var(--muted-fill-hover);
+     }
+
+     &:focus {
+       outline: none;
+     }
+
+     &:focus-visible {
+       outline: 2px solid var(--muted-ring);
+       outline-offset: 2px;
+     }
+
+     &:disabled {
+       cursor: not-allowed;
+
+       // not the button itself: that would isolate it
+       &::before,
+       &::after,
+       .button-inner-container {
+         opacity: 0.4;
        }
      }
- 
-     &.disabled,
-     &:disabled {
-       opacity: 40%;
+
+     @media (prefers-reduced-motion: reduce) {
+       &,
+       &::after,
+       .button-icon,
+       [class^="icon-"] {
+         transition: none;
+       }
      }
  
      &.size-small {

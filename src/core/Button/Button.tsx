@@ -117,13 +117,34 @@ type BaseButtonProps = CommonButtonProps & {
   // these are specifically forbidden for the non-muted button
   blurred?: never;
   inverted?: never;
+  onDark?: never;
+  pressed?: never;
 };
 
-type MutedButtonProps = CommonButtonProps & {
+export type MutedButtonProps = CommonButtonProps & {
   type: Extract<ButtonTypes, ButtonTypes.muted>;
   size?: ButtonSizes;
+  /**
+   * Adds a 32px backdrop blur behind the fill (glass look). The blur lives on its own layer,
+   * so the fill keeps blending with the page.
+   */
   blurred?: boolean;
+  /**
+   * The colour set for dark surfaces (photos, dark cards, the canvas hero): a white 18% fill
+   * (28% on hover) blended with `plus-lighter`, white text, icon and focus ring.
+   * Leave it `false` on light surfaces, where the fill is multiplied.
+   */
   inverted?: boolean;
+  /**
+   * The other text colour: swaps the text, icon and focus-ring colours and uses its own
+   * `--button-muted-on-dark-*` fill tokens (same values as default in the light scheme,
+   * theme-dependent in dark). The blend mode stays the muted one.
+   * - default + `onDark`: white text and ring on the multiplied fill.
+   * - `inverted` + `onDark`: dark (#263349) text and the blue ring on the plus-lighter fill.
+   */
+  onDark?: boolean;
+  /** Toggle state: renders `aria-pressed` and keeps the hover-strength fill while `true`. */
+  pressed?: boolean;
 };
 
 export type ButtonProps = BaseButtonProps | MutedButtonProps;
@@ -165,9 +186,12 @@ export const Button = (props: ButtonProps) => {
 
   let { icon, iconPosition = 'left', rounded = false, iconColor, targetRef, iconHoverColor } = props;
 
-  // Extract blurred and inverted props for muted buttons
+  // Extract the muted-only props
   const blurred = 'blurred' in props ? props.blurred : false;
   const inverted = 'inverted' in props ? props.inverted : false;
+  const onDark = 'onDark' in props ? props.onDark : false;
+  const pressed = 'pressed' in props ? props.pressed : undefined;
+  const isMuted = type === ButtonTypes.muted;
 
   // Maintain support for iconLeft & iconRight props, but only use icon internally;
   // icon props takes precedence over iconLeft/iconRight and iconRight over iconLeft.
@@ -223,7 +247,8 @@ export const Button = (props: ButtonProps) => {
           iconColor = '--button-shimmer-text-color';
           break;
         case ButtonTypes.muted:
-          iconColor = inverted ? '--button-muted-inverted-text-color' : '--button-muted-text-color';
+          // The muted colours live in CSS (surface flags), the icon follows the text colour
+          iconColor = 'currentColor';
           break;
       }
     }
@@ -247,7 +272,7 @@ export const Button = (props: ButtonProps) => {
           iconHoverColor = '--button-shimmer-hover-text-color';
           break;
         case ButtonTypes.muted:
-          iconColor = inverted ? '--button-muted-inverted-text-color' : '--button-muted-text-color';
+          iconHoverColor = 'currentColor';
           break;
       }
     }
@@ -266,7 +291,7 @@ export const Button = (props: ButtonProps) => {
         iconHoverColor = '--button-shimmer-text-color';
         break;
       case ButtonTypes.muted:
-        iconColor = inverted ? '--button-muted-inverted-text-color' : '--button-muted-text-color';
+        iconHoverColor = 'currentColor';
         break;
     }
   }
@@ -277,9 +302,10 @@ export const Button = (props: ButtonProps) => {
   }, [disabled, btnHovered, hoverColor, color]);
 
   const getIconColor = useCallback(() => {
-    if (disabled) return undefined;
+    // Muted keeps following the text colour when disabled; the 0.4 opacity comes from CSS
+    if (disabled) return isMuted ? iconColor : undefined;
     return iconHoverColor ? (btnHovered ? iconHoverColor : iconColor) : iconColor;
-  }, [disabled, btnHovered, iconHoverColor, iconColor]);
+  }, [disabled, isMuted, btnHovered, iconHoverColor, iconColor]);
 
   /**
    * Get Button Icon
@@ -417,7 +443,9 @@ export const Button = (props: ButtonProps) => {
           textWrap === 'wrap' ? styles.buttonTextWrap : '',
           blurred ? styles.blurred : '',
           inverted ? styles.inverted : '',
+          isMuted && onDark ? styles.onDark : '',
         )}
+        aria-pressed={isMuted ? pressed : undefined}
       >
         <div className={styles.buttonInnerContainer}>
           {icon && iconPosition === 'left' ? (

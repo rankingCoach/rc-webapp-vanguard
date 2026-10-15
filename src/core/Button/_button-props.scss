@@ -29,7 +29,7 @@
     // default is a text-style button: keep its normal (transparent) background,
     // the disabled look comes from the 0.5 text opacity above
     background-color: var(--#{$prefix}button-#{$name}-background-color);
-  } @else if (#{$name} != "muted" and #{$name} != "muted-inverted") {
+  } @else {
     @include rgba-background(--#{$prefix}button-#{$name}-disabled-background-color-rgb, 0.5);
 
     border: $x0_125 solid var(--#{$prefix}button-#{$name}-disabled-border-color);
