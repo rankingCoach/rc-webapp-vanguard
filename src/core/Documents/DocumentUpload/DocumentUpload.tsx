@@ -143,10 +143,10 @@ const UploadDocumentButton = (props: { onClick: () => void; text: string }) => {
 const UploadDocumentEditGroup = (props: { onRemove: () => void; onChange: () => void }) => {
   return (
     <ComponentContainer testId={'UploadDocumentEditGroup'} className={styles.editGroup}>
-      <Button onClick={props.onRemove} type={ButtonTypes.secondary} size={ButtonSizes.small}>
+      <Button onClick={props.onRemove} type={ButtonTypes.muted} size={ButtonSizes.medium}>
         {'Remove'}
       </Button>
-      <Button onClick={props.onChange} type={ButtonTypes.secondary} size={ButtonSizes.small}>
+      <Button onClick={props.onChange} type={ButtonTypes.muted} size={ButtonSizes.medium}>
         {'Change'}
       </Button>
     </ComponentContainer>

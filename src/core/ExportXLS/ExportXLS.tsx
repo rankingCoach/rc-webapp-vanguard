@@ -45,8 +45,8 @@ export const ExportXLS = (props: ExportXLSProps) => {
       <Button
         onClick={exportHandler}
         iconLeft={IconNames.download}
-        size={ButtonSizes.small}
-        type={ButtonTypes.secondary}
+        size={ButtonSizes.medium}
+        type={ButtonTypes.muted}
         className={styles.button}
         fontWeight={FontWeights.bold}
       >

@@ -40,8 +40,8 @@ export const SectionMissing = (props: Props) => {
 
       <Button
         className={classNames(mt3)}
-        type={ButtonTypes.secondary}
-        size={ButtonSizes.small}
+        type={ButtonTypes.muted}
+        size={ButtonSizes.medium}
         iconLeft={IconNames.add}
         onClick={buttonCallback}
       >

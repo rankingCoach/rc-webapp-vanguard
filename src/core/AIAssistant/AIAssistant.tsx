@@ -81,7 +81,7 @@ export const AIAssistant = (props: AIAssistantProps) => {
       <div className={mb2}>
         <Render if={panelStatus === 'closed' && value == ''}>
           <Button
-            type={ButtonTypes.secondary}
+            type={ButtonTypes.shimmer}
             iconLeft={IconNames.ai}
             onClick={onClickOnGenerateButton}
             disabled={disabled}
@@ -91,7 +91,7 @@ export const AIAssistant = (props: AIAssistantProps) => {
         </Render>
         <Render if={panelStatus === 'closed' && value != ''}>
           <Button
-            type={ButtonTypes.secondary}
+            type={ButtonTypes.shimmer}
             iconLeft={IconNames.ai}
             onClick={() => {
               setPanelStatus('open');
@@ -103,7 +103,7 @@ export const AIAssistant = (props: AIAssistantProps) => {
         </Render>
         <Render if={panelStatus !== 'closed'}>
           <Button
-            type={ButtonTypes.secondary}
+            type={ButtonTypes.shimmer}
             iconLeft={IconNames.ai}
             onClick={() => {
               setPanelStatus('closed');

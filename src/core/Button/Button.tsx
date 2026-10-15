@@ -21,6 +21,19 @@ export enum ButtonSizes {
 
 export enum ButtonTypes {
   default = 'default',
+  /**
+   * Being replaced by `muted` (VAN-82). When swapping, bump the size one step so the
+   * button keeps its height:
+   *
+   * | secondary          | muted        | height (desktop / mobile)       | text (desktop) |
+   * | ------------------ | ------------ | ------------------------------- | -------------- |
+   * | `small`            | `medium`     | 32 / 40px, unchanged            | 16px → 12px    |
+   * | `medium` (default) | `extraLarge` | 48 / 40px, unchanged            | 16px, same     |
+   * | `large`            | `extraLarge` | 60 → 48px / 48 → 40px (shorter) | 20px → 16px    |
+   *
+   * Muted also has no border and a see-through fill; on dark or coloured backgrounds use
+   * `inverted`. See the "Secondary To Muted" story under Vanguard/Button.
+   */
   secondary = 'secondary',
   primary = 'primary',
   shimmer = 'shimmer',

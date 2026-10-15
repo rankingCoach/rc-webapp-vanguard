@@ -8,7 +8,7 @@ import { Render } from '@vanguard/Render/Render';
 import { TextReplacements } from '@vanguard/Text/Text';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { Button, ButtonProps, ButtonShape, ButtonTypes } from '../../Button/Button';
+import { Button, ButtonProps, ButtonShape, ButtonSizes, ButtonTypes } from '../../Button/Button';
 import { ComponentContainer } from '../../ComponentContainer/ComponentContainer';
 import { IconNames } from '../../Icon/IconNames';
 
@@ -111,7 +111,9 @@ export const ModalFooter = (props: ModalFooterProps) => {
             <Render if={hasNeutral}>
               <Popover position={'right'} message={neutral?.popoverMessage}>
                 <Button
-                  type={neutral?.type ?? ButtonTypes.secondary}
+                  {...(neutral?.type
+                    ? { type: neutral.type }
+                    : { type: ButtonTypes.muted, size: ButtonSizes.extraLarge })}
                   testId={'modal-negative-cta'}
                   iconLeft={tertiaryIconPlacement === 'left' ? neutral?.icon : undefined}
                   iconRight={tertiaryIconPlacement === 'right' ? neutral?.icon : undefined}

@@ -32,6 +32,8 @@ const config: StorybookConfig = {
   stories: [
     "../src/core/**/_*.stories.@(js|jsx|mjs|ts|tsx)",
     // "../src/common/**/_*.stories.@(js|jsx|mjs|ts|tsx)"
+    // Opted-in common stories (VAN-82)
+    "../src/common/SectionMissing/_SectionMissing.stories.tsx",
   ],
 
   addons: [
