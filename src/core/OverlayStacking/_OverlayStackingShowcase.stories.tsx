@@ -14,6 +14,11 @@ import { DrawerOverFullscreenModal as _DrawerOverFullscreenModal } from './stori
 import { FullscreenModalDrawerModal as _FullscreenModalDrawerModal } from './stories/FullscreenModalDrawerModal.story';
 import { FullscreenModalDrawerModalPopover as _FullscreenModalDrawerModalPopover } from './stories/FullscreenModalDrawerModalPopover.story';
 import { FullscreenModalFullscreenModalDatePicker as _FullscreenModalFullscreenModalDatePicker } from './stories/FullscreenModalFullscreenModalDatePicker.story';
+import {
+  FullscreenModalPopoverModal as _FullscreenModalPopoverModal,
+  FullscreenModalPopoverModalToast as _FullscreenModalPopoverModalToast,
+  PlainPagePopoverModal as _PlainPagePopoverModal,
+} from './stories/FullscreenModalPopoverModal.story';
 import { ModalOverDrawer as _ModalOverDrawer } from './stories/ModalOverDrawer.story';
 import { ModalOverDrawerWithHighlightInput as _ModalOverDrawerWithHighlightInput } from './stories/ModalOverDrawerWithHighlightInput.story';
 import { Story } from './stories/_OverlayStacking.default';
@@ -32,6 +37,9 @@ export const DrawerModalAnchoredAutocomplete: Story = { ..._DrawerModalAnchoredA
 export const DrawerModalSearchableSelect: Story = { ..._DrawerModalSearchableSelect };
 export const DrawerModalDateRangePicker: Story = { ..._DrawerModalDateRangePicker };
 export const FullscreenModalFullscreenModalDatePicker: Story = { ..._FullscreenModalFullscreenModalDatePicker };
+export const FullscreenModalPopoverModal: Story = { ..._FullscreenModalPopoverModal };
+export const FullscreenModalPopoverModalToast: Story = { ..._FullscreenModalPopoverModalToast };
+export const PlainPagePopoverModal: Story = { ..._PlainPagePopoverModal };
 
 export default {
   ...SbDecorator({
