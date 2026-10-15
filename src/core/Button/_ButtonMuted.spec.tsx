@@ -96,7 +96,8 @@ describe('Vanguard muted button surface flags & pressed state', () => {
   // The icon colour Button hands to Icon ends up on the svg's `color` attribute
   const findIconSvg = () => appScreen.findByTestId('muted-btn_icon-svg');
 
-  it('keeps explicit iconColor / iconHoverColor', async () => {
+  // iconHoverColor is deprecated: like the other types, muted ignores it and follows the text colour on hover
+  it('ignores the deprecated iconHoverColor', async () => {
     await render(
       <Button
         testId={'muted-btn'}
@@ -112,7 +113,7 @@ describe('Vanguard muted button surface flags & pressed state', () => {
     act(() => {
       fireEvent.mouseOver(getButton());
     });
-    expect((await findIconSvg()).getAttribute('color')).toBe('var(--icon-hover)');
+    expect((await findIconSvg()).getAttribute('color')).toBe('currentColor');
   });
 
   it('defaults the icon colour to currentColor on rest and hover', async () => {

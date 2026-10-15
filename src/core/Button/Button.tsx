@@ -277,7 +277,9 @@ export const Button = (props: ButtonProps) => {
       case ButtonTypes.shimmer:
         iconHoverColor = '--button-shimmer-text-color';
         break;
-      // muted: keep the explicitly supplied iconHoverColor
+      case ButtonTypes.muted:
+        iconHoverColor = 'currentColor';
+        break;
     }
   }
 
