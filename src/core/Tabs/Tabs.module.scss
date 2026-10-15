@@ -2,6 +2,13 @@
 @import 'src/styles/spacings';
 
 $floating-padding: $x0_25;
+// Floating theme: the selected tab is a muted inverted + onDark button (design decision), so the chip takes its
+// hover/pressed fill; the other tabs are plain muted buttons (see Tab.module.scss). Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
+$muted-fill-selected: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.28));
+$muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
+// Also the duration of the squish played by useTabsIndicator, which reads it from the computed transition
+$indicator-duration: 300ms;
+$indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
 
 // Bar root. Keep specificity at a single class so a consumer className
 // (padding, border, margin, background, ...) applied on the same element still wins.
@@ -28,7 +35,9 @@ $floating-padding: $x0_25;
     padding: $floating-padding;
     // Concentric corners: the tabs' radius plus the gap around them
     border-radius: $rounded-border-radius + $floating-padding;
-    background-color: rc_transparent(--fn-fg-light, 0.1);
+    // Translucent shadow-tinted tray; the tabs' muted fills blend onto it, so the bar must not isolate
+    // (no z-index, opacity, filter...)
+    background-color: rc_transparent(--fn-shadow, 0.1);
   }
 
   // Scroll buttons (TabsCustomScroll) are direct children of the bar root; round them fully and fit them to the
@@ -70,8 +79,30 @@ $floating-padding: $x0_25;
 }
 
 .tab-list {
+  // Offset parent of the tabs, so the indicator can be placed with their offsetLeft/offsetTop
+  position: relative;
   display: flex;
   gap: $x0_25;
+}
+
+// Selected chip of the floating theme: a single element gliding to the selected tab (see useTabsIndicator).
+// Painted before the tabs, which are positioned too, so it stays behind their labels.
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: $rounded-border-radius;
+  pointer-events: none;
+  background-color: $muted-fill-selected;
+  mix-blend-mode: $muted-blend;
+  transition:
+    translate $indicator-duration $indicator-easing,
+    width $indicator-duration $indicator-easing,
+    height $indicator-duration $indicator-easing;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }
 
 // Class passed to TabsCustomScroll; positioning/appearance lives in its own module,

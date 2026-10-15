@@ -1,5 +1,6 @@
 import { classNames } from '@helpers/classNames';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { useTabsIndicator } from '@vanguard/Tabs/hooks/use-tabs-indicator';
 import { useTabsKeyboard } from '@vanguard/Tabs/hooks/use-tabs-keyboard';
 import { useTabsScroll } from '@vanguard/Tabs/hooks/use-tabs-scroll';
 import { omitProps, Tab, TabProps } from '@vanguard/Tabs/Tab/Tab';
@@ -165,6 +166,9 @@ export const Tabs = (props: TabsProps) => {
   const getTabId = (tab: TabProps, index: number) => tab.id ?? `${baseId}-tab-${index}`;
   const getPanelId = (index: number) => `${baseId}-panel-${index}`;
 
+  const layoutKey = visibleTabs.map(({ tab, index }) => `${index}:${String(resolveValue(tab, index))}`).join('|');
+  const isFloating = config.theme === 'floating';
+
   const {
     scrollerRef,
     listRef,
@@ -176,9 +180,13 @@ export const Tabs = (props: TabsProps) => {
     scrollRightward,
   } = useTabsScroll({
     currentValue,
-    layoutKey: visibleTabs.map(({ tab, index }) => `${index}:${String(resolveValue(tab, index))}`).join('|'),
+    layoutKey,
     measureKey: config.theme,
   });
+
+  // Floating theme: one chip glides to the selected tab instead of each tab painting its own selected fill.
+  const indicatorRef = useRef<HTMLSpanElement | null>(null);
+  const indicator = useTabsIndicator({ listRef, indicatorRef, enabled: isFloating, currentValue, layoutKey });
 
   const selectValue = (nextValue: any, event: React.SyntheticEvent) => {
     setInternalValue(nextValue);
@@ -204,7 +212,7 @@ export const Tabs = (props: TabsProps) => {
         {...rootProps}
         className={classNames(
           styles.tabsContainer,
-          config.theme === 'floating' ? styles.floating : '',
+          isFloating ? styles.floating : '',
           config.alignCenter ? styles.alignCenter : '',
           className ?? '',
         )}
@@ -240,6 +248,18 @@ export const Tabs = (props: TabsProps) => {
               });
             }}
           >
+            {indicator && (
+              <span
+                ref={indicatorRef}
+                aria-hidden="true"
+                className={styles.indicator}
+                style={{
+                  width: indicator.width,
+                  height: indicator.height,
+                  translate: `${indicator.left}px ${indicator.top}px`,
+                }}
+              />
+            )}
             {visibleTabs.map(({ tab, index }, visibleIndex) => {
               const tabValue = resolveValue(tab, index);
               const selected = tabValue === currentValue;
@@ -259,6 +279,7 @@ export const Tabs = (props: TabsProps) => {
                   hasError={tab.hasError}
                   tabConfig={config}
                   selected={selected}
+                  hasIndicator={indicator !== null}
                   onClick={(event: React.MouseEvent<HTMLDivElement>) => {
                     pointerFocusRef.current = false;
                     selectValue(tabValue, event);
