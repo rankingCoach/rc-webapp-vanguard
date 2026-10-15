@@ -10,10 +10,12 @@ export interface TabsCustomScrollProps {
   onClick: () => void;
   disabled: boolean;
   testId?: string;
+  /** Extra class name merged into the wrapper element. */
+  className?: string;
 }
 
 export const TabsCustomScroll = (props: TabsCustomScrollProps) => {
-  const { direction, onClick, disabled, testId } = props;
+  const { direction, onClick, disabled, testId, className } = props;
 
   return (
     <div
@@ -22,7 +24,9 @@ export const TabsCustomScroll = (props: TabsCustomScrollProps) => {
         styles.customScrollButtonWrapper,
         direction === 'right' ? styles.right : styles.left,
         disabled && styles.hidden,
+        className,
       )}
+      aria-hidden="true"
       data-testid={testId}
     >
       <Icon color={'var(--n400)'} type={IconSize.small}>

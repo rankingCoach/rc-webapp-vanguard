@@ -1,43 +1,81 @@
 @import '@styles/color-functions';
 @import 'src/styles/spacings';
 
+$floating-padding: $x0_25;
+
+// Bar root. Keep specificity at a single class so a consumer className
+// (padding, border, margin, background, ...) applied on the same element still wins.
 .tabs-container {
   position: relative;
+  display: flex;
+  overflow: hidden;
+  min-height: $x6;
+  -webkit-overflow-scrolling: touch;
 
-   > div > div {
-     gap: $x0_25;
-   }
-
-  :global(.MuiTabs-scrollableX) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  &.align-center {
+    align-items: center;
   }
 
   // STYLES FOR FLOATING THEME
-  &.floating {
+  // `:where()` keeps the bar rules at single-class specificity, like the base rules above, so a consumer
+  // className on the bar root (padding, margin, background, ...) still wins.
+  &:where(.floating) {
     box-sizing: border-box;
     width: fit-content;
     max-width: 100%;
     min-height: 0;
     margin-inline: auto;
-    padding: $x0_5;
-    border-radius: $x4;
+    padding: $floating-padding;
+    // Concentric corners: the tabs' radius plus the gap around them
+    border-radius: $rounded-border-radius + $floating-padding;
     background-color: rc_transparent(--fn-fg-light, 0.1);
+  }
 
-    // Scroll buttons (TabsCustomScroll) are the first/last children of the MUI root;
-    // round them fully so the pill's corners don't clip them
-    > :first-child:not(:global(.MuiTabs-scroller)),
-    > :last-child:not(:global(.MuiTabs-scroller)) {
-      border-radius: $x4;
+  // Scroll buttons (TabsCustomScroll) are direct children of the bar root; round them fully and fit them to the
+  // pill's inner height so they aren't clipped. Full specificity: must beat TabsCustomScroll's own rules.
+  &.floating {
+    > .scroll-button {
+      box-sizing: border-box;
+      height: calc(100% - #{2 * $floating-padding});
+      aspect-ratio: 1;
+      padding: 0;
+      border-radius: $rounded-border-radius;
     }
 
-    > :first-child:not(:global(.MuiTabs-scroller)) {
-      left: $x0_5;
+    > .scroll-button:first-child {
+      left: $floating-padding;
     }
 
-    > :last-child:not(:global(.MuiTabs-scroller)) {
-      right: $x0_5;
+    > .scroll-button:last-child {
+      right: $floating-padding;
     }
   }
+}
+
+.scroller {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  // Hide the scrollbar
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab-list {
+  display: flex;
+  gap: $x0_25;
+}
+
+// Class passed to TabsCustomScroll; positioning/appearance lives in its own module,
+// theme-specific overrides are nested under .tabs-container.floating.
+.scroll-button {
+  // Intentionally empty: styled via .tabs-container.floating > .scroll-button
 }

@@ -319,7 +319,7 @@
    // ====================== MODIFIERS - Shapes ======================
  
    &.shape-round {
-     --border-radius: #{$x3};
+     --border-radius: #{$rounded-border-radius};
    }
  
    // ====================== MODIFIERS - Layout ======================
