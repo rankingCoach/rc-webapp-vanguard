@@ -45,6 +45,8 @@ export interface TabProps<T = any> extends Omit<React.HTMLAttributes<HTMLDivElem
 interface InternalTabProps {
   /** Visual configuration shared by all tabs of the bar. */
   tabConfig?: TabConfig;
+  /** The selected fill is drawn by the bar's sliding indicator, so the tab must not paint its own. */
+  hasIndicator?: boolean;
 }
 
 /** Returns a shallow copy of `source` without the given keys. */
@@ -67,6 +69,7 @@ const TAB_OWN_KEYS = [
   'testId',
   'selected',
   'tabConfig',
+  'hasIndicator',
   'className',
 ] as const;
 
@@ -77,7 +80,16 @@ const TEXT_TRANSFORM_CLASSES: Record<string, string | undefined> = {
 };
 
 export const Tab = (props: TabProps & InternalTabProps) => {
-  const { hasError = false, tabIcons, testId, tabConfig, selected = false, label, className } = props;
+  const {
+    hasError = false,
+    tabIcons,
+    testId,
+    tabConfig,
+    selected = false,
+    hasIndicator = false,
+    label,
+    className,
+  } = props;
   // Handlers are typed for `HTMLDivElement` (former MUI typing) but are attached to the button.
   const buttonProps = omitProps(props, TAB_OWN_KEYS) as unknown as React.ButtonHTMLAttributes<HTMLButtonElement> & {
     ref?: React.Ref<HTMLButtonElement>;
@@ -93,7 +105,12 @@ export const Tab = (props: TabProps & InternalTabProps) => {
     tabGrow,
   } = tabConfig || {};
   const isFloating = theme === 'floating';
-  const labelColor = selected && !isFloating ? 'var(--fn-fg-cta)' : 'var(--fn-fg)';
+  // Floating: the selected tab is a muted inverted + onDark button, the others plain muted buttons
+  const floatingLabelColor = selected
+    ? 'var(--button-muted-inverted-on-dark-text-color, #263349)'
+    : 'var(--button-muted-text-color, #263349)';
+  const defaultLabelColor = selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)';
+  const labelColor = isFloating ? floatingLabelColor : defaultLabelColor;
 
   const renderLabel = () => {
     if (!tabIcons) {
@@ -170,6 +187,7 @@ export const Tab = (props: TabProps & InternalTabProps) => {
         styles.tab,
         styles[theme],
         selected ? styles.selected : '',
+        hasIndicator ? styles.hasIndicator : '',
         selected && hasError ? styles.hasError : '',
         tabHeight === 'small' ? styles.heightSmall : '',
         tabNoMinWidth === true ? styles.noMinWidth : '',

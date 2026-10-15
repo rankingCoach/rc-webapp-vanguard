@@ -99,18 +99,70 @@
   }
 
   // STYLES FOR FLOATING THEME
+  // Unselected tabs are muted buttons: on hover the muted hover fill grows in (the former muted button hover ripple).
+  // The selected tab is a muted inverted + onDark button: its hover/pressed fill is drawn by the bar's sliding
+  // indicator. Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
+  // The fill sits on ::before so only the fill blends; the tab must not isolate (no z-index, opacity, filter...).
   &.floating {
     min-height: 0;
     padding: $x1 $x2;
     border-radius: $rounded-border-radius !important;
     flex-grow: 0;
+    color: var(--button-muted-text-color, #263349);
 
-    &:hover {
-      background-color: rc_transparent(--fn-fg-light, 0.15);
+    // Opacity/transform live on the layer, never on the tab, so the blend keeps working
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background-color: var(--button-muted-hover-background-color, rgba(185, 197, 216, 0.4));
+      mix-blend-mode: var(--button-muted-blend-mode, multiply);
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    // Hover grows the fill from the centre while fading it in. Hover only: the selected tab hands its fill to the
+    // indicator instantly (no flash on mount).
+    &:not(.selected)::before {
+      transition:
+        transform 400ms cubic-bezier(0.01, 0.74, 0.6, 0.98),
+        opacity 400ms cubic-bezier(0.01, 0.74, 0.6, 0.98);
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+
+    // Label content above the fill layer
+    > * {
+      position: relative;
+    }
+
+    &:hover:not(.selected)::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    &:focus-visible {
+      outline-color: var(--button-muted-focus-outline-color, #0062ff);
     }
 
     &.selected {
-      background-color: rc_transparent(--fn-fg-light, 0.2);
+      color: var(--button-muted-inverted-on-dark-text-color, #263349);
+
+      &:focus-visible {
+        outline-color: var(--button-muted-inverted-on-dark-focus-outline-color, #0062ff);
+      }
+    }
+
+    // Fallback when the bar can't draw its sliding indicator (standalone Tab, bar not measurable yet)
+    &.selected:not(.has-indicator)::before {
+      background-color: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.28));
+      mix-blend-mode: var(--button-muted-inverted-blend-mode, plus-lighter);
+      opacity: 1;
+      transform: none;
     }
   }
 
