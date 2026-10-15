@@ -59,6 +59,15 @@ const config: StorybookConfig = {
       // Remove external dependencies for Storybook build
       delete storybookBaseConfig.build.rollupOptions.external;
     }
+    // theming.css references webapp-hosted fonts; bundle the local copies instead.
+    // Must come before the generic "/vanguard" alias, which points into the webapp checkout.
+    storybookBaseConfig.resolve = {
+      ...storybookBaseConfig.resolve,
+      alias: {
+        "/vanguard/assets/fonts": path.resolve(__dirname, "../public/vanguard/assets/fonts"),
+        ...storybookBaseConfig.resolve?.alias,
+      },
+    };
 
     const WithBaseConfig = mergeConfig(config, storybookBaseConfig);
     return mergeConfig(WithBaseConfig, {
