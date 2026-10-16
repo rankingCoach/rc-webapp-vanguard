@@ -152,7 +152,22 @@ export const getAlpha = (color: string): number => {
   return 1;
 };
 
-export const getFillAlpha = (button: HTMLElement): number => getAlpha(getLayerStyle(button, '::after').backgroundColor);
+// The hover layer: hover-strength fill that grows in on hover / pressed while the rest fill (::after) fades out
+export const getHoverLayer = (button: HTMLElement): HTMLElement => {
+  const el = button.querySelector<HTMLElement>('[class*="hover-layer"], [class*="HoverLayer"]');
+  if (!el) {
+    throw new Error('Muted hover layer not found');
+  }
+  return el;
+};
+
+// Background of the fill that is currently showing: the hover layer once ::after has faded out, else ::after
+export const getVisibleFill = (button: HTMLElement): string =>
+  getLayerStyle(button, '::after').opacity === '0'
+    ? getComputedStyle(getHoverLayer(button)).backgroundColor
+    : getLayerStyle(button, '::after').backgroundColor;
+
+export const getFillAlpha = (button: HTMLElement): number => getAlpha(getVisibleFill(button));
 
 // The button element must never create an isolated blend group: blending happens on ::after only
 export const expectNotIsolated = async (button: HTMLElement) => {

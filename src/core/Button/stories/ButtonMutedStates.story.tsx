@@ -10,6 +10,8 @@ import {
   getAlpha,
   getButtonByTestId,
   getFillAlpha,
+  getHoverLayer,
+  getVisibleFill,
   getLayerStyle,
   MUTED_COMBOS,
   Surface,
@@ -20,12 +22,12 @@ Rest, **pressed** (\`pressed\` renders \`aria-pressed\` and keeps the hover-stre
 **loading** for each muted combination on its intended surface, plus an interactive toggle.
 
 Behaviour verified by the play function:
-- pressed uses the hover-strength fill (0.40, or white 28 %) while rest is 0.25 / white 18 %; real :hover uses the same
-  token with a 150 ms transition (not simulated: synthetic user-event hovers do not trigger CSS :hover);
+- pressed uses the hover-strength fill (0.40, or white 28 %) while rest is 0.25 / white 18 %. On hover (and when
+  pressed) a hover layer with that fill grows from the centre (scale 0.5 → 1, 400 ms) while the rest fill fades out;
 - \`disabled\` lowers opacity to 0.4 on the **layers only** (the button itself is never faded, so blending is not
   isolated) and swallows clicks;
-- hover is visual-only (user-event cannot trigger a real CSS :hover); \`prefers-reduced-motion\` removes the fill
-  transition;
+- hover is visual-only (user-event cannot trigger a real CSS :hover); \`prefers-reduced-motion\` removes the grow
+  animation and the transitions;
 - the focus ring (2px, 2px offset) is the blue \`#0062ff\` or white depending on the surface matrix.
 `;
 
@@ -98,19 +100,27 @@ export const ButtonMutedStates: ButtonStory = {
       await expect(getFillAlpha(pressed), `${combo.key} pressed fill`).toBeCloseTo(hoverAlpha, 3);
       // same colour channels, only the alpha differs
       const channels = (c: string) => c.replace(/\/?\s*[\d.]+%?\s*\)$|,\s*[\d.]+\)$/, '');
-      await expect(channels(getLayerStyle(pressed, '::after').backgroundColor)).toBe(
-        channels(getLayerStyle(rest, '::after').backgroundColor),
-      );
-      // fill transition: 150 ms on background-color
-      const fillStyle = getLayerStyle(rest, '::after');
-      await expect(fillStyle.transitionDuration).toContain('0.15s');
-      await expect(fillStyle.transitionProperty).toContain('background-color');
+      await expect(channels(getVisibleFill(pressed))).toBe(channels(getVisibleFill(rest)));
+      // pressed: the hover layer has grown in (full size, opaque, blending) and the rest fill has faded out
+      const pressedLayer = getComputedStyle(getHoverLayer(pressed));
+      await expect(pressedLayer.opacity).toBe('1');
+      await expect(pressedLayer.transform).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+      await expect(pressedLayer.mixBlendMode).toBe(combo.blend);
+      await expect(getLayerStyle(pressed, '::after').opacity).toBe('0');
+      // rest: the hover layer waits at half size, invisible; it grows and fades in over 400 ms
+      const restLayer = getComputedStyle(getHoverLayer(rest));
+      await expect(restLayer.opacity).toBe('0');
+      await expect(restLayer.transform).toBe('matrix(0.5, 0, 0, 0.5, 0, 0)');
+      await expect(restLayer.transitionProperty).toContain('transform');
+      await expect(restLayer.transitionDuration).toContain('0.4s');
+      await expect(getLayerStyle(rest, '::after').transitionProperty).toContain('opacity');
 
       // disabled: opacity on the layers only, never on the button
       await expect(disabled).toBeDisabled();
       await expectNotIsolated(disabled);
       await expect(getComputedStyle(disabled).opacity).toBe('1');
       await expect(getLayerStyle(disabled, '::after').opacity).toBe('0.4');
+      await expect(getComputedStyle(getHoverLayer(disabled)).opacity).toBe('0');
       await expect(getComputedStyle(disabled.querySelector('.button-inner-container, [class*="inner-container"], [class*="innerContainer"]')!).opacity).toBe('0.4');
     }
 

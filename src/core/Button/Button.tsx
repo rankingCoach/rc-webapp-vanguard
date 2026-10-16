@@ -434,6 +434,7 @@ export const Button = (props: ButtonProps) => {
         )}
         aria-pressed={isMuted ? pressed : undefined}
       >
+        {isMuted && <span className={styles.buttonHoverLayer} aria-hidden="true" />}
         <div className={styles.buttonInnerContainer}>
           {icon && iconPosition === 'left' ? (
             isIconSizeDifferentOnHover() && !isLoading && !disabled ? (
