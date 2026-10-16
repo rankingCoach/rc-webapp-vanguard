@@ -5,6 +5,7 @@ import modalDescription from "./Modal.description.md?raw";
 import { Story } from "./stories/_Modal.default";
 import { ModalStory as _ModalStory } from "./stories/ModalStory.story";
 import { FooterNeutralButton as _FooterNeutralButton } from "./stories/FooterNeutralButton.story";
+import { FooterButtonHeights as _FooterButtonHeights } from "./stories/FooterButtonHeights.story";
 import { CloseViaService as _CloseViaService } from "./stories/CloseViaService.story";
 import { CloseViaHeaderButtonWithResponse as _CloseViaHeaderButtonWithResponse } from "./stories/CloseViaHeaderButtonWithResponse.story";
 import { CloseViaHeaderButton as _CloseViaHeaderButton } from "./stories/CloseViaHeaderButton.story";
@@ -86,6 +87,7 @@ export const StackFullscreenSlideOverNormalGrow: Story = { ..._StackFullscreenSl
 export const StackNormalSlideOverFullscreenGrow: Story = { ..._StackNormalSlideOverFullscreenGrow };
 export const StackNormalPopOverFullscreenSlide: Story = { ..._StackNormalPopOverFullscreenSlide };
 export const FooterNeutralButton: Story = { ..._FooterNeutralButton };
+export const FooterButtonHeights: Story = { ..._FooterButtonHeights };
 
 export default {
   ...SbDecorator({
