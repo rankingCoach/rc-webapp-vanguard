@@ -152,6 +152,15 @@ export const getAlpha = (color: string): number => {
   return 1;
 };
 
+// The hover layer: grows in on hover / pressed and adds its colour on top of the rest fill (::after)
+export const getHoverLayer = (button: HTMLElement): HTMLElement => {
+  const el = button.querySelector<HTMLElement>('[class*="hover-layer"], [class*="HoverLayer"]');
+  if (!el) {
+    throw new Error('Muted hover layer not found');
+  }
+  return el;
+};
+
 export const getFillAlpha = (button: HTMLElement): number => getAlpha(getLayerStyle(button, '::after').backgroundColor);
 
 // The button element must never create an isolated blend group: blending happens on ::after only

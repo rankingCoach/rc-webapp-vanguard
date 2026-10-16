@@ -143,7 +143,7 @@ export type MutedButtonProps = CommonButtonProps & {
    * - `inverted` + `onDark`: dark (#263349) text and the blue ring on the plus-lighter fill.
    */
   onDark?: boolean;
-  /** Toggle state: renders `aria-pressed` and keeps the hover-strength fill while `true`. */
+  /** Toggle state: renders `aria-pressed` and keeps the hover layer shown while `true`. */
   pressed?: boolean;
 };
 
@@ -447,6 +447,7 @@ export const Button = (props: ButtonProps) => {
         )}
         aria-pressed={isMuted ? pressed : undefined}
       >
+        {isMuted && <span className={styles.buttonHoverLayer} aria-hidden="true" />}
         <div className={styles.buttonInnerContainer}>
           {icon && iconPosition === 'left' ? (
             isIconSizeDifferentOnHover() && !isLoading && !disabled ? (
