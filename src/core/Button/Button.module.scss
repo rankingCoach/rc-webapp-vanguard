@@ -44,12 +44,12 @@
  * • .blurred                - Backdrop blur on the ::before layer (muted buttons)
  * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons)
  * • .on-dark                - The other text colour: swaps text/icon/focus ring only (muted buttons)
- * • [aria-pressed="true"]   - Pressed toggle, keeps the hover-strength fill (muted buttons)
+ * • [aria-pressed="true"]   - Pressed toggle, keeps the hover layer shown (muted buttons)
  *
  * MUTED LAYERS (back to front):
  * • ::before                 - Blur layer (only .blurred)
- * • .button-hover-layer      - Hover-strength fill, grows from the centre on hover / pressed (blends)
- * • ::after                  - Rest fill, fades out on hover / pressed (blends)
+ * • ::after                  - Rest fill, never changes on hover / pressed (blends)
+ * • .button-hover-layer      - Hover colour added on top of the rest fill, grows from the centre (blends)
  * • .button-inner-container  - Content, positioned above the layers
  * The muted button itself never isolates (no z-index, opacity, filter or backdrop-filter).
  * 
@@ -223,7 +223,7 @@
        -webkit-backdrop-filter: blur(#{$x4});
      }
 
-     // fill layer: the only part that blends
+     // rest fill: never changes on hover / pressed
      &::after {
        content: '';
        position: absolute;
@@ -232,11 +232,9 @@
        pointer-events: none;
        background-color: var(--muted-fill);
        mix-blend-mode: var(--muted-blend);
-       transition: opacity $transitionTimeLong cubic-bezier(.01, .74, .6, .98);
      }
 
-     // hover layer: the hover-strength fill grows from the centre while the rest fill (::after) fades out,
-     // so the settled hover/pressed state is exactly the hover token
+     // hover layer: grows from the centre on hover / pressed and adds its (translucent) colour on top of the rest fill
      .button-hover-layer {
        position: absolute;
        inset: 0;
@@ -282,10 +280,6 @@
      // states
      &:hover:not(:disabled),
      &[aria-pressed="true"] {
-       &::after {
-         opacity: 0;
-       }
-
        .button-hover-layer {
          opacity: 1;
          transform: scale(1);
@@ -311,21 +305,14 @@
          opacity: 0.4;
        }
 
-       // pressed + disabled: the hover-strength fill replaces the rest fill, faded like the rest
-       &[aria-pressed="true"] {
-         &::after {
-           opacity: 0;
-         }
-
-         .button-hover-layer {
-           opacity: 0.4;
-         }
+       // pressed + disabled: the hover layer stays, faded like the rest
+       &[aria-pressed="true"] .button-hover-layer {
+         opacity: 0.4;
        }
      }
 
      @media (prefers-reduced-motion: reduce) {
        &,
-       &::after,
        .button-hover-layer,
        .button-icon,
        [class^="icon-"] {
