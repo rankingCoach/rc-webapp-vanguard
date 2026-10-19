@@ -1,7 +1,10 @@
-# VAN-85 point 4: transparent `default` button and its `accent` option (investigation)
+# VAN-85 point 4: transparent `default` button and its Ado text colour (investigation)
 
-Status: investigation only. No component code has been changed yet. The theme request is in
-`VAN-85-button-default-theme-request.md`.
+Status: on hold for design feedback. No component code has been changed yet.
+- Plan: as amended on 2026-10-19 (sections 2, 5 and 6).
+- Theme request: `VAN-85-button-default-theme-request.md`.
+- RFC for colleagues: the Claude Doc "RFC: Transparent default Button (VAN-85)".
+- Scope: light scheme only; dark mode is not supported yet.
 
 ## 1. Where the white comes from
 
@@ -21,26 +24,28 @@ The white comes from the theme. Nothing in Vanguard sets it locally.
 | `$email` map, `default-theme.scss:283-285` | `--email-button-default-bg` and `--email-button-default-border` alias `--button-default-background-color`. |
 | Legacy compiled `html/vanguard/styles/vanguard.css` | Its `.btn.btn-default` rule reads the same tokens. It is loaded for the PHP views (`application/config/content/vanguard/clients.php`), and `btn-default` appears in **42** files under `application/views/…`. |
 
-So `--button-default-background-color: transparent` would also change emails and the legacy PHP pages. That is why the
-theme request asks for **new** tokens instead of changing this one (see the request, section 1).
+So `--button-default-background-color: transparent` would also change emails and the legacy PHP pages.
+**Amended plan:**
+- Keep the token and change its value.
+- Decouple the two readers first:
+  - emails re-alias to `--fn-bg`;
+  - the legacy `.btn-default` pins its own fills, or is accepted as a ghost after a check.
 
-## 2. `--ado-text`
+The theme request covers both.
 
-- `--ado-text` does not exist in Vanguard or in the webapp theme.
-- It exists only in the design mock: `rc-webapp/tmp/ado hub/src/styles/tokens.css:84,94`. There it is `oklch(from var(--ado-base) min(l, 0.5) c h)`, which gives `#006a85`.
-- The webapp theme does have `--ado-base` (`default-theme.scss:174`, `#006a85`) and the derived `--ado-*` colours.
-- In the mock, the accent is `.ghost.accent { --fg: var(--ado-text) }`. Its hover only adds the ghost fill, and the text colour stays the same.
+## 2. The Ado text colour: a typed `textColor` prop, not an accent theme
 
-**Decision (recommended): a role token set that aliases the palette.** The theme would provide:
-- `--ado-text` in the palette;
-- `--button-default-accent-text-color` and `--button-default-accent-hover-text-color`, both aliasing `--ado-text`.
+- `--ado-text` does not exist in Vanguard or in the webapp theme. It exists only in the design mock
+  (`tmp/ado hub/src/styles/tokens.css:84,94`: `oklch(from var(--ado-base) min(l, 0.5) c h)`).
+- The webapp theme has `--ado-base` (`default-theme.scss:174`, `#006a85`).
 
-Vanguard would read `var(--button-default-accent-text-color, var(--ado-text, var(--ado-base, #006a85)))`.
-
-Why this instead of reading `--ado-text` directly:
-- It follows the existing pattern, where button tokens alias the palette.
-- A white-label brand can retune the button without touching Ado's palette.
-- The fallbacks mean nothing waits on the theme release. With the default base, the fallback is already exact, because `--ado-base` has `l` = 0.4868, which is below 0.5.
+**Amended decision:** no accent tokens. The default type gets a `textColor` prop that takes a closed enum
+(`ButtonTextColors`), starting with `ado`.
+- A Sass map in the Button styles turns each key into a rest colour and derives its hover colour (`ado` → `--ado-base`,
+  hover `color-mix(in oklch, <colour>, black 25%)`).
+- Later products add an enum value and a map entry, with no new theme tokens.
+- The prop is restricted to `type={ButtonTypes.default}`.
+- The deprecated `color` / `hoverColor` props are not extended.
 
 ## 3. Webapp sweep (`rc-webapp/html/react/src`)
 
@@ -122,25 +127,27 @@ The mock is `<Button tone="ghost" accent icon={<LucideChevronRight/>} iconPositi
 (`tmp/ado hub/src/components/AfterDashboard/Trays.tsx:137`).
 
 Once this lands, the webapp can replace the native button with
-`<Button type={ButtonTypes.default} accent size={ButtonSizes.small} iconRight={IconNames.caretLeft}>`.
+`<Button type={ButtonTypes.default} textColor={ButtonTextColors.ado} size={ButtonSizes.small} iconRight={IconNames.caretLeft}>`.
 That is a webapp follow-up, not part of the Vanguard change.
 
 ## 5. Breaking?
 
-- **API:** non-breaking. `accent` is a new optional prop.
+- **API:** non-breaking. `textColor` is a new optional prop on the default type.
 - **Visual:** a breaking change for the default type wherever the surface is not white. Seven usages need a webapp change
-  before or together with the Vanguard bump (3.1). About 25 change subtly (3.2).
-- **Theme:** no hard dependency if Vanguard uses fallbacks. Without the theme update, the hover and accent use the
-  fallback values, which are exact for the default brand. White-label brands get their own colours once the theme
-  ships.
+  together with the theme value change (3.1). About 25 change subtly (3.2).
+- **Dependency:** the transparent look depends on the theme value change and on decoupling the email and legacy readers.
+  The generator lives in the webapp, so both land in one webapp PR. `textColor` has no theme dependency.
 
-## 6. Options
+## 6. Plan (option A, amended)
 
-| | What | Pros | Cons |
-|---|---|---|---|
-| **A (recommended)** | Vanguard makes the default rest fill `transparent` itself. Hover reads the new `--button-default-ghost-hover-background-color` (fallback `rgba(185,197,216,.12)`). `accent` reads `--button-default-accent-text-color` (fallback chain to `--ado-text` / `--ado-base`). Request the new tokens (theme request). Ship as a minor release with a "visual change" note, and fix the 3.1 usages in the webapp alongside the bump. | No dependency on the theme release. Emails and the 42 legacy PHP views are untouched. Fully additive tokens. | Stops reading the existing token for the rest state. That token stays in the theme only for the email and legacy readers. |
-| B | Flip `--button-default-background-color` to `transparent` (and the hover token) in the theme. Vanguard changes only for `accent`. | No component change for (a). | Needs the theme release. Hits emails (unless they are re-aliased) and the legacy `.btn-default` pages. The opaque hover token must change too, and that also reaches the legacy pages. |
-| C | Keep `default` as it is and add an opt-in `ghost` (transparent) flag next to `accent`. | Zero visual change for consumers. | Does not do (a) as the ticket asks. The white default lives on. |
-
-**Recommendation: A.** Also fix the seven 3.1 usages in the webapp, and convert the Needs-you row, in the same webapp
-PR that bumps Vanguard.
+1. Design sign-off: the hover fill, the derived `ado` hover colour, `--ado-base` against the mock's capped
+   `--ado-text`, and the replacements for the risky usages.
+2. Vanguard: add `ButtonTextColors` and `textColor` (map plus stories). The default background keeps reading
+   `--button-default-background-color`, so there is no change there.
+3. Webapp, one PR:
+   1. re-alias the email tokens;
+   2. pin or accept the legacy `.btn-default` look;
+   3. change the two `--button-default-*` values;
+   4. fix the 3.1 usages;
+   5. bump Vanguard and move the Needs-you row to `Button` with `textColor`.
+4. Visual QA: landing pages, the location header, the Ado dashboard, one email, and a few legacy PHP views.
