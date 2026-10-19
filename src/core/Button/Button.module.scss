@@ -85,9 +85,11 @@
  }
  
  .button {
-   --padding-y: #{$x1 + $x0_5};
+   // medium (the default size); the other sizes override these in MODIFIERS - Sizes
+   --padding-y: #{$x1_5};
    --padding-x: #{$x2};
    --label-height: #{$x2};
+   --text-size: #{$x1_5};
    --letter-spacing: 0.04em;
    --border-radius: var(--buttons-border-radius, #{$x0_5});
  
@@ -107,8 +109,8 @@
    padding: var(--padding-y) var(--padding-x);
  
    @include media('>mobile') {
-     --padding-y: #{$x2};
-     --padding-x: #{$x3};
+     --padding-y: #{$x1};
+     --padding-x: #{$x1_5};
    }
  
    // =========================== ELEMENTS ===========================
@@ -143,7 +145,7 @@
    .button-icon {
      font-family: var(--buttons-typeface);
      font-size: var(--label-height);
-     line-height: calc(var(--label-height) + 7px);
+     line-height: var(--label-height);
      display: inline-flex;
      align-items: center;
      font-weight: var(--medium);
@@ -151,6 +153,11 @@
      text-overflow: ellipsis !important;
      white-space: nowrap !important;
      overflow: hidden !important;
+   }
+
+   // the label follows the size; the icon keeps --label-height
+   .button-text {
+     font-size: var(--text-size);
    }
  
    // Loader Spinner
@@ -199,7 +206,6 @@
      --muted-ring: var(--button-muted-focus-outline-color, #0062ff);
 
      position: relative;
-     height: unset; // button height results from line-height & padding!!!
      background: none;
      border: 0;
      color: var(--muted-fg);
@@ -330,95 +336,44 @@
          transform: none;
        }
      }
- 
-     &.size-small {
-       --padding-y: #{$x1};
-       --padding-x: #{$x1_5};
- 
-       .button-text {
-         font-size: #{$x1_5};
-         line-height: #{$x2};
-       }
- 
-       .button-inner-container {
-         gap: #{$x0_5};
-       }
-       
-       @include media('>mobile') {
-         --padding-y: #{$x0_5};
-         --padding-x: #{$x1};
- 
-         .button-inner-container {
-           gap: #{$x0_5};
-         }
-       }
-     }
- 
-     &.size-medium {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x1_5};
-         line-height: #{$x2};
-       }
- 
-       @include media('>mobile') {
-         --padding-y: #{$x1};
-         --padding-x: #{$x1_5};
-       }
-     }
- 
-     &.size-large {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x1_75};
-         line-height: #{$x2};
-       }
-     }
- 
-     &.size-extra-large {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x2};
-         line-height: #{$x2};
-       }
- 
-       @include media('>mobile') {
-         --padding-y: #{$x2};
-         --padding-x: #{$x2_5};
-       }
-     }
- 
-     &.has-icon-left {
-       padding-left: var(--padding-y);
-     }
    }
  
    // ====================== MODIFIERS - Sizes ======================
- 
+   // One size set for every type: the same size gives the same footprint whatever the type.
+   // Height = 2 * --padding-y + --label-height (mobile / desktop):
+   //   small 32 / 24px · medium 40 / 32px · large 40 / 40px · extra-large 40 / 48px
+
    &.size-small {
+     --padding-y: #{$x1};
+     --padding-x: #{$x1_5};
+     --text-size: #{$x1_5};
+
+     .button-inner-container {
+       gap: #{$x0_5};
+     }
+
      @include media('>mobile') {
-       --padding-y: #{$x1};
-       --padding-x: #{$x2};
+       --padding-y: #{$x0_5};
+       --padding-x: #{$x1};
      }
    }
- 
-   &.size-medium { /* default button size */ }
- 
+
+   &.size-medium { /* default button size, the base values */ }
+
    &.size-large {
-     --padding-y: #{$x2};
-     --padding-x: #{$x3};
- 
+     --padding-y: #{$x1_5};
+     --padding-x: #{$x2};
+     --text-size: #{$x1_75};
+   }
+
+   &.size-extra-large {
+     --padding-y: #{$x1_5};
+     --padding-x: #{$x2};
+     --text-size: #{$x2};
+
      @include media('>mobile') {
-       --padding-y: #{$x2_5};
-       --padding-x: #{$x4};
-       --letter-spacing: 0.02em;
-       --label-height: #{$x2_5};
+       --padding-y: #{$x2};
+       --padding-x: #{$x2_5};
      }
    }
  
@@ -463,36 +418,31 @@
 
    &.button-text-wrap {
      max-width: 100%;
+     // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
+     height: auto;
+     min-height: calc(2 * var(--padding-y) + var(--label-height));
 
      &:not(.button-muted) {
-       // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
-       height: auto;
-       min-height: calc(2 * var(--padding-y) + var(--label-height));
-       // Absorbs the (max #{$x0_125}) border of some variants, so min-height alone drives the single-line height
+       // Absorbs the #{$x0_125} border of the bordered types, so min-height alone drives the single-line height
        padding-top: calc(var(--padding-y) - #{$x0_125});
        padding-bottom: calc(var(--padding-y) - #{$x0_125});
-
-       .button-text {
-         // Offsets the extra 7px of the label line-height so a single line renders at the default button height
-         margin-block: -3.5px;
-       }
-
-       // Icons taller than the label (iconHasCircle, large / on-hover icons) overflow symmetrically, as with the fixed height
-       .button-inner-container > :not(.button-text) {
-         display: flex;
-         align-items: center;
-         height: var(--label-height);
-       }
-
-       .icon-on-hover-container {
-         min-height: var(--label-height);
-       }
      }
 
-     &.button-muted .button-text {
-       // Adds leading between wrapped lines, offset so a single line keeps the default muted height
+     .button-text {
+       // Adds leading between wrapped lines, offset so a single line keeps the default height
        line-height: calc(#{$x2} + #{$x0_5});
        margin-block: -#{$x0_25};
+     }
+
+     // Icons taller than the label (iconHasCircle, large / on-hover icons) overflow symmetrically, as with the fixed height
+     .button-inner-container > :not(.button-text) {
+       display: flex;
+       align-items: center;
+       height: var(--label-height);
+     }
+
+     .icon-on-hover-container {
+       min-height: var(--label-height);
      }
 
      .button-inner-container {

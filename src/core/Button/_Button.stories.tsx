@@ -28,6 +28,7 @@ import { ButtonRounded as _ButtonRounded } from "./stories/ButtonRounded.story";
 import { ButtonWithIcon as _ButtonWithIcon } from "./stories/ButtonWithIcon.story";
 import { ButtonIconOnly as _ButtonIconOnly } from "./stories/ButtonIconOnly.story";
 import { ButtonSize as _ButtonSize } from "./stories/ButtonSize.story";
+import { ButtonSizeMatrix as _ButtonSizeMatrix } from "./stories/ButtonSizeMatrix.story";
 import { ButtonHoverState as _ButtonHoverState } from "./stories/ButtonHoverState.story";
 import { ButtonUppercase as _ButtonUppercase } from "./stories/ButtonUppercase.story";
 import { ButtonTextWrapNoWrap as _ButtonTextWrapNoWrap } from "./stories/ButtonTextWrapNoWrap.story";
@@ -68,6 +69,7 @@ export const ButtonRounded: ButtonStory = { ..._ButtonRounded }
 export const ButtonWithIcon: ButtonStory = { ..._ButtonWithIcon }
 export const ButtonIconOnly: ButtonStory = { ..._ButtonIconOnly }
 export const ButtonSize: ButtonStory = { ..._ButtonSize }
+export const ButtonSizeMatrix: ButtonStory = { ..._ButtonSizeMatrix }
 export const ButtonHoverState: ButtonStory = { ..._ButtonHoverState }
 export const ButtonUppercase: ButtonStory = { ..._ButtonUppercase }
 export const ButtonTextWrapNoWrap: ButtonStory = { ..._ButtonTextWrapNoWrap }

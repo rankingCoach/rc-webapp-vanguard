@@ -11,28 +11,33 @@ import styles from './Button.module.scss';
 /**
  * Types
  */
+/**
+ * One size set for every button type: the same size gives the same footprint whatever the type.
+ *
+ * | size               | height (mobile / desktop) | text  |
+ * | ------------------ | ------------------------- | ----- |
+ * | `small`            | 32 / 24px                 | 12px  |
+ * | `medium` (default) | 40 / 32px                 | 12px  |
+ * | `large`            | 40 / 40px                 | 14px  |
+ * | `extraLarge`       | 40 / 48px                 | 16px  |
+ *
+ * Migrating from v2: the non-muted types used to be bigger. Bump them one step to keep their footprint:
+ * `small` → `medium` (32 / 40px), `medium` → `extraLarge` (48 / 40px), `large` → `extraLarge` (60 → 48px /
+ * 48 → 40px, shorter). See the "Size Matrix" story under Vanguard/Button.
+ */
 export enum ButtonSizes {
   small = 'small',
   medium = 'medium',
   large = 'large',
-  /** @remarks only available for the muted button type */
   extraLarge = 'extra-large',
 }
 
 export enum ButtonTypes {
   default = 'default',
   /**
-   * Being replaced by `muted` (VAN-82). When swapping, bump the size one step so the
-   * button keeps its height:
-   *
-   * | secondary          | muted        | height (desktop / mobile)       | text (desktop) |
-   * | ------------------ | ------------ | ------------------------------- | -------------- |
-   * | `small`            | `medium`     | 32 / 40px, unchanged            | 16px → 12px    |
-   * | `medium` (default) | `extraLarge` | 48 / 40px, unchanged            | 16px, same     |
-   * | `large`            | `extraLarge` | 60 → 48px / 48 → 40px (shorter) | 20px → 16px    |
-   *
-   * Muted also has no border and a see-through fill; on dark or coloured backgrounds use
-   * `inverted`. See the "Secondary To Muted" story under Vanguard/Button.
+   * Being replaced by `muted` (VAN-82). Both share the same sizes, so swap the type and keep the size.
+   * Muted has no border and a see-through fill; on dark or coloured backgrounds use `inverted`.
+   * See the "Secondary To Muted" story under Vanguard/Button.
    */
   secondary = 'secondary',
   primary = 'primary',
@@ -113,7 +118,7 @@ interface CommonButtonProps {
 
 type BaseButtonProps = CommonButtonProps & {
   type?: Exclude<ButtonTypes, ButtonTypes.muted>;
-  size?: Exclude<ButtonSizes, ButtonSizes.extraLarge>;
+  size?: ButtonSizes;
   // these are specifically forbidden for the non-muted button
   blurred?: never;
   inverted?: never;

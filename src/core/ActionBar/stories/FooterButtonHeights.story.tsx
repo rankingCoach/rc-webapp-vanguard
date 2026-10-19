@@ -3,8 +3,8 @@ import { ButtonTypes } from "@vanguard/Button/Button";
 import { Story, selectors } from "./_ActionBar.default";
 
 /**
- * Buttons in the ActionBar footer share one height whatever their type: muted buttons without an explicit size
- * get `extraLarge`, matching the 48px / 40px of the other types' default `medium`.
+ * Buttons in the ActionBar footer share one height whatever their type: buttons without an explicit size get the
+ * row size (`extraLarge`), 48px on desktop and 40px on mobile.
  */
 export const FooterButtonHeights: Story = {
   args: {

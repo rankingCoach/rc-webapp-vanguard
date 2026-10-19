@@ -53,7 +53,6 @@ export const BUTTONS_EXCLUDED_CONTROLS_MUTED = ['testId', 'className', 'targetRe
 
 // Button type options (excluding muted for base buttons)
 export const { muted, ...BaseButtonTypeOptions } = ButtonTypes;
-export const { extraLarge, ...BaseButtonSizeOptions } = ButtonSizes;
 
 // Storybook argTypes configuration for common controls
 export const buttonArgTypes = {
@@ -100,7 +99,7 @@ export const buttonArgTypes = {
   },
   size: {
     control: 'radio',
-    options: BaseButtonSizeOptions,
+    options: ButtonSizes,
     defaultValue: ButtonSizes.medium,
   },
   type: {
