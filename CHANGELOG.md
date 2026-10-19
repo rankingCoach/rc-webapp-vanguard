@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.4.0...v2.5.0) (2026-10-19)
+
+
+### Features
+
+* **error-boundary:** optional title and description texts ([b780d17](https://github.com/rankingCoach/rc-webapp-vanguard/commit/b780d17a0bf202e6c674cf94efce86b083be372d))
+
 ## [2.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.3.0...v2.4.0) (2026-10-19)
 
 
