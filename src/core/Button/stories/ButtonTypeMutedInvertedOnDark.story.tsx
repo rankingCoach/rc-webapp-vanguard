@@ -8,8 +8,8 @@ import { BUTTONS_EXCLUDED_CONTROLS_MUTED, ButtonStory, mutedButtonArgTypes } fro
 import { expectForeground, expectMutedSurface, FG_DARK, getLayerStyle, Surface } from './_mutedSurfaces';
 
 const description = `
-**Inverted + onDark** keeps the inverted \`plus-lighter\` white fill (18 % rest, 28 % hover) but switches the label,
-icon and focus ring to the dark \`#263349\` / blue \`#0062ff\`. That makes it legible on **light surfaces and photos**
+**Inverted + onDark** is a **light glass**: a white 60 % fill (70 % on hover) blended normally, with the dark
+\`#263349\` label and icon and the blue \`#0062ff\` focus ring. That makes it legible on **light surfaces and photos**
 (pale ripple gradient, bright imagery) where a white label would vanish, while still lifting the surface slightly.
 
 Use it for muted buttons that must stay inverted in treatment (e.g. a frosted pill over imagery) but sit on light
@@ -55,11 +55,11 @@ export const ButtonTypeMutedInvertedOnDark: ButtonStory = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByTestId('inv-on-dark-pale_button');
-    await expectMutedSurface(button, { fg: FG_DARK, blend: 'plus-lighter' });
-    await expectMutedSurface(canvas.getByTestId('inv-on-dark-photo_button'), { fg: FG_DARK, blend: 'plus-lighter' });
+    await expectMutedSurface(button, { fg: FG_DARK, blend: 'normal' });
+    await expectMutedSurface(canvas.getByTestId('inv-on-dark-photo_button'), { fg: FG_DARK, blend: 'normal' });
     await expectMutedSurface(canvas.getByTestId('inv-on-dark-pale-blurred_button'), {
       fg: FG_DARK,
-      blend: 'plus-lighter',
+      blend: 'normal',
     });
     await expect(getLayerStyle(canvas.getByTestId('inv-on-dark-pale-blurred_button'), '::before').backdropFilter).toContain('blur(');
 

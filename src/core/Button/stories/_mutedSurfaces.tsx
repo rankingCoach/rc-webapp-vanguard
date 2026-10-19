@@ -80,7 +80,7 @@ export type MutedCombo = {
   props: Pick<MutedButtonProps, 'type' | 'inverted' | 'onDark'>;
   fg: string;
   ring: string;
-  blend: 'multiply' | 'plus-lighter';
+  blend: 'multiply' | 'plus-lighter' | 'normal';
   /** The surface this combination is designed for */
   surface: MutedSurfaceKey;
 };
@@ -101,7 +101,7 @@ export const MUTED_COMBOS: MutedCombo[] = [
     props: { type: ButtonTypes.muted, onDark: true },
     fg: FG_WHITE,
     ring: RING_WHITE,
-    blend: 'multiply',
+    blend: 'normal',
     surface: 'teal',
   },
   {
@@ -119,7 +119,7 @@ export const MUTED_COMBOS: MutedCombo[] = [
     props: { type: ButtonTypes.muted, inverted: true, onDark: true },
     fg: FG_DARK,
     ring: RING_BLUE,
-    blend: 'plus-lighter',
+    blend: 'normal',
     surface: 'pale',
   },
 ];

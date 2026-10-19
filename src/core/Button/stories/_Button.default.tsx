@@ -192,7 +192,7 @@ export const mutedButtonArgTypes = {
     control: 'boolean',
     defaultValue: false,
     description:
-      'Swaps text, icon and focus ring colour for use on dark surfaces; fill and blend are unchanged (muted buttons only)',
+      'Glass for dark or busy surfaces: a dark glass with white text, or a light glass with dark text when inverted (muted buttons only)',
   },
   pressed: {
     control: 'boolean',

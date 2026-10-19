@@ -8,8 +8,8 @@ import { BUTTONS_EXCLUDED_CONTROLS_MUTED, ButtonStory, mutedButtonArgTypes } fro
 import { expectForeground, expectMutedSurface, FG_WHITE, Surface } from './_mutedSurfaces';
 
 const description = `
-\`onDark\` swaps only the **text, icon and focus ring** colour to white. The fill is still the translucent grey-blue
-\`multiply\` layer, so it reads as a soft darker pill on mid-tone surfaces such as the Ado bubble teal (\`#00495d\`).
+\`onDark\` is a **dark glass**: a black 60 % fill (70 % on hover) blended normally, with white text, icon and focus
+ring. It reads as a dark pill on mid-tone or busy surfaces such as the Ado bubble teal (\`#00495d\`) or photos.
 
 Use it for a default (non-inverted) muted button that sits on a mid-to-dark brand surface. For fully dark or
 photographic backgrounds prefer \`inverted\`.
@@ -39,7 +39,7 @@ export const ButtonTypeMutedOnDark: ButtonStory = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByTestId('on-dark-label_button');
-    await expectMutedSurface(button, { fg: FG_WHITE, blend: 'multiply' });
+    await expectMutedSurface(button, { fg: FG_WHITE, blend: 'normal' });
 
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledTimes(1);

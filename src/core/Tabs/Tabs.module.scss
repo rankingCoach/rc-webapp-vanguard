@@ -3,8 +3,9 @@
 
 $floating-padding: $x0_25;
 // Floating theme: the selected tab is a muted inverted + onDark button (design decision), so the chip takes its
-// hover/pressed fill; the other tabs are plain muted buttons (see Tab.module.scss). Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
-$muted-fill-selected: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.28));
+// light-glass fill, brightened onto the tray like the selected item of a button group; the other tabs are plain
+// muted buttons (see Tab.module.scss). Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
+$muted-fill-selected: var(--button-muted-inverted-on-dark-background-color, rgba(255, 255, 255, 0.6));
 $muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
 // Also the duration of the squish played by useTabsIndicator, which reads it from the computed transition
 $indicator-duration: 300ms;

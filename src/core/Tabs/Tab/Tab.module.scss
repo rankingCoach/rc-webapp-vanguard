@@ -99,8 +99,9 @@
   }
 
   // STYLES FOR FLOATING THEME
-  // Unselected tabs are muted buttons: on hover the muted hover fill grows in (the former muted button hover ripple).
-  // The selected tab is a muted inverted + onDark button: its hover/pressed fill is drawn by the bar's sliding
+  // Unselected tabs are muted buttons: on hover the muted rest fill grows in (the button's hover token is only the
+  // layer it adds on top of that fill, so it isn't used here).
+  // The selected tab is a muted inverted + onDark button: its light-glass fill is drawn by the bar's sliding
   // indicator. Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
   // The fill sits on ::before so only the fill blends; the tab must not isolate (no z-index, opacity, filter...).
   &.floating {
@@ -117,7 +118,7 @@
       inset: 0;
       border-radius: inherit;
       pointer-events: none;
-      background-color: var(--button-muted-hover-background-color, rgba(185, 197, 216, 0.4));
+      background-color: var(--button-muted-background-color, rgba(185, 197, 216, 0.25));
       mix-blend-mode: var(--button-muted-blend-mode, multiply);
       opacity: 0;
       transform: scale(0.5);
@@ -159,7 +160,7 @@
 
     // Fallback when the bar can't draw its sliding indicator (standalone Tab, bar not measurable yet)
     &.selected:not(.has-indicator)::before {
-      background-color: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.28));
+      background-color: var(--button-muted-inverted-on-dark-background-color, rgba(255, 255, 255, 0.6));
       mix-blend-mode: var(--button-muted-inverted-blend-mode, plus-lighter);
       opacity: 1;
       transform: none;

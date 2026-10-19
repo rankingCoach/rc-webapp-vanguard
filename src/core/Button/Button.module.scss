@@ -190,8 +190,10 @@
      //
      // Theme tokens: --button-muted[-on-dark|-inverted|-inverted-on-dark]-* are all defined by the theme;
      // the literals are the spec values, kept only as a safety net.
+     // *-hover-background-color is the layer added on top of the rest fill, not the final hover colour:
+     // rest + layer give the design's hover colour.
      --muted-fill: var(--button-muted-background-color, rgba(185, 197, 216, 0.25));
-     --muted-fill-hover: var(--button-muted-hover-background-color, rgba(185, 197, 216, 0.4));
+     --muted-fill-hover: var(--button-muted-hover-background-color, rgba(185, 197, 216, 0.16));
      --muted-fg: var(--button-muted-text-color, #263349);
      --muted-blend: var(--button-muted-blend-mode, multiply);
      --muted-ring: var(--button-muted-focus-outline-color, #0062ff);
@@ -256,23 +258,28 @@
      }
 
      // surface flags: colours & blend only
+     // dark glass: a dark fill reads the same under multiply and normal; normal keeps it visible whatever the theme's muted blend
      &.on-dark {
-       --muted-fill: var(--button-muted-on-dark-background-color, rgba(185, 197, 216, 0.25));
-       --muted-fill-hover: var(--button-muted-on-dark-hover-background-color, rgba(185, 197, 216, 0.4));
+       --muted-fill: var(--button-muted-on-dark-background-color, rgba(1, 4, 11, 0.6));
+       --muted-fill-hover: var(--button-muted-on-dark-hover-background-color, rgba(1, 4, 11, 0.25));
+       --muted-blend: normal;
        --muted-fg: var(--button-muted-on-dark-text-color, #fff);
        --muted-ring: var(--button-muted-on-dark-focus-outline-color, #fff);
      }
 
      &.inverted {
        --muted-fill: var(--button-muted-inverted-background-color, rgba(255, 255, 255, 0.18));
-       --muted-fill-hover: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.28));
+       --muted-fill-hover: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.1));
        --muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
        --muted-fg: var(--button-muted-inverted-text-color, #fff);
        --muted-ring: var(--button-muted-inverted-focus-outline-color, #fff);
      }
 
-     // inverted fills with dark text (the theme decides the dark-scheme value)
+     // light glass with dark text
      &.inverted.on-dark {
+       --muted-fill: var(--button-muted-inverted-on-dark-background-color, rgba(255, 255, 255, 0.6));
+       --muted-fill-hover: var(--button-muted-inverted-on-dark-hover-background-color, rgba(255, 255, 255, 0.25));
+       --muted-blend: normal;
        --muted-fg: var(--button-muted-inverted-on-dark-text-color, #263349);
        --muted-ring: var(--button-muted-inverted-on-dark-focus-outline-color, #0062ff);
      }

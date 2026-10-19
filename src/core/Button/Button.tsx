@@ -136,11 +136,10 @@ export type MutedButtonProps = CommonButtonProps & {
    */
   inverted?: boolean;
   /**
-   * The other text colour: swaps the text, icon and focus-ring colours and uses its own
-   * `--button-muted-on-dark-*` fill tokens (same values as default in the light scheme,
-   * theme-dependent in dark). The blend mode stays the muted one.
-   * - default + `onDark`: white text and ring on the multiplied fill.
-   * - `inverted` + `onDark`: dark (#263349) text and the blue ring on the plus-lighter fill.
+   * Glass for busy or dark backdrops (photos, Ado's bubble): swaps the text, icon and focus-ring
+   * colours and uses its own `--button-muted[-inverted]-on-dark-*` fills, blended normally.
+   * - default + `onDark`: dark glass (black 60%, 70% on hover), white text and ring.
+   * - `inverted` + `onDark`: light glass (white 60%, 70% on hover), dark (#263349) text and the blue ring.
    */
   onDark?: boolean;
   /** Toggle state: renders `aria-pressed` and keeps the hover layer shown while `true`. */

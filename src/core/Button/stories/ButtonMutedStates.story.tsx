@@ -21,8 +21,10 @@ Rest, **pressed** (\`pressed\` renders \`aria-pressed\` and keeps the hover-stre
 **loading** for each muted combination on its intended surface, plus an interactive toggle.
 
 Behaviour verified by the play function:
-- the rest fill (0.25 / white 18 %) never changes. On hover (and while pressed) a hover layer (0.40 / white 28 %)
-  grows from the centre (scale 0.5 → 1, 400 ms) and adds its colour on top of the rest fill;
+- the rest fill never changes. On hover (and while pressed) a hover layer grows from the centre (scale 0.5 → 1,
+  400 ms) and adds its colour on top of the rest fill. Rest + layer give the design's hover: default 0.25 + 0.16
+  (≈ 0.40, multiply), onDark black 60 % + 25 % (70 %), inverted white 18 % + 10 % (28 %, plus-lighter),
+  inverted + onDark white 60 % + 25 % (70 %);
 - \`disabled\` lowers opacity to 0.4 on the **layers only** (the button itself is never faded, so blending is not
   isolated) and swallows clicks;
 - hover is visual-only (user-event cannot trigger a real CSS :hover); \`prefers-reduced-motion\` removes the grow
@@ -97,9 +99,14 @@ export const ButtonMutedStates: ButtonStory = {
       // pressed: aria-pressed and a stronger fill than rest
       await expect(pressed).toHaveAttribute('aria-pressed', 'true');
       await expect(rest).not.toHaveAttribute('aria-pressed', 'true');
-      const light = combo.key === 'inverted' || combo.key === 'invertedOnDark';
-      const restAlpha = light ? 0.18 : 0.25;
-      const hoverAlpha = light ? 0.28 : 0.4;
+      // rest fill / hover layer alphas: the layer adds just enough on top of the rest fill to reach the design's hover
+      const ALPHAS: Record<typeof combo.key, [rest: number, layer: number]> = {
+        default: [0.25, 0.16],
+        onDark: [0.6, 0.25],
+        inverted: [0.18, 0.1],
+        invertedOnDark: [0.6, 0.25],
+      };
+      const [restAlpha, hoverAlpha] = ALPHAS[combo.key];
       // the rest fill never changes: pressed keeps it as is
       await expect(getFillAlpha(rest), `${combo.key} rest fill`).toBeCloseTo(restAlpha, 3);
       await expect(getFillAlpha(pressed), `${combo.key} pressed rest fill`).toBeCloseTo(restAlpha, 3);

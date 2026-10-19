@@ -40,7 +40,7 @@ export const ConfigFloating: Story = {
     };
     await expect(indicatorOf()).toBeTruthy();
     await expect(getComputedStyle(indicatorOf()).backgroundColor).toBe(
-      resolvedVarColor('--button-muted-inverted-hover-background-color'),
+      resolvedVarColor('--button-muted-inverted-on-dark-background-color'),
     );
     expectIndicatorOn(tabs[0]);
 
@@ -61,12 +61,12 @@ export const ConfigFloating: Story = {
     await expect(labelStyle.fontWeight).toBe('400');
     await expect(labelStyle.color).toBe(resolvedVarColor('--button-muted-inverted-on-dark-text-color'));
 
-    // Unselected tabs are plain muted buttons: muted text, muted hover fill and blend.
+    // Unselected tabs are plain muted buttons: muted text, muted rest fill and blend.
     await expect(getComputedStyle(canvas.getByText(sampleLabels[1])).color).toBe(
       resolvedVarColor('--button-muted-text-color'),
     );
     const unselectedFill = getComputedStyle(tabs[1], '::before');
-    await expect(unselectedFill.backgroundColor).toBe(resolvedVarColor('--button-muted-hover-background-color'));
+    await expect(unselectedFill.backgroundColor).toBe(resolvedVarColor('--button-muted-background-color'));
     await expect(unselectedFill.mixBlendMode).toBe('multiply');
 
     // Selecting another tab glides the indicator over to it, squishing on the way.
