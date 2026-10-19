@@ -23,6 +23,24 @@ export const RcErrorBoundary: Story = {
   },
 };
 
+export const CustomTexts: Story = {
+  render: () => (
+    <ErrorBoundary
+      onError={() => {}}
+      title="rankingCoach was updated"
+      description="A newer version is ready. Reload the page to carry on where you were."
+    >
+      <Child />
+    </ErrorBoundary>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(await canvas.findByText("rankingCoach was updated")).toBeInTheDocument();
+    await expect(canvas.queryByText("Aw, snap!")).not.toBeInTheDocument();
+  },
+};
+
 export default {
   title: "vanguard/RcErrorBoundary",
   component: ErrorBoundary,
