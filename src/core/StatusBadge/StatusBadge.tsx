@@ -33,6 +33,7 @@ export type StatusBadgeStatus =
   | 'neutral'
   | 'limitExcedeed'
   | 'ai'
+  | 'ado'
   | StatusBadgePostStatus
   | StatusBadgeBoostStatus
   | 'sent'
