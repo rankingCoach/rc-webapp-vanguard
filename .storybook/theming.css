@@ -543,8 +543,8 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-muted-focus-outline-color-rgb: 0, 98, 255;
   --button-muted-on-dark-text-color: white;
   --button-muted-on-dark-text-color-rgb: 255, 255, 255;
-  --button-muted-on-dark-background-color: light-dark(rgba(1, 4, 11, 0.6), rgba(255, 255, 255, 0.6));
-  --button-muted-on-dark-hover-background-color: light-dark(rgba(1, 4, 11, 0.25), rgba(255, 255, 255, 0.25));
+  --button-muted-on-dark-background-color: rgba(1, 4, 11, 0.6);
+  --button-muted-on-dark-hover-background-color: rgba(1, 4, 11, 0.25);
   --button-muted-on-dark-focus-outline-color: white;
   --button-muted-on-dark-focus-outline-color-rgb: 255, 255, 255;
   --button-muted-inverted-text-color: white;
@@ -554,7 +554,7 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-muted-inverted-blend-mode: plus-lighter;
   --button-muted-inverted-focus-outline-color: white;
   --button-muted-inverted-focus-outline-color-rgb: 255, 255, 255;
-  --button-muted-inverted-on-dark-text-color: light-dark(#263349, #f6f9fc);
+  --button-muted-inverted-on-dark-text-color: #263349;
   --button-muted-inverted-on-dark-text-color-rgb: 38, 51, 73;
   --button-muted-inverted-on-dark-background-color: rgba(255, 255, 255, 0.6);
   --button-muted-inverted-on-dark-hover-background-color: rgba(255, 255, 255, 0.25);
@@ -3346,7 +3346,6 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-shimmer-focus-box-shadow-color-rgb: 0, 3, 53;
   --button-shimmer-ripple-color-rgb: 0, 3, 53;
   --button-muted-text-color-rgb: 246, 249, 252;
-  --button-muted-inverted-on-dark-text-color-rgb: 246, 249, 252;
   --button-muted-hover-text-color-rgb: 246, 249, 252;
   --button-muted-disabled-text-color-rgb: 246, 249, 252;
   --button-muted-ripple-background-color-rgb: 255, 255, 255;
@@ -3482,7 +3481,6 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --button-shimmer-focus-box-shadow-color-rgb: 0, 3, 53;
     --button-shimmer-ripple-color-rgb: 0, 3, 53;
     --button-muted-text-color-rgb: 246, 249, 252;
-    --button-muted-inverted-on-dark-text-color-rgb: 246, 249, 252;
     --button-muted-hover-text-color-rgb: 246, 249, 252;
     --button-muted-disabled-text-color-rgb: 246, 249, 252;
     --button-muted-ripple-background-color-rgb: 255, 255, 255;

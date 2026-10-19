@@ -41,8 +41,9 @@ export const ButtonMutedDarkTheme: ButtonStory = {
       await expect(getComputedStyle(button, '::after').mixBlendMode).toBe(combo.blend);
       await expect(style.mixBlendMode).toBe('normal');
       await expect(style.opacity).toBe('1');
-      // default and inverted + onDark follow the theme (#263349 in light, #f6f9fc in dark); the white ones stay white
-      const fg = combo.key === 'default' || combo.key === 'invertedOnDark' ? FG_DARK_THEME : combo.fg;
+      // default follows the theme (#263349 in light, #f6f9fc in dark); the glasses sit on a known surface, so
+      // inverted + onDark keeps its dark text on the white glass and the others stay white
+      const fg = combo.key === 'default' ? FG_DARK_THEME : combo.fg;
       await expectForeground(button, fg, true);
       if (combo.key === 'invertedOnDark') {
         await expect(style.getPropertyValue('--muted-ring').trim()).toMatch(/^(#0062ff|rgb\(0,\s*98,\s*255\))$/i);
