@@ -243,7 +243,7 @@ export const CommentItem = (props: CommentItemProps): React.JSX.Element => {
               iconColor={'LIGHT_COLOR'}
               color={'LIGHT_COLOR'}
               hoverColor={'LIGHT_COLOR'}
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               textType={TextTypes.textHelp}
               fontWeight={FontWeights.regular}
               onClick={() => {
@@ -269,7 +269,7 @@ export const CommentItem = (props: CommentItemProps): React.JSX.Element => {
               iconColor={'LIGHT_COLOR'}
               color={'LIGHT_COLOR'}
               hoverColor={'LIGHT_COLOR'}
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               textType={TextTypes.textHelp}
               fontWeight={FontWeights.regular}
               isLoading={isHidingComment && commentExternalId === comment.externalId}
@@ -292,7 +292,7 @@ export const CommentItem = (props: CommentItemProps): React.JSX.Element => {
             iconColor={'LIGHT_COLOR'}
             color={'LIGHT_COLOR'}
             hoverColor={'LIGHT_COLOR'}
-            size={ButtonSizes.small}
+            size={ButtonSizes.medium}
             textType={TextTypes.textHelp}
             fontWeight={FontWeights.regular}
             isLoading={isDeletingComment && commentExternalId === comment.externalId}
@@ -318,7 +318,7 @@ export const CommentItem = (props: CommentItemProps): React.JSX.Element => {
               iconFillColor={buttonColor}
               color={buttonColor}
               hoverColor={buttonColor}
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               textType={TextTypes.textHelp}
               fontWeight={FontWeights.regular}
               isLoading={

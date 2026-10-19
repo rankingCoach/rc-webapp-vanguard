@@ -1,4 +1,4 @@
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { CheckBox } from '@vanguard/CheckBox/CheckBox';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Render } from '@vanguard/Render/Render';
@@ -92,6 +92,7 @@ export const MultiSelectDrawer = (props: MultiSelectDrawerProps) => {
       </div>
       <div className={styles.textEditDrawerActionsContainer}>
         <Button
+          size={ButtonSizes.extraLarge}
           onClick={handleSave}
           iconLeft={IconNames.save}
           isLoading={isLoadingSave}
@@ -99,7 +100,7 @@ export const MultiSelectDrawer = (props: MultiSelectDrawerProps) => {
         >
           Save
         </Button>
-        <Button type={ButtonTypes.default} onClick={onClose} disabled={isLoadingSave}>
+        <Button size={ButtonSizes.extraLarge} type={ButtonTypes.default} onClick={onClose} disabled={isLoadingSave}>
           Cancel
         </Button>
       </div>

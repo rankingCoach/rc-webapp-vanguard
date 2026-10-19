@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from '@vanguard/Button/Button';
+import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -47,7 +47,12 @@ export const ActionBarMessage = (props: ActionBarMessageProps) => {
       </div>
 
       <Render if={!!button}>
-        <Button iconRight={IconNames.arrowRight} onClick={button?.onClick} {...button?.props}>
+        <Button
+          iconRight={IconNames.arrowRight}
+          size={button?.props?.type === ButtonTypes.muted ? ButtonSizes.medium : ButtonSizes.extraLarge}
+          onClick={button?.onClick}
+          {...button?.props}
+        >
           {button?.text}
         </Button>
       </Render>
