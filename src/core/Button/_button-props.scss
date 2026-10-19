@@ -38,21 +38,23 @@
   cursor: not-allowed;
 }
 
-@mixin focusState($name, $prefix : '-') {
-  outline: none;
+// Pressed look: the hover colours, no ring
+@mixin activeState($name, $prefix : '-') {
   color: var(--#{$prefix}button-#{$name}-hover-text-color);
-
 
   .button-text {
     color: var(--#{$prefix}button-#{$name}-hover-text-color);
   }
 
   background-color: var(--#{$prefix}button-#{$name}-hover-background-color);
-  box-shadow: 0 0 0 2px var(--#{$prefix}button-#{$name}-focus-box-shadow-color);
-  // THhs is intentional if the button has  --#{$prefix}button-#{$name}-border-color
-  // it should overwrite in in the focus state
-  border: 2px outside var(--#{$prefix}button-#{$name}-focus-box-shadow-color);
   border: $x0_125 solid var(--#{$prefix}button-#{$name}-border-color);
+}
+
+// Keyboard focus: a 2px outline with a 2px offset, like muted; no colour change.
+// *-focus-outline-color is optional in the theme: until it exists the ring keeps the old box-shadow colour.
+@mixin focusRing($name, $prefix : '-') {
+  outline: 2px solid var(--#{$prefix}button-#{$name}-focus-outline-color, var(--#{$prefix}button-#{$name}-focus-box-shadow-color));
+  outline-offset: 2px;
 }
 
 
@@ -88,12 +90,14 @@
   }
 
   &:focus {
-    @include focusState($name, $prefix);
+    outline: none;
+  }
+
+  &:focus-visible {
+    @include focusRing($name, $prefix);
   }
 
   &:active:not(:disabled):not(.disabled) {
-    outline: none;
-    box-shadow: none;
-    @include focusState($name, $prefix);
+    @include activeState($name, $prefix);
   }
 }
