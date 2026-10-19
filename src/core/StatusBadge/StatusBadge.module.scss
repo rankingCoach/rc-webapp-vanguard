@@ -28,6 +28,17 @@
 }
 
 
+// size="compact": 18px tall (1px + 16px caption line height + 1px). With an icon, its 18px circle sets the height.
+.status-badge.compact {
+  box-sizing: border-box;
+  height: 18px;
+  padding: 1px 7px;
+
+  &:not(.status-badge-no-icon):not(.status-badge-none-icon) {
+    padding: 0 7px 0 0;
+  }
+}
+
 .is-blurred {
   filter: blur(15px);
 }

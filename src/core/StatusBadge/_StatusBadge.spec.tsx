@@ -1,6 +1,8 @@
 import { appScreen, render } from '@test-utils/test-utils';
 import { getColorsBasedOnStatus } from '@vanguard/StatusBadge/status-badge-get-colors-based-on-status';
 import { StatusBadge } from '@vanguard/StatusBadge/StatusBadge';
+import styles from '@vanguard/StatusBadge/StatusBadge.module.scss';
+import { FontWeights } from '@vanguard/Text/Text';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -19,5 +21,41 @@ describe('Vanguard StatusBadge ado status', () => {
     const text = appScreen.getByText('New');
     expect(getBadge('New').style.backgroundColor).toBe('var(--status-badge-ado-background-color)');
     expect(text.style.color).toBe('var(--status-badge-ado-text-color)');
+  });
+});
+
+describe('Vanguard StatusBadge compact size', () => {
+  it('is not compact by default', async () => {
+    await render(<StatusBadge status={'ado'} text={'New'} hideIcon translate={false} />);
+    const text = appScreen.getByText('New');
+    expect(getBadge('New').classList.contains(styles.compact)).toBe(false);
+    expect(text.style.fontSize).toBe('');
+  });
+
+  it('adds the compact class and renders 11px bold text', async () => {
+    await render(<StatusBadge status={'ado'} text={'New'} size={'compact'} hideIcon translate={false} />);
+    const text = appScreen.getByText('New');
+    expect(getBadge('New').classList.contains(styles.compact)).toBe(true);
+    expect(text.style.fontSize).toBe('11px');
+    expect(text.style.fontWeight).toBe('bold');
+  });
+
+  it('keeps an explicit fontWeight', async () => {
+    await render(
+      <StatusBadge
+        status={'ado'}
+        text={'New'}
+        size={'compact'}
+        fontWeight={FontWeights.medium}
+        hideIcon
+        translate={false}
+      />,
+    );
+    expect(appScreen.getByText('New').style.fontWeight).toBe('500');
+  });
+
+  it('is ignored by the big variant', async () => {
+    await render(<StatusBadge status={'ado'} text={'New'} size={'compact'} variant={'big'} translate={false} />);
+    expect(appScreen.getByText('New').style.fontSize).toBe('');
   });
 });

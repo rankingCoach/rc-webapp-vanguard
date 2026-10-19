@@ -6,6 +6,7 @@ import { StatusBadgeNeutral as _StatusBadgeNeutral } from "./stories/StatusBadge
 import { StatusBadgeRectangle as _StatusBadgeRectangle } from "./stories/StatusBadgeRectangle.story";
 import { StatusBadgeAdo as _StatusBadgeAdo } from "./stories/StatusBadgeAdo.story";
 import { StatusBadgeAll as _StatusBadgeAll } from "./stories/StatusBadgeAll.story";
+import { StatusBadgeCompact as _StatusBadgeCompact } from "./stories/StatusBadgeCompact.story";
 import { StatusBadgeAllInverted as _StatusBadgeAllInverted } from "./stories/StatusBadgeAllInverted.story";
 import { WithArrowIcons as _WithArrowIcons } from "./stories/WithArrowIcons.story";
 
@@ -41,4 +42,5 @@ export const StatusBadgeRectangle: Story = { ..._StatusBadgeRectangle };
 export const StatusBadgeAdo: Story = { ..._StatusBadgeAdo };
 export const StatusBadgeAll: Story = { ..._StatusBadgeAll };
 export const StatusBadgeAllInverted: Story = { ..._StatusBadgeAllInverted };
+export const StatusBadgeCompact: Story = { ..._StatusBadgeCompact };
 export const WithArrowIcons: Story = { ..._WithArrowIcons };
