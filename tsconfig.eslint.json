@@ -1,0 +1,5 @@
+{
+  // Used only by eslint-import-resolver-typescript. Extends tsconfig.json without its
+  // `references`, which make the resolver drop the root `paths` aliases.
+  "extends": "./tsconfig.json"
+}
