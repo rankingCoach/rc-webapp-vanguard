@@ -20,13 +20,6 @@
 }
 
 
-.status-badge-none-icon {
-  @extend .status-badge;
-  padding: 2px 6px 2px 6px;
-  height: 16px
-}
-
-
 .is-blurred {
   filter: blur(15px);
 }
