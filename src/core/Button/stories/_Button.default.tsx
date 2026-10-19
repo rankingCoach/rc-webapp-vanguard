@@ -46,6 +46,8 @@ export const BUTTONS_EXCLUDED_CONTROLS_DEFAULT = [
   'replacements',
   'blurred',
   'inverted',
+  'onDark',
+  'pressed',
 ];
 export const BUTTONS_EXCLUDED_CONTROLS_MUTED = ['testId', 'className', 'targetRef', 'w100', 'debounce', 'replacements'];
 
@@ -185,6 +187,17 @@ export const mutedButtonArgTypes = {
     control: 'boolean',
     defaultValue: false,
     description: 'Inverts the button colors (muted buttons only)',
+  },
+  onDark: {
+    control: 'boolean',
+    defaultValue: false,
+    description:
+      'Glass for dark or busy surfaces: a dark glass with white text, or a light glass with dark text when inverted (muted buttons only)',
+  },
+  pressed: {
+    control: 'boolean',
+    defaultValue: false,
+    description: 'Toggled-on state: renders aria-pressed and keeps the hover-strength fill (muted buttons only)',
   },
 };
 

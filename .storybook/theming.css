@@ -71,6 +71,14 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --base-eng-rgb: 7, 134, 136;
   --base-ads: #b81450;
   --base-ads-rgb: 184, 20, 80;
+  --ado-base: #006a85;
+  --ado-base-rgb: 0, 106, 133;
+  --ado-glow-accent: #00ace7;
+  --ado-glow-accent-rgb: 0, 172, 231;
+  --ado-glow-light: #3df3f0;
+  --ado-glow-light-rgb: 61, 243, 240;
+  --ado-glow-white: white;
+  --ado-glow-white-rgb: 255, 255, 255;
   --ado-face-gradient-start: #00495d;
   --ado-face-gradient-start-rgb: 0, 73, 93;
   --ado-face-gradient-end: #12ffff;
@@ -78,6 +86,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --ado-face-feature: white;
   --ado-face-feature-rgb: 255, 255, 255;
   --ado-face-bubble-bg: rgba(0, 73, 93, 0.8);
+  --ado-chat-window-expanded-background-start: #eef9fe;
+  --ado-chat-window-expanded-background-start-rgb: 238, 249, 254;
+  --ado-chat-window-expanded-background-middle: #f3fcff;
+  --ado-chat-window-expanded-background-middle-rgb: 243, 252, 255;
+  --ado-chat-window-expanded-background-end: #f6fdff;
+  --ado-chat-window-expanded-background-end-rgb: 246, 253, 255;
   --ado-shader-light-start-bg: light-dark(#f6f9fc, #01040b);
   --ado-shader-light-start-bg-rgb: 246, 249, 252;
   --ado-shader-light-start-col1: #00495d;
@@ -192,6 +206,8 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --email-footer-version: 1;
   --email-footer-theme-mode: light;
   --email-footer-display-logo: bottom;
+  --email-footer-social-media-icons-order: facebook instagram youtube blogOrNews linkedin twitter google;
+  --email-footer-blog-link-placement: social-media-icons;
   --email-footer-fg-main: #263349;
   --email-footer-fg-main-rgb: 38, 51, 73;
   --email-footer-bg-main: white;
@@ -415,6 +431,17 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --font-name: "Inter";
   --theme-typeface: 'Inter', sans-serif;
   --heading-font-name: "Inter";
+  --editorial-weight-bold: 600;
+  --editorial-V600-weight-autogen: 600;
+  --editorial-V600-src-autogen: "/vanguard/assets/fonts/CrimsonPro-SemiBold.woff2";
+  --editorial-weight-medium: 500;
+  --editorial-V500-weight-autogen: 500;
+  --editorial-V500-src-autogen: "/vanguard/assets/fonts/CrimsonPro-Medium.woff2";
+  --editorial-weight-regular: 400;
+  --editorial-V400-weight-autogen: 400;
+  --editorial-V400-src-autogen: "/vanguard/assets/fonts/CrimsonPro-Regular.woff2";
+  --editorial-font-name: "Crimson Pro";
+  --editorial-typeface: 'Crimson Pro', Georgia, 'Times New Roman', serif;
   --buttons-typeface: 'Inter', sans-serif;
   --buttons-border-radius: 4px;
   --button-default-text-color: light-dark(#0062ff, #6db3ff);
@@ -509,25 +536,43 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-shimmer-ripple-color-rgb: 184, 217, 255;
   --button-muted-text-color: light-dark(#263349, #f6f9fc);
   --button-muted-text-color-rgb: 38, 51, 73;
-  --button-muted-background-color: light-dark(rgba(1, 4, 11, 0.02), rgba(255, 255, 255, 0.3));
+  --button-muted-background-color: light-dark(rgba(185, 197, 216, 0.25), rgba(255, 255, 255, 0.1));
+  --button-muted-hover-background-color: light-dark(rgba(185, 197, 216, 0.16), rgba(255, 255, 255, 0.1));
+  --button-muted-blend-mode: multiply;
+  --button-muted-focus-outline-color: #0062ff;
+  --button-muted-focus-outline-color-rgb: 0, 98, 255;
+  --button-muted-on-dark-text-color: white;
+  --button-muted-on-dark-text-color-rgb: 255, 255, 255;
+  --button-muted-on-dark-background-color: rgba(1, 4, 11, 0.6);
+  --button-muted-on-dark-hover-background-color: rgba(1, 4, 11, 0.25);
+  --button-muted-on-dark-focus-outline-color: white;
+  --button-muted-on-dark-focus-outline-color-rgb: 255, 255, 255;
+  --button-muted-inverted-text-color: white;
+  --button-muted-inverted-text-color-rgb: 255, 255, 255;
+  --button-muted-inverted-background-color: rgba(255, 255, 255, 0.18);
+  --button-muted-inverted-hover-background-color: rgba(255, 255, 255, 0.1);
+  --button-muted-inverted-blend-mode: plus-lighter;
+  --button-muted-inverted-focus-outline-color: white;
+  --button-muted-inverted-focus-outline-color-rgb: 255, 255, 255;
+  --button-muted-inverted-on-dark-text-color: #263349;
+  --button-muted-inverted-on-dark-text-color-rgb: 38, 51, 73;
+  --button-muted-inverted-on-dark-background-color: rgba(255, 255, 255, 0.6);
+  --button-muted-inverted-on-dark-hover-background-color: rgba(255, 255, 255, 0.25);
+  --button-muted-inverted-on-dark-focus-outline-color: #0062ff;
+  --button-muted-inverted-on-dark-focus-outline-color-rgb: 0, 98, 255;
   --button-muted-hover-text-color: light-dark(#263349, #f6f9fc);
   --button-muted-hover-text-color-rgb: 38, 51, 73;
   --button-muted-disabled-text-color: light-dark(#263349, #f6f9fc);
   --button-muted-disabled-text-color-rgb: 38, 51, 73;
-  --button-muted-hover-background-color: light-dark(rgba(1, 4, 11, 0.02), rgba(255, 255, 255, 0.3));
-  --button-muted-ripple-background-color: light-dark(#b9c5d8, white);
-  --button-muted-ripple-background-color-rgb: 185, 197, 216;
   --button-muted-disabled-background-color: rgba(1, 4, 11, 0.02);
   --button-muted-focus-box-shadow-color: #99c0ff;
   --button-muted-focus-box-shadow-color-rgb: 153, 192, 255;
-  --button-muted-inverted-text-color: white;
-  --button-muted-inverted-text-color-rgb: 255, 255, 255;
-  --button-muted-inverted-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
+  --button-muted-ripple-background-color: light-dark(#b9c5d8, white);
+  --button-muted-ripple-background-color-rgb: 185, 197, 216;
   --button-muted-inverted-hover-text-color: white;
   --button-muted-inverted-hover-text-color-rgb: 255, 255, 255;
   --button-muted-inverted-disabled-text-color: white;
   --button-muted-inverted-disabled-text-color-rgb: 255, 255, 255;
-  --button-muted-inverted-hover-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
   --button-muted-inverted-disabled-background-color: light-dark(rgba(255, 255, 255, 0.1), rgba(24, 33, 47, 0.1));
   --button-muted-inverted-focus-box-shadow-color: #99c0ff;
   --button-muted-inverted-focus-box-shadow-color-rgb: 153, 192, 255;
@@ -551,12 +596,15 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --nav-side-notif-fg-rgb: 255, 255, 255;
   --nav-side-powered-by-display: none;
   --nav-side-powered-by-max-height: unset;
+  --nav-side-powered-by-image-max-height: 40px;
   --fn-bg: light-dark(white, #090d17);
   --fn-bg-rgb: 255, 255, 255;
   --fn-bg-var: light-dark(#f6f9fc, #01040b);
   --fn-bg-var-rgb: 246, 249, 252;
   --fn-bg-surface: light-dark(white, #18212f);
   --fn-bg-surface-rgb: 255, 255, 255;
+  --fn-bg-sheet: #fdfcfc;
+  --fn-bg-sheet-rgb: 253, 252, 252;
   --fn-bg-cta: light-dark(#0062ff, #358cff);
   --fn-bg-cta-rgb: 0, 98, 255;
   --fn-fg-cta: light-dark(#0062ff, #6db3ff);
@@ -652,6 +700,19 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --header-logo-mobile-adcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
   --header-logo-mobile-listingcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
   --header-logo-mobile-360: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-social: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-rankingcoach: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-social: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-rankingcoach-social: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-rankingcoach-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-social-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-rankingcoach-social: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-rankingcoach-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-social-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-rankingcoach-social-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
+  --header-logo-mobile-vision-adcoach-rankingcoach-social-reviews: url("/vanguard/assets/images/rc-360-logo-mobile.svg");
   --p100: #f1f9ff;
   --p100-rgb: 241, 249, 255;
   --p200: #b8d9ff;
@@ -1117,6 +1178,30 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-base-ads {
   color: var(--base-ads);
 }
+:root .bg-color-ado-base {
+  background-color: var(--ado-base);
+}
+:root .color-ado-base {
+  color: var(--ado-base);
+}
+:root .bg-color-ado-glow-accent {
+  background-color: var(--ado-glow-accent);
+}
+:root .color-ado-glow-accent {
+  color: var(--ado-glow-accent);
+}
+:root .bg-color-ado-glow-light {
+  background-color: var(--ado-glow-light);
+}
+:root .color-ado-glow-light {
+  color: var(--ado-glow-light);
+}
+:root .bg-color-ado-glow-white {
+  background-color: var(--ado-glow-white);
+}
+:root .color-ado-glow-white {
+  color: var(--ado-glow-white);
+}
 :root .bg-color-ado-face-gradient-start {
   background-color: var(--ado-face-gradient-start);
 }
@@ -1134,6 +1219,24 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 :root .color-ado-face-feature {
   color: var(--ado-face-feature);
+}
+:root .bg-color-ado-chat-window-expanded-background-start {
+  background-color: var(--ado-chat-window-expanded-background-start);
+}
+:root .color-ado-chat-window-expanded-background-start {
+  color: var(--ado-chat-window-expanded-background-start);
+}
+:root .bg-color-ado-chat-window-expanded-background-middle {
+  background-color: var(--ado-chat-window-expanded-background-middle);
+}
+:root .color-ado-chat-window-expanded-background-middle {
+  color: var(--ado-chat-window-expanded-background-middle);
+}
+:root .bg-color-ado-chat-window-expanded-background-end {
+  background-color: var(--ado-chat-window-expanded-background-end);
+}
+:root .color-ado-chat-window-expanded-background-end {
+  color: var(--ado-chat-window-expanded-background-end);
 }
 :root .bg-color-ado-shader-light-start-bg {
   background-color: var(--ado-shader-light-start-bg);
@@ -1957,6 +2060,48 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-muted-text-color {
   color: var(--button-muted-text-color);
 }
+:root .bg-color-button-muted-focus-outline-color {
+  background-color: var(--button-muted-focus-outline-color);
+}
+:root .color-button-muted-focus-outline-color {
+  color: var(--button-muted-focus-outline-color);
+}
+:root .bg-color-button-muted-on-dark-text-color {
+  background-color: var(--button-muted-on-dark-text-color);
+}
+:root .color-button-muted-on-dark-text-color {
+  color: var(--button-muted-on-dark-text-color);
+}
+:root .bg-color-button-muted-on-dark-focus-outline-color {
+  background-color: var(--button-muted-on-dark-focus-outline-color);
+}
+:root .color-button-muted-on-dark-focus-outline-color {
+  color: var(--button-muted-on-dark-focus-outline-color);
+}
+:root .bg-color-button-muted-inverted-text-color {
+  background-color: var(--button-muted-inverted-text-color);
+}
+:root .color-button-muted-inverted-text-color {
+  color: var(--button-muted-inverted-text-color);
+}
+:root .bg-color-button-muted-inverted-focus-outline-color {
+  background-color: var(--button-muted-inverted-focus-outline-color);
+}
+:root .color-button-muted-inverted-focus-outline-color {
+  color: var(--button-muted-inverted-focus-outline-color);
+}
+:root .bg-color-button-muted-inverted-on-dark-text-color {
+  background-color: var(--button-muted-inverted-on-dark-text-color);
+}
+:root .color-button-muted-inverted-on-dark-text-color {
+  color: var(--button-muted-inverted-on-dark-text-color);
+}
+:root .bg-color-button-muted-inverted-on-dark-focus-outline-color {
+  background-color: var(--button-muted-inverted-on-dark-focus-outline-color);
+}
+:root .color-button-muted-inverted-on-dark-focus-outline-color {
+  color: var(--button-muted-inverted-on-dark-focus-outline-color);
+}
 :root .bg-color-button-muted-hover-text-color {
   background-color: var(--button-muted-hover-text-color);
 }
@@ -1969,23 +2114,17 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-muted-disabled-text-color {
   color: var(--button-muted-disabled-text-color);
 }
-:root .bg-color-button-muted-ripple-background-color {
-  background-color: var(--button-muted-ripple-background-color);
-}
-:root .color-button-muted-ripple-background-color {
-  color: var(--button-muted-ripple-background-color);
-}
 :root .bg-color-button-muted-focus-box-shadow-color {
   background-color: var(--button-muted-focus-box-shadow-color);
 }
 :root .color-button-muted-focus-box-shadow-color {
   color: var(--button-muted-focus-box-shadow-color);
 }
-:root .bg-color-button-muted-inverted-text-color {
-  background-color: var(--button-muted-inverted-text-color);
+:root .bg-color-button-muted-ripple-background-color {
+  background-color: var(--button-muted-ripple-background-color);
 }
-:root .color-button-muted-inverted-text-color {
-  color: var(--button-muted-inverted-text-color);
+:root .color-button-muted-ripple-background-color {
+  color: var(--button-muted-ripple-background-color);
 }
 :root .bg-color-button-muted-inverted-hover-text-color {
   background-color: var(--button-muted-inverted-hover-text-color);
@@ -2064,6 +2203,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 :root .color-fn-bg-surface {
   color: var(--fn-bg-surface);
+}
+:root .bg-color-fn-bg-sheet {
+  background-color: var(--fn-bg-sheet);
+}
+:root .color-fn-bg-sheet {
+  color: var(--fn-bg-sheet);
 }
 :root .bg-color-fn-bg-cta {
   background-color: var(--fn-bg-cta);
@@ -3435,6 +3580,24 @@ The purpose of this file is to implement all modifier functions in it so the mai
   font-style: normal;
   font-weight: 700;
   src: url("/vanguard/assets/fonts/Inter-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Crimson Pro";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/vanguard/assets/fonts/CrimsonPro-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Crimson Pro";
+  font-style: normal;
+  font-weight: 500;
+  src: url("/vanguard/assets/fonts/CrimsonPro-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Crimson Pro";
+  font-style: normal;
+  font-weight: 600;
+  src: url("/vanguard/assets/fonts/CrimsonPro-SemiBold.woff2") format("woff2");
 }
 body {
   font-family: var(--theme-typeface);

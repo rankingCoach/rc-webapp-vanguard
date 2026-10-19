@@ -1,7 +1,7 @@
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 import React, { useState } from "react";
 import { StoryObj } from "@storybook/react";
-import { Tabs, TabsProps } from "./Tabs";
+import { TabConfig, Tabs, TabsProps } from "./Tabs";
 import { within, expect, userEvent } from "storybook/test";
 
 export default {
@@ -377,6 +377,51 @@ export const HighlightSmallCentered: Story = {
       }}
     />
   ),
+};
+
+export const FloatingSmall: Story = {
+  name: "Combined: Floating + Small height",
+  render: () => <TabsDemo tabs={defaultTabs} tabConfig={{ theme: "floating", tabHeight: "small" }} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tabs = canvas.getAllByRole("tab");
+    await expect(tabs).toHaveLength(3);
+    await userEvent.click(tabs[2]);
+    await expect(canvas.getByRole("heading", { name: "Brand keywords" })).toBeInTheDocument();
+  },
+};
+
+// ─── Playground ───────────────────────────────────────────────────────────────
+
+// Flattened TabConfig so every option gets its own control
+export const Playground: StoryObj<Required<TabConfig>> = {
+  name: "Playground: Tab config",
+  parameters: {
+    controls: {
+      include: ["theme", "tabHeight", "padding", "iconSize", "tabTextTransform", "tabNoMinWidth", "tabGrow", "alignCenter"],
+    },
+  },
+  args: {
+    theme: "floating",
+    tabHeight: "small",
+    padding: "default",
+    iconSize: "default",
+    tabTextTransform: "none",
+    tabNoMinWidth: false,
+    tabGrow: true,
+    alignCenter: false,
+  },
+  argTypes: {
+    theme: { control: "inline-radio", options: ["highlight", "underline", "floating"] },
+    tabHeight: { control: "inline-radio", options: ["tall", "small"] },
+    padding: { control: "inline-radio", options: ["default", "small"] },
+    iconSize: { control: "inline-radio", options: ["default", "small"] },
+    tabTextTransform: { control: "select", options: ["none", "capitalize", "uppercase", "lowercase"] },
+    tabNoMinWidth: { control: "boolean" },
+    tabGrow: { control: "boolean" },
+    alignCenter: { control: "boolean" },
+  },
+  render: (tabConfig) => <TabsDemo tabs={defaultTabs} tabConfig={tabConfig} />,
 };
 
 // ─── Two Tabs ─────────────────────────────────────────────────────────────────

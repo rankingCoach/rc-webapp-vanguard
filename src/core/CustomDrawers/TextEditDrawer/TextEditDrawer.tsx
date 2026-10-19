@@ -48,8 +48,8 @@ export const TextEditDrawer = (props: TextEditDrawerProps) => {
         <Render if={!!defaultValue} className={styles.restoreButtonContainer}>
           <Button
             disabled={isRestoreToDefaultButtonDisabled}
-            type={ButtonTypes.secondary}
-            size={ButtonSizes.small}
+            type={ButtonTypes.muted}
+            size={ButtonSizes.medium}
             onClick={() => setInnerValue(defaultValue!)}
           >
             Restore to default

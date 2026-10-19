@@ -1,43 +1,113 @@
 @import '@styles/color-functions';
 @import 'src/styles/spacings';
 
+$floating-padding: $x0_25;
+// Floating theme: the selected tab is a muted inverted + onDark button (design decision), so the chip takes its
+// light-glass fill, brightened onto the tray like the selected item of a button group; the other tabs are plain
+// muted buttons (see Tab.module.scss). Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
+$muted-fill-selected: var(--button-muted-inverted-on-dark-background-color, rgba(255, 255, 255, 0.6));
+$muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
+// Also the duration of the squish played by useTabsIndicator, which reads it from the computed transition
+$indicator-duration: 300ms;
+$indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
+
+// Bar root. Keep specificity at a single class so a consumer className
+// (padding, border, margin, background, ...) applied on the same element still wins.
 .tabs-container {
   position: relative;
+  display: flex;
+  overflow: hidden;
+  min-height: $x6;
+  -webkit-overflow-scrolling: touch;
 
-   > div > div {
-     gap: $x0_25;
-   }
-
-  :global(.MuiTabs-scrollableX) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  &.align-center {
+    align-items: center;
   }
 
   // STYLES FOR FLOATING THEME
-  &.floating {
+  // `:where()` keeps the bar rules at single-class specificity, like the base rules above, so a consumer
+  // className on the bar root (padding, margin, background, ...) still wins.
+  &:where(.floating) {
     box-sizing: border-box;
     width: fit-content;
     max-width: 100%;
     min-height: 0;
     margin-inline: auto;
-    padding: $x0_5;
-    border-radius: $x4;
-    background-color: rc_transparent(--fn-fg-light, 0.1);
+    padding: $floating-padding;
+    // Concentric corners: the tabs' radius plus the gap around them
+    border-radius: $rounded-border-radius + $floating-padding;
+    // Translucent shadow-tinted tray; the tabs' muted fills blend onto it, so the bar must not isolate
+    // (no z-index, opacity, filter...)
+    background-color: rc_transparent(--fn-shadow, 0.1);
+  }
 
-    // Scroll buttons (TabsCustomScroll) are the first/last children of the MUI root;
-    // round them fully so the pill's corners don't clip them
-    > :first-child:not(:global(.MuiTabs-scroller)),
-    > :last-child:not(:global(.MuiTabs-scroller)) {
-      border-radius: $x4;
+  // Scroll buttons (TabsCustomScroll) are direct children of the bar root; round them fully and fit them to the
+  // pill's inner height so they aren't clipped. Full specificity: must beat TabsCustomScroll's own rules.
+  &.floating {
+    > .scroll-button {
+      box-sizing: border-box;
+      height: calc(100% - #{2 * $floating-padding});
+      aspect-ratio: 1;
+      padding: 0;
+      border-radius: $rounded-border-radius;
     }
 
-    > :first-child:not(:global(.MuiTabs-scroller)) {
-      left: $x0_5;
+    > .scroll-button:first-child {
+      left: $floating-padding;
     }
 
-    > :last-child:not(:global(.MuiTabs-scroller)) {
-      right: $x0_5;
+    > .scroll-button:last-child {
+      right: $floating-padding;
     }
   }
+}
+
+.scroller {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  // Hide the scrollbar
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab-list {
+  // Offset parent of the tabs, so the indicator can be placed with their offsetLeft/offsetTop
+  position: relative;
+  display: flex;
+  gap: $x0_25;
+}
+
+// Selected chip of the floating theme: a single element gliding to the selected tab (see useTabsIndicator).
+// Painted before the tabs, which are positioned too, so it stays behind their labels.
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: $rounded-border-radius;
+  pointer-events: none;
+  background-color: $muted-fill-selected;
+  mix-blend-mode: $muted-blend;
+  transition:
+    translate $indicator-duration $indicator-easing,
+    width $indicator-duration $indicator-easing,
+    height $indicator-duration $indicator-easing;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Class passed to TabsCustomScroll; positioning/appearance lives in its own module,
+// theme-specific overrides are nested under .tabs-container.floating.
+.scroll-button {
+  // Intentionally empty: styled via .tabs-container.floating > .scroll-button
 }

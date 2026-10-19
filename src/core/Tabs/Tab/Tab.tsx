@@ -1,6 +1,5 @@
 import { alignItemsCenter, dFlex, gap1, ml1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { Tab as MuiTab, TabProps as MuiTabProps } from '@mui/material';
 import { Avatar } from '@vanguard/Avatar/Avatar';
 import { ValueOfAvatarIconMap } from '@vanguard/Avatar/Avatar.enum';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
@@ -9,44 +8,109 @@ import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text } from '@vanguard/Text/Text';
 import React from 'react';
 
-import { TabConfig } from '../Tabs';
+import type { TabConfig } from '../Tabs';
 import styles from './Tab.module.scss';
 
-export interface TabProps<T = any> extends Omit<MuiTabProps, 'component'> {
-  component?: React.ReactNode;
-  selected?: boolean;
+/**
+ * A single tab definition, as passed to `<Tabs tabs={[...]} />`.
+ * Any extra HTML attributes (`className`, `style`, `id`, `aria-*`, `onClick`, ...) are forwarded to the
+ * rendered `<button role="tab">`. Event handlers keep the `HTMLDivElement` typing of the former MUI `Tab`
+ * (whose default component type was `div`) so existing annotations keep compiling.
+ */
+export interface TabProps<T = any> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
+  /** Ref to the rendered `<button role="tab">` element. */
+  ref?: React.Ref<any>;
+  /**
+   * Panel content rendered by `Tabs` when this tab is selected.
+   * Omit it for a bar-only tab (no panel is rendered); `null` renders an empty panel (useful for lazy content).
+   */
+  component?: React.ReactNode | null;
+  /** Tab label. Strings are rendered (and translated) through vanguard `Text`; ReactNodes are rendered as-is. */
   label?: string | React.ReactNode;
-  tabIcons?: ValueOfAvatarIconMap[];
-  hasError?: boolean;
-  hasBorderBottom?: boolean;
-  showBackgroundColor?: boolean;
-  simple?: boolean;
-  testId?: string;
+  /** Value identifying the tab; compared with `Tabs.value`. Defaults to the tab's index in the `tabs` array. */
   value?: T;
+  /** When true the tab is hidden from the bar (its panel is still rendered through the panel loop). */
   disabled?: boolean;
+  /** Avatar icons rendered before the label (one or several, overlapped). */
+  tabIcons?: (ValueOfAvatarIconMap | string)[];
+  /** Marks the tab as erroneous: shows an exclamation icon (with `tabIcons`) and an error border when selected. */
+  hasError?: boolean;
+  /** `data-testid` of the label element. Overridden by `Tabs` (`${testId}-${index}`) when `Tabs.testId` is set. */
+  testId?: string;
+  /** Selected state. Computed by `Tabs` from its `value`; only set it when rendering `Tab` standalone. */
+  selected?: boolean;
 }
 
+/** Props set by `Tabs` on every rendered tab. */
 interface InternalTabProps {
+  /** Visual configuration shared by all tabs of the bar. */
   tabConfig?: TabConfig;
+  /** The selected fill is drawn by the bar's sliding indicator, so the tab must not paint its own. */
+  hasIndicator?: boolean;
 }
+
+/** Returns a shallow copy of `source` without the given keys. */
+export const omitProps = <P extends object, K extends PropertyKey>(source: P, keys: readonly K[]): Omit<P, K> => {
+  const result = { ...source } as Record<PropertyKey, unknown>;
+  keys.forEach((key) => {
+    delete result[key];
+  });
+  return result as Omit<P, K>;
+};
+
+/** Props owned by `Tab` (not forwarded to the button as-is). */
+const TAB_OWN_KEYS = [
+  'component',
+  'label',
+  'value',
+  'disabled',
+  'tabIcons',
+  'hasError',
+  'testId',
+  'selected',
+  'tabConfig',
+  'hasIndicator',
+  'className',
+] as const;
+
+const TEXT_TRANSFORM_CLASSES: Record<string, string | undefined> = {
+  uppercase: styles.textUppercase,
+  capitalize: styles.textCapitalize,
+  lowercase: styles.textLowercase,
+};
 
 export const Tab = (props: TabProps & InternalTabProps) => {
   const {
     hasError = false,
     tabIcons,
-    hasBorderBottom,
-    showBackgroundColor = true,
-    simple = false,
     testId,
-    disabled = false,
     tabConfig,
-    ...tabProps
+    selected = false,
+    hasIndicator = false,
+    label,
+    className,
   } = props;
-  const { selected, label, value } = tabProps;
+  // Handlers are typed for `HTMLDivElement` (former MUI typing) but are attached to the button.
+  const buttonProps = omitProps(props, TAB_OWN_KEYS) as unknown as React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    ref?: React.Ref<HTMLButtonElement>;
+  };
 
-  const { theme = 'highlight', iconSize = 'default', tabTextTransform = 'none' } = tabConfig || {};
+  const {
+    theme = 'highlight',
+    iconSize = 'default',
+    tabTextTransform = 'none',
+    tabHeight,
+    tabNoMinWidth,
+    padding,
+    tabGrow,
+  } = tabConfig || {};
   const isFloating = theme === 'floating';
-  const labelColor = selected && !isFloating ? 'var(--fn-fg-cta)' : 'var(--fn-fg)';
+  // Floating: the selected tab is a muted inverted + onDark button, the others plain muted buttons
+  const floatingLabelColor = selected
+    ? 'var(--button-muted-inverted-on-dark-text-color, #263349)'
+    : 'var(--button-muted-text-color, #263349)';
+  const defaultLabelColor = selected ? 'var(--fn-fg-cta)' : 'var(--fn-fg)';
+  const labelColor = isFloating ? floatingLabelColor : defaultLabelColor;
 
   const renderLabel = () => {
     if (!tabIcons) {
@@ -67,8 +131,8 @@ export const Tab = (props: TabProps & InternalTabProps) => {
     if (tabIcons.length > 1) {
       return (
         <div data-testid={testId} className={classNames(dFlex, alignItemsCenter, styles.tabsDirectoryIcons)}>
-          {tabIcons.map((icon, index) => (
-            <div key={index} className={classNames(styles.tabsDirectoryIcon)}>
+          {tabIcons.map((icon, iconIndex) => (
+            <div key={iconIndex} className={classNames(styles.tabsDirectoryIcon)}>
               <Avatar noHover={true} size={iconSize === 'small' ? 'xs' : 'small'} icon={icon} name={icon} />
             </div>
           ))}
@@ -97,7 +161,7 @@ export const Tab = (props: TabProps & InternalTabProps) => {
 
     if (tabIcons.length === 1) {
       return (
-        <div className={classNames(classNames(dFlex, alignItemsCenter, gap1))}>
+        <div data-testid={testId} className={classNames(dFlex, alignItemsCenter, gap1)}>
           <Avatar noHover={true} size={iconSize === 'small' ? 'xs' : 'small'} icon={tabIcons[0]} />
           {typeof label === 'string' ? <Text color={labelColor}>{label}</Text> : label}
           <Render if={hasError}>
@@ -108,23 +172,32 @@ export const Tab = (props: TabProps & InternalTabProps) => {
         </div>
       );
     }
+
+    return null;
   };
 
   return (
-    <MuiTab
-      {...tabProps}
-      sx={{
-        ...(selected && {
-          ...(hasError && {
-            border: '1px solid var(--e500)',
-            borderRadius: '8px',
-            color: 'var(--e500)',
-          }),
-        }),
-        textTransform: tabTextTransform,
-      }}
-      className={classNames(styles.tab, styles[theme], selected ? styles.selected : '')}
-      label={renderLabel()}
-    />
+    <button
+      tabIndex={selected ? 0 : -1}
+      {...buttonProps}
+      type="button"
+      role="tab"
+      aria-selected={selected}
+      className={classNames(
+        styles.tab,
+        styles[theme],
+        selected ? styles.selected : '',
+        hasIndicator ? styles.hasIndicator : '',
+        selected && hasError ? styles.hasError : '',
+        tabHeight === 'small' ? styles.heightSmall : '',
+        tabNoMinWidth === true ? styles.noMinWidth : '',
+        padding === 'small' ? styles.paddingSmall : '',
+        tabGrow === false ? styles.noGrow : '',
+        TEXT_TRANSFORM_CLASSES[tabTextTransform] ?? '',
+        className ?? '',
+      )}
+    >
+      {renderLabel()}
+    </button>
   );
 };
