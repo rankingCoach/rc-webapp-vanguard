@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.3.0...v2.4.0) (2026-10-19)
+
+
+### Features
+
+* **button:** add muted inverted-on-dark variant and blend/blur layers (VAN-83) ([3f65b6a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/3f65b6a106c1978325b7f1872d56d9ca476cd51f))
+* **button:** match the muted mock at rest and on hover (VAN-83) ([c5ccd75](https://github.com/rankingCoach/rc-webapp-vanguard/commit/c5ccd7541153d5311d29c68afd30b76549f0e3b6))
+* **button:** restore the muted hover grow animation (VAN-83) ([eda85cf](https://github.com/rankingCoach/rc-webapp-vanguard/commit/eda85cf39fa42099181a63bd739f2c7f5c2730ff))
+* **button:** swap secondary buttons for muted (VAN-82) ([10d29cd](https://github.com/rankingCoach/rc-webapp-vanguard/commit/10d29cd228ea798e39353732896ef535ff4c40ce))
+* **modal:** footer owns button sizing so all actions share one height (VAN-82) ([5e56a17](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5e56a1761dfec7a977fce20cb538c737e5c11342))
+* **tabs:** muted floating tabs with gliding selected chip (VAN-80) ([6278d07](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6278d0777296607c348e780715f9d2c969c446e2))
+* **tabs:** tighten floating tab bar and share rounded radius (VAN-80) ([852bff1](https://github.com/rankingCoach/rc-webapp-vanguard/commit/852bff1f162b56c865431935a01b1e6475da85d1))
+
+
+### Bug Fixes
+
+* **button:** ignore deprecated iconHoverColor on muted buttons (VAN-83) ([2d1eb6c](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2d1eb6c614ab6996abd4372ec98819b7e114b52b))
+* **button:** keep the muted glasses readable in dark mode (VAN-83) ([184ded2](https://github.com/rankingCoach/rc-webapp-vanguard/commit/184ded2040a0f810f9a2efa9ed21db666fb31fc9)), closes [#263349](https://github.com/rankingCoach/rc-webapp-vanguard/issues/263349)
+* **button:** keep the muted rest fill and add the hover layer on top (VAN-83) ([929e004](https://github.com/rankingCoach/rc-webapp-vanguard/commit/929e004ce1496862ad2cf56902af905bb702edbd))
+* **storybook:** bundle Crimson Pro fonts from public dir ([42415ab](https://github.com/rankingCoach/rc-webapp-vanguard/commit/42415ab9a5926f41394c068e2e24350e9435aa05))
+* **storybook:** bundle Crimson Pro fonts from public dir ([129a998](https://github.com/rankingCoach/rc-webapp-vanguard/commit/129a998c869581c9cc2be8139f0cbf74d041089e))
+* **tabs:** let consumer className win over floating bar styles (VAN-80) ([5626c7a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5626c7a4e0db5252a582574614571df9d05da4e9))
+
 ## [2.3.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.2.0...v2.3.0) (2026-10-12)
 
 
