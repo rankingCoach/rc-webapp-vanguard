@@ -103,6 +103,8 @@
    justify-content: center;
    overflow: hidden;
    border-radius: var(--border-radius);
+   // Squircle corners (Chromium 139+); other browsers ignore it and keep the plain border-radius
+   corner-shape: superellipse(1.3);
    height: calc(2 * var(--padding-y) + var(--label-height));
    padding: var(--padding-y) var(--padding-x);
  
@@ -220,6 +222,7 @@
        position: absolute;
        inset: 0;
        border-radius: inherit;
+       corner-shape: inherit;
        pointer-events: none;
        backdrop-filter: blur(#{$x4});
        -webkit-backdrop-filter: blur(#{$x4});
@@ -231,6 +234,7 @@
        position: absolute;
        inset: 0;
        border-radius: inherit;
+       corner-shape: inherit;
        pointer-events: none;
        background-color: var(--muted-fill);
        mix-blend-mode: var(--muted-blend);
@@ -241,6 +245,7 @@
        position: absolute;
        inset: 0;
        border-radius: inherit;
+       corner-shape: inherit;
        pointer-events: none;
        background-color: var(--muted-fill-hover);
        mix-blend-mode: var(--muted-blend);
@@ -426,6 +431,8 @@
  
    &.shape-round {
      --border-radius: #{$rounded-border-radius};
+     // pills and round icon buttons stay truly round
+     corner-shape: round;
    }
  
    // ====================== MODIFIERS - Layout ======================
