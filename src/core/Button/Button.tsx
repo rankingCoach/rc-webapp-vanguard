@@ -116,8 +116,8 @@ type BaseButtonProps = CommonButtonProps & {
   size?: Exclude<ButtonSizes, ButtonSizes.extraLarge>;
   /**
    * Only for `primary` (the default type) and `shimmer`; ignored on `default` and `secondary`.
-   * For dark or coloured surfaces (e.g. the recommended card): a white fill with the text and icon in Ado's face
-   * colour (`--ado-face-gradient-start`), tinted 12% toward that colour on hover, and a white focus ring.
+   * For dark or coloured surfaces (e.g. the recommended card): a white fill with the text and icon in Ado's base
+   * colour (`--ado-base`), tinted 12% toward that colour on hover, and a white focus ring.
    * Shimmer keeps its sweep, as a faint band of the same tint.
    */
   inverted?: boolean;

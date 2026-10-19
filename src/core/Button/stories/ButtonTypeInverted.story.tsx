@@ -8,9 +8,9 @@ import { expectForeground, getButtonByTestId, Surface, waitForIcons } from './_m
 
 const description = `
 \`inverted\` on \`primary\` and \`shimmer\`, for dark or coloured surfaces such as the recommended card: a white fill,
-the text and icon in Ado's face colour (\`--ado-face-gradient-start\`), and a white focus ring.
+the text and icon in Ado's base colour (\`--ado-base\`), and a white focus ring.
 
-- **Hover:** the fill turns \`color-mix(in srgb, #fff 88%, var(--ado-face-gradient-start))\`.
+- **Hover:** the fill turns \`color-mix(in srgb, #fff 88%, var(--ado-base))\`.
 - **Shimmer:** the sweep stays, as a faint band of that hover tint running over the white fill. On hover the two swap,
   so a white glint runs over the tinted fill. Reduced motion stops it, like the regular shimmer.
 - **Disabled:** the same colours at 40% opacity, with no sweep.
@@ -20,7 +20,7 @@ Theme tokens \`--button-primary-inverted-*\` and \`--button-shimmer-inverted-*\`
 until they ship, Vanguard uses these values as fallbacks.
 `;
 
-const FACE = 'rgb(0, 73, 93)';
+const ADO_BASE = 'rgb(0, 106, 133)';
 const WHITE = 'rgb(255, 255, 255)';
 
 const TYPES = [
@@ -37,7 +37,7 @@ const STATES = [
 
 const tid = (type: string, state: string) => `inverted-${type}-${state}`;
 
-const InvertedMatrix = (args: ButtonProps) => (
+const InvertedMatrix = ({ onClick }: Pick<ButtonProps, 'onClick'>) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
     {/* keyboard sentinel for the focus-ring check */}
     <button
@@ -48,7 +48,7 @@ const InvertedMatrix = (args: ButtonProps) => (
     {TYPES.map(({ key, type }) => (
       <Surface key={key} surface={'teal'} caption={`${key} + inverted, on the Ado teal (recommended card)`}>
         {STATES.map((state) => (
-          <Button {...args} key={state.key} {...state.props} type={type} inverted testId={tid(key, state.key)}>
+          <Button onClick={onClick} key={state.key} {...state.props} type={type} inverted testId={tid(key, state.key)}>
             {state.label}
           </Button>
         ))}
@@ -56,7 +56,7 @@ const InvertedMatrix = (args: ButtonProps) => (
     ))}
     <Surface surface={'dark'} caption={'On a dark surface'}>
       {TYPES.map(({ key, type }) => (
-        <Button {...args} key={key} type={type} inverted icon={IconNames.add} testId={`inverted-${key}-dark`}>
+        <Button onClick={onClick} key={key} type={type} inverted icon={IconNames.add} testId={`inverted-${key}-dark`}>
           {key}
         </Button>
       ))}
@@ -72,7 +72,7 @@ const playInverted: ButtonStory['play'] = async ({ canvasElement, args }) => {
     for (const state of STATES) {
       const button = getButtonByTestId(canvasElement, tid(key, state.key));
       const style = getComputedStyle(button);
-      await expectForeground(button, FACE, state.key !== 'rest');
+      await expectForeground(button, ADO_BASE, state.key !== 'rest');
       await expect(style.backgroundColor).toBe(WHITE);
 
       if (state.key === 'disabled') {
@@ -129,7 +129,7 @@ export const ButtonTypeInverted: ButtonStory = {
   globals: { theme: 'light' },
   parameters: { docs: { description: { story: description } } },
   args: { onClick: fn() },
-  render: (args) => <InvertedMatrix {...args} />,
+  render: (args) => <InvertedMatrix onClick={args.onClick} />,
   play: playInverted,
 };
 
@@ -140,6 +140,6 @@ export const ButtonTypeInvertedDarkTheme: ButtonStory = {
     docs: { description: { story: 'Inverted primary & shimmer with the dark theme: same colours as light.' } },
   },
   args: { onClick: fn() },
-  render: (args) => <InvertedMatrix {...args} />,
+  render: (args) => <InvertedMatrix onClick={args.onClick} />,
   play: playInverted,
 };

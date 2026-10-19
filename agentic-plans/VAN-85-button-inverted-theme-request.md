@@ -8,11 +8,12 @@ before or after the Vanguard release. Nothing is removed.
 
 ---
 
-## 1. Read this first: the face colour
+## 1. Read this first: the colour is `--ado-base`
 
-The design prototype (`tmp/ado hub/src/styles/tokens.css`) calls Ado's face colour `--ado-face-start`. The generated
-theme calls it **`--ado-face-gradient-start`** (`#00495d` in `direct-channel`). The values below refer to the
-generated name. Please don't add an `--ado-face-start` alias for this.
+The design prototype (`tmp/ado hub/src/styles/tokens.css`) builds these on its `--ado-face-start` (the dark end of
+Ado's face gradient, `#00495d`). Vanguard uses **`--ado-base`** instead (`#006a85` in `direct-channel`): the brand's
+own Ado colour, which the face colours are derived from. It already exists in the generated theme. The values below
+refer to it. Please don't add an `--ado-face-start` alias for this.
 
 Unlike the muted hover tokens, `…-hover-background-color` here is **the final hover colour**, not a layer on top of the
 rest fill. The inverted primary/shimmer button has a single fill.
@@ -29,17 +30,17 @@ so it doesn't need `light-dark()`.
   /* Primary inverted: white button on dark / coloured surfaces (recommended card) */
   --button-primary-inverted-background-color: #ffffff;
   --button-primary-inverted-background-color-rgb: 255, 255, 255;
-  --button-primary-inverted-hover-background-color: color-mix(in srgb, #fff 88%, var(--ado-face-gradient-start));
-  --button-primary-inverted-text-color: var(--ado-face-gradient-start);
+  --button-primary-inverted-hover-background-color: color-mix(in srgb, #fff 88%, var(--ado-base));
+  --button-primary-inverted-text-color: var(--ado-base);
   --button-primary-inverted-focus-outline-color: #ffffff;
   --button-primary-inverted-focus-outline-color-rgb: 255, 255, 255;
 
   /* Shimmer inverted: the same button, plus the colour of the sweep band running over the white fill */
   --button-shimmer-inverted-background-color: #ffffff;
   --button-shimmer-inverted-background-color-rgb: 255, 255, 255;
-  --button-shimmer-inverted-hover-background-color: color-mix(in srgb, #fff 88%, var(--ado-face-gradient-start));
-  --button-shimmer-inverted-text-color: var(--ado-face-gradient-start);
-  --button-shimmer-inverted-sweep-color: color-mix(in srgb, #fff 88%, var(--ado-face-gradient-start));
+  --button-shimmer-inverted-hover-background-color: color-mix(in srgb, #fff 88%, var(--ado-base));
+  --button-shimmer-inverted-text-color: var(--ado-base);
+  --button-shimmer-inverted-sweep-color: color-mix(in srgb, #fff 88%, var(--ado-base));
   --button-shimmer-inverted-focus-outline-color: #ffffff;
   --button-shimmer-inverted-focus-outline-color-rgb: 255, 255, 255;
 }
@@ -47,11 +48,11 @@ so it doesn't need `light-dark()`.
 
 Notes for the generator:
 
-- **Text colour.** It references `var(--ado-face-gradient-start)` so that it follows each brand's Ado colour. If the
-  generator can only emit literals, emit the resolved `--ado-face-gradient-start` value of that theme (e.g. `#00495d`),
+- **Text colour.** It references `var(--ado-base)` so that it follows each brand's Ado colour. If the
+  generator can only emit literals, emit the resolved `--ado-base` value of that theme (e.g. `#006a85`),
   plus a `-text-color-rgb` companion.
-- **Hover and sweep colours.** These are `color-mix()` values (12% face colour into white). For `direct-channel` they
-  resolve to about `#e0e9ec`. They get no `-rgb` companion and no `.color-*` / `.bg-color-*` utility classes, the same
+- **Hover and sweep colours.** These are `color-mix()` values (12% Ado base colour into white). For `direct-channel` they
+  resolve to about `#e0edf0`. They get no `-rgb` companion and no `.color-*` / `.bg-color-*` utility classes, the same
   as other non-literal values.
 - **Disabled.** No tokens: Vanguard fades the inverted button to 40% opacity itself.
 - **Dark-scheme blocks.** No overrides are needed.
@@ -63,8 +64,8 @@ Notes for the generator:
 | Token | Vanguard fallback |
 |---|---|
 | `--button-{primary,shimmer}-inverted-background-color` | `#fff` |
-| `--button-{primary,shimmer}-inverted-hover-background-color` | `color-mix(in srgb, #fff 88%, var(--ado-face-gradient-start, #00495d))` |
-| `--button-{primary,shimmer}-inverted-text-color` | `var(--ado-face-gradient-start, #00495d)` |
+| `--button-{primary,shimmer}-inverted-hover-background-color` | `color-mix(in srgb, #fff 88%, var(--ado-base, #006a85))` |
+| `--button-{primary,shimmer}-inverted-text-color` | `var(--ado-base, #006a85)` |
 | `--button-{primary,shimmer}-inverted-focus-outline-color` | `#fff` |
 | `--button-shimmer-inverted-sweep-color` | the hover colour above |
 

@@ -100,17 +100,17 @@
 
 // Inverted primary / shimmer: a white fill for dark or coloured surfaces (e.g. the recommended card).
 // Theme tokens: --button-#{$name}-inverted-* are requested from the webapp (VAN-85); the literals are the spec values,
-// built on Ado's face colour, kept as the safety net. Same values in both colour schemes: the button sits on its own
+// built on Ado's base colour, kept as the safety net. Same values in both colour schemes: the button sits on its own
 // dark surface, not on the page.
 // Include it on `.button-#{$name}.inverted`: it resets every state buttonProps styles, so its selectors match theirs.
 @mixin filledInverted($name) {
-  --inverted-face: var(--ado-face-gradient-start, #00495d);
+  --inverted-base: var(--ado-base, #006a85);
   --inverted-fill: var(--button-#{$name}-inverted-background-color, #fff);
   --inverted-fill-hover: var(
     --button-#{$name}-inverted-hover-background-color,
-    color-mix(in srgb, #fff 88%, var(--inverted-face))
+    color-mix(in srgb, #fff 88%, var(--inverted-base))
   );
-  --inverted-fg: var(--button-#{$name}-inverted-text-color, var(--inverted-face));
+  --inverted-fg: var(--button-#{$name}-inverted-text-color, var(--inverted-base));
   --inverted-ring: var(--button-#{$name}-inverted-focus-outline-color, #fff);
 
   &,
