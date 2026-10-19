@@ -8,6 +8,10 @@ import { ButtonTypeDefault as _ButtonTypeDefault } from "./stories/ButtonTypeDef
 import { ButtonTypeSecondary as _ButtonTypeSecondary } from "./stories/ButtonTypeSecondary.story";
 import { ButtonTypeShimmer as _ButtonTypeShimmer } from "./stories/ButtonTypeShimmer.story";
 import { ButtonShimmerShowcase as _ButtonShimmerShowcase } from "./stories/ButtonShimmerShowcase.story";
+import {
+  ButtonTypeInverted as _ButtonTypeInverted,
+  ButtonTypeInvertedDarkTheme as _ButtonTypeInvertedDarkTheme,
+} from "./stories/ButtonTypeInverted.story";
 import { ButtonTypeMutedOnDark as _ButtonTypeMutedOnDark } from "./stories/ButtonTypeMutedOnDark.story";
 import { ButtonTypeMutedInvertedOnDark as _ButtonTypeMutedInvertedOnDark } from "./stories/ButtonTypeMutedInvertedOnDark.story";
 import { ButtonMutedSurfaceMatrix as _ButtonMutedSurfaceMatrix } from "./stories/ButtonMutedSurfaceMatrix.story";
@@ -48,6 +52,8 @@ export const ButtonTypeDefault: ButtonStory = { ..._ButtonTypeDefault }
 export const ButtonTypeSecondary: ButtonStory = { ..._ButtonTypeSecondary }
 export const ButtonTypeShimmer: ButtonStory = { ..._ButtonTypeShimmer }
 export const ButtonShimmerShowcase: ButtonStory = { ..._ButtonShimmerShowcase }
+export const ButtonTypeInverted: ButtonStory = { ..._ButtonTypeInverted }
+export const ButtonTypeInvertedDarkTheme: ButtonStory = { ..._ButtonTypeInvertedDarkTheme }
 export const ButtonTypeMutedOnDark: ButtonStory = { ..._ButtonTypeMutedOnDark }
 export const ButtonTypeMutedInvertedOnDark: ButtonStory = { ..._ButtonTypeMutedInvertedOnDark }
 export const ButtonMutedSurfaceMatrix: ButtonStory = { ..._ButtonMutedSurfaceMatrix }

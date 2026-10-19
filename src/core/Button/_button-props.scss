@@ -97,3 +97,98 @@
     @include focusState($name, $prefix);
   }
 }
+
+// Inverted primary / shimmer: a white fill for dark or coloured surfaces (e.g. the recommended card).
+// Theme tokens: --button-#{$name}-inverted-* are requested from the webapp (VAN-85); the literals are the spec values,
+// built on Ado's face colour, kept as the safety net. Same values in both colour schemes: the button sits on its own
+// dark surface, not on the page.
+// Include it on `.button-#{$name}.inverted`: it resets every state buttonProps styles, so its selectors match theirs.
+@mixin filledInverted($name) {
+  --inverted-face: var(--ado-face-gradient-start, #00495d);
+  --inverted-fill: var(--button-#{$name}-inverted-background-color, #fff);
+  --inverted-fill-hover: var(
+    --button-#{$name}-inverted-hover-background-color,
+    color-mix(in srgb, #fff 88%, var(--inverted-face))
+  );
+  --inverted-fg: var(--button-#{$name}-inverted-text-color, var(--inverted-face));
+  --inverted-ring: var(--button-#{$name}-inverted-focus-outline-color, #fff);
+
+  &,
+  &:hover,
+  &:focus,
+  &:active:not(:disabled):not(.disabled),
+  &.disabled,
+  &:disabled {
+    color: var(--inverted-fg);
+    background-color: var(--inverted-fill);
+    border-color: transparent;
+    box-shadow: none;
+    outline: none;
+
+    .button-text {
+      color: var(--inverted-fg);
+    }
+  }
+
+  .material-ink {
+    background-color: color-mix(in srgb, var(--inverted-fg) 20%, transparent);
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled):not(.disabled) {
+      background-color: var(--inverted-fill-hover);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--inverted-ring);
+    outline-offset: 2px;
+  }
+
+  &.disabled,
+  &:disabled {
+    // the primary fill doesn't blend, so fading the whole button is safe
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    .button-icon svg path {
+      fill: var(--inverted-fg);
+    }
+  }
+
+  @if $name == shimmer {
+    // The sweep stays, as a faint band of the hover tint on the white fill; on hover the two swap,
+    // so a white glint runs over the tinted fill. The base shimmer's keyframes and timing are kept.
+    --inverted-sweep-base: var(--inverted-fill);
+    --inverted-sweep-band: var(--button-shimmer-inverted-sweep-color, var(--inverted-fill-hover));
+
+    &:not(:disabled):not(.disabled) {
+      background-image: linear-gradient(
+        110deg,
+        var(--inverted-sweep-base) 0%,
+        var(--inverted-sweep-base) 20%,
+        color-mix(in srgb, var(--inverted-sweep-base) 60%, var(--inverted-sweep-band)) 34%,
+        color-mix(in srgb, var(--inverted-sweep-base) 25%, var(--inverted-sweep-band)) 44%,
+        var(--inverted-sweep-band) 50%,
+        color-mix(in srgb, var(--inverted-sweep-base) 25%, var(--inverted-sweep-band)) 56%,
+        color-mix(in srgb, var(--inverted-sweep-base) 60%, var(--inverted-sweep-band)) 66%,
+        var(--inverted-sweep-base) 80%,
+        var(--inverted-sweep-base) 100%
+      );
+    }
+
+    @media (hover: hover) {
+      &:hover:not(:disabled):not(.disabled) {
+        --inverted-sweep-base: var(--inverted-fill-hover);
+        --inverted-sweep-band: var(--inverted-fill);
+        // the base shimmer darkens on hover; the tint does that job here
+        filter: none;
+      }
+    }
+
+    &.disabled {
+      background-image: none;
+      animation: none;
+    }
+  }
+}

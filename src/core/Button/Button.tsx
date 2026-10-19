@@ -114,9 +114,15 @@ interface CommonButtonProps {
 type BaseButtonProps = CommonButtonProps & {
   type?: Exclude<ButtonTypes, ButtonTypes.muted>;
   size?: Exclude<ButtonSizes, ButtonSizes.extraLarge>;
+  /**
+   * Only for `primary` (the default type) and `shimmer`; ignored on `default` and `secondary`.
+   * For dark or coloured surfaces (e.g. the recommended card): a white fill with the text and icon in Ado's face
+   * colour (`--ado-face-gradient-start`), tinted 12% toward that colour on hover, and a white focus ring.
+   * Shimmer keeps its sweep, as a faint band of the same tint.
+   */
+  inverted?: boolean;
   // these are specifically forbidden for the non-muted button
   blurred?: never;
-  inverted?: never;
   onDark?: never;
   pressed?: never;
 };
@@ -185,12 +191,16 @@ export const Button = (props: ButtonProps) => {
 
   let { icon, iconPosition = 'left', rounded = false, iconColor, targetRef, iconHoverColor } = props;
 
-  // Extract the muted-only props
+  // Extract the variant-only props: blurred, onDark & pressed are muted-only, inverted is muted, primary & shimmer
   const blurred = 'blurred' in props ? props.blurred : false;
   const inverted = 'inverted' in props ? props.inverted : false;
   const onDark = 'onDark' in props ? props.onDark : false;
   const pressed = 'pressed' in props ? props.pressed : undefined;
   const isMuted = type === ButtonTypes.muted;
+  const isFilledInverted = !!inverted && (type === ButtonTypes.primary || type === ButtonTypes.shimmer);
+  const hasInvertedClass = isFilledInverted || (isMuted && !!inverted);
+  // These colours live in CSS, the icon follows the text colour
+  const iconFollowsText = isMuted || isFilledInverted;
 
   // Maintain support for iconLeft & iconRight props, but only use icon internally;
   // icon props takes precedence over iconLeft/iconRight and iconRight over iconLeft.
@@ -231,6 +241,8 @@ export const Button = (props: ButtonProps) => {
   if (!iconColor) {
     if (color) {
       iconColor = color;
+    } else if (isFilledInverted) {
+      iconColor = 'currentColor';
     } else {
       switch (type) {
         case ButtonTypes.default:
@@ -256,6 +268,8 @@ export const Button = (props: ButtonProps) => {
   if (!iconHoverColor) {
     if (hoverColor) {
       iconHoverColor = hoverColor;
+    } else if (isFilledInverted) {
+      iconHoverColor = 'currentColor';
     } else {
       switch (type) {
         case ButtonTypes.default:
@@ -275,6 +289,8 @@ export const Button = (props: ButtonProps) => {
           break;
       }
     }
+  } else if (isFilledInverted) {
+    iconHoverColor = 'currentColor';
   } else {
     switch (type) {
       case ButtonTypes.default:
@@ -301,10 +317,10 @@ export const Button = (props: ButtonProps) => {
   }, [disabled, btnHovered, hoverColor, color]);
 
   const getIconColor = useCallback(() => {
-    // Muted keeps following the text colour when disabled; the 0.4 opacity comes from CSS
-    if (disabled) return isMuted ? iconColor : undefined;
+    // Muted & inverted keep following the text colour when disabled; the 0.4 opacity comes from CSS
+    if (disabled) return iconFollowsText ? iconColor : undefined;
     return iconHoverColor ? (btnHovered ? iconHoverColor : iconColor) : iconColor;
-  }, [disabled, isMuted, btnHovered, iconHoverColor, iconColor]);
+  }, [disabled, iconFollowsText, btnHovered, iconHoverColor, iconColor]);
 
   /**
    * Get Button Icon
@@ -441,7 +457,7 @@ export const Button = (props: ButtonProps) => {
           rounded ? styles.shapeRound : '',
           textWrap === 'wrap' ? styles.buttonTextWrap : '',
           blurred ? styles.blurred : '',
-          inverted ? styles.inverted : '',
+          hasInvertedClass ? styles.inverted : '',
           isMuted && onDark ? styles.onDark : '',
         )}
         aria-pressed={isMuted ? pressed : undefined}
