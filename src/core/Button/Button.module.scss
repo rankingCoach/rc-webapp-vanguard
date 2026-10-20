@@ -171,7 +171,9 @@
    .button-icon {
      font-family: var(--buttons-typeface);
      font-size: var(--label-height);
-     line-height: var(--label-height);
+     // Taller than the label so accents (Î, Ä) and descenders (g, Ș) aren't clipped by overflow: hidden;
+     // the button height comes from --label-height, so the extra 7px overflows into the padding, centred.
+     line-height: calc(var(--label-height) + 7px);
      display: inline-flex;
      align-items: center;
      font-weight: var(--medium);
