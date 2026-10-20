@@ -95,6 +95,12 @@ $indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
   z-index: 1;
   display: flex;
   translate: 0 -50%;
+  // Soft shadow cast over the tabs it covers (the TabsCustomScroll one, round): --shadow-x is 1 towards the right
+  border-radius: $rounded-border-radius;
+  box-shadow:
+    calc(var(--shadow-x) * #{$x0_25}) 0 $x0_25 rc_transparent(--fn-shadow, 0.03),
+    calc(var(--shadow-x) * #{$x0_5}) 0 $x1 rc_transparent(--fn-shadow, 0.05),
+    calc(var(--shadow-x) * #{$x1}) 0 $x3 rc_transparent(--fn-shadow, 0.08);
   transition:
     opacity 0.2s ease,
     visibility 0.2s;
@@ -114,11 +120,23 @@ $indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .scroll-button-start {
+  --shadow-x: 1;
+
   inset-inline-start: var(--scroll-button-inset);
+
+  &:dir(rtl) {
+    --shadow-x: -1;
+  }
 }
 
 .scroll-button-end {
+  --shadow-x: -1;
+
   inset-inline-end: var(--scroll-button-inset);
+
+  &:dir(rtl) {
+    --shadow-x: 1;
+  }
 }
 
 .scroll-button-hidden {
