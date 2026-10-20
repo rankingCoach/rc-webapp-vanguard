@@ -82,6 +82,22 @@ The sweep found non-wrapping rows where a Button sits next to text with an auto 
 
 If shared rows need full shrinking later, make it opt-in (option 2).
 
+## Known limitation: `textWrap="wrap"` with a long unbreakable word in a shared row
+
+With `textWrap="wrap"` long labels wrap; they never truncate. A+ improves one case: the label is now a block, so `overflow-wrap: break-word` takes effect and a single long word (e.g. a URL) breaks to fit when the button is alone in its row. Before, it overflowed (258px in a 220px container).
+
+**Still overflowing:** a long unbreakable word in a button that shares a flex row with text. The wrapper can't shrink below that word's width, so the row overflows. Measured in a 220px row: overflow of 40px next to "Row title", 61px next to a long title.
+
+Options measured, all rejected as a default:
+
+| Option | Long URL next to text | Short "Edit" next to long text (fits today) |
+|---|---|---|
+| Wrapper `min-width: 0` | fits, URL breaks | **regresses:** 48px, label clipped, row still overflows 17px |
+| Label `overflow-wrap: anywhere` | fits, URL breaks | **regresses:** wraps to "Ed / it" |
+| Wrapper `min-width: calc-size(min-content, min(size, 50%))` | fits, URL breaks | unchanged |
+
+`calc-size()` is the only one that's safe as a default, but it's Chromium-only (Chrome/Edge 129+; not Firefox or Safari, including iOS Safari as of 26.5). It would do nothing on iPhones, which is where this matters. The webapp hasn't hit this case yet. When it does, a consumer can wrap that Button in an element with `min-width: 0`; if that becomes common, an opt-in Button prop can do the same. **Decision (VAN-85): leave as is.**
+
 ## Outcome
 
 Implemented A+ in `fix(button): truncate long labels with an ellipsis (VAN-85)`:
