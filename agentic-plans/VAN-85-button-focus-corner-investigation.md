@@ -3,8 +3,9 @@
 **Scope:** the two "Minor" Button points of [VAN-85](https://rankingcoach.atlassian.net/browse/VAN-85):
 (1) focus as a 2px outline with a 2px offset on every type, (2) `corner-shape: superellipse(1.3)`.
 **Baseline:** `master` / v2.4.0 (`src/core/Button/Button.module.scss`, `src/core/Button/_button-props.scss`).
-**Verdict:** non-breaking (no API change), self-contained (no theme change needed to ship). One optional theme
-request for a better ring colour: [VAN-85-button-focus-theme-request.md](VAN-85-button-focus-theme-request.md).
+**Verdict:** non-breaking (no API change), self-contained (no theme change needed to ship). Theme request
+(optional, non-blocking) for a better ring colour and a per-theme corner shape:
+[VAN-85-button-focus-corner-theme-request.md](VAN-85-button-focus-corner-theme-request.md).
 
 ---
 
@@ -61,6 +62,9 @@ and Safari **preview only**; Safari iOS **no**. Experimental, not Baseline.
 today's look). `corner-shape` has no effect when the radius is 0. Where supported, outline, box-shadow, background,
 border and `overflow` clipping follow the shape, so the new ring hugs the squircle. A single declaration needs no
 `@supports` wrapper: nothing else has to switch together with it.
+
+**Per theme:** the shape comes from `var(--button-corner-shape, superellipse(1.3))`. Resellers with a large
+`--buttons-border-radius` set `--button-corner-shape: round`, where a squircle gets too boxy (theme request §2).
 
 **Which buttons:**
 - default, primary, secondary, shimmer, muted (square-ish shape): **yes**.

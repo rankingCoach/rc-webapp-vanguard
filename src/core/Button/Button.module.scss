@@ -103,8 +103,9 @@
    justify-content: center;
    overflow: hidden;
    border-radius: var(--border-radius);
-   // Squircle corners (Chromium 139+); other browsers ignore it and keep the plain border-radius
-   corner-shape: superellipse(1.3);
+   // Squircle corners (Chromium 139+); other browsers ignore it and keep the plain border-radius.
+   // --button-corner-shape is optional in the theme: themes with a large --buttons-border-radius set it to round.
+   corner-shape: var(--button-corner-shape, superellipse(1.3));
    height: calc(2 * var(--padding-y) + var(--label-height));
    padding: var(--padding-y) var(--padding-x);
  
