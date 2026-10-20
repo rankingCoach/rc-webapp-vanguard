@@ -79,11 +79,17 @@
  $loader-spinner: $x2;
  $loader-timing: 850ms;
  
+ // Never wider than the container, so a long label truncates instead of overflowing.
+ // No min-width: 0 here: in a shared flex row the button keeps its width and the siblings shrink first.
+ .button-container {
+   max-width: 100%;
+ }
+
  .button-container-full-width,
  .button-container-full-width .button {
    width: 100%;
  }
- 
+
  .button {
    // medium (the default size); the other sizes override these in MODIFIERS - Sizes
    --padding-y: #{$x1_5};
@@ -104,6 +110,7 @@
    box-sizing: border-box;
    justify-content: center;
    overflow: hidden;
+   max-width: 100%;
    border-radius: var(--border-radius);
    height: calc(2 * var(--padding-y) + var(--label-height));
    padding: var(--padding-y) var(--padding-x);
@@ -119,8 +126,15 @@
      display: flex;
      align-items: center;
      gap: $x1;
+     // Lets the label shrink below its text width (ellipsis) instead of being clipped by the button
+     min-width: 0;
+
+     // Icons keep their size, only the label gives way
+     > :not(.button-text) {
+       flex-shrink: 0;
+     }
    }
- 
+
    .button-icon-container {
      min-width: #{$x4};
      display: flex;
@@ -155,9 +169,11 @@
      overflow: hidden !important;
    }
 
-   // the label follows the size; the icon keeps --label-height
    .button-text {
+     // the label follows the size; the icon keeps --label-height
      font-size: var(--text-size);
+     // A block container, not a flex one: text-overflow doesn't apply to flex containers, so the ellipsis would never show
+     display: block;
    }
  
    // Loader Spinner
@@ -417,7 +433,6 @@
    // Opt-in only (textWrap="wrap"): every rule is scoped to this class so the default single-line button is untouched.
 
    &.button-text-wrap {
-     max-width: 100%;
      // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
      height: auto;
      min-height: calc(2 * var(--padding-y) + var(--label-height));
@@ -443,14 +458,6 @@
 
      .icon-on-hover-container {
        min-height: var(--label-height);
-     }
-
-     .button-inner-container {
-       min-width: 0;
-
-       > :not(.button-text) {
-         flex-shrink: 0;
-       }
      }
 
      .button-text {

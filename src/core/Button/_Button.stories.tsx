@@ -43,6 +43,7 @@ import { ButtonNoTranslate as _ButtonNoTranslate } from "./stories/ButtonNoTrans
 import { ButtonOnMouseDown as _ButtonOnMouseDown } from "./stories/ButtonOnMouseDown.story";
 import { ButtonDeprecatedProps as _ButtonDeprecatedProps } from "./stories/ButtonDeprecatedProps.story";
 import { ButtonTextAlignedCenter as _ButtonTextAlignedCenter } from "./stories/ButtonTextAlignedCenter.story";
+import { ButtonTruncate as _ButtonTruncate } from "./stories/ButtonTruncate.story";
 
 export const ButtonTypePrimary: ButtonStory = { ..._ButtonTypePrimary }
 export const ButtonTypeDefault: ButtonStory = { ..._ButtonTypeDefault }
@@ -82,6 +83,7 @@ export const ButtonNoTranslate: ButtonStory = { ..._ButtonNoTranslate }
 export const ButtonOnMouseDown: ButtonStory = { ..._ButtonOnMouseDown }
 export const ButtonDeprecatedProps: ButtonStory = { ..._ButtonDeprecatedProps }
 export const ButtonTextAlignedCenter: ButtonStory = { ..._ButtonTextAlignedCenter }
+export const ButtonTruncate: ButtonStory = { ..._ButtonTruncate }
 
 export default {
   ...SbDecorator({
