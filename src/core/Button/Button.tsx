@@ -21,7 +21,7 @@ import styles from './Button.module.scss';
  * | `large`            | 40 / 40px                 | 14px  |
  * | `extraLarge`       | 40 / 48px                 | 16px  |
  *
- * Migrating from v2: the non-muted types used to be bigger. Bump them one step to keep their footprint:
+ * Migrating from the pre-2.5 sizes: the non-muted types used to be bigger. Bump them one step to keep their footprint:
  * `small` → `medium` (32 / 40px), `medium` → `extraLarge` (48 / 40px), `large` → `extraLarge` (60 → 48px /
  * 48 → 40px, shorter). See the "Size Matrix" story under Vanguard/Button.
  */

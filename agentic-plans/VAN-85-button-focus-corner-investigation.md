@@ -125,5 +125,5 @@ No `.snap` files or style assertions on focus. Chromatic diffs expected in stori
 ## 4. Versioning
 
 No prop/API change; visual-only (ring position, ring only on keyboard focus, squarer corners in Chromium) →
-`feat`, minor. VAN-85's size harmonisation is the breaking part of the release; mention these two in the same
+`feat`, minor. VAN-85's size harmonisation is the most visible part of the release; mention these two in the same
 CHANGELOG entry.

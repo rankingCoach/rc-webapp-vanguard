@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Codemod for the v3 button sizes (VAN-85): every type now shares the muted size set, so the
+ * Codemod for the harmonized button sizes (VAN-85): every type now shares the muted size set, so the
  * non-muted types (default, primary, secondary, shimmer) are bumped one step to keep their footprint:
  *
  *   small            -> medium        (32 / 40px, unchanged)
@@ -10,7 +10,7 @@
  * Muted buttons are left alone. Buttons whose type or size is computed at runtime, or that spread
  * props, are not touched: they are listed for a manual check.
  *
- * Usage: node scripts/codemod-button-sizes-v3.js <dir> [--write] [--exclude <substring>]...
+ * Usage: node scripts/codemod-button-sizes.js <dir> [--write] [--exclude <substring>]...
  * Without --write it only reports what it would change.
  */
 const fs = require('fs');
@@ -22,7 +22,7 @@ const root = args.find((a) => !a.startsWith('--') && args[args.indexOf(a) - 1] !
 const write = args.includes('--write');
 const excludes = args.filter((_, i) => args[i - 1] === '--exclude');
 if (!root) {
-  console.error('Usage: node scripts/codemod-button-sizes-v3.js <dir> [--write] [--exclude <substring>]...');
+  console.error('Usage: node scripts/codemod-button-sizes.js <dir> [--write] [--exclude <substring>]...');
   process.exit(1);
 }
 

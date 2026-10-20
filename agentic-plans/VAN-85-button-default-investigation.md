@@ -136,7 +136,7 @@ That is a webapp follow-up, not part of the Vanguard change.
 ## 5. Breaking?
 
 - **API:** non-breaking. `textColor` is a new optional prop on the default type.
-- **Visual:** a breaking change for the default type wherever the surface is not white. Seven usages need a webapp change
+- **Visual:** a visible change for the default type wherever the surface is not white. Seven usages need a webapp change
   together with the theme value change (3.1). About 25 change subtly (3.2).
 - **Dependency:** the transparent look depends on the theme value change and on decoupling the email and legacy readers.
   The generator lives in the webapp, so both land in one webapp PR. `textColor` has no theme dependency.
