@@ -22,9 +22,7 @@ const DEFAULT_CONFIG: MissingAssetConfig = {
     "/vanguard/assets/fonts/Roboto-Regular.ttf": "/vanguard/assets/fonts/Roboto-Regular.ttf",
     "/vanguard/assets/fonts/Roboto-Medium.ttf": "/vanguard/assets/fonts/Roboto-Medium.ttf",
     "/vanguard/assets/fonts/Roboto-Bold.ttf": "/vanguard/assets/fonts/Roboto-Bold.ttf",
-    "/vanguard/assets/fonts/Inter-Regular.woff2": "/vanguard/assets/fonts/Inter-Regular.woff2",
-    "/vanguard/assets/fonts/Inter-Medium.woff2": "/vanguard/assets/fonts/Inter-Medium.woff2",
-    "/vanguard/assets/fonts/Inter-Bold.woff2": "/vanguard/assets/fonts/Inter-Bold.woff2",
+    // Inter is served from public/vanguard/assets/fonts, like Crimson Pro
   },
 };
 
