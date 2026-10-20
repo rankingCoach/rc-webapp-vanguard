@@ -27,6 +27,8 @@ The dry run against `rc-webapp` at `1e62365a352` changes **822 buttons**:
 
 It adds `ButtonSizes` to the `vanguard` import where it's missing. The full list is in §4.
 
+Re-checked on 2026-10-20 at `8a846a885e8` (`feature/competitor-selection-redesign`, which already has the secondary → muted refactor `d776413cd85`): **469 buttons** and **42** by hand. The codemod fix for the `@vanguard/Button` barrel changes nothing here, because the webapp imports from `vanguard`. The drop from 822 comes from that refactor, which isn't on `master` yet. Re-run the dry run on the branch you migrate, right before `--write`, and use its output instead of §4.
+
 ## 2. By hand: type or size computed at runtime (39)
 
 The codemod leaves these alone. Guidance per group:

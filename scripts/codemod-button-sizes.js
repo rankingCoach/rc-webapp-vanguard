@@ -12,6 +12,9 @@
  *
  * Usage: node scripts/codemod-button-sizes.js <dir> [--write] [--exclude <substring>]...
  * Without --write it only reports what it would change.
+ *
+ * Run it once per codebase: it can't tell a migrated `medium` (formerly `small`) from an unmigrated one,
+ * so a second run reports, and with --write applies, a second bump.
  */
 const fs = require('fs');
 const path = require('path');
@@ -26,8 +29,10 @@ if (!root) {
   process.exit(1);
 }
 
-// Modules a vanguard Button can be imported from (the package, path aliases, relative paths inside vanguard)
-const BUTTON_MODULE = /(^vanguard$|@rankingcoach\/vanguard|Button\/Button$|^\.\/Button$|^\.\.\/Button$)/;
+// Modules a vanguard Button can be imported from (the package, the @vanguard/Button barrel and its index,
+// the Button file with or without its extension, relative paths inside vanguard)
+const BUTTON_MODULE =
+  /(^vanguard$|@rankingcoach\/vanguard|@vanguard\/Button(\/index)?$|Button\/Button(\.tsx)?$|^\.\.?\/Button(\/index)?$)/;
 const BUMP = { small: 'medium', medium: 'extraLarge', large: 'extraLarge', extraLarge: 'extraLarge' };
 const SIZE_STRINGS = { small: 'small', medium: 'medium', large: 'large', 'extra-large': 'extraLarge' };
 const NON_MUTED = ['default', 'primary', 'secondary', 'shimmer'];
