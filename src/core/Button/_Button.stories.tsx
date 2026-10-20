@@ -5,6 +5,10 @@ import { buttonArgTypes, BUTTONS_EXCLUDED_CONTROLS_DEFAULT, ButtonStory } from "
 // Import all individual stories
 import { ButtonTypePrimary as _ButtonTypePrimary } from "./stories/ButtonTypePrimary.story";
 import { ButtonTypeDefault as _ButtonTypeDefault } from "./stories/ButtonTypeDefault.story";
+import {
+  ButtonDefaultTextColor as _ButtonDefaultTextColor,
+  ButtonDefaultTransparentPreview as _ButtonDefaultTransparentPreview,
+} from "./stories/ButtonDefaultTextColor.story";
 import { ButtonTypeSecondary as _ButtonTypeSecondary } from "./stories/ButtonTypeSecondary.story";
 import { ButtonTypeShimmer as _ButtonTypeShimmer } from "./stories/ButtonTypeShimmer.story";
 import { ButtonShimmerShowcase as _ButtonShimmerShowcase } from "./stories/ButtonShimmerShowcase.story";
@@ -45,6 +49,8 @@ import { ButtonTextAlignedCenter as _ButtonTextAlignedCenter } from "./stories/B
 
 export const ButtonTypePrimary: ButtonStory = { ..._ButtonTypePrimary }
 export const ButtonTypeDefault: ButtonStory = { ..._ButtonTypeDefault }
+export const ButtonDefaultTextColor: ButtonStory = { ..._ButtonDefaultTextColor }
+export const ButtonDefaultTransparentPreview: ButtonStory = { ..._ButtonDefaultTransparentPreview }
 export const ButtonTypeSecondary: ButtonStory = { ..._ButtonTypeSecondary }
 export const ButtonTypeShimmer: ButtonStory = { ..._ButtonTypeShimmer }
 export const ButtonShimmerShowcase: ButtonStory = { ..._ButtonShimmerShowcase }

@@ -44,6 +44,7 @@
  * • .blurred                - Backdrop blur on the ::before layer (muted buttons)
  * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons)
  * • .on-dark                - The other text colour: swaps text/icon/focus ring only (muted buttons)
+ * • .text-color-{name}      - Default button label/icon colour from $default-text-colors (textColor prop)
  * • [aria-pressed="true"]   - Pressed toggle, keeps the hover layer shown (muted buttons)
  *
  * MUTED LAYERS (back to front):
@@ -72,6 +73,13 @@
  @import "../../styles/spacings";
  @import "../../styles/mixins";
  @import "./button-props";
+ 
+ // Text colours of the default button (textColor prop, ButtonTextColors): key -> rest colour.
+ // The hover/focus colour is derived (25% towards black, like the default blue). Keep the keys in sync with
+ // ButtonTextColors and TEXT_COLOR_CLASSES in Button.tsx.
+ $default-text-colors: (
+   ado: var(--ado-base),
+ );
  
  // To correlate all transition animation time -> button color / background / text background
  $transitionTime: 200ms;
@@ -161,6 +169,28 @@
    // ====================== MODIFIERS - Types ======================
    &.button-default {
      @include buttonProps(default);
+ 
+     // The fill, focus ring and disabled state stay the default button's; only the label and icon colour change
+     @each $name, $color in $default-text-colors {
+       &.text-color-#{$name}:not(:disabled):not(.disabled) {
+         --default-text-color: #{$color};
+         --default-text-hover-color: color-mix(in oklch, #{$color}, black 25%);
+ 
+         &,
+         .button-text {
+           color: var(--default-text-color);
+         }
+ 
+         &:hover,
+         &:focus,
+         &:active {
+           &,
+           .button-text {
+             color: var(--default-text-hover-color);
+           }
+         }
+       }
+     }
    }
  
    &.button-primary {
