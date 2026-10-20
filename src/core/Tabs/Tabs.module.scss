@@ -97,12 +97,13 @@ $indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
   display: flex;
   height: fit-content;
   margin-block: auto;
-  // Soft shadow cast over the tabs it covers (the TabsCustomScroll one, round): --shadow-x is 1 towards the right
+  // Tight shadow: a soft 1px rim, a short drop, and a slight cast over the tabs it covers (--shadow-x is 1 towards
+  // the right). Blurs stay within the 4px between the button and the bar edge, so nothing spills past the tray.
   border-radius: $rounded-border-radius;
   box-shadow:
-    calc(var(--shadow-x) * #{$x0_25}) 0 $x0_25 rc_transparent(--fn-shadow, 0.03),
-    calc(var(--shadow-x) * #{$x0_5}) 0 $x1 rc_transparent(--fn-shadow, 0.05),
-    calc(var(--shadow-x) * #{$x1}) 0 $x3 rc_transparent(--fn-shadow, 0.08);
+    0 0 0 1px rc_transparent(--fn-shadow, 0.08),
+    0 1px $x0_5 rc_transparent(--fn-shadow, 0.12),
+    calc(var(--shadow-x) * #{$x0_5}) 0 $x0_5 rc_transparent(--fn-shadow, 0.06);
   transition:
     opacity 0.2s ease,
     visibility 0.2s;
