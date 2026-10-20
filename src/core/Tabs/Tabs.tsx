@@ -214,7 +214,7 @@ export const Tabs = (props: TabsProps) => {
           type={ButtonTypes.muted}
           blurred
           shape="round"
-          size={config.tabHeight === 'small' ? ButtonSizes.small : ButtonSizes.medium}
+          size={ButtonSizes.large}
           // The caret SVG assets are mirror-named: caretRight points left (same swap as NavigationModal)
           icon={isStart ? IconNames.caretRight : IconNames.caretLeft}
           ariaLabel={translationService.get(isStart ? 'Scroll to start' : 'Scroll to end').value}
