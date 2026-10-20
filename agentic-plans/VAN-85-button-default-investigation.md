@@ -1,8 +1,9 @@
 # VAN-85 point 4: transparent `default` button and its Ado text colour (investigation)
 
-Status: on hold for design feedback. No component code has been changed yet.
+Status: plan approved on 2026-10-20; the Vanguard part (`textColor`) is implemented, the webapp part waits for the rollout.
 - Plan: as amended on 2026-10-19 (sections 2, 5 and 6).
 - Theme request: `VAN-85-button-default-theme-request.md`.
+- Rollout steps (after the Vanguard release): `VAN-85-button-default-rollout.md`.
 - RFC for colleagues: the Claude Doc "RFC: Transparent default Button (VAN-85)".
 - Scope: light scheme only; dark mode is not supported yet.
 
@@ -44,7 +45,9 @@ The theme request covers both.
 - A Sass map in the Button styles turns each key into a rest colour and derives its hover colour (`ado` → `--ado-base`,
   hover `color-mix(in oklch, <colour>, black 25%)`).
 - Later products add an enum value and a map entry, with no new theme tokens.
-- The prop is restricted to `type={ButtonTypes.default}`.
+- The prop acts only on `type={ButtonTypes.default}`; other types ignore it. A type-level restriction (a separate
+  default-props variant) was tried and dropped: it broke wrappers that spread `ButtonProps` and then set `type`
+  (ActionButton, HoverableCard, ActionBarFooter), and the webapp has the same pattern.
 - The deprecated `color` / `hoverColor` props are not extended.
 
 ## 3. Webapp sweep (`rc-webapp/html/react/src`)
