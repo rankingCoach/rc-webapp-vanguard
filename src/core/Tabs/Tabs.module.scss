@@ -86,15 +86,17 @@ $indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
   }
 }
 
-// Overflow buttons (muted round Buttons, see Tabs.tsx), floating over the inline-start / inline-end edges of the bar.
+// Overflow buttons (muted round blurred Buttons, see Tabs.tsx), floating over the inline-start / inline-end edges of the bar.
 .scroll-button {
   --scroll-button-inset: #{$x0_5};
 
+  // Centred with auto margins rather than translate/z-index: the muted fill blends (multiply) with the tabs below,
+  // so the wrapper must not isolate
   position: absolute;
-  top: 50%;
-  z-index: 1;
+  inset-block: 0;
   display: flex;
-  translate: 0 -50%;
+  height: fit-content;
+  margin-block: auto;
   // Soft shadow cast over the tabs it covers (the TabsCustomScroll one, round): --shadow-x is 1 towards the right
   border-radius: $rounded-border-radius;
   box-shadow:

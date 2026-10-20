@@ -1,7 +1,7 @@
 # VAN-85 – Tabs overflow scroll buttons: investigation
 
 Scope: replace the custom `TabsCustomScroll` arrows of `Tabs` with muted round icon-only `Button`s
-(`type={ButtonTypes.muted} inverted onDark blurred shape="round"`), make the left/right buttons jump to the
+(`type={ButtonTypes.muted} blurred shape="round"`), make the left/right buttons jump to the
 start/end of the tabs, and remove the dead custom styling.
 
 ## Verdict
@@ -22,10 +22,14 @@ start/end of the tabs, and remove the dead custom styling.
 
 | Token | Status |
 | --- | --- |
-| `--button-muted-inverted-on-dark-background-color`, `-hover-background-color`, `-text-color`, `-focus-outline-color` | Defined in the webapp theme (`rc-webapp/html/theming/default-theme.scss`, `storybook-default.scss`) and in `.storybook/theming.css`. `Button.module.scss` only keeps the literals as a safety net. |
+| `--button-muted-*` (background, hover, text, blend mode, focus outline) | Defined in the webapp theme (`rc-webapp/html/theming/default-theme.scss`, `storybook-default.scss`) and in `.storybook/theming.css`, like the `inverted` / `onDark` variants. `Button.module.scss` only keeps the literals as a safety net. |
 | `blurred` | No token: a plain `backdrop-filter: blur(32px)` layer. |
 
 No theme request needed.
+
+Design follow-up: the first cut used `inverted onDark` (white 60% glass); it read poorly on the light tab themes, so
+the buttons use the regular muted fill (multiply-blended) with the blur and a soft drop shadow. The button wrappers
+are rendered after the scroller and carry no z-index/transform so the multiply blend reaches the tabs below.
 
 ## 3. Direction bug
 

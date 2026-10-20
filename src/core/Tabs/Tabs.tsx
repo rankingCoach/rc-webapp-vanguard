@@ -212,8 +212,6 @@ export const Tabs = (props: TabsProps) => {
       >
         <Button
           type={ButtonTypes.muted}
-          inverted
-          onDark
           blurred
           shape="round"
           size={config.tabHeight === 'small' ? ButtonSizes.small : ButtonSizes.medium}
@@ -242,7 +240,6 @@ export const Tabs = (props: TabsProps) => {
           className ?? '',
         )}
       >
-        {isOverflowing && renderScrollButton('start')}
         <div ref={scrollerRef} className={styles.scroller} onScroll={onScroll}>
           <div
             ref={listRef}
@@ -315,6 +312,8 @@ export const Tabs = (props: TabsProps) => {
             })}
           </div>
         </div>
+        {/* After the scroller: positioned tab labels (floating theme) would otherwise paint over the start button */}
+        {isOverflowing && renderScrollButton('start')}
         {isOverflowing && renderScrollButton('end')}
       </div>
       {tabList.map((tab, index) =>
