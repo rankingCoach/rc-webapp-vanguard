@@ -167,7 +167,9 @@ export const StatusBadge = (props: StatusBadgeProps) => {
         fontSize={isCompact ? COMPACT_FONT_SIZE : undefined}
         capitalize={capitalizeStatus}
         color={textColor}
-        textWrap={'wrap'}
+        textWrap={isCompact ? 'no-wrap' : 'wrap'}
+        ellipsis={isCompact}
+        className={isCompact ? styles.compactLabel : undefined}
         translate={translate}
       >
         {text}

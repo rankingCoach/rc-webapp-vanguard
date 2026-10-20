@@ -40,6 +40,22 @@ describe('Vanguard StatusBadge compact size', () => {
     expect(text.style.fontWeight).toBe('bold');
   });
 
+  it('keeps the compact label on one line, ending in an ellipsis', async () => {
+    await render(<StatusBadge status={'ado'} text={'New'} size={'compact'} hideIcon translate={false} />);
+    const text = appScreen.getByText('New');
+    expect(text.classList.contains(styles.compactLabel)).toBe(true);
+    expect(text.style.whiteSpace).toBe('nowrap');
+    expect(text.style.overflow).toBe('hidden');
+    expect(text.style.textOverflow).toBe('ellipsis');
+  });
+
+  it('lets the default label wrap', async () => {
+    await render(<StatusBadge status={'ado'} text={'New'} hideIcon translate={false} />);
+    const text = appScreen.getByText('New');
+    expect(text.classList.contains(styles.compactLabel)).toBe(false);
+    expect(text.style.textOverflow).toBe('');
+  });
+
   it('keeps an explicit fontWeight', async () => {
     await render(
       <StatusBadge

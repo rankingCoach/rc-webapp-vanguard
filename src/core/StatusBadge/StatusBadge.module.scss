@@ -29,13 +29,26 @@
 
 
 // size="compact": 18px tall (1px + 16px caption line height + 1px). With an icon, its 18px circle sets the height.
+// The label stays on one line and ends in an ellipsis when the badge runs out of room, so it can't wrap out of the
+// pill; the icon and the number keep their size.
 .status-badge.compact {
   box-sizing: border-box;
   height: 18px;
+  max-width: 100%;
+  min-width: 0;
   padding: 1px 7px;
 
   &:not(.status-badge-no-icon):not(.status-badge-none-icon) {
     padding: 0 7px 0 0;
+  }
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  > .compact-label {
+    flex-shrink: 1;
+    min-width: 0;
   }
 }
 
