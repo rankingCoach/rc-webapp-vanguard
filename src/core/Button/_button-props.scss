@@ -127,11 +127,16 @@
     background-color: var(--inverted-fill);
     border-color: transparent;
     box-shadow: none;
-    outline: none;
 
     .button-text {
       color: var(--inverted-fg);
     }
+  }
+
+  // The ring is only removed for pointer focus: kept out of the state reset above, whose :active selector outranks
+  // :focus-visible and would hide the ring while a keyboard user holds Space or Enter.
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 
   .material-ink {
