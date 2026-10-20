@@ -23,18 +23,18 @@ export interface UseTabsScrollResult {
   scrollerRef: React.RefObject<HTMLDivElement | null>;
   /** Ref for the `role="tablist"` element inside the scroller. */
   listRef: React.RefObject<HTMLDivElement | null>;
-  /** True when there is hidden content on the physical left of the viewport. */
-  canScrollLeft: boolean;
-  /** True when there is hidden content on the physical right of the viewport. */
-  canScrollRight: boolean;
+  /** True when there is hidden content towards the start of the tabs (left in LTR, right in RTL). */
+  canScrollStart: boolean;
+  /** True when there is hidden content towards the end of the tabs (right in LTR, left in RTL). */
+  canScrollEnd: boolean;
   /** True when the tabs overflow the scroller (either direction can scroll). */
   isOverflowing: boolean;
   /** `onScroll` handler for the scroller (rAF-throttled re-measure). */
   onScroll: () => void;
-  /** Scrolls one "page" of whole tabs to the physical left. */
-  scrollLeftward: () => void;
-  /** Scrolls one "page" of whole tabs to the physical right. */
-  scrollRightward: () => void;
+  /** Scrolls to the start of the tabs (the first tab). */
+  scrollToStart: () => void;
+  /** Scrolls to the end of the tabs (the last tab). */
+  scrollToEnd: () => void;
 }
 
 const isRtl = (element: HTMLElement): boolean =>
@@ -56,6 +56,12 @@ const scrollScrollerTo = (scroller: HTMLElement, left: number, smooth: boolean):
   scroller.scrollLeft = left;
 };
 
+/** Furthest `scrollLeft` towards the end: positive in LTR, negative in RTL (modern browsers). */
+const getEndScrollLeft = (scroller: HTMLElement): number => {
+  const maxScroll = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+  return isRtl(scroller) ? -maxScroll : maxScroll;
+};
+
 const getSelectedGeometry = (scroller: HTMLElement, selected: HTMLElement): string =>
   `${selected.offsetLeft}:${selected.offsetWidth}:${scroller.clientWidth}`;
 
@@ -72,7 +78,7 @@ const getTabElements = (list: HTMLElement | null): HTMLElement[] => {
 
 /**
  * Horizontal overflow handling for the tab bar: measures whether the tabs overflow, exposes scroll-button handlers
- * (scrolling by whole tabs, like MUI's `getScrollSize`) and keeps the selected tab inside the visible viewport.
+ * (jumping to the start or the end of the tabs) and keeps the selected tab inside the visible viewport.
  * All DOM APIs are feature-guarded so it is safe in jsdom/SSR.
  */
 export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsScrollOptions): UseTabsScrollResult => {
@@ -83,23 +89,21 @@ export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsSc
   /** Geometry of the selected tab and viewport the last time it was scrolled into view. */
   const selectedGeometryRef = useRef('');
 
-  const [scrollState, setScrollState] = useState({ left: false, right: false });
+  const [scrollState, setScrollState] = useState({ start: false, end: false });
 
-  // Physical (left/right) measurement. In RTL, modern browsers report `scrollLeft` from 0 (start, right edge)
-  // down to -(scrollWidth - clientWidth) (end, left edge); in LTR it goes from 0 up to the maximum.
+  // Logical (start/end) measurement. In RTL, modern browsers report `scrollLeft` from 0 (start, right edge)
+  // down to -(scrollWidth - clientWidth) (end, left edge); in LTR it goes from 0 up to the maximum. Either way the
+  // distance from the start is |scrollLeft|.
   const measure = useCallback(() => {
     const scroller = scrollerRef.current;
     if (!scroller) {
       return;
     }
-    const { scrollLeft, clientWidth, scrollWidth } = scroller;
-    const maxScroll = Math.max(0, scrollWidth - clientWidth);
-    const rtl = isRtl(scroller);
-    const minLeft = rtl ? -maxScroll : 0;
-    const maxLeft = rtl ? 0 : maxScroll;
-    const left = scrollLeft > minLeft + EPSILON;
-    const right = scrollLeft < maxLeft - EPSILON;
-    setScrollState((prev) => (prev.left === left && prev.right === right ? prev : { left, right }));
+    const fromStart = Math.abs(scroller.scrollLeft);
+    const maxScroll = Math.abs(getEndScrollLeft(scroller));
+    const start = fromStart > EPSILON;
+    const end = fromStart < maxScroll - EPSILON;
+    setScrollState((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
   }, []);
 
   /** Keeps the selected tab inside the viewport via rect math; never uses scrollIntoView (would scroll the page). */
@@ -200,39 +204,19 @@ export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsSc
     [],
   );
 
-  /** Sum of the widths of the leading tabs that fully fit in the viewport (MUI `getScrollSize`). */
-  const getScrollSize = useCallback((): number => {
+  const scrollToStart = useCallback(() => {
     const scroller = scrollerRef.current;
-    if (!scroller) {
-      return 0;
+    if (scroller) {
+      scrollScrollerTo(scroller, 0, true);
     }
-    const containerSize = scroller.clientWidth;
-    let totalSize = 0;
-    const tabs = getTabElements(listRef.current);
-    for (let i = 0; i < tabs.length; i += 1) {
-      const tabSize = tabs[i].clientWidth;
-      if (totalSize + tabSize > containerSize) {
-        if (i === 0) {
-          totalSize = containerSize;
-        }
-        break;
-      }
-      totalSize += tabSize;
-    }
-    return totalSize;
   }, []);
 
-  const moveBy = useCallback((delta: number) => {
+  const scrollToEnd = useCallback(() => {
     const scroller = scrollerRef.current;
-    if (!scroller) {
-      return;
+    if (scroller) {
+      scrollScrollerTo(scroller, getEndScrollLeft(scroller), true);
     }
-    scrollScrollerTo(scroller, scroller.scrollLeft + delta, true);
   }, []);
-
-  // Physical directions: decreasing `scrollLeft` always moves the viewport left, in LTR and RTL alike.
-  const scrollLeftward = useCallback(() => moveBy(-getScrollSize()), [moveBy, getScrollSize]);
-  const scrollRightward = useCallback(() => moveBy(getScrollSize()), [moveBy, getScrollSize]);
 
   // Keep the selected tab inside the viewport whenever the selection or the rendered tabs change.
   useEffect(() => {
@@ -242,11 +226,11 @@ export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsSc
   return {
     scrollerRef,
     listRef,
-    canScrollLeft: scrollState.left,
-    canScrollRight: scrollState.right,
-    isOverflowing: scrollState.left || scrollState.right,
+    canScrollStart: scrollState.start,
+    canScrollEnd: scrollState.end,
+    isOverflowing: scrollState.start || scrollState.end,
     onScroll,
-    scrollLeftward,
-    scrollRightward,
+    scrollToStart,
+    scrollToEnd,
   };
 };

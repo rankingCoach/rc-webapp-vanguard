@@ -169,20 +169,12 @@ export const Tabs = (props: TabsProps) => {
   const layoutKey = visibleTabs.map(({ tab, index }) => `${index}:${String(resolveValue(tab, index))}`).join('|');
   const isFloating = config.theme === 'floating';
 
-  const {
-    scrollerRef,
-    listRef,
-    canScrollLeft,
-    canScrollRight,
-    isOverflowing,
-    onScroll,
-    scrollLeftward,
-    scrollRightward,
-  } = useTabsScroll({
-    currentValue,
-    layoutKey,
-    measureKey: config.theme,
-  });
+  const { scrollerRef, listRef, canScrollStart, canScrollEnd, isOverflowing, onScroll, scrollToStart, scrollToEnd } =
+    useTabsScroll({
+      currentValue,
+      layoutKey,
+      measureKey: config.theme,
+    });
 
   // Floating theme: one chip glides to the selected tab instead of each tab painting its own selected fill.
   const indicatorRef = useRef<HTMLSpanElement | null>(null);
@@ -220,8 +212,8 @@ export const Tabs = (props: TabsProps) => {
         {isOverflowing && (
           <TabsCustomScroll
             direction="left"
-            disabled={!canScrollLeft}
-            onClick={scrollLeftward}
+            disabled={!canScrollStart}
+            onClick={scrollToStart}
             className={styles.scrollButton}
             testId={testId ? `${testId}-scroll-left` : undefined}
           />
@@ -301,8 +293,8 @@ export const Tabs = (props: TabsProps) => {
         {isOverflowing && (
           <TabsCustomScroll
             direction="right"
-            disabled={!canScrollRight}
-            onClick={scrollRightward}
+            disabled={!canScrollEnd}
+            onClick={scrollToEnd}
             className={styles.scrollButton}
             testId={testId ? `${testId}-scroll-right` : undefined}
           />
