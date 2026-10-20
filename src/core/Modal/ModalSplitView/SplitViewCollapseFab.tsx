@@ -12,9 +12,10 @@ interface SplitViewCollapseFabProps {
   /**
    * Animated `left`, taken straight from the SAME panel spring that drives the slide/fade — NOT a second spring.
    * Because it's the same `SpringValue` instance (one clock), the FAB can never get ahead of or lag the panel,
-   * even when a toggle interrupts an in-flight animation.
+   * even when a toggle interrupts an in-flight animation. Omitted when the FAB sits on the edge rail (`resize`), which
+   * carries the slide itself: the FAB is then at the rail's left edge.
    */
-  animatedLeft: SpringValue<string>;
+  animatedLeft?: SpringValue<string>;
 }
 
 /**
@@ -33,7 +34,7 @@ export const SplitViewCollapseFab = (props: SplitViewCollapseFabProps) => {
     <a.button
       type="button"
       className="SplitView-collapse-fab"
-      style={{ left: animatedLeft, top }}
+      style={{ left: animatedLeft ?? 0, top }}
       onClick={collapseToggle.onToggle}
       aria-label={collapseToggle.ariaLabel ?? (isOpen ? 'Collapse panel' : 'Expand panel')}
     >
