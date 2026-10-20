@@ -20,6 +20,7 @@ import { ButtonTypeMutedOnDark as _ButtonTypeMutedOnDark } from "./stories/Butto
 import { ButtonTypeMutedInvertedOnDark as _ButtonTypeMutedInvertedOnDark } from "./stories/ButtonTypeMutedInvertedOnDark.story";
 import { ButtonMutedSurfaceMatrix as _ButtonMutedSurfaceMatrix } from "./stories/ButtonMutedSurfaceMatrix.story";
 import { ButtonMutedStates as _ButtonMutedStates } from "./stories/ButtonMutedStates.story";
+import { ButtonFocusStates as _ButtonFocusStates } from "./stories/ButtonFocusStates.story";
 import { ButtonMutedSizes as _ButtonMutedSizes } from "./stories/ButtonMutedSizes.story";
 import { ButtonMutedRounded as _ButtonMutedRounded } from "./stories/ButtonMutedRounded.story";
 import { ButtonMutedBlurredCombos as _ButtonMutedBlurredCombos } from "./stories/ButtonMutedBlurredCombos.story";
@@ -66,6 +67,7 @@ export const ButtonTypeMutedOnDark: ButtonStory = { ..._ButtonTypeMutedOnDark }
 export const ButtonTypeMutedInvertedOnDark: ButtonStory = { ..._ButtonTypeMutedInvertedOnDark }
 export const ButtonMutedSurfaceMatrix: ButtonStory = { ..._ButtonMutedSurfaceMatrix }
 export const ButtonMutedStates: ButtonStory = { ..._ButtonMutedStates }
+export const ButtonFocusStates: ButtonStory = { ..._ButtonFocusStates }
 export const ButtonMutedSizes: ButtonStory = { ..._ButtonMutedSizes }
 export const ButtonMutedRounded: ButtonStory = { ..._ButtonMutedRounded }
 export const ButtonMutedBlurredCombos: ButtonStory = { ..._ButtonMutedBlurredCombos }
