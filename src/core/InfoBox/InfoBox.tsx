@@ -9,12 +9,12 @@ import {
   ml2,
   mr2,
   mt1,
-  p2,
   pt2,
 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { AnimatedConditional } from '@vanguard/AnimatedConditional/AnimatedConditional';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
+import { getRowButtonTypeAndSize } from '@vanguard/Button/button-row-size';
 import { Collapse } from '@vanguard/Collapse/Collapse/Collapse';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
@@ -70,7 +70,7 @@ export const InfoBox = (props: InfoBoxProps) => {
     positive,
     negative,
     width,
-    borderRadius = 4,
+    borderRadius,
   } = props;
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export const InfoBox = (props: InfoBoxProps) => {
     }
   }, [title, description]);
 
-  const getInfoBoxData = (type?: InfoBoxType): { color: string; icon: IconNames; iconColor: string } => {
+  const getInfoBoxData = (): { color: string; icon: IconNames; iconColor: string } => {
     switch (type) {
       case 'danger':
         return {
@@ -93,7 +93,7 @@ export const InfoBox = (props: InfoBoxProps) => {
         return {
           color: '--w500',
           iconColor: '--w100',
-          icon: IconNames.warning,
+          icon: IconNames.exclamation,
         };
       case 'success':
         return {
@@ -111,8 +111,8 @@ export const InfoBox = (props: InfoBoxProps) => {
     }
   };
 
-  const getInfoBoxPositionStyle = (type?: InfoBoxPosition) => {
-    switch (type) {
+  const getInfoBoxPositionStyle = (infoBoxPosition?: InfoBoxPosition) => {
+    switch (infoBoxPosition) {
       case 'start':
         return justifyContentStart;
       case 'end':
@@ -131,6 +131,8 @@ export const InfoBox = (props: InfoBoxProps) => {
     return null;
   }
 
+  const infoBoxData = getInfoBoxData();
+
   return (
     <Collapse isOpen={open}>
       <ComponentContainer
@@ -139,20 +141,23 @@ export const InfoBox = (props: InfoBoxProps) => {
       >
         <div
           data-testid={'info-box-content'}
-          className={classNames(styles.InfoBoxComponent, styles[type ? type : ''])}
+          className={styles.InfoBoxComponent}
           style={{ maxWidth: maxWidth, width: width, borderRadius: borderRadius }}
         >
-          <Icon
-            testId={'info-box-icon'}
-            className={classNames(mr2)}
-            type={type != 'warn' ? IconSize.small : IconSize.large}
-            color={getInfoBoxData(type).color}
-            hasCircle={type != 'warn'}
-            fillColor={getInfoBoxData(type).iconColor}
-          >
-            {getInfoBoxData(type).icon}
-          </Icon>
-          <div>
+          <div className={classNames(styles.firstLine, mr2, !title && styles.noTitle)}>
+            {/* warn sits in a filled triangle (styles), the other types in Icon's filled circle */}
+            <Icon
+              testId={'info-box-icon'}
+              className={classNames(type === 'warn' && styles.warnTriangle)}
+              type={IconSize.small}
+              color={infoBoxData.color}
+              hasCircle={type !== 'warn'}
+              fillColor={infoBoxData.iconColor}
+            >
+              {infoBoxData.icon}
+            </Icon>
+          </div>
+          <div data-testid={'info-box-body'} className={styles.body}>
             <AnimatedConditional condition={!!title}>
               <Text
                 testId={'info-box-title'}
@@ -175,8 +180,10 @@ export const InfoBox = (props: InfoBoxProps) => {
               <div className={classNames(dFlex, justifyContentBetween, flexWrap, pt2, gap1)}>
                 <Render if={!!positive}>
                   <Button
-                    type={positive?.type ?? ButtonTypes.primary}
-                    iconRight={positive?.icon}
+                    {...getRowButtonTypeAndSize(positive?.type ?? ButtonTypes.primary)}
+                    rounded={true}
+                    icon={positive?.icon}
+                    iconPosition={'right'}
                     onClick={() => {
                       positive?.cta();
                     }}
@@ -187,8 +194,10 @@ export const InfoBox = (props: InfoBoxProps) => {
 
                 <Render if={!!negative}>
                   <Button
-                    type={negative?.type ?? ButtonTypes.default}
-                    iconLeft={negative?.icon}
+                    {...getRowButtonTypeAndSize(negative?.type ?? ButtonTypes.muted)}
+                    rounded={true}
+                    icon={negative?.icon}
+                    iconPosition={'left'}
                     onClick={() => {
                       negative?.cta();
                     }}
@@ -201,18 +210,18 @@ export const InfoBox = (props: InfoBoxProps) => {
           </div>
 
           <AnimatedConditional condition={dismissible}>
-            <Button
-              testId={'info-box-cta'}
-              type={ButtonTypes.default}
-              iconColor={'--n500'}
-              className={classNames('pointer', ml2, p2, styles.closeBtn)}
-              color={'--n500'}
-              size={ButtonSizes.small}
-              onClick={() => {
-                closeInfoBox(false);
-              }}
-              iconLeft={IconNames.close}
-            />
+            <div className={classNames(styles.firstLine, ml2, !title && styles.noTitle)}>
+              <Button
+                testId={'info-box-cta'}
+                type={ButtonTypes.muted}
+                size={ButtonSizes.small}
+                onClick={() => {
+                  closeInfoBox(false);
+                }}
+                icon={IconNames.close}
+                rounded={true}
+              />
+            </div>
           </AnimatedConditional>
         </div>
       </ComponentContainer>

@@ -1,5 +1,8 @@
-@import "@styles/spacings";
-@import "@styles/media-mixins";
+@import '@styles/spacings';
+@import '@styles/media-mixins';
+
+// Rounded triangle (each corner is a curve) for the warn icon, drawn in a 24x24 viewBox and stretched to its box
+$warn-triangle-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10.05 3.99 Q12 0.5 13.95 3.99 L22.05 18.51 Q24 22 20 22 L4 22 Q0 22 1.95 18.51 Z'/%3E%3C/svg%3E");
 
 .InfoBoxContainer {
   display: flex;
@@ -7,28 +10,69 @@
 
 .InfoBoxComponent {
   padding: $x1 $x1 $x1 $x1_5;
-  border: $x0_125 solid;
+  border: $x0_125 solid var(--fn-divider-gl);
+  border-radius: $x2;
   display: flex;
   //justify-content: center;
   align-items: flex-start;
+  // can shrink in its container, so long words wrap (see .body) instead of overflowing
+  min-width: 0;
 
-  &.danger {
-    border-color: var(--e100);
+  // Warn icon: the Icon draws the exclamation, its ::before paints a rounded triangle behind it in the warn fill.
+  // Same 24px box as the circled icons of the other types. The triangle is an SVG mask, so it scales with the box.
+  .warn-triangle {
+    position: relative;
+    // optical correction: the exclamation sits low in the triangle, so the triangle moves up until the
+    // exclamation is centred on the first line like the other icons' glyphs (no effect on layout)
+    top: -$x0_25;
+    box-sizing: border-box;
+    width: $x3;
+    height: $x3;
+    // glyph centred horizontally and set low, in the wide part of the triangle
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: $x0_5 + $x0_25;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--w100);
+      // -webkit- for Chromium before 120 and older Safari, which only support the prefixed mask properties
+      -webkit-mask-image: $warn-triangle-mask;
+      -webkit-mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-image: $warn-triangle-mask;
+      mask-size: 100% 100%;
+      mask-repeat: no-repeat;
+      mask-position: center;
+    }
+
+    svg {
+      position: relative; // above the triangle
+    }
   }
 
-  &.info {
-    border-color: var(--i100);
+  // Text column: can shrink below its longest word, so a long URL wraps instead of pushing the close button out.
+  // break-word (not anywhere) keeps the longest word as the box's min-content width in content-sized layouts.
+  .body {
+    min-width: 0;
+    overflow-wrap: break-word;
   }
 
-  &.warn {
-    border-color: var(--w100);
-  }
+  // Exactly one line tall: the title line (28px), or the first description line (24px) when there's no title.
+  // Holds the icon and the close button, centred on that line; a taller close button overflows evenly
+  // without growing the row.
+  .first-line {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    height: $x3 + $x0_5;
 
-  &.success {
-    border-color: var(--s100);
-  }
-
-  .close-btn {
-    height: auto;
+    &.no-title {
+      height: $x3;
+    }
   }
 }
