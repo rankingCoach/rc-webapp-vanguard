@@ -42,7 +42,8 @@
  * • .has-icon-left            - Button has left icon
  * • .has-icon-right           - Button has right icon
  * • .blurred                - Backdrop blur on the ::before layer (muted buttons)
- * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons)
+ * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons);
+ *                              solid white fill, Ado base-colour text (primary & shimmer buttons)
  * • .on-dark                - The other text colour: swaps text/icon/focus ring only (muted buttons)
  * • [aria-pressed="true"]   - Pressed toggle, keeps the hover layer shown (muted buttons)
  *
@@ -188,6 +189,10 @@
  
    &.button-primary {
      @include buttonProps(primary);
+
+     &.inverted {
+       @include filledInverted(primary);
+     }
    }
  
    &.button-secondary {
@@ -203,6 +208,10 @@
        @include shimmerEffect;
        // Keep the base transitions; the hover darkening uses the spec's 150ms filter transition
        transition: all $transitionTime ease-in-out, filter 150ms ease;
+     }
+
+     &.inverted {
+       @include filledInverted(shimmer);
      }
    }
  
