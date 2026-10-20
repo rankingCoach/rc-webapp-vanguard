@@ -80,8 +80,30 @@ In `html/theming/default-theme.scss` (`$buttons` map, around line 389):
   | Brand | Override | Action |
   |---|---|---|
   | `meditrend/meditrend.scss:30,32` | bg `--n200`, hover `--brand-color` (both opaque) | Ask design; the default is to drop both overrides |
-  | `pylot-barmenia/pylot-barmenia.scss:23` | hover `--p100` (opaque) | Ask design; the default is to drop it |
+  | `pylot-barmenia/pylot-barmenia.scss:23` | hover `--p100` (`#fff7eb`, opaque) | **Update the override** (decided), see below |
   | `webcentral/webcentral.scss:46` | bg `transparent` | Already matches; no change |
+
+  **pylot-barmenia.** It does not override the rest fill, so it inherits the new `transparent`. Its hover override
+  (`--p100`, a solid cream `#fff7eb`) would show as an opaque patch on grey or tinted surfaces. Replace it with a
+  translucent tint of the brand's palette, which keeps the cream look on white:
+
+  ```diff
+     // Default btn
+     --button-default-text-color: --p600,
+     --button-default-hover-text-color: --p700,
+  -  --button-default-hover-background-color: --p100,
+  +  --button-default-hover-background-color: rc_rgba(--p300, 0.12),
+  ```
+
+  `--p300` is `#e3ac5b`. At 12% over white it gives about `#fcf5eb`, close to today's `#fff7eb`, so the hover on
+  white looks the same. The 12% matches the default slate hover. Brand files already use `rc_rgba` (e.g. `namecheap`).
+  After step 4, check:
+
+  ```bash
+  grep -o -e "--button-default-[a-z-]*background-color:[^;]*" html/theming/definitions/pylot-barmenia/pylot-barmenia.min.css
+  ```
+
+  It must print `transparent` for the rest fill and `rgba(227, 172, 91, 0.12)` for the hover.
 
 ## Step 4: regenerate
 
@@ -156,6 +178,8 @@ Use the light scheme.
       is expected.
 - [ ] Modals, drawers and the ActionBar footer: no visible change on white.
 - [ ] One email that renders a default button (any template using `email_button_default_*`): still white.
+- [ ] pylot-barmenia brand: a default button on white and on a grey card, at rest and on hover (light cream tint,
+      no opaque patch).
 - [ ] Three legacy PHP pages with `btn-default`, e.g. `account/subscriptions`, `directories/errors`, `tools/analysis/new`:
       unchanged.
 
