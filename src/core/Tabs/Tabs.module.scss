@@ -40,26 +40,6 @@ $indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
     // (no z-index, opacity, filter...)
     background-color: rc_transparent(--fn-shadow, 0.1);
   }
-
-  // Scroll buttons (TabsCustomScroll) are direct children of the bar root; round them fully and fit them to the
-  // pill's inner height so they aren't clipped. Full specificity: must beat TabsCustomScroll's own rules.
-  &.floating {
-    > .scroll-button {
-      box-sizing: border-box;
-      height: calc(100% - #{2 * $floating-padding});
-      aspect-ratio: 1;
-      padding: 0;
-      border-radius: $rounded-border-radius;
-    }
-
-    > .scroll-button:first-child {
-      left: $floating-padding;
-    }
-
-    > .scroll-button:last-child {
-      right: $floating-padding;
-    }
-  }
 }
 
 .scroller {
@@ -106,8 +86,42 @@ $indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
   }
 }
 
-// Class passed to TabsCustomScroll; positioning/appearance lives in its own module,
-// theme-specific overrides are nested under .tabs-container.floating.
+// Overflow buttons (muted round Buttons, see Tabs.tsx), floating over the inline-start / inline-end edges of the bar.
 .scroll-button {
-  // Intentionally empty: styled via .tabs-container.floating > .scroll-button
+  --scroll-button-inset: #{$x0_5};
+
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  translate: 0 -50%;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+
+  .floating > & {
+    --scroll-button-inset: #{$floating-padding};
+  }
+
+  // Carets follow the reading direction
+  &:dir(rtl) svg {
+    scale: -1 1;
+  }
+}
+
+.scroll-button-start {
+  inset-inline-start: var(--scroll-button-inset);
+}
+
+.scroll-button-end {
+  inset-inline-end: var(--scroll-button-inset);
+}
+
+.scroll-button-hidden {
+  visibility: hidden;
+  opacity: 0;
 }

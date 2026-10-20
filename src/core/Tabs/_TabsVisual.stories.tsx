@@ -34,7 +34,12 @@ import {
   SelectedScrolledIntoViewExternally as _SelectedScrolledIntoViewExternally,
   SelectedVisibleAfterResize as _SelectedVisibleAfterResize,
 } from './stories/OverflowDynamic.story';
-import { NoOverflowWide as _NoOverflowWide, OverflowScroll as _OverflowScroll } from './stories/OverflowScroll.story';
+import {
+  NoOverflowWide as _NoOverflowWide,
+  OverflowScroll as _OverflowScroll,
+  OverflowScrollFloating as _OverflowScrollFloating,
+  OverflowScrollRtl as _OverflowScrollRtl,
+} from './stories/OverflowScroll.story';
 import {
   SelectedLabelHighlight as _SelectedLabelHighlight,
   SelectedLabelUnderline as _SelectedLabelUnderline,
@@ -61,6 +66,8 @@ export const ConfigFloating: Story = { ..._ConfigFloating };
 export const ConfigGrowCenteredIcons: Story = { ..._ConfigGrowCenteredIcons };
 export const ConfigNoGrowCentered: Story = { ..._ConfigNoGrowCentered };
 export const OverflowScroll: Story = { ..._OverflowScroll };
+export const OverflowScrollFloating: Story = { ..._OverflowScrollFloating };
+export const OverflowScrollRtl: Story = { ..._OverflowScrollRtl };
 export const NoOverflowWide: Story = { ..._NoOverflowWide };
 export const SelectedLabelHighlight: Story = { ..._SelectedLabelHighlight };
 export const SelectedLabelUnderline: Story = { ..._SelectedLabelUnderline };
