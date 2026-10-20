@@ -45,6 +45,20 @@ export enum ButtonTypes {
   muted = 'muted',
 }
 
+/**
+ * Text colours the default button supports besides its own (`textColor` prop). Each key maps to a rest colour in
+ * `$default-text-colors` (Button.module.scss); the hover colour is derived from it. Add a product's accent here.
+ */
+export enum ButtonTextColors {
+  /** Ado's colour (`--ado-base`), e.g. the Needs-you row action */
+  ado = 'ado',
+}
+
+// One class per text colour, generated from `$default-text-colors` in Button.module.scss
+const TEXT_COLOR_CLASSES: Record<ButtonTextColors, string> = {
+  [ButtonTextColors.ado]: styles.textColorAdo,
+};
+
 type eventFn = (event: React.MouseEvent) => void;
 type simpleFn = () => void;
 
@@ -126,6 +140,12 @@ type BaseButtonProps = CommonButtonProps & {
    * Shimmer keeps its sweep, as a faint band of the same tint.
    */
   inverted?: boolean;
+  /**
+   * Default type only (ignored by the other types): colours the label and icon, rest and hover, from a fixed set.
+   * The fill, focus ring and disabled state stay the default button's. Takes precedence over the deprecated
+   * `color` / `hoverColor`.
+   */
+  textColor?: ButtonTextColors;
   // these are specifically forbidden for the non-muted button
   blurred?: never;
   onDark?: never;
@@ -206,6 +226,7 @@ export const Button = (props: ButtonProps) => {
   const hasInvertedClass = isFilledInverted || (isMuted && !!inverted);
   // These colours live in CSS, the icon follows the text colour
   const iconFollowsText = isMuted || isFilledInverted;
+  const textColor = type === ButtonTypes.default && 'textColor' in props ? props.textColor : undefined;
 
   // Maintain support for iconLeft & iconRight props, but only use icon internally;
   // icon props takes precedence over iconLeft/iconRight and iconRight over iconLeft.
@@ -316,10 +337,16 @@ export const Button = (props: ButtonProps) => {
     }
   }
 
+  // A text colour lives in CSS (rest and hover); the icon follows the label unless an icon colour was given
+  if (textColor) {
+    iconColor = props.iconColor ?? 'currentColor';
+    iconHoverColor = props.iconHoverColor ?? 'currentColor';
+  }
+
   const getLabelColor = useCallback(() => {
-    if (disabled) return undefined;
+    if (disabled || textColor) return undefined;
     return hoverColor ? (btnHovered ? hoverColor : color) : color;
-  }, [disabled, btnHovered, hoverColor, color]);
+  }, [disabled, textColor, btnHovered, hoverColor, color]);
 
   const getIconColor = useCallback(() => {
     // Muted & inverted keep following the text colour when disabled; the 0.4 opacity comes from CSS
@@ -464,6 +491,7 @@ export const Button = (props: ButtonProps) => {
           blurred ? styles.blurred : '',
           hasInvertedClass ? styles.inverted : '',
           isMuted && onDark ? styles.onDark : '',
+          textColor ? TEXT_COLOR_CLASSES[textColor] : '',
         )}
         aria-pressed={isMuted ? pressed : undefined}
       >
