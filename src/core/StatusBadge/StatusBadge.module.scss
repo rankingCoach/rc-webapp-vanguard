@@ -1,3 +1,10 @@
+// Colours of the 'ado' status (see status-badge-get-colors-based-on-status.ts). Declared on the badge root so the
+// inline var() and the Text/Icon children resolve them. --ado-text is not in the theme yet: falls back to --ado-base.
+@mixin ado-colors {
+  --status-badge-ado-background-color: color-mix(in srgb, var(--ado-base) 12%, transparent);
+  --status-badge-ado-text-color: var(--ado-text, var(--ado-base));
+}
+
 .status-badge {
   display: flex;
   flex-wrap: nowrap;
@@ -7,6 +14,7 @@
   gap: 4px;
   border-radius: 32px;
   //background-color: var(--s100);
+  @include ado-colors;
 }
 
 .status-badge-no-icon {
@@ -20,12 +28,16 @@
 }
 
 
-.status-badge-none-icon {
-  @extend .status-badge;
-  padding: 2px 6px 2px 6px;
-  height: 16px
-}
+// size="compact": 18px tall (1px + 16px caption line height + 1px). With an icon, its 18px circle sets the height.
+.status-badge.compact {
+  box-sizing: border-box;
+  height: 18px;
+  padding: 1px 7px;
 
+  &:not(.status-badge-no-icon):not(.status-badge-none-icon) {
+    padding: 0 7px 0 0;
+  }
+}
 
 .is-blurred {
   filter: blur(15px);
@@ -56,6 +68,7 @@
 
 
 .status-icon {
+  @include ado-colors;
   min-width: 128px;
   display: flex;
   flex-direction: column;

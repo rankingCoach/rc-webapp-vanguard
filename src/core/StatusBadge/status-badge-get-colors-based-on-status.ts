@@ -181,6 +181,15 @@ export const getColorsBasedOnStatus = (
         bgColor: '--a1100',
         iconName: IconNames.ai,
       };
+    case 'ado':
+      // Component-scoped variables declared in StatusBadge.module.scss (12% --ado-base fill, --ado-text label)
+      return {
+        reverseColor: '--ado-base',
+        iconColor: '--ado-base',
+        textColor: '--status-badge-ado-text-color',
+        bgColor: '--status-badge-ado-background-color',
+        iconName: IconNames.ado,
+      };
   }
 
   return {

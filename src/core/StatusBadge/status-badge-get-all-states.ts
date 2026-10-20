@@ -25,4 +25,5 @@ export const statusBadgeGetAllStates = () =>
     'not_sent',
     'connected',
     'ai',
+    'ado',
   ] as const;

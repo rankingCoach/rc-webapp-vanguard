@@ -33,6 +33,7 @@ export type StatusBadgeStatus =
   | 'neutral'
   | 'limitExcedeed'
   | 'ai'
+  | 'ado'
   | StatusBadgePostStatus
   | StatusBadgeBoostStatus
   | 'sent'
@@ -44,6 +45,7 @@ export type StatusBadgeStatus =
 
 // | StatusBadgeReviewStatus;
 export type StatusBadgeIconVariant = 'normal' | 'reverse' | 'none';
+export type StatusBadgeSize = 'default' | 'compact';
 
 export interface StatusBadgeProps {
   status: StatusBadgeStatus;
@@ -55,11 +57,15 @@ export interface StatusBadgeProps {
   icon?: IconNames;
   hideIcon?: boolean;
   variant?: 'small' | 'big';
+  /** Only applies to the `small` variant. `compact`: 18px tall, 11px bold text. */
+  size?: StatusBadgeSize;
   iconVariant?: StatusBadgeIconVariant;
   isBlurred?: boolean;
   borderRadius?: number;
   capitalizeStatus?: boolean;
 }
+
+const COMPACT_FONT_SIZE = 11;
 
 export const StatusBadge = (props: StatusBadgeProps) => {
   const {
@@ -70,6 +76,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
     icon,
     className,
     variant = 'small',
+    size = 'default',
     iconVariant = 'normal',
     hideIcon = false,
     capitalizeStatus = false,
@@ -90,6 +97,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
     iconColor = bgColor;
   }
 
+  const isCompact = size === 'compact';
   const color = `var(${iconColor}-rgb)`;
   if (variant === 'big') {
     return (
@@ -134,6 +142,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
         isBlurred ? styles.isBlurred : '',
         hideIcon ? styles.statusBadgeNoIcon : styles.statusBadge,
         iconVariant === 'none' ? styles.statusBadgeNoneIcon : undefined,
+        isCompact ? styles.compact : undefined,
       )}
       style={{
         backgroundColor: `var(${bgColor})`,
@@ -148,12 +157,14 @@ export const StatusBadge = (props: StatusBadgeProps) => {
           hasIconReverse={hasIconReverse}
           iconVariant={iconVariant}
           iconName={iconName}
+          compact={isCompact}
         />
       </AnimatedConditional>
       <Text
         type={TextTypes.textCaption}
         isBlurred={isBlurred}
-        fontWeight={fontWeight}
+        fontWeight={fontWeight ?? (isCompact ? FontWeights.bold : undefined)}
+        fontSize={isCompact ? COMPACT_FONT_SIZE : undefined}
         capitalize={capitalizeStatus}
         color={textColor}
         textWrap={'wrap'}
@@ -169,6 +180,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
             translate={false}
             color={textColor}
             type={TextTypes.textCaption}
+            fontSize={isCompact ? COMPACT_FONT_SIZE : undefined}
           >
             {numberValue}
           </Text>
