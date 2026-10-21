@@ -113,6 +113,7 @@ export const FeatureBox = (props: FeatureBoxProps) => {
         <AnimatedConditional condition={buttonPosition == 'left'}>
           <div className={width < breakpoints.tablet ? classNames(dFlex, justifyContentCenter, alignItemsCenter) : ''}>
             <Button
+              size={ButtonSizes.extraLarge}
               type={ButtonTypes.primary}
               iconRight={IconNames.arrowRight}
               onClick={onClick}
@@ -146,7 +147,7 @@ export const FeatureBox = (props: FeatureBoxProps) => {
         <AnimatedConditional className={w100} condition={buttonPosition == 'right'}>
           <Button
             className={classNames(px4, dFlex, justifyContentCenter, alignItemsCenter, w100, styles.upsellButton)}
-            size={ButtonSizes.large}
+            size={ButtonSizes.extraLarge}
             onClick={onClick}
           >
             {btnText}

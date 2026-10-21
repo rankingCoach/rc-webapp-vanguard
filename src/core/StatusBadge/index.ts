@@ -4,6 +4,7 @@ export type {
   StatusBadgePostStatus,
   StatusBadgeProps,
   StatusBadgeReviewStatus,
+  StatusBadgeSize,
   StatusBadgeStatus,
 } from './StatusBadge';
 export { StatusBadge } from './StatusBadge';

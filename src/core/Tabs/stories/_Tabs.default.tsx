@@ -5,10 +5,6 @@ import { Tabs, TabsProps } from '../Tabs';
 
 export type Story = StoryObj<typeof Tabs>;
 
-export const selectors = {
-  scrollButton: '[class*="custom-scroll-button-wrapper"]',
-};
-
 /** The scrolling viewport that wraps the tablist (implementation-agnostic: direct parent of role="tablist"). */
 export const scrollerOf = (tablist: HTMLElement): HTMLElement | null => tablist.parentElement;
 

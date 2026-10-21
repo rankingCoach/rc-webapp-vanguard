@@ -1,11 +1,13 @@
 import { classNames } from '@helpers/classNames';
+import { translationService } from '@services/translation.service';
+import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { IconNames } from '@vanguard/Icon/IconNames';
 import { useTabsIndicator } from '@vanguard/Tabs/hooks/use-tabs-indicator';
 import { useTabsKeyboard } from '@vanguard/Tabs/hooks/use-tabs-keyboard';
 import { useTabsScroll } from '@vanguard/Tabs/hooks/use-tabs-scroll';
 import { omitProps, Tab, TabProps } from '@vanguard/Tabs/Tab/Tab';
 import { TabPanel } from '@vanguard/Tabs/TabPanel/TabPanel';
-import { TabsCustomScroll } from '@vanguard/Tabs/TabsCustomScroll/TabsCustomScroll';
 import React, { useId, useRef, useState } from 'react';
 
 import styles from './Tabs.module.scss';
@@ -169,20 +171,12 @@ export const Tabs = (props: TabsProps) => {
   const layoutKey = visibleTabs.map(({ tab, index }) => `${index}:${String(resolveValue(tab, index))}`).join('|');
   const isFloating = config.theme === 'floating';
 
-  const {
-    scrollerRef,
-    listRef,
-    canScrollLeft,
-    canScrollRight,
-    isOverflowing,
-    onScroll,
-    scrollLeftward,
-    scrollRightward,
-  } = useTabsScroll({
-    currentValue,
-    layoutKey,
-    measureKey: config.theme,
-  });
+  const { scrollerRef, listRef, canScrollStart, canScrollEnd, isOverflowing, onScroll, scrollToStart, scrollToEnd } =
+    useTabsScroll({
+      currentValue,
+      layoutKey,
+      measureKey: config.theme,
+    });
 
   // Floating theme: one chip glides to the selected tab instead of each tab painting its own selected fill.
   const indicatorRef = useRef<HTMLSpanElement | null>(null);
@@ -203,6 +197,35 @@ export const Tabs = (props: TabsProps) => {
     pointerFocusRef.current = true;
   };
 
+  // Overflow buttons, placed on the inline-start / inline-end edges of the bar (left / right in LTR). The one that
+  // can't scroll fades out but stays mounted, disabled, so the other one doesn't move.
+  const renderScrollButton = (edge: 'start' | 'end') => {
+    const isStart = edge === 'start';
+    const canScroll = isStart ? canScrollStart : canScrollEnd;
+    return (
+      <span
+        className={classNames(
+          styles.scrollButton,
+          isStart ? styles.scrollButtonStart : styles.scrollButtonEnd,
+          canScroll ? '' : styles.scrollButtonHidden,
+        )}
+      >
+        <Button
+          type={ButtonTypes.muted}
+          blurred
+          shape="round"
+          size={ButtonSizes.large}
+          // The caret SVG assets are mirror-named: caretRight points left (same swap as NavigationModal)
+          icon={isStart ? IconNames.caretRight : IconNames.caretLeft}
+          ariaLabel={translationService.get(isStart ? 'Scroll to start' : 'Scroll to end').value}
+          disabled={!canScroll}
+          onClick={isStart ? scrollToStart : scrollToEnd}
+          testId={testId ? `${testId}-scroll-${isStart ? 'left' : 'right'}` : undefined}
+        />
+      </span>
+    );
+  };
+
   const isPanelInDom = (tab: TabProps, index: number) =>
     tab.component !== undefined && (keepInactiveTabsInDom || resolveValue(tab, index) === currentValue);
 
@@ -217,15 +240,6 @@ export const Tabs = (props: TabsProps) => {
           className ?? '',
         )}
       >
-        {isOverflowing && (
-          <TabsCustomScroll
-            direction="left"
-            disabled={!canScrollLeft}
-            onClick={scrollLeftward}
-            className={styles.scrollButton}
-            testId={testId ? `${testId}-scroll-left` : undefined}
-          />
-        )}
         <div ref={scrollerRef} className={styles.scroller} onScroll={onScroll}>
           <div
             ref={listRef}
@@ -298,15 +312,9 @@ export const Tabs = (props: TabsProps) => {
             })}
           </div>
         </div>
-        {isOverflowing && (
-          <TabsCustomScroll
-            direction="right"
-            disabled={!canScrollRight}
-            onClick={scrollRightward}
-            className={styles.scrollButton}
-            testId={testId ? `${testId}-scroll-right` : undefined}
-          />
-        )}
+        {/* After the scroller: positioned tab labels (floating theme) would otherwise paint over the start button */}
+        {isOverflowing && renderScrollButton('start')}
+        {isOverflowing && renderScrollButton('end')}
       </div>
       {tabList.map((tab, index) =>
         tab.component === undefined ? null : (

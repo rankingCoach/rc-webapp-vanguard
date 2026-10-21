@@ -30,7 +30,7 @@ export { Textarea } from './core/Textarea';
 
 // Button
 export type { ButtonProps, ButtonShape } from './core/Button';
-export { Button, ButtonSizes, ButtonTypes } from './core/Button';
+export { Button, ButtonSizes, ButtonTextColors, ButtonTypes } from './core/Button';
 
 // Form
 export type { FormStatus } from './core/Form';
@@ -193,6 +193,7 @@ export type {
   StatusBadgePostStatus,
   StatusBadgeProps,
   StatusBadgeReviewStatus,
+  StatusBadgeSize,
   StatusBadgeStatus,
 } from './core/StatusBadge';
 export type { StatusBadgeIconProps } from './core/StatusBadge';

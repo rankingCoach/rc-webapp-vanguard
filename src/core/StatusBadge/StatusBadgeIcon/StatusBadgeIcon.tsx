@@ -12,10 +12,12 @@ export interface StatusBadgeIconProps {
   variant?: 'small' | 'big';
   iconVariant?: StatusBadgeIconVariant;
   iconName?: IconNames;
+  /** Shrinks the small icon's circle to 18px (10px glyph), for `<StatusBadge size="compact" />`. */
+  compact?: boolean;
 }
 
 export const StatusBadgeIcon = (props: StatusBadgeIconProps) => {
-  const { status, variant = 'small', hasIconReverse, iconVariant, iconName: propIconName } = props;
+  const { status, variant = 'small', hasIconReverse, iconVariant, iconName: propIconName, compact } = props;
 
   if (!status) {
     return null;
@@ -49,6 +51,7 @@ export const StatusBadgeIcon = (props: StatusBadgeIconProps) => {
     <Icon
       spin={status === 'publishing' || status === 'queued'}
       hasCircle={true}
+      forceSize={compact ? 10 : undefined}
       fillColor={!hasIconReverse ? iconColor : bgColor}
       color={!hasIconReverse ? '--n000' : reverseColor}
     >

@@ -73,6 +73,8 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --base-ads-rgb: 184, 20, 80;
   --ado-base: #006a85;
   --ado-base-rgb: 0, 106, 133;
+  --ado-text: #006a85;
+  --ado-text-rgb: 0, 106, 133;
   --ado-glow-accent: #00ace7;
   --ado-glow-accent-rgb: 0, 172, 231;
   --ado-glow-light: #3df3f0;
@@ -444,14 +446,15 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --editorial-typeface: 'Crimson Pro', Georgia, 'Times New Roman', serif;
   --buttons-typeface: 'Inter', sans-serif;
   --buttons-border-radius: 4px;
+  --button-corner-shape: superellipse(1.3);
   --button-default-text-color: light-dark(#0062ff, #6db3ff);
   --button-default-text-color-rgb: 0, 98, 255;
-  --button-default-background-color: light-dark(white, #090d17);
-  --button-default-background-color-rgb: 255, 255, 255;
+  --button-default-background-color: rgba(0, 0, 0, 0);
+  --button-default-background-color-rgb: 0, 0, 0;
   --button-default-hover-text-color: light-dark(#00369e, #358cff);
   --button-default-hover-text-color-rgb: 0, 54, 158;
-  --button-default-hover-background-color: light-dark(#f6f9fc, #01040b);
-  --button-default-hover-background-color-rgb: 246, 249, 252;
+  --button-default-hover-background-color: rgba(185, 197, 216, 0.12);
+  --button-default-hover-background-color-rgb: 185, 197, 216;
   --button-default-disabled-text-color: light-dark(#263349, #f6f9fc);
   --button-default-disabled-text-color-rgb: 38, 51, 73;
   --button-default-disabled-background-color: rgba(0, 0, 0, 0);
@@ -462,6 +465,8 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-default-focus-background-color-rgb: 0, 0, 0;
   --button-default-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
   --button-default-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-default-focus-outline-color: #0062ff;
+  --button-default-focus-outline-color-rgb: 0, 98, 255;
   --button-default-ripple-color: light-dark(#0062ff, #358cff);
   --button-default-ripple-color-rgb: 0, 98, 255;
   --button-primary-text-color: white;
@@ -482,6 +487,8 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-primary-focus-background-color-rgb: 0, 98, 255;
   --button-primary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
   --button-primary-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-primary-focus-outline-color: #0062ff;
+  --button-primary-focus-outline-color-rgb: 0, 98, 255;
   --button-primary-ripple-color: light-dark(#b8d9ff, #000335);
   --button-primary-ripple-color-rgb: 184, 217, 255;
   --button-secondary-text-color: light-dark(#263349, #f6f9fc);
@@ -512,6 +519,8 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-secondary-focus-border-color-rgb: 185, 197, 216;
   --button-secondary-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
   --button-secondary-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-secondary-focus-outline-color: #0062ff;
+  --button-secondary-focus-outline-color-rgb: 0, 98, 255;
   --button-secondary-ripple-color: light-dark(#0062ff, #358cff);
   --button-secondary-ripple-color-rgb: 0, 98, 255;
   --button-shimmer-text-color: white;
@@ -532,8 +541,25 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --button-shimmer-focus-background-color-rgb: 0, 98, 255;
   --button-shimmer-focus-box-shadow-color: light-dark(#b8d9ff, #000335);
   --button-shimmer-focus-box-shadow-color-rgb: 184, 217, 255;
+  --button-shimmer-focus-outline-color: #0062ff;
+  --button-shimmer-focus-outline-color-rgb: 0, 98, 255;
   --button-shimmer-ripple-color: light-dark(#b8d9ff, #000335);
   --button-shimmer-ripple-color-rgb: 184, 217, 255;
+  --button-primary-inverted-background-color: white;
+  --button-primary-inverted-background-color-rgb: 255, 255, 255;
+  --button-primary-inverted-hover-background-color: color-mix(in srgb, #fff 88%, #006a85);
+  --button-primary-inverted-text-color: #006a85;
+  --button-primary-inverted-text-color-rgb: 0, 106, 133;
+  --button-primary-inverted-focus-outline-color: white;
+  --button-primary-inverted-focus-outline-color-rgb: 255, 255, 255;
+  --button-shimmer-inverted-background-color: white;
+  --button-shimmer-inverted-background-color-rgb: 255, 255, 255;
+  --button-shimmer-inverted-hover-background-color: color-mix(in srgb, #fff 88%, #006a85);
+  --button-shimmer-inverted-text-color: #006a85;
+  --button-shimmer-inverted-text-color-rgb: 0, 106, 133;
+  --button-shimmer-inverted-sweep-color: color-mix(in srgb, #fff 88%, #006a85);
+  --button-shimmer-inverted-focus-outline-color: white;
+  --button-shimmer-inverted-focus-outline-color-rgb: 255, 255, 255;
   --button-muted-text-color: light-dark(#263349, #f6f9fc);
   --button-muted-text-color-rgb: 38, 51, 73;
   --button-muted-background-color: light-dark(rgba(185, 197, 216, 0.25), rgba(255, 255, 255, 0.1));
@@ -1183,6 +1209,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 :root .color-ado-base {
   color: var(--ado-base);
+}
+:root .bg-color-ado-text {
+  background-color: var(--ado-text);
+}
+:root .color-ado-text {
+  color: var(--ado-text);
 }
 :root .bg-color-ado-glow-accent {
   background-color: var(--ado-glow-accent);
@@ -1838,6 +1870,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-default-focus-box-shadow-color {
   color: var(--button-default-focus-box-shadow-color);
 }
+:root .bg-color-button-default-focus-outline-color {
+  background-color: var(--button-default-focus-outline-color);
+}
+:root .color-button-default-focus-outline-color {
+  color: var(--button-default-focus-outline-color);
+}
 :root .bg-color-button-default-ripple-color {
   background-color: var(--button-default-ripple-color);
 }
@@ -1897,6 +1935,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 }
 :root .color-button-primary-focus-box-shadow-color {
   color: var(--button-primary-focus-box-shadow-color);
+}
+:root .bg-color-button-primary-focus-outline-color {
+  background-color: var(--button-primary-focus-outline-color);
+}
+:root .color-button-primary-focus-outline-color {
+  color: var(--button-primary-focus-outline-color);
 }
 :root .bg-color-button-primary-ripple-color {
   background-color: var(--button-primary-ripple-color);
@@ -1988,6 +2032,12 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-secondary-focus-box-shadow-color {
   color: var(--button-secondary-focus-box-shadow-color);
 }
+:root .bg-color-button-secondary-focus-outline-color {
+  background-color: var(--button-secondary-focus-outline-color);
+}
+:root .color-button-secondary-focus-outline-color {
+  color: var(--button-secondary-focus-outline-color);
+}
 :root .bg-color-button-secondary-ripple-color {
   background-color: var(--button-secondary-ripple-color);
 }
@@ -2048,11 +2098,53 @@ The purpose of this file is to implement all modifier functions in it so the mai
 :root .color-button-shimmer-focus-box-shadow-color {
   color: var(--button-shimmer-focus-box-shadow-color);
 }
+:root .bg-color-button-shimmer-focus-outline-color {
+  background-color: var(--button-shimmer-focus-outline-color);
+}
+:root .color-button-shimmer-focus-outline-color {
+  color: var(--button-shimmer-focus-outline-color);
+}
 :root .bg-color-button-shimmer-ripple-color {
   background-color: var(--button-shimmer-ripple-color);
 }
 :root .color-button-shimmer-ripple-color {
   color: var(--button-shimmer-ripple-color);
+}
+:root .bg-color-button-primary-inverted-background-color {
+  background-color: var(--button-primary-inverted-background-color);
+}
+:root .color-button-primary-inverted-background-color {
+  color: var(--button-primary-inverted-background-color);
+}
+:root .bg-color-button-primary-inverted-text-color {
+  background-color: var(--button-primary-inverted-text-color);
+}
+:root .color-button-primary-inverted-text-color {
+  color: var(--button-primary-inverted-text-color);
+}
+:root .bg-color-button-primary-inverted-focus-outline-color {
+  background-color: var(--button-primary-inverted-focus-outline-color);
+}
+:root .color-button-primary-inverted-focus-outline-color {
+  color: var(--button-primary-inverted-focus-outline-color);
+}
+:root .bg-color-button-shimmer-inverted-background-color {
+  background-color: var(--button-shimmer-inverted-background-color);
+}
+:root .color-button-shimmer-inverted-background-color {
+  color: var(--button-shimmer-inverted-background-color);
+}
+:root .bg-color-button-shimmer-inverted-text-color {
+  background-color: var(--button-shimmer-inverted-text-color);
+}
+:root .color-button-shimmer-inverted-text-color {
+  color: var(--button-shimmer-inverted-text-color);
+}
+:root .bg-color-button-shimmer-inverted-focus-outline-color {
+  background-color: var(--button-shimmer-inverted-focus-outline-color);
+}
+:root .color-button-shimmer-inverted-focus-outline-color {
+  color: var(--button-shimmer-inverted-focus-outline-color);
 }
 :root .bg-color-button-muted-text-color {
   background-color: var(--button-muted-text-color);
@@ -3312,9 +3404,7 @@ The purpose of this file is to implement all modifier functions in it so the mai
   --header-button-secondary-focus-box-shadow-color-rgb: 0, 3, 53;
   --header-button-secondary-ripple-color-rgb: 53, 140, 255;
   --button-default-text-color-rgb: 109, 179, 255;
-  --button-default-background-color-rgb: 9, 13, 23;
   --button-default-hover-text-color-rgb: 53, 140, 255;
-  --button-default-hover-background-color-rgb: 1, 4, 11;
   --button-default-disabled-text-color-rgb: 246, 249, 252;
   --button-default-focus-text-color-rgb: 109, 179, 255;
   --button-default-focus-box-shadow-color-rgb: 0, 3, 53;
@@ -3447,9 +3537,7 @@ The purpose of this file is to implement all modifier functions in it so the mai
     --header-button-secondary-focus-box-shadow-color-rgb: 0, 3, 53;
     --header-button-secondary-ripple-color-rgb: 53, 140, 255;
     --button-default-text-color-rgb: 109, 179, 255;
-    --button-default-background-color-rgb: 9, 13, 23;
     --button-default-hover-text-color-rgb: 53, 140, 255;
-    --button-default-hover-background-color-rgb: 1, 4, 11;
     --button-default-disabled-text-color-rgb: 246, 249, 252;
     --button-default-focus-text-color-rgb: 109, 179, 255;
     --button-default-focus-box-shadow-color-rgb: 0, 3, 53;
