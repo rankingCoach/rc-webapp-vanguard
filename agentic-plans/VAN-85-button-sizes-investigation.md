@@ -85,7 +85,7 @@ The remaining ~40 usages pick their type or size at runtime (§3.3).
    - no `size` / `ButtonSizes.medium` → `ButtonSizes.extraLarge`
    - `ButtonSizes.large` → `ButtonSizes.extraLarge`
    - That's about 820 edits. The height stays the same. Text shrinks only on today's `small`: 16 → 12px on desktop, which is how muted `medium` looks today.
-2. **`large` (6 call sites):** FeatureBox:149, MobileAppInviteSheet:118/128, CardBasedBenefits:516, UpsellingCard:210, SpaceshipUpsellCard:95. These are upsell and invite CTAs that drop from 60 to 48px on desktop. Design needs to sign off. There is no 60px size left.
+2. **`large` (6 call sites):** FeatureBox:149, MobileAppInviteSheet:118/128, CardBasedBenefits:516, UpsellingCard:210, SpaceshipUpsellCard:95. These are upsell and invite CTAs that drop from 60 to 48px on desktop. Design approved the drop on 2026-10-21. There is no 60px size left.
 3. **Muted buttons:** untouched.
 
 ### 3.3 Manual review: type or size picked at runtime

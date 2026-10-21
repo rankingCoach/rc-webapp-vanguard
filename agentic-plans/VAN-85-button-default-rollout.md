@@ -79,7 +79,7 @@ In `html/theming/default-theme.scss` (`$buttons` map, around line 389):
 
   | Brand | Override | Action |
   |---|---|---|
-  | `meditrend/meditrend.scss:30,32` | bg `--n200`, hover `--brand-color` (both opaque) | Ask design; the default is to drop both overrides |
+  | `meditrend/meditrend.scss:30,32` | bg `--n200`, hover `--brand-color` (both opaque) | Not part of this PR: handled as webapp step **W7** (D3, 2026-10-21). The proposed default is to drop both overrides |
   | `pylot-barmenia/pylot-barmenia.scss:23` | hover `--p100` (`#fff7eb`, opaque) | **Update the override** (decided), see below |
   | `webcentral/webcentral.scss:46` | bg `transparent` | Already matches; no change |
 

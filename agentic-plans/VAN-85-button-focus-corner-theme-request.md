@@ -106,7 +106,7 @@ Vanguard reads the token and falls back to the squircle:
 - No `-rgb` companion, no `light-dark()`, no `.color-*` / `.bg-color-*` utility classes.
 - It sits next to `--buttons-border-radius` in the generator, because the two are chosen together.
 
-**Which value per theme (suggestion):**
+**Which value per theme (decided 2026-10-21: 8px threshold):**
 
 | `--buttons-border-radius` | `--button-corner-shape` |
 |---|---|
@@ -114,7 +114,7 @@ Vanguard reads the token and falls back to the squircle:
 | more than 8px | `round` |
 
 If the generator knows each theme's radius, it can derive the shape with that rule; otherwise set it per reseller
-theme. Design has the final say on the threshold.
+theme.
 
 ### 2.3 What it does and does not affect
 

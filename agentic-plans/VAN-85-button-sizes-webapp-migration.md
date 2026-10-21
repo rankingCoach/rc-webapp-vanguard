@@ -47,7 +47,7 @@ After the codemod, heights stay the same. These still need a look:
 
 - `upsellings/.../SpaceshipUpsellCard.module.scss:70/80`: `.card .cta.cta` sets `--padding-y: 10px` and a 1rem label to get a 40px `large` button. After the bump the button is `extraLarge`, so check it still lands at 40px.
 - `presence/GBP/GoogleBusinessProfileCreateNotInPlanNotice/...module.scss:37`: `height: auto` plus wrapping label below 480px. It still works, but consider the `textWrap="wrap"` prop instead.
-- The 6 `large` CTAs: FeatureBox:149, MobileAppInviteSheet:118/128, CardBasedBenefits:516, UpsellingCard:210, SpaceshipUpsellCard:95. They drop from 60 to 48px on desktop and need design sign-off.
+- The 6 `large` CTAs: FeatureBox:149, MobileAppInviteSheet:118/128, CardBasedBenefits:516, UpsellingCard:210, SpaceshipUpsellCard:95. They drop from 60 to 48px on desktop. **Approved by design (2026-10-21)**: keep them at `extraLarge`, no extra change.
 
 ## 4. Full codemod dry run
 

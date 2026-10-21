@@ -4,7 +4,7 @@
 the email theme templates and every brand/white-label theme.
 **Goal:** the Vanguard `default` button is transparent at rest, with a light translucent fill on hover (the mock's ghost
 button). Light scheme only; dark mode is not supported yet.
-**Status:** on hold until design signs off (see the RFC, "Open questions").
+**Status:** approved by design (2026-10-21). The `meditrend` brand override is handled separately, as webapp step W7.
 **No new tokens.** Two existing values change, and two readers that inherit them get decoupled first.
 
 ---

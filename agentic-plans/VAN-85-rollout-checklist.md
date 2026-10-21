@@ -11,13 +11,13 @@ theme changes) are covered by the codemod and the theme steps below, not by a ma
 
 ---
 
-## 0. Open decisions (block the step they name)
+## 0. Design decisions (all settled on 2026-10-21)
 
-- [ ] D: the 6 `large` CTAs that drop from 60 to 48px on desktop (list: `VAN-85-button-sizes-webapp-migration.md` §3). Blocks W2.
-- [ ] D: the transparent default button RFC ("RFC: Transparent default Button (VAN-85)"). Blocks T4 and W3.
-- [ ] D: `meditrend` keeps or drops its own default-button fills (`VAN-85-button-default-rollout.md` step 3). Blocks T4 for that brand.
-- [ ] D: the dark-scheme `--ado-text` value (suggested `#7fcde3`). Blocks T3 (dark only).
-- [ ] D: the `--buttons-border-radius` threshold above which a theme keeps `round` corners (suggested 8px). Blocks T2.
+- [x] D1: the 6 `large` CTAs that drop from 60 to 48px on desktop (list: `VAN-85-button-sizes-webapp-migration.md` §3). **Approved: the drop is fine.** W2 is unblocked.
+- [x] D2: the transparent default button RFC ("RFC: Transparent default Button (VAN-85)"). **Approved.** T4 and W3 are unblocked.
+- [x] D3: `meditrend` keeps or drops its own default-button fills. **Moved out of T4 into its own webapp step, W7.** It no longer blocks T4.
+- [x] D4: the `--ado-text` value. **Use one value for light and dark.** Dark mode doesn't exist in the webapp yet, so there's no separate dark value.
+- [x] D5: the `--buttons-border-radius` threshold above which a theme keeps `round` corners. **Approved: 8px.** T2 is unblocked.
 
 ## 1. Vanguard release (V)
 
@@ -35,9 +35,9 @@ theme changes) are covered by the codemod and the theme steps below, not by a ma
 None of these block the Vanguard release; Vanguard falls back to the values in brackets. Order matters only where noted.
 
 - [ ] **T1 focus outline colour.** `--button-{default,primary,secondary,shimmer}-focus-outline-color` (fallback: `--button-<type>-focus-box-shadow-color`). Then update the 3 app files that override the old ring token. → `VAN-85-button-focus-corner-theme-request.md` §1
-- [ ] **T2 corner shape.** `--button-corner-shape` (fallback: `superellipse(1.3)`). Set it to `round` on large-radius reseller themes **before** those themes get Vanguard 2.6.0. → same doc §2
-- [ ] **T3 Ado text.** `--ado-text` + `-rgb` (fallback: `--ado-base`). → `VAN-85-status-badge-theme-request.md`
-- [ ] **T4 transparent default button.** Change two values of existing tokens; no new tokens. Must ship in the **same webapp PR** as W3, after the email and legacy readers are decoupled. → `VAN-85-button-default-theme-request.md`, `VAN-85-button-default-rollout.md` steps 2–4
+- [ ] **T2 corner shape.** `--button-corner-shape` (fallback: `superellipse(1.3)`). Set it to `round` on every reseller theme whose `--buttons-border-radius` is above **8px** (D5), **before** those themes get Vanguard 2.6.0. → same doc §2
+- [ ] **T3 Ado text.** `--ado-text: #006a85` + `-rgb`, one value with no `light-dark()` (D4). Fallback: `--ado-base`. → `VAN-85-status-badge-theme-request.md`
+- [ ] **T4 transparent default button.** Change two values of existing tokens; no new tokens. Must ship in the **same webapp PR** as W3, after the email and legacy readers are decoupled. The `meditrend` brand override is handled separately in W7. → `VAN-85-button-default-theme-request.md`, `VAN-85-button-default-rollout.md` steps 2–4
 - [ ] **T5 inverted primary/shimmer** `--button-{primary,shimmer}-inverted-*` (fallbacks equal the requested values, based on `--ado-base`). Optional. → `VAN-85-button-inverted-theme-request.md`
 - [ ] Regenerate: `gulp vanguard-theme-build` and `gulp vanguard-styles-build`, then run the grep checks in the default-button rollout step 4.
 
@@ -49,17 +49,19 @@ None of these block the Vanguard release; Vanguard falls back to the values in b
 - [ ] **W4 New badge**: use `<StatusBadge status="ado" size="compact" />`. → `VAN-85-status-badge-investigation.md`
 - [ ] **W5 recommended card**: use `inverted` primary/shimmer and remove local white-button overrides. → `VAN-85-button-inverted-investigation.md`
 - [ ] **W6 truncation**: remove the local label-overflow workarounds listed in `VAN-85-button-truncation-investigation.md`.
+- [ ] **W7 meditrend default button** (D3), after T4: `meditrend/meditrend.scss:30,32` overrides the default-button rest fill (`--n200`) and hover (`--brand-color`), both opaque, so this brand keeps a filled default button after T4. Align it with the transparent default by dropping both overrides (the proposed default), or keep them on purpose, then regenerate and check the brand's `min.css`. → `VAN-85-button-default-rollout.md` step 3
 
-## 4. QA (W, light and dark where supported)
+## 4. QA (W, light scheme; the webapp has no dark mode yet)
 
 - [ ] Button footprint unchanged after the codemod: spot-check modals, ActionBar footers, tables, cards on mobile and desktop.
-- [ ] The 6 `large` CTAs at their approved size.
-- [ ] Keyboard focus ring visible on every type and on dark surfaces; no ring on mouse click.
+- [ ] The 6 `large` CTAs at 48px on desktop (approved, D1).
+- [ ] Keyboard focus ring visible on every type, including on dark or coloured surfaces such as the recommended card; no ring on mouse click.
 - [ ] Squircle corners in Chrome/Edge; plain radius in Firefox/Safari; `round` on large-radius reseller themes.
 - [ ] Long labels truncate with an ellipsis in phone-width row actions.
 - [ ] Diacritics and descenders (Î, Ș, g, y) are whole on large and extraLarge buttons (`VAN-85-button-label-clipping-investigation.md`).
 - [ ] Default-button QA list in `VAN-85-button-default-rollout.md` step 6 (incl. emails and legacy PHP pages still white).
-- [ ] New badge and recommended card in light and dark.
+- [ ] New badge and recommended card.
+- [ ] meditrend brand after W7: the default button looks as decided.
 
 ## Rollback
 
