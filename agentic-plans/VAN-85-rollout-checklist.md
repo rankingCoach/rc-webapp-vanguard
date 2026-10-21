@@ -22,7 +22,7 @@ theme changes) are covered by the codemod and the theme steps below, not by a ma
 ## 1. Vanguard release (V)
 
 - [x] All six VAN-85 steps merged into `feature/VAN-85`.
-- [x] Code review passed. All 5 Astra findings (`VAN-85-astra-review.md`) fixed: a14e828, 6471789, 5fcf53b, d17033d, 10dc3ce.
+- [x] Code review passed. All 5 Astra findings (`VAN-85-astra-review.md`) fixed: 0aefcc4, 9893b51, e2ba2e8, aa6dec1, a6d01e8.
 - [ ] CHANGELOG for 2.6.0 calls out, under a "Visible changes" heading (not "BREAKING"):
   - every button type shares the muted size set; run `scripts/codemod-button-sizes.js` when bumping;
   - focus ring is a 2px outline with 2px offset, on `:focus-visible` only;
