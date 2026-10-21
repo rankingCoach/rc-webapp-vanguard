@@ -106,6 +106,8 @@ export const invertedTypeChecks = () => {
     { type: ButtonTypes.secondary, inverted: true },
     { type: ButtonTypes.primary, inverted: true },
     { type: ButtonTypes.shimmer, inverted: false },
+    // every type shares one size set, extraLarge included
+    { inverted: true, size: ButtonSizes.extraLarge },
     { type: ButtonTypes.muted, inverted: true, onDark: true },
   ];
 
@@ -128,8 +130,6 @@ export const invertedTypeChecks = () => {
     <Button key={2} type={ButtonTypes.shimmer} inverted blurred />,
     // @ts-expect-error pressed stays muted-only
     <Button key={3} inverted pressed />,
-    // @ts-expect-error extraLarge stays muted-only
-    <Button key={4} inverted size={ButtonSizes.extraLarge} />,
   ];
 
   return [ok, existing, invalid];
