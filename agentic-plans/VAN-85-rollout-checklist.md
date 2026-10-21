@@ -57,6 +57,7 @@ None of these block the Vanguard release; Vanguard falls back to the values in b
 - [ ] Keyboard focus ring visible on every type and on dark surfaces; no ring on mouse click.
 - [ ] Squircle corners in Chrome/Edge; plain radius in Firefox/Safari; `round` on large-radius reseller themes.
 - [ ] Long labels truncate with an ellipsis in phone-width row actions.
+- [ ] Diacritics and descenders (Î, Ș, g, y) are whole on large and extraLarge buttons (`VAN-85-button-label-clipping-investigation.md`).
 - [ ] Default-button QA list in `VAN-85-button-default-rollout.md` step 6 (incl. emails and legacy PHP pages still white).
 - [ ] New badge and recommended card in light and dark.
 

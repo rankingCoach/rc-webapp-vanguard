@@ -10,7 +10,7 @@ const TYPES = [ButtonTypes.default, ButtonTypes.primary, ButtonTypes.secondary, 
 const SIZES = [ButtonSizes.small, ButtonSizes.medium, ButtonSizes.large, ButtonSizes.extraLarge] as const;
 
 // Height (mobile / desktop) and label size per size, the same for every type
-const EXPECTED: Record<ButtonSizes, { mobile: number; desktop: number; text: number }> = {
+export const EXPECTED: Record<ButtonSizes, { mobile: number; desktop: number; text: number }> = {
   [ButtonSizes.small]: { mobile: 32, desktop: 24, text: 12 },
   [ButtonSizes.medium]: { mobile: 40, desktop: 32, text: 12 },
   [ButtonSizes.large]: { mobile: 40, desktop: 40, text: 14 },
