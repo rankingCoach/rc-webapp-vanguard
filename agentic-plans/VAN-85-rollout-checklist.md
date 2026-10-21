@@ -34,12 +34,22 @@ theme changes) are covered by the codemod and the theme steps below, not by a ma
 
 None of these block the Vanguard release; Vanguard falls back to the values in brackets. Order matters only where noted.
 
-- [ ] **T1 focus outline colour.** `--button-{default,primary,secondary,shimmer}-focus-outline-color` (fallback: `--button-<type>-focus-box-shadow-color`). Then update the 3 app files that override the old ring token. → `VAN-85-button-focus-corner-theme-request.md` §1
-- [ ] **T2 corner shape.** `--button-corner-shape` (fallback: `superellipse(1.3)`). Set it to `round` on every reseller theme whose `--buttons-border-radius` is above **8px** (D5), **before** those themes get Vanguard 2.6.0. → same doc §2
-- [ ] **T3 Ado text.** `--ado-text: #006a85` + `-rgb`, one value with no `light-dark()` (D4). Fallback: `--ado-base`. → `VAN-85-status-badge-theme-request.md`
-- [ ] **T4 transparent default button.** Change two values of existing tokens; no new tokens. Must ship in the **same webapp PR** as W3, after the email and legacy readers are decoupled. The `meditrend` brand override is handled separately in W7. → `VAN-85-button-default-theme-request.md`, `VAN-85-button-default-rollout.md` steps 2–4
-- [ ] **T5 inverted primary/shimmer** `--button-{primary,shimmer}-inverted-*` (fallbacks equal the requested values, based on `--ado-base`). Optional. → `VAN-85-button-inverted-theme-request.md`
-- [ ] Regenerate: `gulp vanguard-theme-build` and `gulp vanguard-styles-build`, then run the grep checks in the default-button rollout step 4.
+**Default theme: landed on 2026-10-21** (`adc0d6c`, `.storybook/theming.css`). Every token Vanguard reads is present
+and matches the requests. The brand-level and webapp-side items below each T stay open.
+
+- [x] **T1 focus outline colour (default theme).** `--button-{default,primary,secondary,shimmer}-focus-outline-color: #0062ff` + `-rgb`, one value. → `VAN-85-button-focus-corner-theme-request.md` §1
+  - [ ] Update the 3 app files that override the old ring token (DeleteAccountModal, BulkDeleteAccountsModal, mobile-app-invite tokens).
+  - [ ] Brand and reseller themes: confirm the generated value (same `#0062ff` or the brand's primary).
+- [x] **T2 corner shape (default theme).** `--button-corner-shape: superellipse(1.3)`, with no `-rgb` and no utility classes. → same doc §2
+  - [ ] Set `round` on every reseller theme whose `--buttons-border-radius` is above **8px** (D5), **before** those themes get Vanguard 2.6.0.
+- [x] **T3 Ado text (default theme).** `--ado-text: #006a85` + `-rgb` + utility classes, one value with no dark override (D4). → `VAN-85-status-badge-theme-request.md`
+  - [ ] Other brands and white labels: derive `--ado-text` from their own `--ado-base` (≥ 4.5:1 on a 12% fill).
+- [x] **T4 transparent default button (default theme).** `--button-default-background-color: rgba(0, 0, 0, 0)`, hover `rgba(185, 197, 216, 0.12)`. Email buttons stay white (`--email-button-default-bg: white`). Still ships in the **same webapp PR** as W3. → `VAN-85-button-default-theme-request.md`, `VAN-85-button-default-rollout.md` steps 2–4
+  - [ ] Legacy `.btn.btn-default` pinned to white (rollout step 2b, `html/vanguard/src/styles/components/_buttons.scss`); not visible in the library theme, so check it in the webapp.
+  - [ ] Brand overrides: `pylot-barmenia` hover becomes `rc_rgba(--p300, 0.12)`; `meditrend` is W7.
+- [x] **T5 inverted primary/shimmer (default theme).** `--button-{primary,shimmer}-inverted-*`, emitted as resolved literals (`#006a85`), which the request allows. → `VAN-85-button-inverted-theme-request.md`
+  - [ ] Brand and white-label themes: emit each theme's own resolved `--ado-base`, not the default `#006a85`.
+- [ ] Regenerate for every brand: `gulp vanguard-theme-build` and `gulp vanguard-styles-build`, then run the grep checks in the default-button rollout step 4 (pylot-barmenia, meditrend after W7, direct-channel email partial).
 
 ## 3. Webapp code (W)
 
