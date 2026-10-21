@@ -70,6 +70,8 @@ export type ButtonShape = 'default' | 'round';
  */
 interface CommonButtonProps {
   testId?: string;
+  /** Accessible name of the `<button>`; required for icon-only buttons (no `children`). */
+  ariaLabel?: string;
   /** @deprecated */
   className?: string;
   children?: string;
@@ -212,6 +214,7 @@ export const Button = (props: ButtonProps) => {
     uppercase,
     w100,
     shape = 'default',
+    ariaLabel,
   } = props;
 
   let { icon, iconPosition = 'left', rounded = false, iconColor, targetRef, iconHoverColor } = props;
@@ -494,6 +497,7 @@ export const Button = (props: ButtonProps) => {
           textColor ? TEXT_COLOR_CLASSES[textColor] : '',
         )}
         aria-pressed={isMuted ? pressed : undefined}
+        aria-label={ariaLabel}
       >
         {isMuted && <span className={styles.buttonHoverLayer} aria-hidden="true" />}
         <div className={styles.buttonInnerContainer}>

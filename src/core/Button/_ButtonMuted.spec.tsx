@@ -124,4 +124,11 @@ describe('Vanguard muted button surface flags & pressed state', () => {
     });
     expect((await findIconSvg()).getAttribute('color')).toBe('currentColor');
   });
+
+  it('names an icon-only button with ariaLabel', async () => {
+    await render(
+      <Button testId={'muted-btn'} type={ButtonTypes.muted} icon={IconNames.caretLeft} ariaLabel={'Next'} />,
+    );
+    expect(appScreen.getByRole('button', { name: 'Next' })).toBe(getButton());
+  });
 });
