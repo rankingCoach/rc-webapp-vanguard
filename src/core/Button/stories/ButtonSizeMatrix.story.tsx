@@ -27,7 +27,7 @@ Every type shares one size set, so the same \`size\` gives the same footprint wh
 | \`large\` | 40 / 40px | 14px |
 | \`extraLarge\` | 40 / 48px | 16px |
 
-**Migrating from the pre-2.5 sizes:** default, primary, secondary and shimmer used to be bigger. Bump them one step to keep their
+**Migrating from the pre-2.6 sizes:** default, primary, secondary and shimmer used to be bigger. Bump them one step to keep their
 footprint: \`small\` → \`medium\`, \`medium\` (or no size) → \`extraLarge\`, \`large\` → \`extraLarge\` (60 → 48px desktop,
 48 → 40px mobile). Muted buttons keep their size.
 `;
