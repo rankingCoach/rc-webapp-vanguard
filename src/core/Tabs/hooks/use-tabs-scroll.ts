@@ -29,6 +29,11 @@ export interface UseTabsScrollResult {
   canScrollEnd: boolean;
   /** True when the tabs overflow the scroller (either direction can scroll). */
   isOverflowing: boolean;
+  /**
+   * True when the scroller's computed direction is RTL (from a `dir` attribute or the CSS `direction`), as of the
+   * last measure. The same check drives the start/end scroll math, so the buttons' carets can follow it.
+   */
+  isRtl: boolean;
   /** `onScroll` handler for the scroller (rAF-throttled re-measure). */
   onScroll: () => void;
   /** Scrolls to the start of the tabs (the first tab). */
@@ -89,7 +94,7 @@ export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsSc
   /** Geometry of the selected tab and viewport the last time it was scrolled into view. */
   const selectedGeometryRef = useRef('');
 
-  const [scrollState, setScrollState] = useState({ start: false, end: false });
+  const [scrollState, setScrollState] = useState({ start: false, end: false, rtl: false });
 
   // Logical (start/end) measurement. In RTL, modern browsers report `scrollLeft` from 0 (start, right edge)
   // down to -(scrollWidth - clientWidth) (end, left edge); in LTR it goes from 0 up to the maximum. Either way the
@@ -103,7 +108,10 @@ export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsSc
     const maxScroll = Math.abs(getEndScrollLeft(scroller));
     const start = fromStart > EPSILON;
     const end = fromStart < maxScroll - EPSILON;
-    setScrollState((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+    const rtl = isRtl(scroller);
+    setScrollState((prev) =>
+      prev.start === start && prev.end === end && prev.rtl === rtl ? prev : { start, end, rtl },
+    );
   }, []);
 
   /** Keeps the selected tab inside the viewport via rect math; never uses scrollIntoView (would scroll the page). */
@@ -229,6 +237,7 @@ export const useTabsScroll = ({ currentValue, layoutKey, measureKey }: UseTabsSc
     canScrollStart: scrollState.start,
     canScrollEnd: scrollState.end,
     isOverflowing: scrollState.start || scrollState.end,
+    isRtl: scrollState.rtl,
     onScroll,
     scrollToStart,
     scrollToEnd,

@@ -171,12 +171,21 @@ export const Tabs = (props: TabsProps) => {
   const layoutKey = visibleTabs.map(({ tab, index }) => `${index}:${String(resolveValue(tab, index))}`).join('|');
   const isFloating = config.theme === 'floating';
 
-  const { scrollerRef, listRef, canScrollStart, canScrollEnd, isOverflowing, onScroll, scrollToStart, scrollToEnd } =
-    useTabsScroll({
-      currentValue,
-      layoutKey,
-      measureKey: config.theme,
-    });
+  const {
+    scrollerRef,
+    listRef,
+    canScrollStart,
+    canScrollEnd,
+    isOverflowing,
+    isRtl,
+    onScroll,
+    scrollToStart,
+    scrollToEnd,
+  } = useTabsScroll({
+    currentValue,
+    layoutKey,
+    measureKey: config.theme,
+  });
 
   // Floating theme: one chip glides to the selected tab instead of each tab painting its own selected fill.
   const indicatorRef = useRef<HTMLSpanElement | null>(null);
@@ -199,24 +208,44 @@ export const Tabs = (props: TabsProps) => {
 
   // Overflow buttons, placed on the inline-start / inline-end edges of the bar (left / right in LTR). The one that
   // can't scroll fades out but stays mounted, disabled, so the other one doesn't move.
+  // Left / right follow the computed direction the scroll hook uses (a `dir` attribute or the CSS `direction`).
+  const scrollEdgeClasses = (edge: 'start' | 'end') => {
+    const isStart = edge === 'start';
+    const canScroll = isStart ? canScrollStart : canScrollEnd;
+    return classNames(
+      isStart ? styles.scrollButtonStart : styles.scrollButtonEnd,
+      canScroll ? '' : styles.scrollButtonHidden,
+    );
+  };
+  // The edge physically on the left: the start in LTR, the end in RTL
+  const isLeftEdge = (edge: 'start' | 'end') => (edge === 'start') !== isRtl;
+
+  // Each button's shadow falls over the tabs it covers, i.e. away from its edge
+  const renderScrollShadow = (edge: 'start' | 'end') => (
+    <span
+      className={classNames(
+        styles.scrollShadow,
+        scrollEdgeClasses(edge),
+        isLeftEdge(edge) ? '' : styles.scrollShadowTowardsLeft,
+      )}
+    />
+  );
+
   const renderScrollButton = (edge: 'start' | 'end') => {
     const isStart = edge === 'start';
     const canScroll = isStart ? canScrollStart : canScrollEnd;
     return (
-      <span
-        className={classNames(
-          styles.scrollButton,
-          isStart ? styles.scrollButtonStart : styles.scrollButtonEnd,
-          canScroll ? '' : styles.scrollButtonHidden,
-        )}
-      >
+      <span className={classNames(styles.scrollButton, scrollEdgeClasses(edge))}>
         <Button
           type={ButtonTypes.muted}
+          // A native button submits an enclosing form by default
+          htmlType="button"
           blurred
           shape="round"
           size={ButtonSizes.large}
-          // The caret SVG assets are mirror-named: caretRight points left (same swap as NavigationModal)
-          icon={isStart ? IconNames.caretRight : IconNames.caretLeft}
+          // The caret points to the edge. The caret SVG assets are mirror-named: caretRight points left (same swap
+          // as NavigationModal)
+          icon={isLeftEdge(edge) ? IconNames.caretRight : IconNames.caretLeft}
           ariaLabel={translationService.get(isStart ? 'Scroll to start' : 'Scroll to end').value}
           disabled={!canScroll}
           onClick={isStart ? scrollToStart : scrollToEnd}
@@ -313,6 +342,13 @@ export const Tabs = (props: TabsProps) => {
           </div>
         </div>
         {/* After the scroller: positioned tab labels (floating theme) would otherwise paint over the start button */}
+        {isOverflowing && (
+          // The buttons' shadows, clipped to the bar on their own layer so the buttons (and their focus rings) aren't
+          <span className={styles.scrollShadows} aria-hidden="true">
+            {renderScrollShadow('start')}
+            {renderScrollShadow('end')}
+          </span>
+        )}
         {isOverflowing && renderScrollButton('start')}
         {isOverflowing && renderScrollButton('end')}
       </div>

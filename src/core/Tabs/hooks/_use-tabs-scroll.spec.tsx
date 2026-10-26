@@ -67,5 +67,6 @@ describe('useTabsScroll', () => {
     expect(result.current.canScrollStart).toBe(start);
     expect(result.current.canScrollEnd).toBe(end);
     expect(result.current.isOverflowing).toBe(true);
+    expect(result.current.isRtl).toBe(dir === 'rtl');
   });
 });

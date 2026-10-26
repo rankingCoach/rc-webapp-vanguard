@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 
-import { fireEvent, render } from '@test-utils/test-utils';
+import { fireEvent, render, waitFor } from '@test-utils/test-utils';
 import React from 'react';
-import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Tabs } from './Tabs';
 
@@ -91,5 +91,68 @@ describe('TabList component tests', () => {
     expect(getByTestId('my-tabs-0')).toBeInTheDocument();
     expect(getByTestId('my-tabs-1')).toBeInTheDocument();
     expect(getByTestId('my-tabs-2')).toBeInTheDocument();
+  });
+
+  describe('overflow scroll buttons', () => {
+    // jsdom has no layout: make every element report 1000px of content in a 300px viewport, so the bar overflows
+    beforeEach(() => {
+      Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, get: () => 1000 });
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => 300 });
+    });
+    afterEach(() => {
+      delete (HTMLElement.prototype as any).scrollWidth;
+      delete (HTMLElement.prototype as any).clientWidth;
+      vi.restoreAllMocks();
+    });
+
+    test('do not submit an enclosing form', () => {
+      const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+      const { getByLabelText } = render(
+        <form onSubmit={onSubmit}>
+          <Tabs tabs={tabs} />
+        </form>,
+      );
+      const end = getByLabelText('Scroll to end');
+      expect(end).toHaveAttribute('type', 'button');
+      expect(end).toBeEnabled();
+
+      fireEvent.click(end);
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    test('carets and shadows follow a CSS-only direction (style={{ direction: "rtl" }})', async () => {
+      // jsdom does not inherit `direction` in getComputedStyle: resolve it from the closest inline style
+      const getComputedStyle = window.getComputedStyle.bind(window);
+      vi.spyOn(window, 'getComputedStyle').mockImplementation((element, pseudo) => {
+        const style = getComputedStyle(element, pseudo);
+        const direction = (element as HTMLElement).closest<HTMLElement>('[style*="direction"]')?.style.direction;
+        return direction ? ({ ...style, direction } as CSSStyleDeclaration) : style;
+      });
+      const caretOf = (button: HTMLElement) => button.querySelector('svg')?.innerHTML;
+
+      const ltr = render(<Tabs tabs={tabs} testId="ltr" />);
+      const rtl = render(<Tabs tabs={tabs} testId="rtl" style={{ direction: 'rtl' }} />);
+      const ltrStart = ltr.getByTestId('ltr-scroll-left_button');
+      const ltrEnd = ltr.getByTestId('ltr-scroll-right_button');
+      const rtlStart = rtl.getByTestId('rtl-scroll-left_button');
+      const rtlEnd = rtl.getByTestId('rtl-scroll-right_button');
+      // The icons load asynchronously
+      await waitFor(() =>
+        [ltrStart, ltrEnd, rtlStart, rtlEnd].forEach((button) => expect(caretOf(button)).toBeTruthy()),
+      );
+
+      expect(caretOf(ltrStart)).not.toBe(caretOf(ltrEnd));
+      // In RTL the start is on the right: its caret points right, like the LTR end one, and vice versa
+      expect(caretOf(rtlStart)).toBe(caretOf(ltrEnd));
+      expect(caretOf(rtlEnd)).toBe(caretOf(ltrStart));
+
+      // Shadows fall over the tabs: the right-hand shadow (the end in LTR, the start in RTL) shifts towards the left
+      const shadowClasses = (container: HTMLElement) =>
+        Array.from(container.querySelectorAll('[class*="scrollShadows"] > span'), (shadow) =>
+          /TowardsLeft/.test(shadow.className),
+        );
+      expect(shadowClasses(ltr.container)).toEqual([false, true]);
+      expect(shadowClasses(rtl.container)).toEqual([true, false]);
+    });
   });
 });

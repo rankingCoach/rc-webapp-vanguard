@@ -37,7 +37,9 @@ import {
 import {
   NoOverflowWide as _NoOverflowWide,
   OverflowScroll as _OverflowScroll,
+  OverflowScrollCssRtl as _OverflowScrollCssRtl,
   OverflowScrollFloating as _OverflowScrollFloating,
+  OverflowScrollFloatingCssRtl as _OverflowScrollFloatingCssRtl,
   OverflowScrollRtl as _OverflowScrollRtl,
 } from './stories/OverflowScroll.story';
 import {
@@ -68,6 +70,8 @@ export const ConfigNoGrowCentered: Story = { ..._ConfigNoGrowCentered };
 export const OverflowScroll: Story = { ..._OverflowScroll };
 export const OverflowScrollFloating: Story = { ..._OverflowScrollFloating };
 export const OverflowScrollRtl: Story = { ..._OverflowScrollRtl };
+export const OverflowScrollCssRtl: Story = { ..._OverflowScrollCssRtl };
+export const OverflowScrollFloatingCssRtl: Story = { ..._OverflowScrollFloatingCssRtl };
 export const NoOverflowWide: Story = { ..._NoOverflowWide };
 export const SelectedLabelHighlight: Story = { ..._SelectedLabelHighlight };
 export const SelectedLabelUnderline: Story = { ..._SelectedLabelUnderline };
