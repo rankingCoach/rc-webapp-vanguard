@@ -86,7 +86,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
   } = props;
 
   let { iconColor, iconName } = getColorsBasedOnStatus(status);
-  const { reverseColor, textColor, bgColor, borderColor } = getColorsBasedOnStatus(status);
+  const { reverseColor, textColor, bgColor, borderColor, glowColor } = getColorsBasedOnStatus(status);
   if (icon) {
     iconName = icon;
   }
@@ -98,7 +98,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
   }
 
   const isCompact = size === 'compact';
-  const color = `var(${iconColor}-rgb)`;
+  const color = glowColor ? `var(${glowColor})` : `var(${iconColor}-rgb)`;
   if (variant === 'big') {
     return (
       <div className={classNames(className, styles.statusIcon)}>

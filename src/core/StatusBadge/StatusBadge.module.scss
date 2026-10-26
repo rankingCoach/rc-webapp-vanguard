@@ -1,9 +1,4 @@
-// Colours of the 'ado' status (see status-badge-get-colors-based-on-status.ts). Declared on the badge root so the
-// inline var() and the Text/Icon children resolve them. --ado-text is not in the theme yet: falls back to --ado-base.
-@mixin ado-colors {
-  --status-badge-ado-background-color: color-mix(in srgb, var(--ado-base) 12%, transparent);
-  --status-badge-ado-text-color: var(--ado-text, var(--ado-base));
-}
+@import './status-badge-ado-colors';
 
 .status-badge {
   display: flex;

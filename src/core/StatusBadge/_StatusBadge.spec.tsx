@@ -1,7 +1,9 @@
-import { appScreen, render } from '@test-utils/test-utils';
+import { appScreen, render, waitFor } from '@test-utils/test-utils';
 import { getColorsBasedOnStatus } from '@vanguard/StatusBadge/status-badge-get-colors-based-on-status';
 import { StatusBadge } from '@vanguard/StatusBadge/StatusBadge';
 import styles from '@vanguard/StatusBadge/StatusBadge.module.scss';
+import { StatusBadgeIcon } from '@vanguard/StatusBadge/StatusBadgeIcon/StatusBadgeIcon';
+import iconStyles from '@vanguard/StatusBadge/StatusBadgeIcon/StatusBadgeIcon.module.scss';
 import { FontWeights } from '@vanguard/Text/Text';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
@@ -73,5 +75,39 @@ describe('Vanguard StatusBadge compact size', () => {
   it('is ignored by the big variant', async () => {
     await render(<StatusBadge status={'ado'} text={'New'} size={'compact'} variant={'big'} translate={false} />);
     expect(appScreen.getByText('New').style.fontSize).toBe('');
+  });
+});
+
+describe('Vanguard StatusBadge big variant glow', () => {
+  const getGlow = (container: HTMLElement) => container.querySelector(`.${styles.gradient}`) as HTMLElement;
+
+  it('uses --ado-base-rgb for a reversed Ado badge', async () => {
+    const { container } = await render(
+      <StatusBadge status={'ado'} text={'New'} variant={'big'} iconVariant={'reverse'} translate={false} />,
+    );
+    const boxShadow = getGlow(container).style.boxShadow;
+    expect(boxShadow).toContain('var(--ado-base-rgb)');
+    expect(boxShadow).not.toContain('--status-badge-ado-background-color');
+  });
+
+  it('uses --ado-base-rgb for a normal Ado badge', async () => {
+    const { container } = await render(<StatusBadge status={'ado'} text={'New'} variant={'big'} translate={false} />);
+    expect(getGlow(container).style.boxShadow).toContain('var(--ado-base-rgb)');
+  });
+
+  it("keeps deriving the glow from the fill's -rgb sibling for the other statuses", async () => {
+    const { container } = await render(
+      <StatusBadge status={'live'} text={'Live'} variant={'big'} iconVariant={'reverse'} translate={false} />,
+    );
+    expect(getGlow(container).style.boxShadow).toContain('var(--s100-rgb)');
+  });
+});
+
+describe('Vanguard StatusBadgeIcon ado colours', () => {
+  it('declares the Ado colours on its own root, so it works outside a badge', async () => {
+    const { container } = await render(<StatusBadgeIcon status={'ado'} hasIconReverse />);
+    await waitFor(() => expect(container.querySelector(`.${iconStyles.statusBadgeIcon}`)).not.toBeNull());
+    const icon = container.querySelector(`.${iconStyles.statusBadgeIcon}`) as HTMLElement;
+    expect(icon.style.backgroundColor).toBe('var(--status-badge-ado-background-color)');
   });
 });

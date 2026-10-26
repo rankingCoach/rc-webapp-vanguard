@@ -1,3 +1,4 @@
+import { classNames } from '@helpers/classNames';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { getColorsBasedOnStatus } from '@vanguard/StatusBadge/status-badge-get-colors-based-on-status';
@@ -41,7 +42,7 @@ export const StatusBadgeIcon = (props: StatusBadgeIconProps) => {
         hasCircle={true}
         fillColor={!hasIconReverse ? iconColor : bgColor}
         color={!hasIconReverse ? '--n000' : reverseColor}
-        className={styles.bigIcon}
+        className={classNames(styles.statusBadgeIcon, styles.bigIcon)}
       >
         {iconName}
       </Icon>
@@ -54,6 +55,7 @@ export const StatusBadgeIcon = (props: StatusBadgeIconProps) => {
       forceSize={compact ? 10 : undefined}
       fillColor={!hasIconReverse ? iconColor : bgColor}
       color={!hasIconReverse ? '--n000' : reverseColor}
+      className={styles.statusBadgeIcon}
     >
       {iconName}
     </Icon>
