@@ -72,6 +72,11 @@ interface CommonButtonProps {
   testId?: string;
   /** Accessible name of the `<button>`; required for icon-only buttons (no `children`). */
   ariaLabel?: string;
+  /**
+   * Native `type` attribute of the `<button>` (`type` picks the visual variant). Omitted by default, so the browser
+   * default applies: `submit` inside a `<form>`. Pass `'button'` for controls inside a form that must not submit it.
+   */
+  htmlType?: 'button' | 'submit' | 'reset';
   /** @deprecated */
   className?: string;
   children?: string;
@@ -215,6 +220,7 @@ export const Button = (props: ButtonProps) => {
     w100,
     shape = 'default',
     ariaLabel,
+    htmlType,
   } = props;
 
   let { icon, iconPosition = 'left', rounded = false, iconColor, targetRef, iconHoverColor } = props;
@@ -478,6 +484,7 @@ export const Button = (props: ButtonProps) => {
     >
       <button
         ref={btnRef}
+        type={htmlType}
         data-testid={`${testId ? `${testId}_` : ''}button`}
         disabled={!!disabled}
         className={classNames(
