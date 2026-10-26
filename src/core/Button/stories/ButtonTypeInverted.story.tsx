@@ -16,8 +16,8 @@ the text and icon in Ado's base colour (\`--ado-base\`), and a white focus ring.
 - **Disabled:** the same colours at 40% opacity, with no sweep.
 - **Dark theme:** unchanged. The button sits on its own dark surface, not on the page.
 
-Theme tokens \`--button-primary-inverted-*\` and \`--button-shimmer-inverted-*\` are requested from the webapp (VAN-85);
-until they ship, Vanguard uses these values as fallbacks.
+The colours come from the theme tokens \`--button-primary-inverted-*\` and \`--button-shimmer-inverted-*\` (VAN-85);
+Vanguard falls back to these values for themes that don't define them.
 `;
 
 const ADO_BASE = 'rgb(0, 106, 133)';
@@ -67,6 +67,7 @@ const InvertedMatrix = ({ onClick }: Pick<ButtonProps, 'onClick'>) => (
 const playInverted: ButtonStory['play'] = async ({ canvasElement, args }) => {
   const canvas = within(canvasElement);
   await waitForIcons(canvasElement, TYPES.length * 3 + TYPES.length);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   for (const { key } of TYPES) {
     for (const state of STATES) {
@@ -86,9 +87,13 @@ const playInverted: ButtonStory['play'] = async ({ canvasElement, args }) => {
       await expect(style.opacity).toBe('1');
       await expect(style.filter).toBe('none');
       if (key === 'shimmer') {
-        // the sweep is kept, on the white fill
+        // the sweep is kept, on the white fill (with prefers-reduced-motion it stands still)
         await expect(style.backgroundImage).toContain('linear-gradient');
-        await expect(style.animationName).toContain('adoShimmer');
+        if (reducedMotion) {
+          await expect(style.animationName).toBe('none');
+        } else {
+          await expect(style.animationName).toContain('adoShimmer');
+        }
       } else {
         await expect(style.backgroundImage).toBe('none');
       }
