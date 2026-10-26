@@ -22,7 +22,7 @@ export const ActionButton = (props: ActionButtonProps) => {
       iconFillColor={'--p100'}
       iconHasCircle={true}
       type={ButtonTypes.default}
-      size={ButtonSizes.extraLarge}
+      size={props.type === ButtonTypes.muted ? ButtonSizes.medium : ButtonSizes.extraLarge}
       textType={TextTypes.text}
       fontWeight={FontWeights.regular}
       textWrap={'no-wrap'}
