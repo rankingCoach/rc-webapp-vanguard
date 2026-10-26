@@ -23,7 +23,7 @@ theme changes) are covered by the codemod and the theme steps below, not by a ma
 
 - [x] All six VAN-85 steps merged into `feature/VAN-85`.
 - [x] Code review passed. All 5 Astra findings (`VAN-85-astra-review.md`) fixed: 0aefcc4, 9893b51, e2ba2e8, aa6dec1, a6d01e8.
-- [ ] CHANGELOG for 2.7.0 calls out, under a "Visible changes" heading (not "BREAKING"):
+- [x] The visible changes are called out in the [PR #64](https://github.com/rankingCoach/rc-webapp-vanguard/pull/64) description ("Visible changes for consumers"), not in `CHANGELOG.md`, which standard-version generates from the commits and nobody edits by hand:
   - every button type shares the muted size set; run `scripts/codemod-button-sizes.js` when bumping;
   - focus ring is a 2px outline with 2px offset, on `:focus-visible` only;
   - squircle corners in Chromium 139+ (`--button-corner-shape`).
