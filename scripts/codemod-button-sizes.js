@@ -30,9 +30,9 @@ if (!root) {
 }
 
 // Modules a vanguard Button can be imported from (the package, the @vanguard/Button barrel and its index,
-// the Button file with or without its extension, relative paths inside vanguard)
+// the Button file with or without its extension, relative paths inside vanguard at any depth)
 const BUTTON_MODULE =
-  /(^vanguard$|@rankingcoach\/vanguard|@vanguard\/Button(\/index)?$|Button\/Button(\.tsx)?$|^\.\.?\/Button(\/index)?$)/;
+  /(^vanguard$|@rankingcoach\/vanguard|@vanguard\/Button(\/index)?$|Button\/Button(\.tsx)?$|^(\.\/|(\.\.\/)+)Button(\/index)?$)/;
 const BUMP = { small: 'medium', medium: 'extraLarge', large: 'extraLarge', extraLarge: 'extraLarge' };
 const SIZE_STRINGS = { small: 'small', medium: 'medium', large: 'large', 'extra-large': 'extraLarge' };
 const NON_MUTED = ['default', 'primary', 'secondary', 'shimmer'];
@@ -56,15 +56,22 @@ for (const file of files) {
   if (!src.includes('Button')) continue;
   const sf = ts.createSourceFile(file, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 
-  // Local names of Button / ButtonSizes / ButtonTypes, and the import to add ButtonSizes to if it's missing
+  // Local names of Button / ButtonSizes / ButtonTypes, and the import to add ButtonSizes to if it's missing.
+  // Type-only bindings can't be used as values, so they don't count; a type-only ButtonSizes is remembered
+  // so it can be turned into a value import rather than importing the name a second time.
   const names = { Button: new Set(), ButtonSizes: null, ButtonTypes: null };
   let buttonImport = null;
+  let typeOnlySizes = null;
   for (const stmt of sf.statements) {
     if (!ts.isImportDeclaration(stmt) || !BUTTON_MODULE.test(stmt.moduleSpecifier.text)) continue;
     const bindings = stmt.importClause?.namedBindings;
     if (!bindings || !ts.isNamedImports(bindings)) continue;
     for (const el of bindings.elements) {
       const imported = (el.propertyName || el.name).text;
+      if (stmt.importClause.isTypeOnly || el.isTypeOnly) {
+        if (imported === 'ButtonSizes') typeOnlySizes = { clause: stmt.importClause, el };
+        continue;
+      }
       if (imported === 'Button') {
         names.Button.add(el.name.text);
         buttonImport = buttonImport || bindings;
@@ -75,7 +82,7 @@ for (const file of files) {
   }
   if (!names.Button.size) continue;
 
-  const sizesName = names.ButtonSizes || 'ButtonSizes';
+  const sizesName = names.ButtonSizes || typeOnlySizes?.el.name.text || 'ButtonSizes';
   const edits = [];
   const where = (node) => `${path.relative(root, file)}:${sf.getLineAndCharacterOfPosition(node.getStart()).line + 1}`;
 
@@ -114,7 +121,7 @@ for (const file of files) {
             });
             changed.push(`${where(node)}  ${type.value}: (default) -> extraLarge`);
           } else {
-            const size = literal(sizeAttr.initializer, names.ButtonSizes);
+            const size = literal(sizeAttr.initializer, sizesName);
             const key = size && (size.string ? SIZE_STRINGS[size.value] : size.value);
             if (!key || !BUMP[key]) {
               manual.push(
@@ -134,7 +141,18 @@ for (const file of files) {
   visit(sf);
 
   if (!edits.length) continue;
-  if (!names.ButtonSizes) {
+  if (!names.ButtonSizes && typeOnlySizes) {
+    const { clause, el } = typeOnlySizes;
+    if (el.isTypeOnly) {
+      // `import { type ButtonSizes }`: drop the specifier's `type`
+      edits.push({ pos: el.getStart(), end: (el.propertyName || el.name).getStart(), text: '' });
+    } else {
+      // `import type { ButtonSizes, X }` -> `import { ButtonSizes, type X }`: the others stay type-only
+      edits.push({ pos: clause.getStart(), end: clause.namedBindings.getStart(), text: '' });
+      for (const other of clause.namedBindings.elements)
+        if (other !== el) edits.push({ pos: other.getStart(), end: other.getStart(), text: 'type ' });
+    }
+  } else if (!names.ButtonSizes) {
     // Add ButtonSizes to the import that brings in Button
     const last = buttonImport.elements[buttonImport.elements.length - 1];
     edits.push({ pos: last.getEnd(), end: last.getEnd(), text: ', ButtonSizes' });
