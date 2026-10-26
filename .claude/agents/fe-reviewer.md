@@ -27,6 +27,7 @@ Follow these steps for every review:
 - Check against the team standards in `.claude/agents/fe-developer.md` (one-component-per-folder, no inline props destructuring, no speculative additions, minimum diff, vanguard-only primitives, `translationService.get`).
 - Verify design tokens per the rubric: no hardcoded colors/px, `--fn-*` over raw `--n*`/`--p*`, no `rc_rgba()` in component SCSS.
 - Confirm user-facing text routes through vanguard `Text` / `translationService`.
+- QA test ids: an added/changed interactive component without a `testId` prop rendered as `data-testid` (root + derived inner ids) is MINOR; a changed or removed existing rendered/derived id is MAJOR — it silently breaks QA selectors in every consumer.
 - Label as `## Pattern Analysis`.
 
 ### Step 3: Risk Analysis
