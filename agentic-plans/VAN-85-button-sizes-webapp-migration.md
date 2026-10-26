@@ -1,12 +1,12 @@
 # VAN-85 · Button sizes: webapp migration
 
-How the webapp (`rc-webapp/html/react`) moves to the harmonized button sizes in vanguard 2.6.0. Background and options are in `VAN-85-button-sizes-investigation.md` (option A).
+How the webapp (`rc-webapp/html/react`) moves to the harmonized button sizes in vanguard 2.7.0. Background and options are in `VAN-85-button-sizes-investigation.md` (option A).
 
 ## 1. Run the codemod alongside the vanguard bump
 
 The codemod ships in vanguard as `scripts/codemod-button-sizes.js`. It bumps every non-muted `<Button>` (default, primary, secondary, shimmer) one size step, so each keeps its footprint. Muted buttons aren't touched.
 
-| before 2.6 | from 2.6 | height (mobile / desktop) |
+| before 2.7 | from 2.7 | height (mobile / desktop) |
 | --- | --- | --- |
 | `small` | `medium` | 40 / 32px, unchanged; text 16 → 12px |
 | `medium` or no `size` | `extraLarge` | 40 / 48px, unchanged |
@@ -33,13 +33,13 @@ Re-checked on 2026-10-20 at `8a846a885e8` (`feature/competitor-selection-redesig
 
 The codemod leaves these alone. Guidance per group:
 
-- **Toggle rows that switch between `primary` and `muted` at `small`** (AgentControlPanel:199/218/229, DashboardMeasurements:35, WidgetSetControls:28): **keep `small`**. Before 2.6 the selected chip was 32px and the others 24px on desktop. From 2.6 they all render at 24px.
-- **Send/submit buttons that switch between shimmer and muted** (ConversationMessageInput:418, MediaPromptInput:85): before 2.6, `shimmer small` (32px) was paired with `muted medium` (32px). From 2.6, set the shimmer branch to `ButtonSizes.medium`, or just drop the size ternary.
+- **Toggle rows that switch between `primary` and `muted` at `small`** (AgentControlPanel:199/218/229, DashboardMeasurements:35, WidgetSetControls:28): **keep `small`**. Before 2.7 the selected chip was 32px and the others 24px on desktop. From 2.7 they all render at 24px.
+- **Send/submit buttons that switch between shimmer and muted** (ConversationMessageInput:418, MediaPromptInput:85): before 2.7, `shimmer small` (32px) was paired with `muted medium` (32px). From 2.7, set the shimmer branch to `ButtonSizes.medium`, or just drop the size ternary.
 - **Ternaries between two non-muted types** (PartnerApiTesterLoginForm ×4, AgentSchedulesList:744, AiVisibilityCustomQueries:110, StatusInfo:149, WebsiteThemeManagerPanel:181, WebsiteBuildProgressCard:127, YourWebsiteCard:407): apply the §1 bump.
 - **Type from config or props** (LandingPage sections, Hero, BusinessListItemWithConnections, SectionMissing, MediaItemActions, MediaLibraryUpload, WebsiteReleaseStateLine): bump unless the type can be muted. Then use `type === ButtonTypes.muted ? <muted size> : <bumped size>`, the pattern vanguard's InfoBox uses.
 - **A `size` prop forwarded through a wrapper** (WebsiteTemplateExportButton, WebsiteLookReviewInvitation, WebsiteReleaseStateLine `compact ? small : undefined`, AiVisibilityUpsellTriggerSmall `isMobile ? medium : small`): bump the wrapper's default and the values its callers pass. In WebsiteLookReviewInvitation, one `size` covers both muted and non-muted buttons, so split it.
 - **Spread props** (HoverableCard, ConversationWidgetButton (15 call sites), AIExtensionsTrigger, PublishingBoardCTA): check what the spread carries.
-- **ActionBar footer `props.size`:** before 2.6, `ActionBarFooter` turned an untyped `small` into muted `medium`. From 2.6 it uses the consumer's size as-is and defaults every button to the row size (`extraLarge`). The webapp has no footer-template usages today, so nothing to do.
+- **ActionBar footer `props.size`:** before 2.7, `ActionBarFooter` turned an untyped `small` into muted `medium`. From 2.7 it uses the consumer's size as-is and defaults every button to the row size (`extraLarge`). The webapp has no footer-template usages today, so nothing to do.
 
 ## 3. By hand: CSS that depends on the old sizes
 

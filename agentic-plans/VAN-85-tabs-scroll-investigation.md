@@ -6,7 +6,7 @@ start/end of the tabs, and remove the dead custom styling.
 
 ## Verdict
 
-**Non-breaking, no theme or webapp work needed.** Implemented directly in this branch (MINOR, 2.6.0).
+**Non-breaking, no theme or webapp work needed.** Implemented directly in this branch (MINOR, 2.7.0).
 
 ## 1. Public surface
 
@@ -75,5 +75,5 @@ Overrides and imports:
 - No `*-scroll-left` / `*-scroll-right` test ids in the webapp's tests or e2e.
 - Nothing imports `TabsCustomScroll` directly.
 
-Nothing to change in the webapp; after upgrading to 2.6.0, eyeball the Assistant settings tab bar (page and
+Nothing to change in the webapp; after upgrading to 2.7.0, eyeball the Assistant settings tab bar (page and
 `AgentSettingsModal`) at a narrow width.

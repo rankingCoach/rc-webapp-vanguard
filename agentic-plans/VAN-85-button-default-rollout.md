@@ -1,7 +1,7 @@
 # VAN-85 rollout: transparent default Button and `textColor`
 
 Apply these steps **after** the Vanguard release that ships `ButtonTextColors` / `textColor` (branch
-`feature/VAN-85`, released as **2.6.0**). Steps 1–5 go into **one webapp PR**, in this order, so that no build ships
+`feature/VAN-85`, released as **2.7.0**). Steps 1–5 go into **one webapp PR**, in this order, so that no build ships
 a transparent default button with the email or legacy readers still attached to its token. Light scheme only.
 
 Background and decisions: RFC "RFC: Transparent default Button (VAN-85)", `VAN-85-button-default-investigation.md`,
@@ -21,7 +21,7 @@ Background and decisions: RFC "RFC: Transparent default Button (VAN-85)", `VAN-8
 
 ## Step 1: bump Vanguard
 
-Bump `@vanguard` in `html/react` to 2.6.0 (checklist W1). The default button's fill doesn't change yet, but 2.6.0
+Bump `@vanguard` in `html/react` to 2.7.0 (checklist W1). The default button's fill doesn't change yet, but 2.7.0
 also ships one size set for every Button type, so the bump **must land together with the size migration** (checklist
 W2, `VAN-85-button-sizes-webapp-migration.md`): run the codemod and fix the manual cases in the same PR. Bumping
 without it resizes every non-muted button: no size or `medium` shrinks from 48px to 32px on desktop, and `small` and
