@@ -1,6 +1,8 @@
 import React from "react";
 import { expect, waitFor, within } from "storybook/test";
 import { StatusBadge } from "../StatusBadge";
+import styles from "../StatusBadge.module.scss";
+import iconStyles from "../StatusBadgeIcon/StatusBadgeIcon.module.scss";
 import { Story, statusBadgeGetAllStates } from "./_StatusBadge.default";
 
 const NARROW_TEXT = "Waiting for verification";
@@ -68,6 +70,31 @@ export const StatusBadgeCompact: Story = {
 
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+
+    // The "New" badge from the args: 18px tall, 11px bold text, padding 1px 7px
+    const newLabel = canvas.getByText("New");
+    const newBadge = newLabel.parentElement as HTMLElement;
+    await waitFor(() => {
+      expect(newBadge.getBoundingClientRect().height, "New height").toBe(18);
+      expect(getComputedStyle(newBadge).padding, "New padding").toBe("1px 7px");
+      expect(getComputedStyle(newLabel).fontSize, "New font size").toBe("11px");
+      expect(getComputedStyle(newLabel).fontWeight, "New font weight").toBe("700");
+    });
+
+    // Every compact badge, with an icon, with a number or neither, stays 18px tall; the icon fits inside it
+    const compactBadges = Array.from(canvasElement.querySelectorAll<HTMLElement>(`.${styles.compact}`));
+    expect(compactBadges.length, "compact badges rendered").toBeGreaterThan(statusBadgeGetAllStates().length);
+    await waitFor(() => {
+      for (const badge of compactBadges) {
+        const label = badge.textContent ?? "";
+        expect(badge.getBoundingClientRect().height, `${label} height`).toBe(18);
+        const icon = badge.querySelector<HTMLElement>(`.${iconStyles.statusBadgeIcon}`);
+        if (icon) {
+          expect(icon.getBoundingClientRect().height, `${label} icon height`).toBeLessThanOrEqual(18);
+        }
+      }
+    });
+
     const column = canvas.getByTestId("compact-narrow").getBoundingClientRect();
 
     for (const { key } of NARROW_CASES) {
