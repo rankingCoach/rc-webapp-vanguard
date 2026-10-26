@@ -176,6 +176,7 @@ export const InfoBox = (props: InfoBoxProps) => {
                 <Render if={!!positive}>
                   <Button
                     type={positive?.type ?? ButtonTypes.primary}
+                    size={positive?.type === ButtonTypes.muted ? ButtonSizes.medium : ButtonSizes.extraLarge}
                     iconRight={positive?.icon}
                     onClick={() => {
                       positive?.cta();
@@ -188,6 +189,7 @@ export const InfoBox = (props: InfoBoxProps) => {
                 <Render if={!!negative}>
                   <Button
                     type={negative?.type ?? ButtonTypes.default}
+                    size={negative?.type === ButtonTypes.muted ? ButtonSizes.medium : ButtonSizes.extraLarge}
                     iconLeft={negative?.icon}
                     onClick={() => {
                       negative?.cta();
@@ -207,7 +209,7 @@ export const InfoBox = (props: InfoBoxProps) => {
               iconColor={'--n500'}
               className={classNames('pointer', ml2, p2, styles.closeBtn)}
               color={'--n500'}
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               onClick={() => {
                 closeInfoBox(false);
               }}

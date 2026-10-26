@@ -37,7 +37,7 @@ export const DateRangePickerNavigator = (
           iconColor={'--n700'}
           iconLeft={IconNames.arrowLeft}
           type={ButtonTypes.default}
-          size={ButtonSizes.small}
+          size={ButtonSizes.medium}
         />
         <div className={classNames(dFlex, gap0_5)}>
           <Text textTight={true} fontWeight={FontWeights.bold}>
@@ -52,7 +52,7 @@ export const DateRangePickerNavigator = (
           iconColor={'--n700'}
           iconLeft={IconNames.arrowRight}
           type={ButtonTypes.default}
-          size={ButtonSizes.small}
+          size={ButtonSizes.medium}
         />
       </div>
       <div style={daysStyles} className={classNames(dFlex, justifyContentBetween, alignItemsCenter)}>

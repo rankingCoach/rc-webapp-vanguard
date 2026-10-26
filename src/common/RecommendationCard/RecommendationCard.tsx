@@ -2,7 +2,7 @@ import { TextIcon } from '@common/TextIcon/TextIcon';
 import { dFlex, gap8, mb2, mt1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { AnimatedConditional } from '@vanguard/AnimatedConditional/AnimatedConditional';
-import { Button } from '@vanguard/Button/Button';
+import { Button, ButtonSizes } from '@vanguard/Button/Button';
 import { IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Render } from '@vanguard/Render/Render';
@@ -59,7 +59,7 @@ export const RecommendationCard = (props: RecommendationCardProps) => {
             </Text>
 
             <AnimatedConditional condition={!!ctaText}>
-              <Button onClick={ctaOnClick} iconRight={ctaIcon}>
+              <Button size={ButtonSizes.extraLarge} onClick={ctaOnClick} iconRight={ctaIcon}>
                 {ctaText}
               </Button>
             </AnimatedConditional>

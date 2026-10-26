@@ -14,7 +14,7 @@ import Cropper from 'cropperjs';
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import CropperBase from 'react-cropper';
 
-import { Button, ButtonTypes } from '../Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '../Button/Button';
 import { Icon, IconSize } from '../Icon/Icon';
 import { IconNames } from '../Icon/IconNames';
 import { Modal } from '../Modal/Modal';
@@ -340,10 +340,10 @@ export const RcCropper = (props: RcCropperProps) => {
           </span>
 
           <div className={'action-buttons'}>
-            <Button type={ButtonTypes.default} onClick={close}>
+            <Button size={ButtonSizes.extraLarge} type={ButtonTypes.default} onClick={close}>
               Cancel
             </Button>
-            <Button type={ButtonTypes.primary} onClick={saveImage} isLoading={isLoading}>
+            <Button size={ButtonSizes.extraLarge} type={ButtonTypes.primary} onClick={saveImage} isLoading={isLoading}>
               Save
             </Button>
           </div>

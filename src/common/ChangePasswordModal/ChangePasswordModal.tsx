@@ -3,7 +3,7 @@ import { cursorPointer, mr2, pb1, pb2, pb4, pt2, pt3, px4, textAlignCenter } fro
 import { classNames } from '@helpers/classNames';
 import { getPathId } from '@helpers/get-path-id';
 import { upsellingStore } from '@stores/swagger/UpsellingStore';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Form, FormStatus } from '@vanguard/Form/Form';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
@@ -139,6 +139,7 @@ export const ChangePasswordModal = (props: ChangePasswordModalProps) => {
         </div>
         <div className={classNames(textAlignCenter, pt2, pb4)}>
           <Button
+            size={ButtonSizes.extraLarge}
             type={ButtonTypes.primary}
             disabled={!formSavable}
             onClick={() => {

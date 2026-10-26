@@ -110,7 +110,7 @@ export const RteLinkEditor = (props: RteLinkEditorProps) => {
           />
           <div className={styles.row}>
             <Button
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               iconLeft={IconNames.check}
               type={ButtonTypes.default}
               onMouseDown={(event) => event.preventDefault()}
@@ -120,7 +120,7 @@ export const RteLinkEditor = (props: RteLinkEditorProps) => {
             />
 
             <Button
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               iconLeft={IconNames.close}
               type={ButtonTypes.default}
               onMouseDown={(event) => event.preventDefault()}
@@ -138,7 +138,7 @@ export const RteLinkEditor = (props: RteLinkEditorProps) => {
             </a>
           </div>
           <Button
-            size={ButtonSizes.small}
+            size={ButtonSizes.medium}
             iconLeft={IconNames.edit}
             type={ButtonTypes.default}
             onMouseDown={(event) => event.preventDefault()}
@@ -148,7 +148,7 @@ export const RteLinkEditor = (props: RteLinkEditorProps) => {
             }}
           />
           <Button
-            size={ButtonSizes.small}
+            size={ButtonSizes.medium}
             iconLeft={IconNames.trash}
             type={ButtonTypes.default}
             onMouseDown={(event) => event.preventDefault()}

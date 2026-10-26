@@ -42,8 +42,10 @@
  * • .has-icon-left            - Button has left icon
  * • .has-icon-right           - Button has right icon
  * • .blurred                - Backdrop blur on the ::before layer (muted buttons)
- * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons)
+ * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons);
+ *                              solid white fill, Ado base-colour text (primary & shimmer buttons)
  * • .on-dark                - The other text colour: swaps text/icon/focus ring only (muted buttons)
+ * • .text-color-{name}      - Default button label/icon colour from $default-text-colors (textColor prop)
  * • [aria-pressed="true"]   - Pressed toggle, keeps the hover layer shown (muted buttons)
  *
  * MUTED LAYERS (back to front):
@@ -73,21 +75,36 @@
  @import "../../styles/mixins";
  @import "./button-props";
  
+ // Text colours of the default button (textColor prop, ButtonTextColors): key -> rest colour.
+ // The hover/focus colour is derived (25% towards black, like the default blue). Keep the keys in sync with
+ // ButtonTextColors and TEXT_COLOR_CLASSES in Button.tsx.
+ $default-text-colors: (
+   ado: var(--ado-base),
+ );
+ 
  // To correlate all transition animation time -> button color / background / text background
  $transitionTime: 200ms;
  $transitionTimeLong: 400ms;
  $loader-spinner: $x2;
  $loader-timing: 850ms;
  
+ // Never wider than the container, so a long label truncates instead of overflowing.
+ // No min-width: 0 here: in a shared flex row the button keeps its width and the siblings shrink first.
+ .button-container {
+   max-width: 100%;
+ }
+
  .button-container-full-width,
  .button-container-full-width .button {
    width: 100%;
  }
- 
+
  .button {
-   --padding-y: #{$x1 + $x0_5};
+   // medium (the default size); the other sizes override these in MODIFIERS - Sizes
+   --padding-y: #{$x1_5};
    --padding-x: #{$x2};
    --label-height: #{$x2};
+   --text-size: #{$x1_5};
    --letter-spacing: 0.04em;
    --border-radius: var(--buttons-border-radius, #{$x0_5});
  
@@ -102,13 +119,17 @@
    box-sizing: border-box;
    justify-content: center;
    overflow: hidden;
+   max-width: 100%;
    border-radius: var(--border-radius);
+   // Squircle corners (Chromium 139+); other browsers ignore it and keep the plain border-radius.
+   // --button-corner-shape is optional in the theme: themes with a large --buttons-border-radius set it to round.
+   corner-shape: var(--button-corner-shape, superellipse(1.3));
    height: calc(2 * var(--padding-y) + var(--label-height));
    padding: var(--padding-y) var(--padding-x);
  
    @include media('>mobile') {
-     --padding-y: #{$x2};
-     --padding-x: #{$x3};
+     --padding-y: #{$x1};
+     --padding-x: #{$x1_5};
    }
  
    // =========================== ELEMENTS ===========================
@@ -117,8 +138,15 @@
      display: flex;
      align-items: center;
      gap: $x1;
+     // Lets the label shrink below its text width (ellipsis) instead of being clipped by the button
+     min-width: 0;
+
+     // Icons keep their size, only the label gives way
+     > :not(.button-text) {
+       flex-shrink: 0;
+     }
    }
- 
+
    .button-icon-container {
      min-width: #{$x4};
      display: flex;
@@ -143,6 +171,8 @@
    .button-icon {
      font-family: var(--buttons-typeface);
      font-size: var(--label-height);
+     // Taller than the label so accents (Î, Ä) and descenders (g, Ș) aren't clipped by overflow: hidden;
+     // the button height comes from --label-height, so the extra 7px overflows into the padding, centred.
      line-height: calc(var(--label-height) + 7px);
      display: inline-flex;
      align-items: center;
@@ -151,6 +181,13 @@
      text-overflow: ellipsis !important;
      white-space: nowrap !important;
      overflow: hidden !important;
+   }
+
+   .button-text {
+     // the label follows the size; the icon keeps --label-height
+     font-size: var(--text-size);
+     // A block container, not a flex one: text-overflow doesn't apply to flex containers, so the ellipsis would never show
+     display: block;
    }
  
    // Loader Spinner
@@ -161,10 +198,36 @@
    // ====================== MODIFIERS - Types ======================
    &.button-default {
      @include buttonProps(default);
+ 
+     // The fill, focus ring and disabled state stay the default button's; only the label and icon colour change
+     @each $name, $color in $default-text-colors {
+       &.text-color-#{$name}:not(:disabled):not(.disabled) {
+         --default-text-color: #{$color};
+         --default-text-hover-color: color-mix(in oklch, #{$color}, black 25%);
+ 
+         &,
+         .button-text {
+           color: var(--default-text-color);
+         }
+ 
+         &:hover,
+         &:focus,
+         &:active {
+           &,
+           .button-text {
+             color: var(--default-text-hover-color);
+           }
+         }
+       }
+     }
    }
  
    &.button-primary {
      @include buttonProps(primary);
+
+     &.inverted {
+       @include filledInverted(primary);
+     }
    }
  
    &.button-secondary {
@@ -180,6 +243,10 @@
        @include shimmerEffect;
        // Keep the base transitions; the hover darkening uses the spec's 150ms filter transition
        transition: all $transitionTime ease-in-out, filter 150ms ease;
+     }
+
+     &.inverted {
+       @include filledInverted(shimmer);
      }
    }
  
@@ -199,7 +266,6 @@
      --muted-ring: var(--button-muted-focus-outline-color, #0062ff);
 
      position: relative;
-     height: unset; // button height results from line-height & padding!!!
      background: none;
      border: 0;
      color: var(--muted-fg);
@@ -220,6 +286,7 @@
        position: absolute;
        inset: 0;
        border-radius: inherit;
+       corner-shape: inherit;
        pointer-events: none;
        backdrop-filter: blur(#{$x4});
        -webkit-backdrop-filter: blur(#{$x4});
@@ -231,6 +298,7 @@
        position: absolute;
        inset: 0;
        border-radius: inherit;
+       corner-shape: inherit;
        pointer-events: none;
        background-color: var(--muted-fill);
        mix-blend-mode: var(--muted-blend);
@@ -241,6 +309,7 @@
        position: absolute;
        inset: 0;
        border-radius: inherit;
+       corner-shape: inherit;
        pointer-events: none;
        background-color: var(--muted-fill-hover);
        mix-blend-mode: var(--muted-blend);
@@ -330,95 +399,44 @@
          transform: none;
        }
      }
- 
-     &.size-small {
-       --padding-y: #{$x1};
-       --padding-x: #{$x1_5};
- 
-       .button-text {
-         font-size: #{$x1_5};
-         line-height: #{$x2};
-       }
- 
-       .button-inner-container {
-         gap: #{$x0_5};
-       }
-       
-       @include media('>mobile') {
-         --padding-y: #{$x0_5};
-         --padding-x: #{$x1};
- 
-         .button-inner-container {
-           gap: #{$x0_5};
-         }
-       }
-     }
- 
-     &.size-medium {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x1_5};
-         line-height: #{$x2};
-       }
- 
-       @include media('>mobile') {
-         --padding-y: #{$x1};
-         --padding-x: #{$x1_5};
-       }
-     }
- 
-     &.size-large {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x1_75};
-         line-height: #{$x2};
-       }
-     }
- 
-     &.size-extra-large {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x2};
-         line-height: #{$x2};
-       }
- 
-       @include media('>mobile') {
-         --padding-y: #{$x2};
-         --padding-x: #{$x2_5};
-       }
-     }
- 
-     &.has-icon-left {
-       padding-left: var(--padding-y);
-     }
    }
  
    // ====================== MODIFIERS - Sizes ======================
- 
+   // One size set for every type: the same size gives the same footprint whatever the type.
+   // Height = 2 * --padding-y + --label-height (mobile / desktop):
+   //   small 32 / 24px · medium 40 / 32px · large 40 / 40px · extra-large 40 / 48px
+
    &.size-small {
+     --padding-y: #{$x1};
+     --padding-x: #{$x1_5};
+     --text-size: #{$x1_5};
+
+     .button-inner-container {
+       gap: #{$x0_5};
+     }
+
      @include media('>mobile') {
-       --padding-y: #{$x1};
-       --padding-x: #{$x2};
+       --padding-y: #{$x0_5};
+       --padding-x: #{$x1};
      }
    }
- 
-   &.size-medium { /* default button size */ }
- 
+
+   &.size-medium { /* default button size, the base values */ }
+
    &.size-large {
-     --padding-y: #{$x2};
-     --padding-x: #{$x3};
- 
+     --padding-y: #{$x1_5};
+     --padding-x: #{$x2};
+     --text-size: #{$x1_75};
+   }
+
+   &.size-extra-large {
+     --padding-y: #{$x1_5};
+     --padding-x: #{$x2};
+     --text-size: #{$x2};
+
      @include media('>mobile') {
-       --padding-y: #{$x2_5};
-       --padding-x: #{$x4};
-       --letter-spacing: 0.02em;
-       --label-height: #{$x2_5};
+       --padding-y: #{$x2};
+       --padding-x: #{$x2_5};
      }
    }
  
@@ -426,6 +444,8 @@
  
    &.shape-round {
      --border-radius: #{$rounded-border-radius};
+     // pills and round icon buttons stay truly round
+     corner-shape: round;
    }
  
    // ====================== MODIFIERS - Layout ======================
@@ -462,45 +482,31 @@
    // Opt-in only (textWrap="wrap"): every rule is scoped to this class so the default single-line button is untouched.
 
    &.button-text-wrap {
-     max-width: 100%;
+     // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
+     height: auto;
+     min-height: calc(2 * var(--padding-y) + var(--label-height));
 
      &:not(.button-muted) {
-       // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
-       height: auto;
-       min-height: calc(2 * var(--padding-y) + var(--label-height));
-       // Absorbs the (max #{$x0_125}) border of some variants, so min-height alone drives the single-line height
+       // Absorbs the #{$x0_125} border of the bordered types, so min-height alone drives the single-line height
        padding-top: calc(var(--padding-y) - #{$x0_125});
        padding-bottom: calc(var(--padding-y) - #{$x0_125});
-
-       .button-text {
-         // Offsets the extra 7px of the label line-height so a single line renders at the default button height
-         margin-block: -3.5px;
-       }
-
-       // Icons taller than the label (iconHasCircle, large / on-hover icons) overflow symmetrically, as with the fixed height
-       .button-inner-container > :not(.button-text) {
-         display: flex;
-         align-items: center;
-         height: var(--label-height);
-       }
-
-       .icon-on-hover-container {
-         min-height: var(--label-height);
-       }
      }
 
-     &.button-muted .button-text {
-       // Adds leading between wrapped lines, offset so a single line keeps the default muted height
+     .button-text {
+       // Adds leading between wrapped lines, offset so a single line keeps the default height
        line-height: calc(#{$x2} + #{$x0_5});
        margin-block: -#{$x0_25};
      }
 
-     .button-inner-container {
-       min-width: 0;
+     // Icons taller than the label (iconHasCircle, large / on-hover icons) overflow symmetrically, as with the fixed height
+     .button-inner-container > :not(.button-text) {
+       display: flex;
+       align-items: center;
+       height: var(--label-height);
+     }
 
-       > :not(.button-text) {
-         flex-shrink: 0;
-       }
+     .icon-on-hover-container {
+       min-height: var(--label-height);
      }
 
      .button-text {

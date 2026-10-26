@@ -25,7 +25,7 @@ import { classNames } from '@helpers/classNames';
 import { GoogleLocation } from '@models/swagger/App/Domain/Presence/Entities/ListingServices/Google/Locations/GoogleLocation';
 import { GooglePlace } from '@models/swagger/App/Domain/Presence/Entities/ListingServices/Google/Places/GooglePlace';
 import { LocationMediaItemType } from '@models/swagger/App/Domain/Presence/Entities/Locations/MediaItems/LocationMediaItem';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { Collapse } from '@vanguard/Collapse/Collapse/Collapse';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -104,7 +104,12 @@ export const LocationCard = (props: LocationCardProps) => {
             languageCode={languageCode}
           />
         </div>
-        <Button type={ButtonTypes.default} iconRight={IconNames.visibilityOff} onClick={exitClick}>
+        <Button
+          size={ButtonSizes.extraLarge}
+          type={ButtonTypes.default}
+          iconRight={IconNames.visibilityOff}
+          onClick={exitClick}
+        >
           Hide map
         </Button>
       </div>
@@ -220,6 +225,7 @@ export const LocationCard = (props: LocationCardProps) => {
             {cta}
             <Render if={showOnMap && !!address?.formattedAddress}>
               <Button
+                size={ButtonSizes.extraLarge}
                 type={ButtonTypes.default}
                 iconRight={isMapOpen ? IconNames.visibilityOff : IconNames.visibility}
                 onClick={() => {

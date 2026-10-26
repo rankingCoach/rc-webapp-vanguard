@@ -20,8 +20,8 @@ const COMBOS: FooterCombo[] = [
 const label = (type?: ButtonTypes) => type ?? "default type";
 
 /**
- * Every button in a ModalFooter renders at the same height whatever its type: the footer sizes muted actions
- * `extraLarge` and the others `medium`, which are both 48px on desktop and 40px on mobile.
+ * Every button in a ModalFooter renders at the same height whatever its type: the footer sizes every action
+ * `extraLarge`, 48px on desktop and 40px on mobile.
  */
 export const FooterButtonHeights: Story = {
   args: {},

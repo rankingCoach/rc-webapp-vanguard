@@ -1,6 +1,6 @@
 import { alignItemsCenter, dFlexColumn, justifyContentCenter } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { Button } from '@vanguard/Button/Button';
+import { Button, ButtonSizes } from '@vanguard/Button/Button';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Render } from '@vanguard/Render/Render';
 import { BlurredMessageProps, TableContextType, TableProvider } from '@vanguard/Table/Table';
@@ -68,7 +68,12 @@ export const TableBody = (props: TableBodyProps) => {
                     {blurredMessage}
                   </Text>
                   <Render if={!!blurredCta}>
-                    <Button replacements={replacements} onClick={blurredCta?.cta} iconRight={IconNames.arrowRight}>
+                    <Button
+                      size={ButtonSizes.extraLarge}
+                      replacements={replacements}
+                      onClick={blurredCta?.cta}
+                      iconRight={IconNames.arrowRight}
+                    >
                       {blurredCta?.text}
                     </Button>
                   </Render>

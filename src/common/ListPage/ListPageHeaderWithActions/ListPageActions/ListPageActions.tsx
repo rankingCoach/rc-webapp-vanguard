@@ -244,6 +244,7 @@ export const ListPageActions = <T, >(props: ListPageActionsProps<T>) => {
           <div className={styles.actionBtns}>
             <Render if={!filters.automaticRequest}>
               <Button
+                size={ButtonSizes.extraLarge}
                 className={classNames(mt2)}
                 onClick={onApplyFilters}
                 isLoading={showLoading}

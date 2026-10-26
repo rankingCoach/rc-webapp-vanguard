@@ -1,5 +1,5 @@
-import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
-import { getRowButtonTypeAndSize } from '@vanguard/Button/button-row-size';
+import { Button, ButtonProps, ButtonTypes } from '@vanguard/Button/Button';
+import { ROW_BUTTON_SIZE } from '@vanguard/Button/button-row-size';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React from 'react';
 
@@ -39,19 +39,14 @@ export const ActionBarFooter = (props: ActionBarFooterProps) => {
         const typedProps: ButtonProps =
           buttonProps && 'type' in buttonProps
             ? buttonProps
-            : idx === buttons.length - 1
-              ? ({ ...buttonProps, type: ButtonTypes.primary } as ButtonProps)
-              : {
-                  ...buttonProps,
-                  type: ButtonTypes.muted,
-                  // secondary small (32px) used to map to muted medium (32px); keep that for existing consumers
-                  size: buttonProps?.size === ButtonSizes.small ? ButtonSizes.medium : undefined,
-                };
-        // Unless the consumer sets a size, muted buttons get the row size so they match the others' height
-        const resolvedProps: ButtonProps =
-          typedProps.type === ButtonTypes.muted && !typedProps.size
-            ? { ...typedProps, size: getRowButtonTypeAndSize(ButtonTypes.muted).size }
-            : typedProps;
+            : ({
+                ...buttonProps,
+                type: idx === buttons.length - 1 ? ButtonTypes.primary : ButtonTypes.muted,
+              } as ButtonProps);
+        // Unless the consumer sets a size, every button gets the row size so they all share one height
+        const resolvedProps: ButtonProps = typedProps.size
+          ? typedProps
+          : ({ ...typedProps, size: ROW_BUTTON_SIZE } as ButtonProps);
         return (
           <Button key={idx} testId={`ActionBarFooter_${idx}`} onClick={footerButton.onClick} {...resolvedProps}>
             {footerButton.text}

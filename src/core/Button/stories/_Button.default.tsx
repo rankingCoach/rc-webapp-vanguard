@@ -53,7 +53,6 @@ export const BUTTONS_EXCLUDED_CONTROLS_MUTED = ['testId', 'className', 'targetRe
 
 // Button type options (excluding muted for base buttons)
 export const { muted, ...BaseButtonTypeOptions } = ButtonTypes;
-export const { extraLarge, ...BaseButtonSizeOptions } = ButtonSizes;
 
 // Storybook argTypes configuration for common controls
 export const buttonArgTypes = {
@@ -100,7 +99,7 @@ export const buttonArgTypes = {
   },
   size: {
     control: 'radio',
-    options: BaseButtonSizeOptions,
+    options: ButtonSizes,
     defaultValue: ButtonSizes.medium,
   },
   type: {
@@ -175,7 +174,7 @@ export const mutedButtonArgTypes = {
   },
   size: {
     control: 'radio',
-    options: ButtonSizes, // Muted buttons can use all sizes including extraLarge
+    options: ButtonSizes, // the same sizes as every other type
     defaultValue: ButtonSizes.medium,
   },
   blurred: {
@@ -283,7 +282,7 @@ export const ButtonsDemoRendering = (args: ButtonProps): React.JSX.Element => {
             <Button {...args} size={ButtonSizes.small} />
             <Button {...args} size={ButtonSizes.medium} />
             <Button {...args} size={ButtonSizes.large} />
-            {args.type === ButtonTypes.muted ? <Button {...args} size={ButtonSizes.extraLarge} /> : null}
+            <Button {...args} size={ButtonSizes.extraLarge} />
           </div>
         </div>
       ))}
@@ -293,9 +292,7 @@ export const ButtonsDemoRendering = (args: ButtonProps): React.JSX.Element => {
           <Button {..._normalButtonDemo.args} size={ButtonSizes.small} isLoading={isLoading} />
           <Button {..._normalButtonDemo.args} size={ButtonSizes.medium} isLoading={isLoading} />
           <Button {..._normalButtonDemo.args} size={ButtonSizes.large} isLoading={isLoading} />
-          {_normalButtonDemo.args.type === ButtonTypes.muted ? (
-            <Button {..._normalButtonDemo.args} size={ButtonSizes.extraLarge} isLoading={isLoading} />
-          ) : null}
+          <Button {..._normalButtonDemo.args} size={ButtonSizes.extraLarge} isLoading={isLoading} />
         </div>
       </div>
       <Text color={args.inverted ? 'white' : undefined} type={TextTypes.heading3}>
@@ -308,7 +305,7 @@ export const ButtonsDemoRendering = (args: ButtonProps): React.JSX.Element => {
             <Button {...args} size={ButtonSizes.small} />
             <Button {...args} size={ButtonSizes.medium} />
             <Button {...args} size={ButtonSizes.large} />
-            {args.type === ButtonTypes.muted ? <Button {...args} size={ButtonSizes.extraLarge} /> : null}
+            <Button {...args} size={ButtonSizes.extraLarge} />
           </div>
         </div>
       ))}
