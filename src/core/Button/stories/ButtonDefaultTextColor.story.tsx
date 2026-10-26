@@ -1,18 +1,11 @@
 import { IconNames } from '@vanguard/Icon/IconNames';
-import React, { CSSProperties, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Button, ButtonSizes, ButtonTextColors, ButtonTypes } from '../Button';
 import { ButtonStory } from './_Button.default';
 
 const ADO_BASE = 'rgb(0, 106, 133)'; // --ado-base (#006a85) in the default theme
-
-// The theme values VAN-85 asks the webapp generator for. Scoped to a wrapper so the stories can show the
-// transparent default button before the regenerated theme lands; the real values come from the theme.
-const TRANSPARENT_DEFAULT_THEME = {
-  '--button-default-background-color': 'transparent',
-  '--button-default-hover-background-color': 'rgba(185, 197, 216, 0.12)',
-} as CSSProperties;
 
 const SURFACES = [
   { key: 'white', label: 'White surface (--fn-bg)', background: '#ffffff' },
@@ -145,23 +138,22 @@ export const ButtonDefaultTextColor: ButtonStory = {
   },
 };
 
-const previewDescription = `
-**Preview, not the shipped look.** The default button reads its fill from the theme
-(\`--button-default-background-color\`, \`--button-default-hover-background-color\`). VAN-85 asks the webapp theme
-generator to change them to \`transparent\` and \`rgba(185, 197, 216, 0.12)\`. This story sets those two values on a
-wrapper to show the result on white, grey and tinted surfaces. Hover a button to see the translucent hover fill.
+const transparentDescription = `
+The default button has no fill: the theme sets \`--button-default-background-color\` to \`transparent\` and
+\`--button-default-hover-background-color\` to \`rgba(185, 197, 216, 0.12)\` (VAN-85), so it takes the colour of the
+surface it sits on. Shown on white, grey and tinted surfaces; hover a button to see the translucent hover fill.
 `;
 
-// The default button with the VAN-85 theme values, scoped to this story
-export const ButtonDefaultTransparentPreview: ButtonStory = {
+// The default button with the theme's transparent fill, on several surfaces
+export const ButtonDefaultTransparent: ButtonStory = {
   globals: { theme: 'light' },
   args: { onClick: fn() },
-  parameters: { docs: { description: { story: previewDescription } } },
+  parameters: { docs: { description: { story: transparentDescription } } },
   render: (args) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', ...TRANSPARENT_DEFAULT_THEME }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {SURFACES.map((surface) => (
         <Row key={surface.key} label={surface.label} background={surface.background}>
-          <Button type={ButtonTypes.default} onClick={args.onClick} testId={`preview-${surface.key}-plain`}>
+          <Button type={ButtonTypes.default} onClick={args.onClick} testId={`transparent-${surface.key}-plain`}>
             Default
           </Button>
           <Button type={ButtonTypes.default} icon={IconNames.add} onClick={args.onClick}>
@@ -186,9 +178,9 @@ export const ButtonDefaultTransparentPreview: ButtonStory = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    // with the requested theme values the rest fill is transparent on every surface
+    // the theme's rest fill is transparent on every surface
     for (const surface of SURFACES) {
-      const button = canvas.getByTestId(`preview-${surface.key}-plain_button`);
+      const button = canvas.getByTestId(`transparent-${surface.key}-plain_button`);
       await expect(getComputedStyle(button).backgroundColor).toBe('rgba(0, 0, 0, 0)');
     }
   },

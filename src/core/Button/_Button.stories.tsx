@@ -7,7 +7,7 @@ import { ButtonTypePrimary as _ButtonTypePrimary } from "./stories/ButtonTypePri
 import { ButtonTypeDefault as _ButtonTypeDefault } from "./stories/ButtonTypeDefault.story";
 import {
   ButtonDefaultTextColor as _ButtonDefaultTextColor,
-  ButtonDefaultTransparentPreview as _ButtonDefaultTransparentPreview,
+  ButtonDefaultTransparent as _ButtonDefaultTransparent,
 } from "./stories/ButtonDefaultTextColor.story";
 import { ButtonTypeSecondary as _ButtonTypeSecondary } from "./stories/ButtonTypeSecondary.story";
 import { ButtonTypeShimmer as _ButtonTypeShimmer } from "./stories/ButtonTypeShimmer.story";
@@ -58,7 +58,7 @@ import { ButtonLabelGlyphs as _ButtonLabelGlyphs } from "./stories/ButtonLabelGl
 export const ButtonTypePrimary: ButtonStory = { ..._ButtonTypePrimary }
 export const ButtonTypeDefault: ButtonStory = { ..._ButtonTypeDefault }
 export const ButtonDefaultTextColor: ButtonStory = { ..._ButtonDefaultTextColor }
-export const ButtonDefaultTransparentPreview: ButtonStory = { ..._ButtonDefaultTransparentPreview }
+export const ButtonDefaultTransparent: ButtonStory = { ..._ButtonDefaultTransparent }
 export const ButtonTypeSecondary: ButtonStory = { ..._ButtonTypeSecondary }
 export const ButtonTypeShimmer: ButtonStory = { ..._ButtonTypeShimmer }
 export const ButtonShimmerShowcase: ButtonStory = { ..._ButtonShimmerShowcase }
