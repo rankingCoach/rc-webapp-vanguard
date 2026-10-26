@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.5.0...v2.6.0) (2026-10-21)
+
+
+### Features
+
+* **icon:** add paypal icon ([fc66271](https://github.com/rankingCoach/rc-webapp-vanguard/commit/fc66271f7420d63bdaacf8793914ddbbb406b59d))
+
 ## [2.5.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.4.0...v2.5.0) (2026-10-19)
 
 

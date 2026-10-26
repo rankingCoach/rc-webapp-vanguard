@@ -159,6 +159,7 @@ export enum IconNames {
   like = 'like',
   ado = 'ado',
   adoActive = 'ado-active',
+  paypal = 'paypal',
 }
 
 export const IconNamesArr = Object.values(IconNames);
