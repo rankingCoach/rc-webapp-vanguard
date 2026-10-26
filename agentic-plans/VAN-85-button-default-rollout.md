@@ -1,7 +1,7 @@
 # VAN-85 rollout: transparent default Button and `textColor`
 
 Apply these steps **after** the Vanguard release that ships `ButtonTextColors` / `textColor` (branch
-`feature/VAN-85`, next minor after 2.4.0). Steps 1–5 go into **one webapp PR**, in this order, so that no build ships
+`feature/VAN-85`, released as **2.6.0**). Steps 1–5 go into **one webapp PR**, in this order, so that no build ships
 a transparent default button with the email or legacy readers still attached to its token. Light scheme only.
 
 Background and decisions: RFC "RFC: Transparent default Button (VAN-85)", `VAN-85-button-default-investigation.md`,
@@ -13,14 +13,19 @@ Background and decisions: RFC "RFC: Transparent default Button (VAN-85)", `VAN-8
   and is ignored by the other types.
 - `ado` colours the label and icon with `--ado-base`. Hover and focus get a derived colour: 25% towards black.
 - **No change to the fill.** The default button still reads `--button-default-background-color` and
-  `--button-default-hover-background-color`. Until step 3 lands, nothing looks different.
+  `--button-default-hover-background-color`. Until step 3 lands, its fill looks the same.
 - Stories under Vanguard/Button:
   - "Button Default Text Color"
-  - "Button Default Transparent Preview", which shows the post-rollout look with the step 3 values scoped to the story.
+  - "Button Default Transparent", which shows the post-rollout look with the regenerated Storybook theme (the step 3
+    values).
 
 ## Step 1: bump Vanguard
 
-Bump `@vanguard` in `html/react` to the release above. Nothing changes visually.
+Bump `@vanguard` in `html/react` to 2.6.0 (checklist W1). The default button's fill doesn't change yet, but 2.6.0
+also ships one size set for every Button type, so the bump **must land together with the size migration** (checklist
+W2, `VAN-85-button-sizes-webapp-migration.md`): run the codemod and fix the manual cases in the same PR. Bumping
+without it resizes every non-muted button: no size or `medium` shrinks from 48px to 32px on desktop, and `small` and
+`large` drop a step too.
 
 ## Step 2: decouple the readers that must stay white
 
