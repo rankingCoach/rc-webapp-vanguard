@@ -1,5 +1,6 @@
 import { Popper } from '@mui/material';
 import Backdrop from '@mui/material/Backdrop';
+import Portal from '@mui/material/Portal';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { uuidv4 } from '@helpers/generate-uid';
@@ -54,6 +55,12 @@ export const PopoverModal = (props: PopoverModalProps) => {
    */
   const popperIdRef = useRef<string>(`popover-modal-${uuidv4()}`);
   const [stackZIndex, setStackZIndex] = useState<number | null>(null);
+  /**
+   * The dim backdrop claims its own slot, registered right before the card's, so it lands strictly above
+   * every overlay that was open before the popover (no tie with the parent modal) and strictly below the card.
+   */
+  const backdropIdRef = useRef<string>(`popover-modal-backdrop-${uuidv4()}`);
+  const [backdropStackZIndex, setBackdropStackZIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setAnchorEl(props.anchorEl ?? null);
@@ -134,33 +141,52 @@ export const PopoverModal = (props: PopoverModalProps) => {
   const open = isOpen || Boolean(anchorEl);
 
   useEffect(() => {
-    if (open) {
-      setStackZIndex(OverlayStackingService.register(popperIdRef.current, 'popover'));
-    } else {
-      OverlayStackingService.unregister(popperIdRef.current);
+    if (!open) {
+      setBackdropStackZIndex(null);
       setStackZIndex(null);
+      return;
     }
-  }, [open]);
-  // Release the slot if the popover unmounts while still open.
-  useEffect(() => () => OverlayStackingService.unregister(popperIdRef.current), []);
+    const backdropId = backdropIdRef.current;
+    const popperId = popperIdRef.current;
+    if (dimRestOfPage) {
+      setBackdropStackZIndex(OverlayStackingService.register(backdropId, 'popover'));
+    }
+    setStackZIndex(OverlayStackingService.register(popperId, 'popover'));
+    // Runs on close, on `dimRestOfPage` change and on unmount, so slots never leak.
+    return () => {
+      OverlayStackingService.unregister(popperId);
+      OverlayStackingService.unregister(backdropId);
+    };
+  }, [open, dimRestOfPage]);
 
   // The ledger slot wins when something below raised the stacking floor (e.g. a widget modal with a huge
   // baseZIndex); the legacy `zIndex + 1030` floor is kept so existing callers keep their guaranteed minimum.
   const popperZIndex = Math.max(zIndex + Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS + 1, stackZIndex ?? 0);
+  // Backdrop slot is registered right before the card's, so it is always strictly below the card.
+  const backdropZIndex = Math.max(zIndex + Z_INDEX_TO_APPEAR_ABOVE_ALL_ELEMENTS, backdropStackZIndex ?? 0);
 
   if (!anchorEl) {
     return null;
   }
+
+  /**
+   * With `renderInPortal` the card is portaled to <body>, so the backdrop must go with it: left inline it is
+   * trapped in the stacking context of whatever positioned ancestor hosts the PopoverModal (e.g. `.modalRoot`)
+   * and loses to that ancestor's own children (e.g. the fixed fullscreen `.modal-footer`).
+   */
+  const backdrop = dimRestOfPage && (
+    <Backdrop
+      open={open}
+      className={styles.backdrop}
+      onMouseDown={handleBackdropMouseDown}
+      sx={{ zIndex: backdropZIndex }}
+      data-testid="popover-modal-backdrop"
+    />
+  );
+
   return (
     <>
-      {dimRestOfPage && (
-        <Backdrop
-          open={open}
-          className={styles.backdrop}
-          onMouseDown={handleBackdropMouseDown}
-          sx={{ zIndex: popperZIndex - 1 }}
-        />
-      )}
+      {backdrop && (renderInPortal ? <Portal>{backdrop}</Portal> : backdrop)}
       <Popper
         open={open}
         anchorEl={anchorEl}
