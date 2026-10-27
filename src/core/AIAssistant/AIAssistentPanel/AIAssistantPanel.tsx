@@ -211,7 +211,7 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
                         <Button
                           className={styles.x}
                           type={ButtonTypes.default}
-                          size={ButtonSizes.small}
+                          size={ButtonSizes.medium}
                           iconLeft={IconNames.close}
                           iconColor={'--n500'}
                           iconHoverColor={'--n700'}

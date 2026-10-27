@@ -21,7 +21,7 @@ import { supportService } from '@services/support.service';
 import { PresenceStore, presenceStore } from '@stores/swagger/client/PresenceStore';
 import { AIAssistant } from '@vanguard/AIAssistant/AIAssistant';
 import { Avatar } from '@vanguard/Avatar/Avatar';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { ModalService } from '@vanguard/Modal/ModalService';
@@ -251,6 +251,7 @@ export const ReplyCommentItemForm = (props: ReplyCommentItemFormProps) => {
 
           <div className={classNames(dFlex, justifyContentBetween, mt2)}>
             <Button
+              size={ButtonSizes.extraLarge}
               isLoading={isAddingACommentReply}
               disabled={disableReplyButton || isAddingACommentReply}
               onClick={async () => {
@@ -265,6 +266,7 @@ export const ReplyCommentItemForm = (props: ReplyCommentItemFormProps) => {
             </Button>
 
             <Button
+              size={ButtonSizes.extraLarge}
               type={ButtonTypes.default}
               onClick={() => {
                 actionFinished && actionFinished();

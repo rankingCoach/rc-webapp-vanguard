@@ -1,5 +1,7 @@
 import React from "react";
+import { expect, waitFor } from "storybook/test";
 import { StatusBadge } from "../StatusBadge";
+import styles from "../StatusBadge.module.scss";
 import { Story, statusBadgeGetAllStates } from "./_StatusBadge.default";
 
 export const StatusBadgeAll: Story = {
@@ -40,5 +42,22 @@ export const StatusBadgeAll: Story = {
         })}
       </div>
     );
+  },
+
+  // Badges without a size keep the default look: no compact class, the original padding, and every big variant renders
+  play: async ({ canvasElement }) => {
+    const statuses = statusBadgeGetAllStates();
+
+    await waitFor(() => {
+      expect(canvasElement.querySelectorAll(`.${styles.compact}`).length, "compact badges").toBe(0);
+
+      const smallBadges = Array.from(canvasElement.querySelectorAll<HTMLElement>(`.${styles.statusBadge}`));
+      expect(smallBadges.length, "small badges").toBe(statuses.length * 2);
+      for (const badge of smallBadges) {
+        expect(getComputedStyle(badge).padding, `${badge.textContent} padding`).toBe("2px 12px 2px 2px");
+      }
+
+      expect(canvasElement.querySelectorAll(`.${styles.statusIcon}`).length, "big badges").toBe(statuses.length);
+    });
   },
 };

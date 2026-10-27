@@ -4,7 +4,7 @@ import { useDynamicImport } from '@custom-hooks/use-dynamic-import/use-dynamic-i
 import { ListPageProps } from '@common/ListPage/ListPage';
 import { PageSection, PageSectionRoundedEdges } from '@vanguard/PageSection';
 import { HeaderTypes } from '@vanguard/Header';
-import { Button } from '@vanguard/Button';
+import { Button, ButtonSizes } from '@vanguard/Button';
 import { Render } from '@vanguard/Render';
 import { Text, FontWeights, TextTypes } from '@vanguard/Text';
 import { classNames } from '@helpers/classNames';
@@ -37,6 +37,7 @@ export const ListPageEmpty = <T, >(props: ListPageEmptyProps<T>) => {
       headerActionArea={
         action && (
           <Button
+            size={ButtonSizes.extraLarge}
             iconPosition={'left'}
             icon={action?.iconLeft}
             onClick={action?.cta}

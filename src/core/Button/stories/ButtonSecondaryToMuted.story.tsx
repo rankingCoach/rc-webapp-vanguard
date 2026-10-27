@@ -4,14 +4,10 @@ import { within, expect } from "storybook/test";
 import { ButtonStory } from "./_Button.default";
 import { disableControls } from "@test-utils/get-storybook-decorator";
 
-// Secondary -> muted replacement sizes (VAN-82). Muted is bumped one size so the height stays the same.
-const SIZE_MAP: { secondary: Exclude<ButtonSizes, ButtonSizes.extraLarge>; muted: ButtonSizes; height: string }[] = [
-  { secondary: ButtonSizes.small, muted: ButtonSizes.medium, height: "32px / 40px" },
-  { secondary: ButtonSizes.medium, muted: ButtonSizes.extraLarge, height: "48px / 40px" },
-  { secondary: ButtonSizes.large, muted: ButtonSizes.extraLarge, height: "60px → 48px / 48px → 40px" },
-];
+// Secondary -> muted replacement (VAN-82). Both types share one size set, so the size stays the same.
+const SIZES = [ButtonSizes.small, ButtonSizes.medium, ButtonSizes.large, ButtonSizes.extraLarge] as const;
 
-const labelStyle: React.CSSProperties = { minWidth: "220px", fontSize: "14px", fontWeight: 500 };
+const labelStyle: React.CSSProperties = { minWidth: "120px", fontSize: "14px", fontWeight: 500 };
 
 export const ButtonSecondaryToMuted: ButtonStory = {
   name: "Secondary To Muted",
@@ -25,24 +21,21 @@ export const ButtonSecondaryToMuted: ButtonStory = {
     docs: {
       description: {
         story:
-          "`ButtonTypes.secondary` is being replaced by `ButtonTypes.muted`. Bump the size one step when swapping so the " +
-          "height stays the same: secondary `small` → muted `medium` (32px), secondary `medium` (default) → muted " +
-          "`extraLarge` (48px), secondary `large` → muted `extraLarge` (closest, 12px shorter). Heights shown as desktop / mobile. " +
-          "Text gets smaller for small (16px → 12px) and large (20px → 16px); use `inverted` on dark or coloured backgrounds.",
+          "`ButtonTypes.secondary` is being replaced by `ButtonTypes.muted`. Every type shares one size set, so swap the " +
+          "type and keep the size: the button keeps its footprint. Muted has no border and a see-through fill; use " +
+          "`inverted` on dark or coloured backgrounds.",
       },
     },
   },
   render: ({ children }) => (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "flex-start" }}>
-      {SIZE_MAP.map(({ secondary, muted, height }) => (
-        <div key={secondary} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={labelStyle}>
-            {secondary} → {muted} ({height})
-          </span>
-          <Button type={ButtonTypes.secondary} size={secondary} testId={`secondary-${secondary}`}>
+      {SIZES.map((size) => (
+        <div key={size} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <span style={labelStyle}>{size}</span>
+          <Button type={ButtonTypes.secondary} size={size} testId={`secondary-${size}`}>
             {children}
           </Button>
-          <Button type={ButtonTypes.muted} size={muted} testId={`muted-${secondary}`}>
+          <Button type={ButtonTypes.muted} size={size} testId={`muted-${size}`}>
             {children}
           </Button>
         </div>
@@ -51,10 +44,11 @@ export const ButtonSecondaryToMuted: ButtonStory = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const height = (testId: string) =>
+      Math.round(canvas.getByTestId(testId).querySelector("button")!.getBoundingClientRect().height);
 
-    for (const { secondary } of SIZE_MAP) {
-      await expect(canvas.getByTestId(`secondary-${secondary}`)).toBeInTheDocument();
-      await expect(canvas.getByTestId(`muted-${secondary}`)).toBeInTheDocument();
+    for (const size of SIZES) {
+      await expect(height(`secondary-${size}`)).toBe(height(`muted-${size}`));
     }
   },
 };

@@ -6,7 +6,7 @@ import { mb3 } from '@globalStyles';
 import { useSelector } from 'react-redux';
 import { PageSection, PageSectionRoundedEdges, PageSectionBackground } from '@vanguard/PageSection';
 import { HeaderTypes } from '@vanguard/Header';
-import { Button } from '@vanguard/Button';
+import { Button, ButtonSizes } from '@vanguard/Button';
 import { Render } from '@vanguard/Render';
 import { AnimatedConditional } from '@vanguard/AnimatedConditional';
 
@@ -58,6 +58,7 @@ export const ListPageHeader = <T, >(props: ListPageHeaderProps<T>) => {
       headerActionArea={
         action ? (
           <Button
+            size={ButtonSizes.extraLarge}
             icon={action?.iconLeft}
             iconPosition={'left'}
             onClick={action?.cta}

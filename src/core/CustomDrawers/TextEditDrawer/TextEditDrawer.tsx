@@ -64,10 +64,15 @@ export const TextEditDrawer = (props: TextEditDrawerProps) => {
         />
       </div>
       <div className={styles.textEditDrawerActionsContainer}>
-        <Button onClick={handleSave} iconLeft={IconNames.save} disabled={isSaveButtonDisabled}>
+        <Button
+          size={ButtonSizes.extraLarge}
+          onClick={handleSave}
+          iconLeft={IconNames.save}
+          disabled={isSaveButtonDisabled}
+        >
           Save
         </Button>
-        <Button type={ButtonTypes.default} onClick={onClose}>
+        <Button size={ButtonSizes.extraLarge} type={ButtonTypes.default} onClick={onClose}>
           Cancel
         </Button>
       </div>

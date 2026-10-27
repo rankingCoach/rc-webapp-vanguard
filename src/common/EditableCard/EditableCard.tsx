@@ -108,7 +108,7 @@ export const EditableCard = (props: EditableCardProps) => {
           {WrapButton(
             <Button
               testId={'cta'}
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               iconLeft={IconNames.edit}
               iconSize={IconSize.small}
               iconColor={'--n500'}

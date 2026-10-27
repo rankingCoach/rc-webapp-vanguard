@@ -90,10 +90,15 @@ export const ButtonShimmerShowcase: ButtonStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // Verify the enabled variants all carry the sweep
+    // Verify the enabled variants all carry the sweep (with prefers-reduced-motion it stands still)
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     for (const testId of ["shimmer-small", "shimmer-medium", "shimmer-large", "shimmer-icon-only", "shimmer-loading"]) {
       const button = canvas.getByTestId(`${testId}_button`);
-      await expect(window.getComputedStyle(button).animationName).toContain("adoShimmer");
+      if (reducedMotion) {
+        await expect(window.getComputedStyle(button).animationName).toBe("none");
+      } else {
+        await expect(window.getComputedStyle(button).animationName).toContain("adoShimmer");
+      }
     }
 
     // Verify the disabled button does not

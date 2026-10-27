@@ -33,7 +33,7 @@ export { Textarea } from './core/Textarea/Textarea.tsx';
 
 // Button
 export type { ButtonProps, ButtonShape } from './core/Button/Button.tsx';
-export { Button, ButtonSizes, ButtonTypes } from './core/Button/Button.tsx';
+export { Button, ButtonSizes, ButtonTextColors, ButtonTypes } from './core/Button/Button.tsx';
 
 // Form
 export { extractErrorScopes } from './core/Form/extract-error-scopes';
@@ -137,6 +137,7 @@ export type {
   StatusBadgePostStatus,
   StatusBadgeProps,
   StatusBadgeReviewStatus,
+  StatusBadgeSize,
   StatusBadgeStatus,
 } from './core/StatusBadge/StatusBadge.tsx';
 export { StatusBadge } from './core/StatusBadge/StatusBadge.tsx';

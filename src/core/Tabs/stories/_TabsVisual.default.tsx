@@ -35,9 +35,9 @@ export const barRootOf = (tablist: HTMLElement): HTMLElement => scrollerOf(tabli
 /** The element wrapping the bar and the panels. */
 export const wrapperOf = (tablist: HTMLElement): HTMLElement => barRootOf(tablist).parentElement as HTMLElement;
 
-/** Scroll buttons (caret wrappers), ordered left to right. */
+/** Overflow scroll buttons (the `<button>`s), ordered left to right. */
 export const scrollButtonsOf = (bar: HTMLElement): HTMLElement[] =>
-  Array.from(bar.querySelectorAll<HTMLElement>('[class*="custom-scroll-button-wrapper"]')).sort(
+  Array.from(bar.querySelectorAll<HTMLElement>(':scope > [class*="scroll-button"] button')).sort(
     (a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left,
   );
 
