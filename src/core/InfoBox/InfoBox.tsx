@@ -14,7 +14,6 @@ import {
 import { classNames } from '@helpers/classNames';
 import { AnimatedConditional } from '@vanguard/AnimatedConditional/AnimatedConditional';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
-import { getRowButtonTypeAndSize } from '@vanguard/Button/button-row-size';
 import { Collapse } from '@vanguard/Collapse/Collapse/Collapse';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
@@ -180,7 +179,7 @@ export const InfoBox = (props: InfoBoxProps) => {
               <div className={classNames(dFlex, justifyContentBetween, flexWrap, pt2, gap1)}>
                 <Render if={!!positive}>
                   <Button
-                    {...getRowButtonTypeAndSize(positive?.type ?? ButtonTypes.primary)}
+                    type={positive?.type ?? ButtonTypes.primary}
                     rounded={true}
                     icon={positive?.icon}
                     iconPosition={'right'}
@@ -194,7 +193,7 @@ export const InfoBox = (props: InfoBoxProps) => {
 
                 <Render if={!!negative}>
                   <Button
-                    {...getRowButtonTypeAndSize(negative?.type ?? ButtonTypes.muted)}
+                    type={negative?.type ?? ButtonTypes.muted}
                     rounded={true}
                     icon={negative?.icon}
                     iconPosition={'left'}

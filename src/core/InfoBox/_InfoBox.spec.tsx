@@ -98,7 +98,7 @@ describe('InfoBox close button', () => {
 });
 
 describe('InfoBox action buttons', () => {
-  it('renders a primary medium positive and a muted extraLarge negative by default', async () => {
+  it('renders a primary positive and a muted negative, both medium, by default', async () => {
     await render(
       <InfoBox
         description={description}
@@ -108,10 +108,10 @@ describe('InfoBox action buttons', () => {
     );
 
     expect(hasClasses(getActionButton('Accept'), buttonStyles.buttonPrimary, buttonStyles.sizeMedium)).toBe(true);
-    expect(hasClasses(getActionButton('Decline'), buttonStyles.buttonMuted, buttonStyles.sizeExtraLarge)).toBe(true);
+    expect(hasClasses(getActionButton('Decline'), buttonStyles.buttonMuted, buttonStyles.sizeMedium)).toBe(true);
   });
 
-  it('sizes the buttons from their type, so a muted positive and a primary negative still share a height', async () => {
+  it('keeps both buttons medium whatever their type', async () => {
     await render(
       <InfoBox
         description={description}
@@ -120,7 +120,7 @@ describe('InfoBox action buttons', () => {
       />,
     );
 
-    expect(hasClasses(getActionButton('Accept'), buttonStyles.buttonMuted, buttonStyles.sizeExtraLarge)).toBe(true);
+    expect(hasClasses(getActionButton('Accept'), buttonStyles.buttonMuted, buttonStyles.sizeMedium)).toBe(true);
     expect(hasClasses(getActionButton('Decline'), buttonStyles.buttonPrimary, buttonStyles.sizeMedium)).toBe(true);
   });
 
