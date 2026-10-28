@@ -433,6 +433,7 @@ describe('ModalSplitView resize (right-overlay, animateOnSlideEnd)', () => {
       expect(right.style.left).toBe('25%');
       expect(right.style.width).toBe('75%');
       expect(right.className).not.toContain('--resizing');
+      expect(right.id).toBe('');
     });
 
     test('is not honoured without animateOnSlideEnd', () => {
@@ -460,6 +461,12 @@ describe('ModalSplitView resize (right-overlay, animateOnSlideEnd)', () => {
       expect(handle().getAttribute('aria-valuemax')).toBe(String(MAX_WIDTH));
       // Not dragged yet: the default layout's width
       expect(handle().getAttribute('aria-valuenow')).toBe('750');
+    });
+
+    test('controls the right panel (aria-controls)', () => {
+      const { handle, right } = renderSplit(ui());
+      expect(right().id).not.toBe('');
+      expect(handle().getAttribute('aria-controls')).toBe(right().id);
     });
 
     test('rides the edge rail, which shares the right panel left, width and transform', () => {
@@ -587,6 +594,16 @@ describe('ModalSplitView resize (right-overlay, animateOnSlideEnd)', () => {
       // …and the moves after it no longer drag
       pointerMove(handle(), pointerAtWidth(600));
       expect(right().style.width).toBe(rightWidthCss(MIN_WIDTH));
+    });
+
+    test('follows the split right edge when the window moves it mid-drag', () => {
+      const { handle, right, root } = renderSplit(ui());
+      pointerDown(handle(), pointerAtWidth(750));
+      // The split moves 100px right (centred in a wider window): the same pointer x is now 100px more width
+      root.getBoundingClientRect = () => rectOf(100, SPLIT_WIDTH);
+      pointerMove(handle(), pointerAtWidth(400));
+      expect(right().style.width).toBe(rightWidthCss(500));
+      pointerUp(handle());
     });
 
     test('captures the pointer, so an iframe in the panel cannot take the moves', () => {

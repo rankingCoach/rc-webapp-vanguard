@@ -125,6 +125,12 @@ export { ModalFooter } from './core/Modal';
 export { ModalHeader } from './core/Modal';
 export { ModalRoot } from './core/Modal';
 export { ModalService } from './core/Modal';
+export type {
+  ModalSplitViewCollapseMode,
+  ModalSplitViewCollapseToggle,
+  ModalSplitViewResize,
+  SplitViewElement,
+} from './core/Modal';
 export { ModalSplitView } from './core/Modal';
 export { ModalStepper } from './core/Modal';
 export { NavigationModal } from './core/Modal';

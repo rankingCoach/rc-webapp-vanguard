@@ -153,6 +153,7 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
 
       <a.div
         ref={rightPanelRef}
+        id={activeResize ? splitResize.panelId : undefined}
         className={rightClassName}
         style={rightStyle}
         {...(activeResize ? splitResize.panelProps : undefined)}

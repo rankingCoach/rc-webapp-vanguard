@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import type { ModalSplitViewResize } from './ModalSplitView';
 
@@ -107,6 +107,8 @@ export interface SplitViewResizeHandleDomProps {
   role: string;
   'aria-orientation': 'vertical';
   'aria-label': string | undefined;
+  /** The right panel's id: the panel this separator resizes. */
+  'aria-controls': string;
   tabIndex: number;
   onPointerDown: (e: React.PointerEvent<HTMLElement>) => void;
   onPointerEnter: () => void;
@@ -130,6 +132,8 @@ interface UseSplitViewResizeResult {
   tab: TabState;
   /** The tab's offset from the edge, px: + into the panel, − out of it. */
   tabX: number;
+  /** Put it on the right panel as its `id`: the handle's `aria-controls` names it. */
+  panelId: string;
   panelProps: SplitViewResizePanelDomProps;
   handleProps: SplitViewResizeHandleDomProps;
 }
@@ -151,6 +155,7 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
   const [width, setWidth] = useState<number | null>(null);
   const [hover, setHover] = useState(false);
   const handleRef = useRef<HTMLDivElement>(null);
+  const panelId = useId();
   const [dragging, setDraggingState] = useState(false);
   // Read by the panels' pointer moves, which can arrive before the re-render that dragging causes
   const draggingRef = useRef(false);
@@ -263,8 +268,6 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
     } catch {
       // A pointer the browser doesn't know (synthetic): the strip still gets its moves while over it
     }
-    // The panel's right edge stays put; the pointer is its (visible) left
-    const right = splitOf(panelRef.current)?.getBoundingClientRect().right ?? window.innerWidth;
     const edgeOffset = config.edgeOffset ?? 0;
     // Grabbed off the edge (the strip and the safe area round the tab reach past it), the edge keeps that distance from
     // the pointer instead of jumping under it on the first move. The handle is centred on the visible edge.
@@ -288,6 +291,9 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
     writeMagnet(handleRef.current, null, e.clientY, DRAG_TRAVEL);
     const move = (ev: globalThis.PointerEvent): void => {
       writeMagnet(handleRef.current, null, ev.clientY, DRAG_TRAVEL);
+      // The pointer is the panel's (visible) left; its right is the split's, read on every move as the limits are (the
+      // window can move it mid-drag)
+      const right = splitOf(panelRef.current)?.getBoundingClientRect().right ?? window.innerWidth;
       const desired = right - (ev.clientX - grabOffset) + edgeOffset;
       const { min: lo, max: hi } = limitsOf(config, panelRef.current);
       const next = clampSplitWidth(desired, lo, hi);
@@ -376,6 +382,7 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
     role: 'separator',
     'aria-orientation': 'vertical',
     'aria-label': resize?.ariaLabel,
+    'aria-controls': panelId,
     tabIndex: 0,
     onPointerDown,
     onPointerEnter: () => setHover(true),
@@ -391,6 +398,7 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
     resizing: dragging,
     tab,
     tabX,
+    panelId,
     panelProps: { onPointerMove: onPanelPointerMove, onPointerLeave: onPanelPointerLeave },
     handleProps,
   };
