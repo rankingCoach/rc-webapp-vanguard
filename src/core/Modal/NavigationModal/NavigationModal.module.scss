@@ -1,0 +1,47 @@
+@import '@styles/color-functions';
+@import '@styles/media-mixins';
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  @include media('<=mobile') {
+    display: none;
+  }
+}
+
+.arrow-left {
+  right: calc(100% + 24px);
+}
+
+.arrow-right {
+  left: calc(100% + 24px);
+}
+
+.counter {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  white-space: nowrap;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: rc_transparent(--fn-shadow, 0.6);
+}
+
+/**
+ * Fullscreen panel (mobile default): there is no "outside" — hide the arrows
+ * and overlay the counter near the bottom of the panel instead.
+ */
+:global(.rc-modal.modal-fullscreen) {
+  .arrow {
+    display: none;
+  }
+
+  .counter {
+    top: auto;
+    bottom: 16px;
+  }
+}

@@ -6,8 +6,6 @@ import { Story } from "./_AiGlow.default";
 export const WithColors: Story = {
   args: {
     baseColor: "#ff4500",
-    startColor: "#ff8c00",
-    endColor: "#ff4500",
     children: (
       <div
         style={{
@@ -39,16 +37,16 @@ export const WithColors: Story = {
     await expect(content).toBeInTheDocument();
     await expect(content).toHaveTextContent("Custom Colors");
 
-    // Test that color props are passed and applied
+    // Test that the color prop is passed and applied
     await expect(args.baseColor).toBe("#ff4500");
-    await expect(args.startColor).toBe("#ff8c00");
-    await expect(args.endColor).toBe("#ff4500");
 
-    // Test that the CSS custom properties are set with the correct values
-    await expect(glowContainer).toHaveStyle({
-      "--ai-base-color": "#ff4500",
-      "--ai-start-color": "#ff8c00",
-      "--ai-end-color": "#ff4500",
-    });
+    // Test that the CSS custom property is set with the correct value
+    await expect(glowContainer).toHaveStyle({ "--ai-base-color": "#ff4500" });
+
+    // Test that only the base colour is set inline; the other stops are derived from it
+    const glowElement = glowContainer as HTMLElement;
+    await expect(glowElement.style.getPropertyValue("--ai-start-color")).toBe("");
+    await expect(glowElement.style.getPropertyValue("--ai-end-color")).toBe("");
+    await expect(getComputedStyle(glowElement).getPropertyValue("--ai-glow-light-color")).toContain("#ff4500");
   },
 };

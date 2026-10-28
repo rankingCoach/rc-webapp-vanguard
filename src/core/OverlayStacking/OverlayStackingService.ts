@@ -55,6 +55,17 @@ class OverlayStackingServiceClass {
     return base + o;
   }
 
+  /** Reorder only the supplied overlays, preserving all other overlay slots and raised floors. */
+  reorder(ids: string[]): void {
+    if (new Set(ids).size !== ids.length || ids.some((id) => !this.order.has(id))) return;
+    const slots = ids.map((id) => ({ order: this.order.get(id)!, base: this.base.get(id)! }))
+      .sort((a, b) => (a.base + a.order) - (b.base + b.order));
+    ids.forEach((id, index) => {
+      this.order.set(id, slots[index].order);
+      this.base.set(id, slots[index].base);
+    });
+  }
+
   /** Free the slot. The next opener will reuse the now-vacated topmost order. */
   unregister(id: string): void {
     this.order.delete(id);

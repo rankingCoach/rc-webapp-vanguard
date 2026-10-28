@@ -12,6 +12,8 @@ export const getColorsBasedOnStatus = (
   bgColor: string;
   iconName: IconNames;
   borderColor?: string;
+  /** `-rgb` token for the big variant's glow. When unset, the glow uses the icon colour's `-rgb` sibling. */
+  glowColor?: string;
 } => {
   if (!status) {
     status = 'info';
@@ -180,6 +182,17 @@ export const getColorsBasedOnStatus = (
         textColor: '--a1500',
         bgColor: '--a1100',
         iconName: IconNames.ai,
+      };
+    case 'ado':
+      // Component-scoped variables declared in _status-badge-ado-colors.scss (12% --ado-base fill, --ado-text label).
+      // They have no -rgb sibling, so the glow names its token explicitly.
+      return {
+        reverseColor: '--ado-base',
+        iconColor: '--ado-base',
+        textColor: '--status-badge-ado-text-color',
+        bgColor: '--status-badge-ado-background-color',
+        glowColor: '--ado-base-rgb',
+        iconName: IconNames.ado,
       };
   }
 

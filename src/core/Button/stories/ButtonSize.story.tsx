@@ -50,16 +50,14 @@ export const ButtonSize: ButtonStory = {
         />
       </div>
       
-      {args.type === ButtonTypes.muted && (
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ minWidth: "80px", fontSize: "14px", fontWeight: "500" }}>Extra Large:</span>
-          <Button 
-            {...args} 
-            size={ButtonSizes.extraLarge}
-            testId={`${args.testId}-extra-large`}
-          />
-        </div>
-      )}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span style={{ minWidth: "80px", fontSize: "14px", fontWeight: "500" }}>Extra Large:</span>
+        <Button 
+          {...args} 
+          size={ButtonSizes.extraLarge}
+          testId={`${args.testId}-extra-large`}
+        />
+      </div>
     </div>
   ),
   play: async ({ canvasElement, args }) => {
@@ -75,27 +73,16 @@ export const ButtonSize: ButtonStory = {
     const largeButton = canvas.getByTestId(`${args.testId}-large`);
     await expect(largeButton).toBeInTheDocument();
 
-    // Test conditional extraLarge button for muted type
-    if (args.type === ButtonTypes.muted) {
-      const extraLargeButton = canvas.getByTestId(`${args.testId}-extra-large`);
-      await expect(extraLargeButton).toBeInTheDocument();
-      
-      // Test clicking the extraLarge button
-      await userEvent.click(extraLargeButton);
-      await expect(args.onClick).toHaveBeenCalled();
-    } else {
-      // Ensure extraLarge button is not present for non-muted types
-      const extraLargeButton = canvas.queryByTestId(`${args.testId}-extra-large`);
-      await expect(extraLargeButton).not.toBeInTheDocument();
-    }
+    // Every type supports extraLarge
+    const extraLargeButton = canvas.getByTestId(`${args.testId}-extra-large`);
+    await expect(extraLargeButton).toBeInTheDocument();
+
+    await userEvent.click(extraLargeButton);
+    await expect(args.onClick).toHaveBeenCalled();
 
     // Test that all buttons have the correct text content
     const allButtons = canvas.getAllByText("Button Text");
-    if (args.type === ButtonTypes.muted) {
-      await expect(allButtons).toHaveLength(4); // small, medium, large, extraLarge
-    } else {
-      await expect(allButtons).toHaveLength(3); // small, medium, large
-    }
+    await expect(allButtons).toHaveLength(4); // small, medium, large, extraLarge
 
     // Test click functionality on the medium button (representative test)
     await userEvent.click(mediumButton);
@@ -112,10 +99,8 @@ export const ButtonSize: ButtonStory = {
       const largeIcon = canvas.getByTestId(`${args.testId}-large_icon`);
       await expect(largeIcon).toBeInTheDocument();
 
-      if (args.type === ButtonTypes.muted) {
-        const extraLargeIcon = canvas.getByTestId(`${args.testId}-extra-large_icon`);
-        await expect(extraLargeIcon).toBeInTheDocument();
-      }
+      const extraLargeIcon = canvas.getByTestId(`${args.testId}-extra-large_icon`);
+      await expect(extraLargeIcon).toBeInTheDocument();
     }
   },
 };

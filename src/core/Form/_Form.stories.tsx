@@ -4,6 +4,7 @@ import { Form } from "@vanguard/Form/Form";
 import { Story } from "./stories/_Form.default";
 import { FormValidationColorPicker as _FormValidationColorPicker } from "./stories/FormValidationColorPicker.story";
 import { FormValidationInput as _FormValidationInput } from "./stories/FormValidationInput.story";
+import { FormValidationRequiredCustomMessage as _FormValidationRequiredCustomMessage } from "./stories/FormValidationRequiredCustomMessage.story";
 import { WithClassName as _WithClassName } from "./stories/WithClassName.story";
 import { WithOnSubmit as _WithOnSubmit } from "./stories/WithOnSubmit.story";
 import { BasicChildren as _BasicChildren } from "./stories/BasicChildren.story";
@@ -22,6 +23,7 @@ export default {
 
 export const FormValidationColorPicker: Story = { ..._FormValidationColorPicker };
 export const FormValidationInput: Story = { ..._FormValidationInput };
+export const FormValidationRequiredCustomMessage: Story = { ..._FormValidationRequiredCustomMessage };
 export const WithClassName: Story = { ..._WithClassName };
 export const WithOnSubmit: Story = { ..._WithOnSubmit };
 export const BasicChildren: Story = { ..._BasicChildren };

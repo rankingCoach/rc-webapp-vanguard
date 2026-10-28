@@ -45,6 +45,7 @@ export const selectors = {
   inputElement: 'input',
   labelElement: 'label',
   greyThemeContainer: '.vanguard-input-grey',
+  optionalLabel: '.vanguard-input-label-optional',
 } as const;
 
 // URL mask test data

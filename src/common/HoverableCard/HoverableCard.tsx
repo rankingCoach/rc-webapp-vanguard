@@ -122,7 +122,7 @@ export const HoverableCard = (props: HoverableCardProps) => {
           ) : (
             <Button
               testId={'cta'}
-              size={ButtonSizes.small}
+              size={ButtonSizes.medium}
               iconLeft={IconNames.edit}
               iconSize={IconSize.small}
               iconColor={'--n500'}

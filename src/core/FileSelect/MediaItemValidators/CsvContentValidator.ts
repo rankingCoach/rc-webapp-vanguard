@@ -33,9 +33,7 @@ export class CsvContentValidator extends MediaItemValidator {
     const firstLine = text.split(/\r?\n/)[0] ?? '';
     const presentHeaders = firstLine.split(',').map((h) => h.trim().toLowerCase());
 
-    const missingHeaders = this.requiredHeaders.filter(
-      (required) => !presentHeaders.includes(required.toLowerCase()),
-    );
+    const missingHeaders = this.requiredHeaders.filter((required) => !presentHeaders.includes(required.toLowerCase()));
 
     if (missingHeaders.length > 0) {
       mediaItem.isInvalid = true;

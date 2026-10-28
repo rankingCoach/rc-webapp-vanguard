@@ -1,7 +1,7 @@
 {
   "id": "component:global-state-component",
   "kind": "component",
-  "summary": "Component that exposes and syncs global application state for mounting single-instance behaviors.",
-  "keywords": ["global", "state", "component", "singleton", "store", "sync"],
-  "tags": ["state", "global", "helpers"]
+  "summary": "Wrapper that draws visual states over its content: hover highlight, blur (blocks clicks) and loading shimmer.",
+  "keywords": ["hover", "blur", "shimmer", "loading", "overlay", "wrapper", "state"],
+  "tags": ["visual", "state", "ui"]
 }

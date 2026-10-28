@@ -1,3 +1,13 @@
+import { rcWindow } from '@stores/window.store';
+
+/**
+ * The Maps JS script can be present without the `marker` library loaded.
+ * Guard AdvancedMarkerElement construction so callers render nothing instead of crashing.
+ **/
+export function isAdvancedMarkerElementAvailable(): boolean {
+  return Boolean(rcWindow.google?.maps?.marker?.AdvancedMarkerElement);
+}
+
 /**
  * Handy functions to project lat/lng to pixel
  * Extracted from: https://developers.google.com/maps/documentation/javascript/examples/map-coordinates

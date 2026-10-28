@@ -121,6 +121,8 @@ export const pubSubService = new PubSubService();
 export enum PUB_SUB_EVENTS {
   reactModalOpen = 'REACT_MODAL_OPEN',
   reactModalClose = 'REACT_MODAL_CLOSE',
+  /** Public BAM presentation event. Payload: { modalId: string; isCompact: boolean }. */
+  reactModalCompactChange = 'REACT_MODAL_COMPACT_CHANGE',
   reactSnackbarOpen = 'REACT_SNACKBAR_OPEN',
   reactSnackbarClose = 'REACT_SNACKBAR_CLOSE',
   reactActionBarAddMessage = 'REACT_ACTION_BAR_ADD',

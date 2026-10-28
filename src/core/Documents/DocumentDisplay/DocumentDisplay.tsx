@@ -95,8 +95,8 @@ export const DocumentDisplay = (props: DocumentDisplayProps) => {
       <Render if={showDownload}>
         <Button
           onClick={() => downloadFile(fileSrc, fileName, format)}
-          type={ButtonTypes.secondary}
-          size={ButtonSizes.small}
+          type={ButtonTypes.muted}
+          size={ButtonSizes.medium}
           iconLeft={IconNames.download}
         >
           {'Download'}

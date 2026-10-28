@@ -9,8 +9,6 @@ export const TwoAiGlowComponents: Story = {
       <AiGlow
         borderRadius={12}
         baseColor="#4a00e0"
-        startColor="#8e2de2"
-        endColor="#4a00e0"
         blurWidth={16}
         data-testid="first-glow-container"
       >
@@ -40,8 +38,6 @@ export const TwoAiGlowComponents: Story = {
       <AiGlow
         borderRadius={20}
         baseColor="#00b09b"
-        startColor="#96c93d"
-        endColor="#00b09b"
         borderWidth={4}
         blurWidth={32}
         data-testid="second-glow-container"
@@ -94,8 +90,6 @@ export const TwoAiGlowComponents: Story = {
     await expect(firstGlowContainer).toHaveStyle({
       "--ai-border-radius": "12px",
       "--ai-base-color": "#4a00e0",
-      "--ai-start-color": "#8e2de2",
-      "--ai-end-color": "#4a00e0",
       "--ai-blur-width": "16px",
     });
 
@@ -104,10 +98,16 @@ export const TwoAiGlowComponents: Story = {
     await expect(secondGlowContainer).toHaveStyle({
       "--ai-border-radius": "20px",
       "--ai-base-color": "#00b09b",
-      "--ai-start-color": "#96c93d",
-      "--ai-end-color": "#00b09b",
       "--ai-border-size-outside": "4px",
       "--ai-blur-width": "32px",
     });
+
+    // Test that each glow derives its accent colour from its own base
+    await expect(
+      getComputedStyle(firstGlowContainer as HTMLElement).getPropertyValue("--ai-glow-accent-color"),
+    ).toContain("#4a00e0");
+    await expect(
+      getComputedStyle(secondGlowContainer as HTMLElement).getPropertyValue("--ai-glow-accent-color"),
+    ).toContain("#00b09b");
   },
 };

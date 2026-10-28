@@ -1,7 +1,7 @@
 import { TextIcon } from '@common/TextIcon/TextIcon';
 import { dFlex, dFlexColumn, gap1, justifyContentBetween, pb1, py3 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -53,6 +53,7 @@ export const BusinessListItemWithConnections = (props: BusinessListWithConnectio
             isLoading={isButtonLoading}
             onClick={connectCallbackClick}
             type={btnType ?? ButtonTypes.primary}
+            size={btnType === ButtonTypes.muted ? ButtonSizes.medium : ButtonSizes.extraLarge}
             iconRight={IconNames.arrowRight}
           >
             {'Connect'}

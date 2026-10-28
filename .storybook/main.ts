@@ -1,21 +1,22 @@
 import type { StorybookConfig } from "@storybook/react-vite";
-import { UserConfig } from "vite";
+import type { UserConfig } from "vite";
 // import type { AddonOptionsVite } from "@storybook/addon-coverage";
-import { BaseViteConfig } from "../vite.config.lib";
 // @ts-ignore
 import path from "path";
+import { fileURLToPath } from "node:url";
 //import Inspect from "vite-plugin-inspect";
 
 //Do not delete this mocks Router
 // import * as Mock from "../src/__mocks__/function_mocks/@tanstack/RouterMock";
 
-const SRC_BASE = __dirname + "./../src/";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SRC_BASE = path.resolve(__dirname, "../src");
 // import { visualizer } from "rollup-plugin-visualizer";
 
-import { createMockAliases } from "./create-mock-alias";
+import { createMockAliases } from "./create-mock-alias.ts";
 // import visualizer from "rollup-plugin-visualizer";
-import { createMissingAssetsPlugin } from "./vite-plugin-missing-assets";
-import { tsgoChecker } from "./vite-plugin-tsgo-checker";
+import { createMissingAssetsPlugin } from "./vite-plugin-missing-assets.ts";
+import { tsgoChecker } from "./vite-plugin-tsgo-checker.ts";
 
 // const coverageConfig: AddonOptionsVite = {
 // istanbul: {
@@ -31,6 +32,8 @@ const config: StorybookConfig = {
   stories: [
     "../src/core/**/_*.stories.@(js|jsx|mjs|ts|tsx)",
     // "../src/common/**/_*.stories.@(js|jsx|mjs|ts|tsx)"
+    // Opted-in common stories (VAN-82)
+    "../src/common/SectionMissing/_SectionMissing.stories.tsx",
   ],
 
   addons: [
@@ -39,17 +42,32 @@ const config: StorybookConfig = {
     "@storybook/addon-vitest"
   ],
 
-  async viteFinal(config) {
+  async viteFinal(config, { configType }) {
     // Merge custom configuration into the default config
-    const { mergeConfig } = await import("vite");
+    const { mergeConfig, loadConfigFromFile } = await import("vite");
+    // Let Vite bundle the shared config, which also supports CommonJS build scripts.
+    const loadedConfig = await loadConfigFromFile(
+      { command: configType === "PRODUCTION" ? "build" : "serve", mode: configType === "PRODUCTION" ? "production" : "development" },
+      path.resolve(__dirname, "../vite.config.lib.ts"),
+    );
+    if (!loadedConfig) throw new Error("Could not load the shared Vite configuration");
     const istanbul = (await import("vite-plugin-istanbul")).default;
 
     // Create a modified BaseViteConfig without external dependencies for Storybook
-    const storybookBaseConfig = { ...BaseViteConfig };
+    const storybookBaseConfig = { ...loadedConfig.config };
     if (storybookBaseConfig.build?.rollupOptions) {
       // Remove external dependencies for Storybook build
       delete storybookBaseConfig.build.rollupOptions.external;
     }
+    // theming.css references webapp-hosted fonts; bundle the local copies instead.
+    // Must come before the generic "/vanguard" alias, which points into the webapp checkout.
+    storybookBaseConfig.resolve = {
+      ...storybookBaseConfig.resolve,
+      alias: {
+        "/vanguard/assets/fonts": path.resolve(__dirname, "../public/vanguard/assets/fonts"),
+        ...storybookBaseConfig.resolve?.alias,
+      },
+    };
 
     const WithBaseConfig = mergeConfig(config, storybookBaseConfig);
     return mergeConfig(WithBaseConfig, {
@@ -82,14 +100,10 @@ const config: StorybookConfig = {
           overlay: true,
         }),
       ],
-      // Add dependencies to pre-optimization
       server: {
         fs: {
           allow: [".."],
         },
-      },
-      optimizeDeps: {
-        include: ["storybook-dark-mode"],
       },
       commonjsOptions: {
         transformMixedEsModules: true,

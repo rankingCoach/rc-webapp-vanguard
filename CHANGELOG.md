@@ -2,6 +2,205 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.6.0...v2.7.0) (2026-10-26)
+
+
+### Features
+
+* **button:** add a codemod for the harmonized button sizes (VAN-85) ([5db607f](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5db607febac2c4b4e5666e921efe08dacd720801))
+* **button:** add a textColor option to the default type, starting with ado (VAN-85) ([bd99ac0](https://github.com/rankingCoach/rc-webapp-vanguard/commit/bd99ac0f3346e31a9446d632e74ae8eab77b116e))
+* **button:** add an ariaLabel prop for icon-only buttons (VAN-85) ([975eb24](https://github.com/rankingCoach/rc-webapp-vanguard/commit/975eb246a0567f67ae16118f80999644d906d3a6))
+* **button:** add an htmlType prop for the native button type (VAN-85) ([dcc7572](https://github.com/rankingCoach/rc-webapp-vanguard/commit/dcc75721ca89f4e1cd4cc050de4f5a684803524a))
+* **button:** add inverted option to primary and shimmer (VAN-85) ([b126ba2](https://github.com/rankingCoach/rc-webapp-vanguard/commit/b126ba29cd0b0933acf67164b09923d00f0a1217))
+* **button:** add superellipse corner shape (VAN-85) ([6a7955c](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6a7955cac32c41738e7901f825befd18f6ec0ddc))
+* **button:** read the corner shape from the theme (VAN-85) ([8d75cdd](https://github.com/rankingCoach/rc-webapp-vanguard/commit/8d75cdd047fbb891f4d6b536594d6eb0d9b0e78d))
+* **button:** share one size set across every button type (VAN-85) ([78693b3](https://github.com/rankingCoach/rc-webapp-vanguard/commit/78693b3d8037efc01a59bcdea0252edf4a52b617))
+* **button:** unify focus ring as 2px outline with offset (VAN-85) ([abde713](https://github.com/rankingCoach/rc-webapp-vanguard/commit/abde713649b9c68fcc9822db8c356f2850e898a4))
+* **status-badge:** add ado status (VAN-85) ([abfd6eb](https://github.com/rankingCoach/rc-webapp-vanguard/commit/abfd6ebd30c074e1a0446bc785518c0a41daf82d))
+* **status-badge:** add compact size (VAN-85) ([b12c6a5](https://github.com/rankingCoach/rc-webapp-vanguard/commit/b12c6a56438ae906d753f75d911aa2a88957556d))
+
+
+### Bug Fixes
+
+* **action-button:** default muted ActionButtons to medium (VAN-85) ([66adc69](https://github.com/rankingCoach/rc-webapp-vanguard/commit/66adc696cb68972a89924384bf5074de57ed35dd))
+* **button:** base the inverted primary & shimmer colour on --ado-base (VAN-85) ([6ecbd63](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6ecbd63fd0ad2f80f494a41eeb4049564cb05d3b)), closes [#006a85](https://github.com/rankingCoach/rc-webapp-vanguard/issues/006a85)
+* **button:** handle type-only and nested relative imports in the size codemod (VAN-85) ([b69cce8](https://github.com/rankingCoach/rc-webapp-vanguard/commit/b69cce8ebb612909cb854fec68ecd979fec51a93))
+* **button:** keep the focus ring on pressed inverted buttons (VAN-85) ([aa6dec1](https://github.com/rankingCoach/rc-webapp-vanguard/commit/aa6dec11646cfe6f094fbc40242c8c3bff6e59df))
+* **button:** recognise the @vanguard/Button barrel in the size codemod (VAN-85) ([e2ba2e8](https://github.com/rankingCoach/rc-webapp-vanguard/commit/e2ba2e85b636cc9e0ee040724415a9545e50312a))
+* **button:** restore the 23px label line-height so glyphs aren't clipped (VAN-85) ([33a8f6c](https://github.com/rankingCoach/rc-webapp-vanguard/commit/33a8f6c53cceb526e4a86310a37e60f185b77a64))
+* **button:** truncate long labels with an ellipsis (VAN-85) ([9c67f8a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9c67f8a6c663683ca46632da858b1a0b1740dbb2))
+* **exports:** export ButtonTextColors and StatusBadgeSize from the package entry points (VAN-85) ([0aefcc4](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0aefcc41119395979706ca86e666747879ea44b6))
+* **list-page:** keep the apply, header and empty-state buttons at their pre-2.5 size (VAN-85) ([9893b51](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9893b517f7278523d584c25b383e6d2427bbddc9))
+* **status-badge:** fill standalone reversed Ado icons and keep the big reversed Ado glow (VAN-85) ([4c4bc96](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4c4bc96c86489ef5deba0b2c7d8984e313f91509))
+* **status-badge:** keep the compact label on one line with an ellipsis (VAN-85) ([a6d01e8](https://github.com/rankingCoach/rc-webapp-vanguard/commit/a6d01e8f15455c4703d6c7df0a970a421b5fd729))
+* **tabs:** keep the scroll buttons from submitting forms (VAN-85) ([c978167](https://github.com/rankingCoach/rc-webapp-vanguard/commit/c978167fae97a112c9be71180fa7ef04fe5fa12e))
+* **tabs:** scroll to the start and end from the overflow buttons (VAN-85) ([0cb71b4](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0cb71b4c50f8005351dd139eb34edf480cc12d62))
+
+## [2.6.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.5.0...v2.6.0) (2026-10-21)
+
+
+### Features
+
+* **icon:** add paypal icon ([fc66271](https://github.com/rankingCoach/rc-webapp-vanguard/commit/fc66271f7420d63bdaacf8793914ddbbb406b59d))
+
+## [2.5.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.4.0...v2.5.0) (2026-10-19)
+
+
+### Features
+
+* **error-boundary:** optional title and description texts ([b780d17](https://github.com/rankingCoach/rc-webapp-vanguard/commit/b780d17a0bf202e6c674cf94efce86b083be372d))
+
+## [2.4.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.3.0...v2.4.0) (2026-10-19)
+
+
+### Features
+
+* **button:** add muted inverted-on-dark variant and blend/blur layers (VAN-83) ([3f65b6a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/3f65b6a106c1978325b7f1872d56d9ca476cd51f))
+* **button:** match the muted mock at rest and on hover (VAN-83) ([c5ccd75](https://github.com/rankingCoach/rc-webapp-vanguard/commit/c5ccd7541153d5311d29c68afd30b76549f0e3b6))
+* **button:** restore the muted hover grow animation (VAN-83) ([eda85cf](https://github.com/rankingCoach/rc-webapp-vanguard/commit/eda85cf39fa42099181a63bd739f2c7f5c2730ff))
+* **button:** swap secondary buttons for muted (VAN-82) ([10d29cd](https://github.com/rankingCoach/rc-webapp-vanguard/commit/10d29cd228ea798e39353732896ef535ff4c40ce))
+* **modal:** footer owns button sizing so all actions share one height (VAN-82) ([5e56a17](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5e56a1761dfec7a977fce20cb538c737e5c11342))
+* **tabs:** muted floating tabs with gliding selected chip (VAN-80) ([6278d07](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6278d0777296607c348e780715f9d2c969c446e2))
+* **tabs:** tighten floating tab bar and share rounded radius (VAN-80) ([852bff1](https://github.com/rankingCoach/rc-webapp-vanguard/commit/852bff1f162b56c865431935a01b1e6475da85d1))
+
+
+### Bug Fixes
+
+* **button:** ignore deprecated iconHoverColor on muted buttons (VAN-83) ([2d1eb6c](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2d1eb6c614ab6996abd4372ec98819b7e114b52b))
+* **button:** keep the muted glasses readable in dark mode (VAN-83) ([184ded2](https://github.com/rankingCoach/rc-webapp-vanguard/commit/184ded2040a0f810f9a2efa9ed21db666fb31fc9)), closes [#263349](https://github.com/rankingCoach/rc-webapp-vanguard/issues/263349)
+* **button:** keep the muted rest fill and add the hover layer on top (VAN-83) ([929e004](https://github.com/rankingCoach/rc-webapp-vanguard/commit/929e004ce1496862ad2cf56902af905bb702edbd))
+* **storybook:** bundle Crimson Pro fonts from public dir ([42415ab](https://github.com/rankingCoach/rc-webapp-vanguard/commit/42415ab9a5926f41394c068e2e24350e9435aa05))
+* **storybook:** bundle Crimson Pro fonts from public dir ([129a998](https://github.com/rankingCoach/rc-webapp-vanguard/commit/129a998c869581c9cc2be8139f0cbf74d041089e))
+* **tabs:** let consumer className win over floating bar styles (VAN-80) ([5626c7a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5626c7a4e0db5252a582574614571df9d05da4e9))
+
+## [2.3.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.2.0...v2.3.0) (2026-10-12)
+
+
+### Features
+
+* **ai-glow:** freeze AiGlow and shimmer on --ambient-play-state ([e6c6994](https://github.com/rankingCoach/rc-webapp-vanguard/commit/e6c69946898bb96ed9fa4651a269819128d62abb))
+
+## [2.2.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.1.0...v2.2.0) (2026-10-07)
+
+
+### Features
+
+* **GlobalStateComponent:** introduce visual state management with hover, blur, and shimmer effects ([5b90c4b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5b90c4b3aceae75abed459ded740852293b20f92)), closes [#VAN-79](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-79)
+* **tabs:** add floating theme (VAN-80) ([f134e67](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f134e67e79583904a0bc242a2347e4646a21fb4e))
+
+## [2.1.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.0.0...v2.1.0) (2026-10-05)
+
+
+### Features
+
+* **icon:** add ado icons (VAN-78) ([666f5ec](https://github.com/rankingCoach/rc-webapp-vanguard/commit/666f5ec2f990144985b02e0232d0ce405241140a))
+
+## [2.0.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.21.0...v2.0.0) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **aiglow:** AiGlow no longer accepts startColor / endColor. The accent
+and light stops are derived from baseColor or the inherited --ai-base-color,
+so every glow's colours change (no pink stop).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+### Features
+
+* **aiglow:** derive glow stops from a single baseColor ([91437fd](https://github.com/rankingCoach/rc-webapp-vanguard/commit/91437fdaa0f3ad98afad50911af26dd852652c59))
+* **aiglow:** stop animations under reduced motion and add parity custom properties ([d577b81](https://github.com/rankingCoach/rc-webapp-vanguard/commit/d577b8198a41a867b52828ee96426eb2b6f2485a))
+* **button:** restyle shimmer as a seamless base-colour sweep ([0d52957](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0d52957bb2015b9568c37c0d1419acbdfb464f56))
+* **Form:** allow custom required-field error message via useFormConfig ([6bf87a0](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6bf87a01768dbc1a087b7816f998755e0c5352bf))
+* **modal:** add --modal-content-shadow custom property ([9efdb3a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/9efdb3a86f2f5a54b193d89d0ecb069ee84b2fb1))
+* **modal:** add fullscreen tabs and opt-in window lifecycle events ([07fce66](https://github.com/rankingCoach/rc-webapp-vanguard/commit/07fce66996c9ce5a6d3977ace952bec7c33f461e))
+* **modal:** add ModalService.setStackTitle to relabel open modals ([4f4378b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4f4378bff3abee74c7ba98e31ca739cfd1eaebbc))
+* **modal:** add opt-in BAM stacking and shared compact mode ([7c89776](https://github.com/rankingCoach/rc-webapp-vanguard/commit/7c89776d26b7edaf85b1d211346fb39cd9f3a2dc))
+* **modal:** add opt-in compact mode and upgrade Storybook ([654747a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/654747abef6ec9f8f6c0ab47fc8c3ccdc1ce47ed))
+* **modal:** add opt-in movable compact BAM stacks ([81058a6](https://github.com/rankingCoach/rc-webapp-vanguard/commit/81058a65ba0b725a8cd6e9e085a096f04ba117e6))
+* **modal:** expose per-modal presented state via useModalPresentation ([00d217b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/00d217bc0f6f2daa027b13baa3d54b4324cfa867))
+* **modal:** make stacking opt-in per modal and limit compact mode to allowCompact ([2b19353](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2b19353f5145e3f4917332ef5792c80533459b20))
+
+
+### Bug Fixes
+
+* **modal:** animate compact window collapse and expand in both directions ([0146370](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0146370b891788b104f683c136106d002ce589a3))
+* **modal:** isolate nested modals and harden compact window lifecycle ([bbc1661](https://github.com/rankingCoach/rc-webapp-vanguard/commit/bbc1661dc1ccb0efa567e5c8d0428e2b0dc9fc0c))
+* **modal:** keep standalone Esc precedence and translate stack titles ([470dca6](https://github.com/rankingCoach/rc-webapp-vanguard/commit/470dca6a9988405f0b4488ada724359de9e0781b))
+* **modal:** one translation key per resize handle ([84a7e55](https://github.com/rankingCoach/rc-webapp-vanguard/commit/84a7e55686166db17ee564d7f08773aa22ff0c9b))
+* **modal:** quote the title in the "Bring to front" label ([0c7a07e](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0c7a07e4430545aaaed54fb57c5c9e2ba49d731f))
+
+## [1.21.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.20.0...v1.21.0) (2026-09-29)
+
+
+### Features
+
+* **Button:** add translate prop to render the label without translation ([a00ad66](https://github.com/rankingCoach/rc-webapp-vanguard/commit/a00ad666d58cc14469cdc09b56c3776ade091828))
+* **Button:** make textWrap="wrap" wrap long labels ([70de0d1](https://github.com/rankingCoach/rc-webapp-vanguard/commit/70de0d1f70dde3171facf1ef663bff13ebb16ef1))
+
+
+### Bug Fixes
+
+* **deps:** hoist ws@8 so vitest 4 can start ([13e9644](https://github.com/rankingCoach/rc-webapp-vanguard/commit/13e9644ff0cb4087c1c7157e76f92ae24a8372a6))
+
+## [1.20.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.19.0...v1.20.0) (2026-08-27)
+
+
+### Features
+
+* **ErrorModal:** add support for replacements and error codes display ([af58e84](https://github.com/rankingCoach/rc-webapp-vanguard/commit/af58e84635ce9a80f3635c3b8035e6426691b302)), closes [#VAN-73](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-73)
+
+## [1.19.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.3...v1.19.0) (2026-08-25)
+
+
+### Features
+
+* add flag to hide the "Optional" from label ([f758df8](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f758df8e527f14b65b4f20e41ad9a92b91ad7088)), closes [#VAN-72](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-72)
+
+### [1.18.3](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.2...v1.18.3) (2026-08-13)
+
+### [1.18.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.1...v1.18.2) (2026-08-10)
+
+### [1.18.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.18.0...v1.18.1) (2026-07-28)
+
+## [1.18.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.17.0...v1.18.0) (2026-07-27)
+
+
+### Features
+
+* export all media items transformers, processors and validators ([54f7735](https://github.com/rankingCoach/rc-webapp-vanguard/commit/54f77350631c0ebb26ef6ef6e55f720c059970e3))
+* implement NavigationModal ([388f16d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/388f16dc9a6f1ae84ae5264d88f3381f05cedd13))
+
+## [1.17.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.2...v1.17.0) (2026-07-21)
+
+
+### Features
+
+* **OverlayStacking:** add story for ModalOverDrawer with URL highlighting test ([4a52c75](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4a52c75c5da7d6bf4c43d37b15bfaea1081241e2)), closes [#VAN-67](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-67)
+* **SearchableSelect:** add story for HTML-encoded titles ([426a24b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/426a24bdb7367b89884f087dbaa99f611b3a905d)), closes [#VAN-63](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-63)
+* **Textarea:** add synchronization stories for URL highlighting and backdrop geometry ([f7b2526](https://github.com/rankingCoach/rc-webapp-vanguard/commit/f7b2526cf593778887c2446f7b7d215387ce238e)), closes [#VAN-67](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-67)
+
+
+### Bug Fixes
+
+* **autocomplete:** left-align dropdown and fix overlay stacking ([84ec5a2](https://github.com/rankingCoach/rc-webapp-vanguard/commit/84ec5a23106fab86d158126045e3b03e182b4935)), closes [#VAN-71](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-71)
+* **SearchableSelect:** prevent translation of rendered value in renderValue callback ([ee515da](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ee515dabe8471b996080df9d9758a374261044b2)), closes [#VAN-63](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-63)
+
+### [1.16.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.1...v1.16.2) (2026-07-15)
+
+
+### Bug Fixes
+
+* **GoogleMaps:** guard AdvancedMarkerElement construction and stop competing internal loader (BUF-3899) ([d16c989](https://github.com/rankingCoach/rc-webapp-vanguard/commit/d16c98988105f8f9bd48712de6f2e3b4f14b96ca))
+
+### [1.16.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.16.0...v1.16.1) (2026-07-14)
+
+
+### Bug Fixes
+
+* **tabs:** adjust tab component styles to use the correct color variables ([38ceebb](https://github.com/rankingCoach/rc-webapp-vanguard/commit/38ceebbce8e37b110e938e1b8f43dd1278168c4e)), closes [#VAN-68](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-68)
+* translate noOptionsText ([5d0de7f](https://github.com/rankingCoach/rc-webapp-vanguard/commit/5d0de7f20887e580d6dbddac14563a5c16468822))
+
 ## [1.16.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v1.15.0...v1.16.0) (2026-07-07)
 
 

@@ -1,5 +1,5 @@
 import { REGEX } from '@config/regex.ts';
-import { FormConfigElement } from '@custom-hooks/useFormConfig';
+import { FormConfigElement, FormErrorMessage } from '@custom-hooks/useFormConfig';
 import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { translationService } from '@services/translation.service';
 import { extractSetErrorsFromConfig } from '@vanguard/Form/FormElement/extract-set-errors-from-config';
@@ -38,10 +38,12 @@ export const validInput = (formConfig?: FormConfigElement | null, validateOnlyPo
    * Is Required
    * -------------------------------------------------------------------------------------------------------------------
    */
+  const requiredErrorMessage: FormErrorMessage = formConfig.validation.requiredErrorMessage ?? ErrorsKeys.REQUIRED;
+
   if (formConfig.validation.required) {
     const isNotValid = !validateIsRequired(value);
     if (isNotValid) {
-      return setFieldValidity(formConfig, false, ErrorsKeys.REQUIRED, validateOnlyPositive);
+      return setFieldValidity(formConfig, false, requiredErrorMessage, validateOnlyPositive);
     }
   }
 
@@ -288,7 +290,7 @@ export const validInput = (formConfig?: FormConfigElement | null, validateOnlyPo
 
     if (isPassword) {
       if (!validateIsRequired(value)) {
-        return setFieldValidity(formConfig, false, ErrorsKeys.REQUIRED, validateOnlyPositive);
+        return setFieldValidity(formConfig, false, requiredErrorMessage, validateOnlyPositive);
       }
 
       if (value && value.length < 4) {
@@ -447,7 +449,7 @@ const validateNumberSize = (
 export const setFieldValidity = (
   formConfig: FormConfigElement,
   isValid: boolean,
-  errorMessage?: ErrorsKeys | CustomErrorsKeys,
+  errorMessage?: FormErrorMessage,
   validateOnlyPositive: boolean = false,
 ): boolean => {
   if (isValid) {

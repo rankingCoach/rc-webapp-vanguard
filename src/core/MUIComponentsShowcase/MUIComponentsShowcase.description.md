@@ -25,7 +25,7 @@ The following Vanguard components use MUI:
 #### Layout & Navigation
 - **AppBar**: Application bar with MUI AppBar
 - **Toolbar**: Toolbar component with MUI Toolbar
-- **Tabs**: Tab navigation with MUI Tabs
+- **Tabs**: Tab navigation (vanguard-native, no MUI)
 - **Drawer**: Slide-out panel with MUI Drawer
 - **Accordion**: Collapsible content with MUI Accordion
 
@@ -67,10 +67,14 @@ import { AppBar, Toolbar, Tabs } from '@vanguard';
 
 <AppBar>
   <Toolbar>
-    <Tabs>
-      <Tab label="Home" />
-      <Tab label="About" />
-    </Tabs>
+    <Tabs
+      tabs={[
+        { label: 'Home', value: 'home' },
+        { label: 'About', value: 'about' },
+      ]}
+      value={activeTab}
+      onChange={(_e, value) => setActiveTab(value)}
+    />
   </Toolbar>
 </AppBar>
 ```

@@ -2,7 +2,7 @@ import { ComingSoonCard } from '@common/ComingSoonCard/ComingSoonCard';
 import { alignItemsCenter, dFlex, gap1, mb1, pb0_5, pb1_5 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { navigationService, ROUTES_ENGAGEMENT } from '@services/navigation.service';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -216,6 +216,7 @@ export const StatisticsBoardItem = (props: StatisticsBoardItemProps) => {
       {!empty && ctaText && (
         <div className={styles.ctaContainer}>
           <Button
+            size={ButtonSizes.extraLarge}
             testId={`${testId}_Button`}
             className={styles.cta}
             iconLeft={ctaIcon || iconName || IconNames.add}

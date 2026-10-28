@@ -6,6 +6,7 @@ import { disableControls } from "@test-utils/get-storybook-decorator";
 
 // Tests for the Muted Blurred Button Story
 export const ButtonTypeMutedBlurred: ButtonStory = {
+  globals: { theme: 'light' },
   argTypes: {
     ...disableControls(BUTTONS_EXCLUDED_CONTROLS_MUTED),
     ...mutedButtonArgTypes,
@@ -39,5 +40,16 @@ export const ButtonTypeMutedBlurred: ButtonStory = {
 
     // Verify the button is not disabled
     await expect(button).not.toBeDisabled();
+
+    // The blur sits on its own ::before layer, the fill on ::after keeps blending
+    await expect(getComputedStyle(button, "::before").backdropFilter).toContain("blur(");
+    await expect(getComputedStyle(button, "::after").mixBlendMode).toBe("plus-lighter");
+
+    // The button itself must not isolate the blend
+    const buttonStyle = getComputedStyle(button);
+    await expect(buttonStyle.mixBlendMode).toBe("normal");
+    await expect(buttonStyle.opacity).toBe("1");
+    await expect(buttonStyle.backdropFilter).toBe("none");
+    await expect(buttonStyle.filter).toBe("none");
   },
 };

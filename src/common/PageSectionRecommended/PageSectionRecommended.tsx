@@ -1,7 +1,7 @@
 import { PageSection, PageSectionBackground, PageSectionWithoutTitle } from '@vanguard/PageSection';
 import { justifyContentCenter, mb2, mr4, mt3, mt4, pb2 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { LottieAnimationLoader, LottieAnimationType } from '@vanguard/LottieAnimationLoader/LottieAnimationLoader';
 import { StyledSVG } from '@vanguard/StyledSVG/StyledSVG';
@@ -95,6 +95,7 @@ export const PageSectionRecommended = (props: RecommendationCardProps) => {
 
           {buttonText && (
             <Button
+              size={ButtonSizes.extraLarge}
               testId={`${testId}_Button`}
               type={ButtonTypes.primary}
               iconRight={IconNames.arrowRight}

@@ -44,7 +44,7 @@ export const ActionCardHeader = (props: ActionCardHeaderProps) => {
           className={classNames(styles.openMenuCta)}
           testId={'action-card-header-open-menu-cta'}
           type={ButtonTypes.default}
-          size={ButtonSizes.small}
+          size={ButtonSizes.medium}
           iconLeft={IconNames.meatballsMenu}
           iconSize={IconSize.large}
           iconColor={'--n500'}

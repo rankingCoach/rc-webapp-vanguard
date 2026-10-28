@@ -2,12 +2,45 @@ import { appScreen, cleanup, fireEvent, render } from '@test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import { Modal } from '@vanguard/Modal/Modal';
 import React from 'react';
+import { ModalService } from './ModalService';
+import { ModalPresentation } from './ModalRoot/ModalTransition/ModalPresentation';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 const CLOSE_BTN = 'modal-close-cta';
 
 afterEach(() => {
   cleanup();
+  ModalService.__resetForTests();
+});
+
+describe('nested service modals', () => {
+  test.each([false, true])('an inner modal cannot change the BAM and only it closes on Escape (initial: %s)', (initial) => {
+    ModalService.setStackingEnabled(true);
+    const id = ModalService.open(<div />, { fullscreen: true, allowCompact: true });
+    ModalService.setCompactMode(true);
+    const outerClose = vi.fn();
+    const innerClose = vi.fn();
+    const tree = (inner: boolean) => <div className="modalRoot" data-modal-id={id}>
+      <ModalPresentation modalId={id} allowCompact isCompact stacked active>
+        <Modal fullscreen onClose={outerClose} testId="outer-bam">
+          {inner && <Modal fullscreen={false} onClose={innerClose} testId="inner-modal" />}
+        </Modal>
+      </ModalPresentation>
+    </div>;
+    const { rerender } = render(tree(initial));
+    if (!initial) rerender(tree(true));
+    expect(ModalService.getModalComponent(id).isFullscreen).toBe(true);
+    expect(ModalService.getModalComponent(id).isCompact).toBe(true);
+    expect(ModalService.getBamIds()).toContain(id);
+    expect(appScreen.getByTestId('inner-modal').classList.contains('modal-compact')).toBe(false);
+    expect(appScreen.getByTestId('inner-modal').classList.contains('modal-stacked')).toBe(false);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(innerClose).toHaveBeenCalledTimes(1);
+    expect(outerClose).not.toHaveBeenCalled();
+    rerender(tree(false));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(outerClose).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('Modal close button', () => {
@@ -173,5 +206,48 @@ describe('Modal outside-click close', () => {
     fireEvent.click(appScreen.getByTestId('overlay'));
 
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('Modal outerContent slot', () => {
+  test('renders outer content outside the panel, inside the wrapper', () => {
+    const { container } = render(
+      <Modal outerContent={<button data-testid="outer-btn">nav</button>}>
+        <div>content</div>
+      </Modal>,
+    );
+
+    const outer = container.querySelector('.modal-content-wrapper > .modal-outer-content');
+    expect(outer).not.toBeNull();
+    expect(outer!.querySelector('[data-testid="outer-btn"]')).not.toBeNull();
+    // The slot is a sibling of the panel, not a child of it.
+    expect(container.querySelector('.modal-content [data-testid="outer-btn"]')).toBeNull();
+  });
+
+  test('does not render the wrapper without outerContent (backward-compatible DOM)', () => {
+    const { container } = render(
+      <Modal>
+        <div>content</div>
+      </Modal>,
+    );
+
+    expect(container.querySelector('.modal-content-wrapper')).toBeNull();
+    expect(container.querySelector('.modal-outer-content')).toBeNull();
+    expect(container.querySelector('.rc-modal > .modal-content')).not.toBeNull();
+  });
+
+  test('clicking outer content does not trigger outside-click close', () => {
+    const onClose = vi.fn();
+    render(
+      <Modal onClose={onClose} testId="overlay" outerContent={<button data-testid="outer-btn">nav</button>}>
+        <div>content</div>
+      </Modal>,
+    );
+
+    fireEvent.click(appScreen.getByTestId('outer-btn'));
+    expect(onClose).not.toHaveBeenCalled();
+
+    fireEvent.click(appScreen.getByTestId('overlay'));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
