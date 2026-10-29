@@ -1,71 +1,85 @@
 import { describe, expect, test } from 'vitest';
 
-import { isBlockedNumericKey, numericPasteIsInvalid } from './prevent-numeric-input';
+import { classifyNumericInsertion, isBlockedNumericKey, NumericFieldState } from './prevent-numeric-input';
 
-const state = (value = '', badInput = false) => ({ value, validity: { badInput } });
+const state = (value = '', badInput = false): NumericFieldState => ({ value, badInput });
+const VERIFY = 'allow-verify';
 
 describe('prevent-numeric-input', () => {
   /**
    * FN: isBlockedNumericKey
    * -------------------------------------------------------------------------------------------------------------------
    */
-  test('blocks e / E always (scientific notation)', () => {
-    expect(isBlockedNumericKey('e', state('12'))).toBe(true);
-    expect(isBlockedNumericKey('E', state(''))).toBe(true);
+  test('blocks e / E (scientific notation)', () => {
+    expect(isBlockedNumericKey('e')).toBe(true);
+    expect(isBlockedNumericKey('E')).toBe(true);
   });
 
-  test('allows a leading sign into an empty field', () => {
-    expect(isBlockedNumericKey('-', state(''))).toBe(false);
-    expect(isBlockedNumericKey('+', state(''))).toBe(false);
-  });
-
-  test('blocks a sign when the field already has a value (non-leading)', () => {
-    expect(isBlockedNumericKey('-', state('12'))).toBe(true);
-    expect(isBlockedNumericKey('+', state('12'))).toBe(true);
-  });
-
-  test('blocks a second sign while badInput (a lone "-" reports value="")', () => {
-    // native reports value === "" for an intermediate lone "-", so use badInput
-    expect(isBlockedNumericKey('-', state('', true))).toBe(true);
-  });
-
-  test('allows digits and decimal point', () => {
-    expect(isBlockedNumericKey('5', state('12'))).toBe(false);
-    expect(isBlockedNumericKey('.', state('12'))).toBe(false);
+  test('leaves signs, digits, decimal point and unidentified mobile/IME keys to beforeinput', () => {
+    expect(isBlockedNumericKey('-')).toBe(false);
+    expect(isBlockedNumericKey('+')).toBe(false);
+    expect(isBlockedNumericKey('.')).toBe(false);
+    expect(isBlockedNumericKey('5')).toBe(false);
+    expect(isBlockedNumericKey('Unidentified')).toBe(false);
+    expect(isBlockedNumericKey('Process')).toBe(false);
   });
 
   /**
-   * FN: numericPasteIsInvalid
+   * FN: classifyNumericInsertion
    * -------------------------------------------------------------------------------------------------------------------
    */
-  test('rejects scientific-notation chars anywhere', () => {
-    expect(numericPasteIsInvalid('12e3', '')).toBe(true);
-    expect(numericPasteIsInvalid('1E5', '')).toBe(true);
+  test('blocks e / E anywhere in the inserted text', () => {
+    expect(classifyNumericInsertion('e', state('12'))).toBe('block');
+    expect(classifyNumericInsertion('E', state())).toBe('block');
+    expect(classifyNumericInsertion('1e5', state())).toBe('block');
+    expect(classifyNumericInsertion('12e3', state('5'))).toBe('block');
+    expect(classifyNumericInsertion('  12e3 ', state())).toBe('block');
   });
 
-  test('rejects a non-leading sign', () => {
-    expect(numericPasteIsInvalid('4+1', '')).toBe(true);
-    expect(numericPasteIsInvalid('4-1', '')).toBe(true);
+  test('allows text without a sign (digits, decimal point), also while badInput', () => {
+    expect(classifyNumericInsertion('5', state('12'))).toBe('allow');
+    expect(classifyNumericInsertion('.', state('12'))).toBe('allow');
+    expect(classifyNumericInsertion('12.5', state())).toBe('allow');
+    expect(classifyNumericInsertion('3', state('', true))).toBe('allow');
+    expect(classifyNumericInsertion(' ', state('1'))).toBe('allow');
   });
 
-  test('accepts a clean numeric paste regardless of current value', () => {
-    expect(numericPasteIsInvalid('123', '')).toBe(false);
-    expect(numericPasteIsInvalid('12.5', '')).toBe(false);
-    expect(numericPasteIsInvalid('99', '50')).toBe(false);
+  test('allows null / empty data', () => {
+    expect(classifyNumericInsertion(null, state('12'))).toBe('allow');
+    expect(classifyNumericInsertion('', state())).toBe('allow');
   });
 
-  test('accepts a leading-sign paste into an empty field', () => {
-    expect(numericPasteIsInvalid('-5', '')).toBe(false);
-    expect(numericPasteIsInvalid('+5', '')).toBe(false);
+  test('blocks an inner sign or more than one sign', () => {
+    expect(classifyNumericInsertion('4+1', state())).toBe('block');
+    expect(classifyNumericInsertion('4-1', state('2'))).toBe('block');
+    expect(classifyNumericInsertion('--3', state())).toBe('block');
+    expect(classifyNumericInsertion('-3-', state())).toBe('block');
+    expect(classifyNumericInsertion('+-', state())).toBe('block');
   });
 
-  test('rejects a leading-sign paste when the field already has content (would append: -2 + "+3" = -2+3)', () => {
-    expect(numericPasteIsInvalid('+3', '-2')).toBe(true);
-    expect(numericPasteIsInvalid('-3', '50')).toBe(true);
+  test('blocks a leading sign while badInput (a lone "-" reports value="")', () => {
+    expect(classifyNumericInsertion('-', state('', true))).toBe('block');
+    expect(classifyNumericInsertion('+', state('', true))).toBe('block');
+    expect(classifyNumericInsertion('-3', state('', true))).toBe('block');
   });
 
-  test('trims surrounding whitespace before checking', () => {
-    expect(numericPasteIsInvalid('  -5  ', '')).toBe(false);
-    expect(numericPasteIsInvalid('  12e3 ', '')).toBe(true);
+  test('allows a leading sign into an empty field', () => {
+    expect(classifyNumericInsertion('-', state())).toBe('allow');
+    expect(classifyNumericInsertion('+', state())).toBe('allow');
+    expect(classifyNumericInsertion('-5', state())).toBe('allow');
+    expect(classifyNumericInsertion('+5', state())).toBe('allow');
+    expect(classifyNumericInsertion('  -5  ', state())).toBe('allow');
+  });
+
+  test('allows a single sign into a non-empty value (replaces a selection or goes before the digits)', () => {
+    expect(classifyNumericInsertion('-', state('5'))).toBe('allow');
+    expect(classifyNumericInsertion('+', state('12'))).toBe('allow');
+    expect(classifyNumericInsertion('-', state('-5'))).toBe('allow');
+  });
+
+  test('verifies a signed number inserted into a non-empty value', () => {
+    expect(classifyNumericInsertion('-3', state('5'))).toBe(VERIFY);
+    expect(classifyNumericInsertion('+3', state('-2'))).toBe(VERIFY);
+    expect(classifyNumericInsertion('-3', state('12'))).toBe(VERIFY);
   });
 });

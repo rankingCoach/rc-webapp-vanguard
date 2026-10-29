@@ -8,7 +8,7 @@ import { classNames } from '@helpers/classNames';
 import { debounce } from '@helpers/debounce';
 import { uuidv4 } from '@helpers/generate-uid';
 import { preventInput } from '@helpers/input-preventions/prevent-input';
-import { isBlockedNumericKey, numericPasteIsInvalid } from '@helpers/input-preventions/prevent-numeric-input';
+import { isBlockedNumericKey } from '@helpers/input-preventions/prevent-numeric-input';
 import { sanitizeHtml } from '@helpers/sanitize-html';
 import { highlightedTextMaxLength } from '@helpers/string-helpers';
 import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
@@ -23,6 +23,8 @@ import { Popover } from '@vanguard/Popover/Popover';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
+
+import { useNumberInputGuard } from './use-number-input-guard';
 
 /**
  * Props: Value
@@ -320,6 +322,8 @@ export const InputBase = (props: rcInputBaseProps) => {
   // badInput so we can keep the label shrunk while such a value is shown.
   const [numberHasBadInput, setNumberHasBadInput] = useState(false);
 
+  useNumberInputGuard(inputRef, formFieldType === 'InputNumber');
+
   // Highlights backdrop
   const useBackdrop = Boolean(highlightLengthExceeded || highlightWords || highlightUrl || prohibitedWords);
   const backDropRef = useRef<HTMLDivElement>(null);
@@ -450,8 +454,6 @@ export const InputBase = (props: rcInputBaseProps) => {
     if (!label) return { shrink: true, style: labelStyle };
     if (labelType === 'static') return { shrink: true, style: labelStyle };
     if (labelType === 'outer') return { shrink: true, style: labelStyle };
-    // Keep the floating label up while a number input holds an invalid
-    // intermediate (value="" but badInput), otherwise it drops onto the "-".
     if (formFieldType === 'InputNumber' && numberHasBadInput) return { shrink: true, style: labelStyle };
     return null;
   };
@@ -796,7 +798,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     }
 
     const isShortcut = e.ctrlKey || e.metaKey || e.altKey;
-    if (formFieldType === 'InputNumber' && !isShortcut && isBlockedNumericKey(e.key, e.target as HTMLInputElement)) {
+    if (formFieldType === 'InputNumber' && !isShortcut && isBlockedNumericKey(e.key)) {
       e.preventDefault();
     }
 
@@ -805,10 +807,6 @@ export const InputBase = (props: rcInputBaseProps) => {
 
   const onInputFn = (e: React.FormEvent<HTMLDivElement>) => {
     onInput && onInput(e);
-    // The native input event fires for an invalid intermediate (a lone "-"
-    // keeps value="" but sets badInput) where React's onChange is deduped by
-    // the unchanged value. Track badInput here so the floating label stays
-    // shrunk instead of dropping onto the character. InputNumber only.
     if (formFieldType === 'InputNumber') {
       setNumberHasBadInput(!!inputRef.current?.validity?.badInput);
     }
@@ -934,14 +932,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     }
   };
 
-  const onPasteFn = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    if (
-      formFieldType === 'InputNumber' &&
-      numericPasteIsInvalid(e.clipboardData.getData('text'), (e.target as HTMLInputElement).value)
-    ) {
-      e.preventDefault();
-    }
-
+  const onPasteFn = () => {
     setTimeout(() => {
       // Resize backdrops size according to textarea component itself, and it's content
       resizeBackdrop();
@@ -1025,7 +1016,7 @@ export const InputBase = (props: rcInputBaseProps) => {
         onKeyDown={(e) => onKeyDownFn(e)}
         onInput={(e) => onInputFn(e)}
         onChange={(e) => onChangeFn(e)}
-        onPaste={(e) => onPasteFn(e as React.ClipboardEvent<HTMLInputElement>)}
+        onPaste={() => onPasteFn()}
         inputRef={inputRef}
         {...textFieldProps}
         inputProps={{
