@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.7.0...v2.8.0) (2026-10-27)
+
+
+### Features
+
+* **infobox:** warn triangle, muted actions, first-line alignment (VAN-84) ([3de1ff3](https://github.com/rankingCoach/rc-webapp-vanguard/commit/3de1ff3051247a8d11e05c70a601e8f33d8b3936)), closes [#VAN-84](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-84)
+* **OverlayStacking:** add PopoverModal stacking stories ([02c6675](https://github.com/rankingCoach/rc-webapp-vanguard/commit/02c66754cd3867171bad2bb1b5a68be5475583e4))
+
+
+### Bug Fixes
+
+* **GoogleMapsAdvancedMarker:** update click handling with `gmp-click` and adjust tests ([e0ede69](https://github.com/rankingCoach/rc-webapp-vanguard/commit/e0ede69a7ec94bcd771c4a2b2d88d5a1d8cb128f)), closes [#BUF-3899](https://github.com/rankingCoach/rc-webapp-vanguard/issues/BUF-3899)
+* **infobox:** use default medium size for action buttons (VAN-84) ([8ab32c7](https://github.com/rankingCoach/rc-webapp-vanguard/commit/8ab32c7e58a905779c8665cb7e13cb5ba0551eeb))
+* **PopoverModal:** portal backdrop with card when renderInPortal ([fa89a2e](https://github.com/rankingCoach/rc-webapp-vanguard/commit/fa89a2e435e511be5670c828082c7237c1979fe9))
+
 ## [2.7.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.6.0...v2.7.0) (2026-10-26)
 
 

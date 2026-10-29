@@ -32,6 +32,7 @@ Filter to the FE surface (`html/react/**`, and `admin/` React where relevant). I
 - **Design tokens** — bare hex/rgb/named colours and raw px are findings; prefer functional `--fn-*` tokens over raw `--n*`/`--p*`; spacings via `$x*`.
 - **Translatable copy** — all user-facing text through Vanguard `<Text>` (MAJOR when bare).
 - **One component per file** — strict inside `ai-extensions/.../directives/**`.
+- **QA test ids** — a missing `data-testid`/`testId` on an added interactive or asserted element is MINOR; an existing id renamed or removed while its element remains is MAJOR (breaks QA's end-to-end suite).
 - **No speculative additions** — calibrate severity to a named failure path; "for safety" / "might drift" without a concrete failure → MINOR at most.
 - **Summary chat directives must be reachable by the agent** — flag a directive registered in `supportedDirectives.ts` but missing its `<Name>.md` or absent from `docs/ado-ai-tmp/DIRECTIVES.md`.
 - Honour the project-specific exceptions in the rubric (the `/mock` command + menu, `_*.default.ts` story-types, the no-comment / no-speculative-extraction rules) — do not flag them.

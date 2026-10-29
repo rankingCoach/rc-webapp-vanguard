@@ -30,6 +30,7 @@ Before writing code, invoke the relevant project skill(s) via the `Skill` tool. 
 - **All user-facing text through Vanguard `<Text>`** (`<Text translate={false}>` for dynamic/number/user values). Never a bare string literal in JSX.
 - **One React component per file** — especially strict inside `ai-extensions/.../directives/**`.
 - **Arrow functions only.** No `function` declarations for components/handlers.
+- **Mandatory QA test ids** — every interactive element and every element QA asserts on that you add or touch gets a stable kebab-case `data-testid` (Vanguard: `testId` prop; own components: expose `testId?: string`). Never rename an existing id silently. Rules: `rc-frontend-react-component-specialist/references/test-ids.md`.
 - **No speculative additions** — no refs/wrappers/abstractions/guards without a concrete failure path in current code (project memory `feedback_no_speculative_additions`). Minimum diff.
 - **Never hand-edit** generated SDK types under `src/models/swagger/` or mocks under `__mocks__/__model_mocks__/` — change the PHP DTO + regenerate.
 - **Chat directives that summarize info are not "done" until reachable by the agent** — register in `supportedDirectives.ts`, ship a `<Name>.md`, and ensure the row exists in `docs/ado-ai-tmp/DIRECTIVES.md`. See the component-specialist recipe.
