@@ -2,7 +2,7 @@ import { IconNames } from '@vanguard/Icon/IconNames';
 import React from 'react';
 import { expect, fn, waitFor, within } from 'storybook/test';
 
-import { Button, ButtonSizes, ButtonTypes } from '../Button';
+import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '../Button';
 import { ButtonStory } from './_Button.default';
 
 const LONG_LABEL = 'Review the 12 new customer reviews waiting for an answer';
@@ -33,11 +33,16 @@ export const ButtonTruncate: ButtonStory = {
     >
       {/* Block parent */}
       <div>
-        <Button {...props} type={ButtonTypes.primary} testId="block" />
+        <Button {...({ ...props, type: ButtonTypes.primary } as ButtonProps)} testId="block" />
       </div>
       {/* Row action: alone in a flex row, with an icon */}
       <div style={rowStyle}>
-        <Button {...props} type={ButtonTypes.secondary} icon={IconNames.add} iconPosition="left" testId="row-icon" />
+        <Button
+          {...({ ...props, type: ButtonTypes.secondary } as ButtonProps)}
+          icon={IconNames.add}
+          iconPosition="left"
+          testId="row-icon"
+        />
       </div>
       {/* Muted row action */}
       <div style={rowStyle}>
@@ -46,13 +51,18 @@ export const ButtonTruncate: ButtonStory = {
       {/* Short label next to row text that wraps: the button keeps its whole label */}
       <div style={rowStyle}>
         <span>A row title long enough to wrap onto a couple of lines on a phone</span>
-        <Button {...props} type={ButtonTypes.default} testId="row-short">
+        <Button {...({ ...props, type: ButtonTypes.default } as ButtonProps)} testId="row-short">
           Edit
         </Button>
       </div>
       {/* Short-label references for the icon size */}
       <div style={rowStyle}>
-        <Button {...props} type={ButtonTypes.secondary} icon={IconNames.add} iconPosition="left" testId="ref-icon">
+        <Button
+          {...({ ...props, type: ButtonTypes.secondary } as ButtonProps)}
+          icon={IconNames.add}
+          iconPosition="left"
+          testId="ref-icon"
+        >
           Add
         </Button>
         <Button {...props} type={ButtonTypes.muted} size={ButtonSizes.small} icon={IconNames.add} testId="ref-muted">

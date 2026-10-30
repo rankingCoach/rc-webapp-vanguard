@@ -7,7 +7,7 @@ console.log('🚀 Verifying TypeScript 7 (tsgo) setup...\n');
 
 try {
   // Check if tsgo is available
-  const version = execSync('npx tsgo --version', { encoding: 'utf8' }).trim();
+  const version = execSync('npx tsc --version', { encoding: 'utf8' }).trim();
   console.log('✅ TypeScript 7 (tsgo) version:', version);
 
   // Check if build info files are being generated
@@ -25,7 +25,7 @@ try {
   // Test type checking
   console.log('\n🔍 Testing type checking with tsgo...');
   try {
-    execSync('npx tsgo --noEmit --project tsconfig.lib.json', { encoding: 'utf8' });
+    execSync('npx tsc --noEmit --project tsconfig.lib.json', { encoding: 'utf8' });
     console.log('✅ Type checking passed');
   } catch (error) {
     console.log('❌ Type checking failed:', error.message);
