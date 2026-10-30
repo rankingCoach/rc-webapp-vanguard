@@ -111,7 +111,7 @@ export const DateRangeInput = (props: Props) => {
               <InputAdornment position="end">
                 <Button
                   disabled={props.disabled}
-                  size={ButtonSizes.small}
+                  size={ButtonSizes.medium}
                   iconSize={IconSize.large}
                   iconLeft={IconNames.calendar}
                   type={ButtonTypes.default}

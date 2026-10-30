@@ -32,10 +32,14 @@ export const ButtonTypeShimmer: ButtonStory = {
     let button = canvas.getByRole("button", { name: "Shimmering" });
     await expect(button).toBeInTheDocument();
 
-    // Verify the shimmer sweep is applied to the button itself
+    // Verify the shimmer sweep is applied to the button itself (with prefers-reduced-motion it stands still)
     let computedStyle = window.getComputedStyle(button);
     await expect(computedStyle.backgroundImage).toContain("linear-gradient");
-    await expect(computedStyle.animationName).toContain("adoShimmer");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      await expect(computedStyle.animationName).toBe("none");
+    } else {
+      await expect(computedStyle.animationName).toContain("adoShimmer");
+    }
 
     // Verify the old pseudo-element layer is gone
     await expect(window.getComputedStyle(button, "::before").content).toBe("none");

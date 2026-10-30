@@ -13,6 +13,7 @@ export const statusBadgeGetAllStates = () => [
   "neutral",
   "limitExcedeed",
   "ai",
+  "ado",
   "live",
   "pending_verification",
   "not_approved",

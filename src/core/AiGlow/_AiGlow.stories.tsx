@@ -10,6 +10,7 @@ import { WithClassName as _WithClassName } from "./stories/WithClassName.story";
 import { TwoAiGlowComponents as _TwoAiGlowComponents } from "./stories/TwoAiGlowComponents.story";
 import { DerivedFromBase as _DerivedFromBase } from "./stories/DerivedFromBase.story";
 import { WithParityOptions as _WithParityOptions } from "./stories/WithParityOptions.story";
+import { AmbientPaused as _AmbientPaused } from "./stories/AmbientPaused.story";
 
 export const Default: Story = { ..._Default };
 export const WithBorderRadius: Story = { ..._WithBorderRadius };
@@ -20,6 +21,7 @@ export const WithClassName: Story = { ..._WithClassName };
 export const TwoAiGlowComponents: Story = { ..._TwoAiGlowComponents };
 export const DerivedFromBase: Story = { ..._DerivedFromBase };
 export const WithParityOptions: Story = { ..._WithParityOptions };
+export const AmbientPaused: Story = { ..._AmbientPaused };
 
 export default {
   ...SbDecorator({

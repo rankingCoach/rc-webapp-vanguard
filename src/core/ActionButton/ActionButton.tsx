@@ -1,4 +1,4 @@
-import { Button, ButtonProps, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { FontWeights, TextTypes } from '@vanguard/Text/Text';
 import React from 'react';
@@ -22,6 +22,7 @@ export const ActionButton = (props: ActionButtonProps) => {
       iconFillColor={'--p100'}
       iconHasCircle={true}
       type={ButtonTypes.default}
+      size={props.type === ButtonTypes.muted ? ButtonSizes.medium : ButtonSizes.extraLarge}
       textType={TextTypes.text}
       fontWeight={FontWeights.regular}
       textWrap={'no-wrap'}

@@ -1,7 +1,7 @@
 import { alignItemsCenter, dFlexColumn, gap2, justifyContentCenter, p4 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { Accordion } from '@vanguard/Accordion/Accordion';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { IconSize } from '@vanguard/Icon/Icon';
 import { ErrorModal } from '@vanguard/StandardModals/ErrorModal/ErrorModal';
 import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
@@ -11,6 +11,10 @@ export type ErrorBoundaryProps = {
   children: React.ReactNode;
   onError: (error?: Error, errorInfo?: ErrorInfo) => void;
   isModal?: boolean; // If true, will return the error as a modal
+  /** The card's heading, translated. Defaults to "Aw, snap!". */
+  title?: string;
+  /** The line under the heading, translated. Defaults to "An error occurred while processing your request". */
+  description?: string;
 };
 
 type ErrorBoundaryState = { error: any; errorInfo: any; hasError: boolean };
@@ -38,7 +42,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     const { hasError, errorInfo } = this.state;
-    const { isModal } = this.props;
+    const {
+      isModal,
+      title = 'Aw, snap!',
+      description = 'An error occurred while processing your request',
+    } = this.props;
 
     if (hasError) {
       if (isModal) {
@@ -50,11 +58,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div className="card my-5">
           <div className={classNames(dFlexColumn, justifyContentCenter, gap2, alignItemsCenter, p4)}>
             <Text type={TextTypes.heading2} fontWeight={FontWeights.bold}>
-              Aw, snap!
+              {title}
             </Text>
-            <Text>An error occurred while processing your request</Text>
+            <Text>{description}</Text>
             <Button
-              type={ButtonTypes.secondary}
+              type={ButtonTypes.muted}
+              size={ButtonSizes.extraLarge}
               onClick={() => {
                 window.location.reload();
               }}

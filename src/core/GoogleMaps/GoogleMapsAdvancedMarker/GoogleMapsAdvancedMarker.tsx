@@ -117,12 +117,16 @@ export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) =
     }
   }, [markerInstance, draggable]);
 
-  // Click listener
+  // Click listener (gmp-click DOM event; the legacy addListener('click') is deprecated).
+  // gmpClickable must be set explicitly — addEventListener alone doesn't enable it.
   useEffect(() => {
     if (!markerInstance || !onClick) return;
-    const listener = markerInstance.addListener('click', () => onClick(id));
+    markerInstance.gmpClickable = true;
+    const handleGmpClick = () => onClick(id);
+    markerInstance.addEventListener('gmp-click', handleGmpClick);
     return () => {
-      google.maps.event.removeListener(listener);
+      markerInstance.removeEventListener('gmp-click', handleGmpClick);
+      markerInstance.gmpClickable = false;
     };
   }, [markerInstance, onClick, id]);
 

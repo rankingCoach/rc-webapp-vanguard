@@ -15,6 +15,9 @@ $x7: 7 * $x1;
 $x8: 8 * $x1;
 $x9: 9 * $x1;
 
+// Border radius of rounded (pill) controls, e.g. round buttons and floating tabs
+$rounded-border-radius: $x3;
+
 //TODO: remove old vars
 $pico: 1px;
 $nano: 2px;

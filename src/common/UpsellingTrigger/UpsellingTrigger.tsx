@@ -33,7 +33,7 @@ export const UpsellingTrigger = (props: UpsellingTriggerProps) => {
           </div>
           <Button
             className={styles.upsellingButton}
-            size={ButtonSizes.small}
+            size={ButtonSizes.medium}
             type={ButtonTypes.default}
             iconRight={IconNames.caretLeft}
             onClick={onclick}

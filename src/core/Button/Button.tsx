@@ -11,21 +11,53 @@ import styles from './Button.module.scss';
 /**
  * Types
  */
+/**
+ * One size set for every button type: the same size gives the same footprint whatever the type.
+ *
+ * | size               | height (mobile / desktop) | text  |
+ * | ------------------ | ------------------------- | ----- |
+ * | `small`            | 32 / 24px                 | 12px  |
+ * | `medium` (default) | 40 / 32px                 | 12px  |
+ * | `large`            | 40 / 40px                 | 14px  |
+ * | `extraLarge`       | 40 / 48px                 | 16px  |
+ *
+ * Migrating from the pre-2.7 sizes: the non-muted types used to be bigger. Bump them one step to keep their footprint:
+ * `small` → `medium` (32 / 40px), `medium` → `extraLarge` (48 / 40px), `large` → `extraLarge` (60 → 48px /
+ * 48 → 40px, shorter). See the "Size Matrix" story under Vanguard/Button.
+ */
 export enum ButtonSizes {
   small = 'small',
   medium = 'medium',
   large = 'large',
-  /** @remarks only available for the muted button type */
   extraLarge = 'extra-large',
 }
 
 export enum ButtonTypes {
   default = 'default',
+  /**
+   * Being replaced by `muted` (VAN-82). Both share the same sizes, so swap the type and keep the size.
+   * Muted has no border and a see-through fill; on dark or coloured backgrounds use `inverted`.
+   * See the "Secondary To Muted" story under Vanguard/Button.
+   */
   secondary = 'secondary',
   primary = 'primary',
   shimmer = 'shimmer',
   muted = 'muted',
 }
+
+/**
+ * Text colours the default button supports besides its own (`textColor` prop). Each key maps to a rest colour in
+ * `$default-text-colors` (Button.module.scss); the hover colour is derived from it. Add a product's accent here.
+ */
+export enum ButtonTextColors {
+  /** Ado's colour (`--ado-base`), e.g. the Needs-you row action */
+  ado = 'ado',
+}
+
+// One class per text colour, generated from `$default-text-colors` in Button.module.scss
+const TEXT_COLOR_CLASSES: Record<ButtonTextColors, string> = {
+  [ButtonTextColors.ado]: styles.textColorAdo,
+};
 
 type eventFn = (event: React.MouseEvent) => void;
 type simpleFn = () => void;
@@ -38,6 +70,13 @@ export type ButtonShape = 'default' | 'round';
  */
 interface CommonButtonProps {
   testId?: string;
+  /** Accessible name of the `<button>`; required for icon-only buttons (no `children`). */
+  ariaLabel?: string;
+  /**
+   * Native `type` attribute of the `<button>` (`type` picks the visual variant). Omitted by default, so the browser
+   * default applies: `submit` inside a `<form>`. Pass `'button'` for controls inside a form that must not submit it.
+   */
+  htmlType?: 'button' | 'submit' | 'reset';
   /** @deprecated */
   className?: string;
   children?: string;
@@ -100,17 +139,49 @@ interface CommonButtonProps {
 
 type BaseButtonProps = CommonButtonProps & {
   type?: Exclude<ButtonTypes, ButtonTypes.muted>;
-  size?: Exclude<ButtonSizes, ButtonSizes.extraLarge>;
+  size?: ButtonSizes;
+  /**
+   * Only for `primary` (the default type) and `shimmer`; ignored on `default` and `secondary`.
+   * For dark or coloured surfaces (e.g. the recommended card): a white fill with the text and icon in Ado's base
+   * colour (`--ado-base`), tinted 12% toward that colour on hover, and a white focus ring.
+   * Shimmer keeps its sweep, as a faint band of the same tint.
+   */
+  inverted?: boolean;
+  /**
+   * Default type only (ignored by the other types): colours the label and icon, rest and hover, from a fixed set.
+   * The fill, focus ring and disabled state stay the default button's. Takes precedence over the deprecated
+   * `color` / `hoverColor`.
+   */
+  textColor?: ButtonTextColors;
   // these are specifically forbidden for the non-muted button
   blurred?: never;
-  inverted?: never;
+  onDark?: never;
+  pressed?: never;
 };
 
-type MutedButtonProps = CommonButtonProps & {
+export type MutedButtonProps = CommonButtonProps & {
   type: Extract<ButtonTypes, ButtonTypes.muted>;
   size?: ButtonSizes;
+  /**
+   * Adds a 32px backdrop blur behind the fill (glass look). The blur lives on its own layer,
+   * so the fill keeps blending with the page.
+   */
   blurred?: boolean;
+  /**
+   * The colour set for dark surfaces (photos, dark cards, the canvas hero): a white 18% fill
+   * (28% on hover) blended with `plus-lighter`, white text, icon and focus ring.
+   * Leave it `false` on light surfaces, where the fill is multiplied.
+   */
   inverted?: boolean;
+  /**
+   * Glass for busy or dark backdrops (photos, Ado's bubble): swaps the text, icon and focus-ring
+   * colours and uses its own `--button-muted[-inverted]-on-dark-*` fills, blended normally.
+   * - default + `onDark`: dark glass (black 60%, 70% on hover), white text and ring.
+   * - `inverted` + `onDark`: light glass (white 60%, 70% on hover), dark (#263349) text and the blue ring.
+   */
+  onDark?: boolean;
+  /** Toggle state: renders `aria-pressed` and keeps the hover layer shown while `true`. */
+  pressed?: boolean;
 };
 
 export type ButtonProps = BaseButtonProps | MutedButtonProps;
@@ -148,13 +219,23 @@ export const Button = (props: ButtonProps) => {
     uppercase,
     w100,
     shape = 'default',
+    ariaLabel,
+    htmlType,
   } = props;
 
   let { icon, iconPosition = 'left', rounded = false, iconColor, targetRef, iconHoverColor } = props;
 
-  // Extract blurred and inverted props for muted buttons
+  // Extract the variant-only props: blurred, onDark & pressed are muted-only, inverted is muted, primary & shimmer
   const blurred = 'blurred' in props ? props.blurred : false;
   const inverted = 'inverted' in props ? props.inverted : false;
+  const onDark = 'onDark' in props ? props.onDark : false;
+  const pressed = 'pressed' in props ? props.pressed : undefined;
+  const isMuted = type === ButtonTypes.muted;
+  const isFilledInverted = !!inverted && (type === ButtonTypes.primary || type === ButtonTypes.shimmer);
+  const hasInvertedClass = isFilledInverted || (isMuted && !!inverted);
+  // These colours live in CSS, the icon follows the text colour
+  const iconFollowsText = isMuted || isFilledInverted;
+  const textColor = type === ButtonTypes.default && 'textColor' in props ? props.textColor : undefined;
 
   // Maintain support for iconLeft & iconRight props, but only use icon internally;
   // icon props takes precedence over iconLeft/iconRight and iconRight over iconLeft.
@@ -195,6 +276,8 @@ export const Button = (props: ButtonProps) => {
   if (!iconColor) {
     if (color) {
       iconColor = color;
+    } else if (isFilledInverted) {
+      iconColor = 'currentColor';
     } else {
       switch (type) {
         case ButtonTypes.default:
@@ -210,7 +293,8 @@ export const Button = (props: ButtonProps) => {
           iconColor = '--button-shimmer-text-color';
           break;
         case ButtonTypes.muted:
-          iconColor = inverted ? '--button-muted-inverted-text-color' : '--button-muted-text-color';
+          // The muted colours live in CSS (surface flags), the icon follows the text colour
+          iconColor = 'currentColor';
           break;
       }
     }
@@ -219,6 +303,8 @@ export const Button = (props: ButtonProps) => {
   if (!iconHoverColor) {
     if (hoverColor) {
       iconHoverColor = hoverColor;
+    } else if (isFilledInverted) {
+      iconHoverColor = 'currentColor';
     } else {
       switch (type) {
         case ButtonTypes.default:
@@ -234,10 +320,12 @@ export const Button = (props: ButtonProps) => {
           iconHoverColor = '--button-shimmer-hover-text-color';
           break;
         case ButtonTypes.muted:
-          iconColor = inverted ? '--button-muted-inverted-text-color' : '--button-muted-text-color';
+          iconHoverColor = 'currentColor';
           break;
       }
     }
+  } else if (isFilledInverted) {
+    iconHoverColor = 'currentColor';
   } else {
     switch (type) {
       case ButtonTypes.default:
@@ -253,20 +341,27 @@ export const Button = (props: ButtonProps) => {
         iconHoverColor = '--button-shimmer-text-color';
         break;
       case ButtonTypes.muted:
-        iconColor = inverted ? '--button-muted-inverted-text-color' : '--button-muted-text-color';
+        iconHoverColor = 'currentColor';
         break;
     }
   }
 
+  // A text colour lives in CSS (rest and hover); the icon follows the label unless an icon colour was given
+  if (textColor) {
+    iconColor = props.iconColor ?? 'currentColor';
+    iconHoverColor = props.iconHoverColor ?? 'currentColor';
+  }
+
   const getLabelColor = useCallback(() => {
-    if (disabled) return undefined;
+    if (disabled || textColor) return undefined;
     return hoverColor ? (btnHovered ? hoverColor : color) : color;
-  }, [disabled, btnHovered, hoverColor, color]);
+  }, [disabled, textColor, btnHovered, hoverColor, color]);
 
   const getIconColor = useCallback(() => {
-    if (disabled) return undefined;
+    // Muted & inverted keep following the text colour when disabled; the 0.4 opacity comes from CSS
+    if (disabled) return iconFollowsText ? iconColor : undefined;
     return iconHoverColor ? (btnHovered ? iconHoverColor : iconColor) : iconColor;
-  }, [disabled, btnHovered, iconHoverColor, iconColor]);
+  }, [disabled, iconFollowsText, btnHovered, iconHoverColor, iconColor]);
 
   /**
    * Get Button Icon
@@ -389,6 +484,7 @@ export const Button = (props: ButtonProps) => {
     >
       <button
         ref={btnRef}
+        type={htmlType}
         data-testid={`${testId ? `${testId}_` : ''}button`}
         disabled={!!disabled}
         className={classNames(
@@ -403,9 +499,14 @@ export const Button = (props: ButtonProps) => {
           rounded ? styles.shapeRound : '',
           textWrap === 'wrap' ? styles.buttonTextWrap : '',
           blurred ? styles.blurred : '',
-          inverted ? styles.inverted : '',
+          hasInvertedClass ? styles.inverted : '',
+          isMuted && onDark ? styles.onDark : '',
+          textColor ? TEXT_COLOR_CLASSES[textColor] : '',
         )}
+        aria-pressed={isMuted ? pressed : undefined}
+        aria-label={ariaLabel}
       >
+        {isMuted && <span className={styles.buttonHoverLayer} aria-hidden="true" />}
         <div className={styles.buttonInnerContainer}>
           {icon && iconPosition === 'left' ? (
             isIconSizeDifferentOnHover() && !isLoading && !disabled ? (

@@ -218,8 +218,8 @@ export const ListPageActions = <T, >(props: ListPageActionsProps<T>) => {
         <div className={styles.filterSlot}>
           <Render if={headerFiltersDisplayMode === 'button'}>
             <Button
-              type={ButtonTypes.secondary}
-              size={ButtonSizes.medium}
+              type={ButtonTypes.muted}
+              size={ButtonSizes.extraLarge}
               className={styles.showFilters}
               iconLeft={showFilters ? IconNames.close : IconNames.filter}
               onClick={() => {
@@ -244,6 +244,7 @@ export const ListPageActions = <T, >(props: ListPageActionsProps<T>) => {
           <div className={styles.actionBtns}>
             <Render if={!filters.automaticRequest}>
               <Button
+                size={ButtonSizes.extraLarge}
                 className={classNames(mt2)}
                 onClick={onApplyFilters}
                 isLoading={showLoading}
@@ -253,7 +254,8 @@ export const ListPageActions = <T, >(props: ListPageActionsProps<T>) => {
               </Button>
               <Render if={filters.clearFiltersBtn}>
                 <Button
-                  type={ButtonTypes.secondary}
+                  type={ButtonTypes.muted}
+                  size={ButtonSizes.extraLarge}
                   className={classNames(mt2)}
                   iconLeft={IconNames.filter}
                   onClick={onClearFilters}

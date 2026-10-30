@@ -2,7 +2,7 @@ import { mb2 } from '@globalStyles';
 import { uuidv4 } from '@helpers/generate-uid';
 import { Keyword } from '@models/swagger/App/Domain/Common/Entities/Keywords/Keyword';
 import { AIAssistantPanel } from '@vanguard/AIAssistant/AIAssistentPanel/AIAssistantPanel';
-import { Button, ButtonTypes } from '@vanguard/Button/Button';
+import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Render } from '@vanguard/Render/Render';
@@ -81,7 +81,8 @@ export const AIAssistant = (props: AIAssistantProps) => {
       <div className={mb2}>
         <Render if={panelStatus === 'closed' && value == ''}>
           <Button
-            type={ButtonTypes.secondary}
+            size={ButtonSizes.extraLarge}
+            type={ButtonTypes.shimmer}
             iconLeft={IconNames.ai}
             onClick={onClickOnGenerateButton}
             disabled={disabled}
@@ -91,7 +92,8 @@ export const AIAssistant = (props: AIAssistantProps) => {
         </Render>
         <Render if={panelStatus === 'closed' && value != ''}>
           <Button
-            type={ButtonTypes.secondary}
+            size={ButtonSizes.extraLarge}
+            type={ButtonTypes.shimmer}
             iconLeft={IconNames.ai}
             onClick={() => {
               setPanelStatus('open');
@@ -103,7 +105,8 @@ export const AIAssistant = (props: AIAssistantProps) => {
         </Render>
         <Render if={panelStatus !== 'closed'}>
           <Button
-            type={ButtonTypes.secondary}
+            size={ButtonSizes.extraLarge}
+            type={ButtonTypes.shimmer}
             iconLeft={IconNames.ai}
             onClick={() => {
               setPanelStatus('closed');

@@ -127,7 +127,7 @@ export const ModalHeader = (props: ModalHeaderProps) => {
           )}
           testId={'modal-close-header-cta'}
           type={ButtonTypes.default}
-          size={ButtonSizes.small}
+          size={ButtonSizes.medium}
           iconLeft={IconNames.close}
           iconSize={IconSize.large}
           iconColor={'--n500'}

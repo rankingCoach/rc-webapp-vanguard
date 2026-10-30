@@ -19,6 +19,7 @@ import { WithReplacements as _WithReplacements } from "./stories/WithReplacement
 import { WithDescriptionArray as _WithDescriptionArray } from "./stories/WithDescriptionArray.story";
 import { WithDescriptionReactNode as _WithDescriptionReactNode } from "./stories/WithDescriptionReactNode.story";
 import { AllProps as _AllProps } from "./stories/AllProps.story";
+import { AllCases as _AllCases } from "./stories/AllCases.story";
 
 export const Default: Story = { ..._Default };
 export const WithTitle: Story = { ..._WithTitle };
@@ -38,6 +39,7 @@ export const WithReplacements: Story = { ..._WithReplacements };
 export const WithDescriptionArray: Story = { ..._WithDescriptionArray };
 export const WithDescriptionReactNode: Story = { ..._WithDescriptionReactNode };
 export const AllProps: Story = { ..._AllProps };
+export const AllCases: Story = { ..._AllCases };
 
 export default {
   ...SbDecorator({

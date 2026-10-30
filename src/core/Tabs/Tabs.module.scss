@@ -1,43 +1,161 @@
 @import '@styles/color-functions';
 @import 'src/styles/spacings';
 
+$floating-padding: $x0_25;
+// Floating theme: the selected tab is a muted inverted + onDark button (design decision), so the chip takes its
+// light-glass fill, brightened onto the tray like the selected item of a button group; the other tabs are plain
+// muted buttons (see Tab.module.scss). Literals are the muted spec values, kept only as a safety net (see Button.module.scss).
+$muted-fill-selected: var(--button-muted-inverted-on-dark-background-color, rgba(255, 255, 255, 0.6));
+$muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
+// Also the duration of the squish played by useTabsIndicator, which reads it from the computed transition
+$indicator-duration: 300ms;
+$indicator-easing: cubic-bezier(0.65, 0, 0.35, 1);
+
+// Bar root. Keep specificity at a single class so a consumer className
+// (padding, border, margin, background, ...) applied on the same element still wins.
 .tabs-container {
   position: relative;
+  display: flex;
+  overflow: hidden;
+  min-height: $x6;
+  -webkit-overflow-scrolling: touch;
+  // Gap between the overflow buttons and the bar's inline edges
+  --scroll-button-inset: #{$x0_5};
 
-   > div > div {
-     gap: $x0_25;
-   }
-
-  :global(.MuiTabs-scrollableX) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  &.align-center {
+    align-items: center;
   }
 
   // STYLES FOR FLOATING THEME
-  &.floating {
+  // `:where()` keeps the bar rules at single-class specificity, like the base rules above, so a consumer
+  // className on the bar root (padding, margin, background, ...) still wins.
+  &:where(.floating) {
     box-sizing: border-box;
     width: fit-content;
     max-width: 100%;
     min-height: 0;
     margin-inline: auto;
-    padding: $x0_5;
-    border-radius: $x4;
-    background-color: rc_transparent(--fn-fg-light, 0.1);
-
-    // Scroll buttons (TabsCustomScroll) are the first/last children of the MUI root;
-    // round them fully so the pill's corners don't clip them
-    > :first-child:not(:global(.MuiTabs-scroller)),
-    > :last-child:not(:global(.MuiTabs-scroller)) {
-      border-radius: $x4;
-    }
-
-    > :first-child:not(:global(.MuiTabs-scroller)) {
-      left: $x0_5;
-    }
-
-    > :last-child:not(:global(.MuiTabs-scroller)) {
-      right: $x0_5;
-    }
+    padding: $floating-padding;
+    // Concentric corners: the tabs' radius plus the gap around them
+    border-radius: $rounded-border-radius + $floating-padding;
+    // Translucent shadow-tinted tray; the tabs' muted fills blend onto it, so the bar must not isolate
+    // (no z-index, opacity, filter...)
+    background-color: rc_transparent(--fn-shadow, 0.1);
+    // The overflow buttons sit in the 2px padding, so their focus ring (2px outline + 2px offset) reaches past the
+    // tray: let it out. The scroller and the buttons' shadow layer clip themselves to the tray instead.
+    overflow: visible;
+    --scroll-button-inset: #{$floating-padding};
   }
+}
+
+.scroller {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  // Hide the scrollbar
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Concentric with the tray, which no longer clips (see .floating above)
+  .floating > & {
+    border-radius: $rounded-border-radius;
+  }
+}
+
+.tab-list {
+  // Offset parent of the tabs, so the indicator can be placed with their offsetLeft/offsetTop
+  position: relative;
+  display: flex;
+  gap: $x0_25;
+}
+
+// Selected chip of the floating theme: a single element gliding to the selected tab (see useTabsIndicator).
+// Painted before the tabs, which are positioned too, so it stays behind their labels.
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: $rounded-border-radius;
+  pointer-events: none;
+  background-color: $muted-fill-selected;
+  mix-blend-mode: $muted-blend;
+  transition:
+    translate $indicator-duration $indicator-easing,
+    width $indicator-duration $indicator-easing,
+    height $indicator-duration $indicator-easing;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Overflow buttons (muted round blurred Buttons, see Tabs.tsx), floating over the inline-start / inline-end edges of the
+// bar. Their shadows are separate boxes at the same spots, on a layer clipped to the bar: the buttons themselves stay
+// unclipped so their focus ring is never cut by the bar's edge.
+.scroll-button,
+.scroll-shadow {
+  // Centred with auto margins rather than translate/z-index: the muted fill blends (multiply) with the tabs below,
+  // so the wrapper must not isolate
+  position: absolute;
+  inset-block: 0;
+  height: fit-content;
+  margin-block: auto;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.scroll-button {
+  display: flex;
+}
+
+// Same box as the button (large round icon-only Button: 40px)
+.scroll-shadow {
+  // 1 shifts the shadow towards the right, over the tabs the button covers (set from the computed direction in Tabs.tsx)
+  --shadow-x: 1;
+
+  width: $x5;
+  height: $x5;
+  border-radius: $rounded-border-radius;
+  box-shadow:
+    calc(var(--shadow-x) * #{$x0_25}) 0 $x0_5 0 rc_transparent(--fn-shadow, 0.08),
+    calc(var(--shadow-x) * #{$x1}) 0 $x2 $x0_5 rc_transparent(--fn-shadow, 0.05);
+}
+
+.scroll-shadow-towards-left {
+  --shadow-x: -1;
+}
+
+// Clips the shadows to the bar, as the bar itself did before it let the focus rings out (floating theme)
+.scroll-shadows {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.scroll-button-start {
+  inset-inline-start: var(--scroll-button-inset);
+}
+
+.scroll-button-end {
+  inset-inline-end: var(--scroll-button-inset);
+}
+
+.scroll-button-hidden {
+  visibility: hidden;
+  opacity: 0;
 }

@@ -77,6 +77,7 @@ npm run test                              # Vitest
 - **Think before coding.** No silent assumptions. State your assumptions, surface tradeoffs, and ask for clarification when unsure. Stop when confused instead of guessing.
 - **Simplicity first.** Provide the absolute minimum code required to solve the problem. No speculative features, no complex abstractions for single-use code.
 - **Surgical changes.** Touch only what the task requires. Don't "improve" adjacent code, refactor unrelated functions, or fix adjacent style issues. Every change maps directly back to the instructions.
+- **QA test ids are mandatory (2026-10-26).** QA's end-to-end tests select by `data-testid`, never by DOM structure. In a Vanguard component: accept `testId?: string`, render it as `data-testid` on the root, and derive deterministic ids for every interactive inner element (`Button`: `${testId}_button`; `Tabs`: `${testId}-${index}`). A new or changed interactive component without `testId` is not done. Never change an existing rendered or derived id — every consumer's QA selectors depend on it. In app code: set `testId` on every Vanguard control and `data-testid` on raw interactive/asserted elements; full rules in rc-webapp `.claude/skills/rc-frontend-react-component-specialist/references/test-ids.md`.
 - **Goal-driven execution.** Work to clear success criteria, not step-by-step instructions. Loop independently until the criteria are verified and tests pass.
 
 ---
@@ -212,6 +213,7 @@ Layer responsibilities (team's words):
 - [ ] No hardcoded colors; `--fn-*` tokens used; no `rc_rgba()` in component SCSS (use `rgba(var(--token-rgb), a)`)
 - [ ] User-facing strings go through `translationService.get`
 - [ ] New redux data domain follows the `use-*/` slice/mapper/selector/case layout
+- [ ] Interactive components accept `testId` → `data-testid` (root + derived inner ids); no existing id changed
 - [ ] Orphan imports/vars from your change removed
 
 ---

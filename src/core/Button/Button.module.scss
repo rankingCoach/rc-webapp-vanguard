@@ -41,8 +41,19 @@
  * • .button-label-hidden      - Hide text label (icon-only)
  * • .has-icon-left            - Button has left icon
  * • .has-icon-right           - Button has right icon
- * • .blurred                - Apply blur effect (muted buttons)
- * • .inverted               - Inverted colors (muted buttons)
+ * • .blurred                - Backdrop blur on the ::before layer (muted buttons)
+ * • .inverted               - Colour set for dark surfaces: white fill, plus-lighter blend (muted buttons);
+ *                              solid white fill, Ado base-colour text (primary & shimmer buttons)
+ * • .on-dark                - The other text colour: swaps text/icon/focus ring only (muted buttons)
+ * • .text-color-{name}      - Default button label/icon colour from $default-text-colors (textColor prop)
+ * • [aria-pressed="true"]   - Pressed toggle, keeps the hover layer shown (muted buttons)
+ *
+ * MUTED LAYERS (back to front):
+ * • ::before                 - Blur layer (only .blurred)
+ * • ::after                  - Rest fill, never changes on hover / pressed (blends)
+ * • .button-hover-layer      - Hover colour added on top of the rest fill, grows from the centre (blends)
+ * • .button-inner-container  - Content, positioned above the layers
+ * The muted button itself never isolates (no z-index, opacity, filter or backdrop-filter).
  * 
  * INNER ELEMENTS:
  * • .button-inner-container   - Flex container for button content
@@ -64,21 +75,36 @@
  @import "../../styles/mixins";
  @import "./button-props";
  
+ // Text colours of the default button (textColor prop, ButtonTextColors): key -> rest colour.
+ // The hover/focus colour is derived (25% towards black, like the default blue). Keep the keys in sync with
+ // ButtonTextColors and TEXT_COLOR_CLASSES in Button.tsx.
+ $default-text-colors: (
+   ado: var(--ado-base),
+ );
+ 
  // To correlate all transition animation time -> button color / background / text background
  $transitionTime: 200ms;
  $transitionTimeLong: 400ms;
  $loader-spinner: $x2;
  $loader-timing: 850ms;
  
+ // Never wider than the container, so a long label truncates instead of overflowing.
+ // No min-width: 0 here: in a shared flex row the button keeps its width and the siblings shrink first.
+ .button-container {
+   max-width: 100%;
+ }
+
  .button-container-full-width,
  .button-container-full-width .button {
    width: 100%;
  }
- 
+
  .button {
-   --padding-y: #{$x1 + $x0_5};
+   // medium (the default size); the other sizes override these in MODIFIERS - Sizes
+   --padding-y: #{$x1_5};
    --padding-x: #{$x2};
    --label-height: #{$x2};
+   --text-size: #{$x1_5};
    --letter-spacing: 0.04em;
    --border-radius: var(--buttons-border-radius, #{$x0_5});
  
@@ -93,13 +119,17 @@
    box-sizing: border-box;
    justify-content: center;
    overflow: hidden;
+   max-width: 100%;
    border-radius: var(--border-radius);
+   // Squircle corners (Chromium 139+); other browsers ignore it and keep the plain border-radius.
+   // --button-corner-shape is optional in the theme: themes with a large --buttons-border-radius set it to round.
+   corner-shape: var(--button-corner-shape, superellipse(1.3));
    height: calc(2 * var(--padding-y) + var(--label-height));
    padding: var(--padding-y) var(--padding-x);
  
    @include media('>mobile') {
-     --padding-y: #{$x2};
-     --padding-x: #{$x3};
+     --padding-y: #{$x1};
+     --padding-x: #{$x1_5};
    }
  
    // =========================== ELEMENTS ===========================
@@ -108,8 +138,15 @@
      display: flex;
      align-items: center;
      gap: $x1;
+     // Lets the label shrink below its text width (ellipsis) instead of being clipped by the button
+     min-width: 0;
+
+     // Icons keep their size, only the label gives way
+     > :not(.button-text) {
+       flex-shrink: 0;
+     }
    }
- 
+
    .button-icon-container {
      min-width: #{$x4};
      display: flex;
@@ -134,6 +171,8 @@
    .button-icon {
      font-family: var(--buttons-typeface);
      font-size: var(--label-height);
+     // Taller than the label so accents (Î, Ä) and descenders (g, Ș) aren't clipped by overflow: hidden;
+     // the button height comes from --label-height, so the extra 7px overflows into the padding, centred.
      line-height: calc(var(--label-height) + 7px);
      display: inline-flex;
      align-items: center;
@@ -142,6 +181,13 @@
      text-overflow: ellipsis !important;
      white-space: nowrap !important;
      overflow: hidden !important;
+   }
+
+   .button-text {
+     // the label follows the size; the icon keeps --label-height
+     font-size: var(--text-size);
+     // A block container, not a flex one: text-overflow doesn't apply to flex containers, so the ellipsis would never show
+     display: block;
    }
  
    // Loader Spinner
@@ -152,10 +198,36 @@
    // ====================== MODIFIERS - Types ======================
    &.button-default {
      @include buttonProps(default);
+ 
+     // The fill, focus ring and disabled state stay the default button's; only the label and icon colour change
+     @each $name, $color in $default-text-colors {
+       &.text-color-#{$name}:not(:disabled):not(.disabled) {
+         --default-text-color: #{$color};
+         --default-text-hover-color: color-mix(in oklch, #{$color}, black 25%);
+ 
+         &,
+         .button-text {
+           color: var(--default-text-color);
+         }
+ 
+         &:hover,
+         &:focus,
+         &:active {
+           &,
+           .button-text {
+             color: var(--default-text-hover-color);
+           }
+         }
+       }
+     }
    }
  
    &.button-primary {
      @include buttonProps(primary);
+
+     &.inverted {
+       @include filledInverted(primary);
+     }
    }
  
    &.button-secondary {
@@ -172,154 +244,208 @@
        // Keep the base transitions; the hover darkening uses the spec's 150ms filter transition
        transition: all $transitionTime ease-in-out, filter 150ms ease;
      }
+
+     &.inverted {
+       @include filledInverted(shimmer);
+     }
    }
  
    &.button-muted {
-     position: relative;
-     height: unset; // button height results from line-height & padding!!!
- 
-     @include buttonProps(muted);
+     // Layers (back to front): ::before = blur (only .blurred), ::after = blended fill, .button-inner-container = content.
+     // The button itself must not isolate: no z-index, opacity, filter or backdrop-filter on it (incl. disabled/blurred),
+     // otherwise the fill can't blend with the page behind it.
+     //
+     // Theme tokens: --button-muted[-on-dark|-inverted|-inverted-on-dark]-* are all defined by the theme;
+     // the literals are the spec values, kept only as a safety net.
+     // *-hover-background-color is the layer added on top of the rest fill, not the final hover colour:
+     // rest + layer give the design's hover colour.
+     --muted-fill: var(--button-muted-background-color, rgba(185, 197, 216, 0.25));
+     --muted-fill-hover: var(--button-muted-hover-background-color, rgba(185, 197, 216, 0.16));
+     --muted-fg: var(--button-muted-text-color, #263349);
+     --muted-blend: var(--button-muted-blend-mode, multiply);
+     --muted-ring: var(--button-muted-focus-outline-color, #0062ff);
 
+     position: relative;
+     background: none;
+     border: 0;
+     color: var(--muted-fg);
+     // explicit properties instead of the base `all`: only the colour changes between states
+     transition: color $transitionTime ease-in-out;
+
+     .button-text {
+       color: var(--muted-fg);
+     }
+
+     // blur layer: only for .blurred, kept off the button so it doesn't isolate the fill's blend
      &::before {
-       // hover element
-       position: absolute;
+       content: none;
+     }
+
+     &.blurred::before {
        content: '';
-       display: inline-flex;
-       border-radius: var(--border-radius);
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background-color: var(--button-muted-ripple-background-color, var(--fn-bg-hov-n-gl));
-       opacity: 0;
-       transform-origin: center;
-       transform: scale(0.5);
-       transition:
-         transform $transitionTimeLong cubic-bezier(.01,.74,.6,.98),
-         opacity $transitionTimeLong cubic-bezier(.01,.74,.6,.98);
-     }
-     
-     &.inverted {
-       @include buttonProps(muted-inverted);
-     }
- 
-     &.blurred {
+       position: absolute;
+       inset: 0;
+       border-radius: inherit;
+       corner-shape: inherit;
+       pointer-events: none;
        backdrop-filter: blur(#{$x4});
-       -webkit-backdrop-filter: blur(#{$x4}); 
+       -webkit-backdrop-filter: blur(#{$x4});
      }
- 
+
+     // rest fill: never changes on hover / pressed
+     &::after {
+       content: '';
+       position: absolute;
+       inset: 0;
+       border-radius: inherit;
+       corner-shape: inherit;
+       pointer-events: none;
+       background-color: var(--muted-fill);
+       mix-blend-mode: var(--muted-blend);
+     }
+
+     // hover layer: grows from the centre on hover / pressed and adds its (translucent) colour on top of the rest fill
+     .button-hover-layer {
+       position: absolute;
+       inset: 0;
+       border-radius: inherit;
+       corner-shape: inherit;
+       pointer-events: none;
+       background-color: var(--muted-fill-hover);
+       mix-blend-mode: var(--muted-blend);
+       opacity: 0;
+       transform: scale(0.5);
+       transform-origin: center;
+       transition:
+         transform $transitionTimeLong cubic-bezier(.01, .74, .6, .98),
+         opacity $transitionTimeLong cubic-bezier(.01, .74, .6, .98);
+     }
+
      .button-inner-container {
-       z-index: 1; // to ensure that the inner elements are above the ::before pseudo-element
+       position: relative;
+       z-index: 1; // content above the fill, hover & blur layers
      }
- 
+
+     // surface flags: colours & blend only
+     // dark glass: a dark fill reads the same under multiply and normal; normal keeps it visible whatever the theme's muted blend
+     &.on-dark {
+       --muted-fill: var(--button-muted-on-dark-background-color, rgba(1, 4, 11, 0.6));
+       --muted-fill-hover: var(--button-muted-on-dark-hover-background-color, rgba(1, 4, 11, 0.25));
+       --muted-blend: normal;
+       --muted-fg: var(--button-muted-on-dark-text-color, #fff);
+       --muted-ring: var(--button-muted-on-dark-focus-outline-color, #fff);
+     }
+
+     &.inverted {
+       --muted-fill: var(--button-muted-inverted-background-color, rgba(255, 255, 255, 0.18));
+       --muted-fill-hover: var(--button-muted-inverted-hover-background-color, rgba(255, 255, 255, 0.1));
+       --muted-blend: var(--button-muted-inverted-blend-mode, plus-lighter);
+       --muted-fg: var(--button-muted-inverted-text-color, #fff);
+       --muted-ring: var(--button-muted-inverted-focus-outline-color, #fff);
+     }
+
+     // light glass with dark text
+     &.inverted.on-dark {
+       --muted-fill: var(--button-muted-inverted-on-dark-background-color, rgba(255, 255, 255, 0.6));
+       --muted-fill-hover: var(--button-muted-inverted-on-dark-hover-background-color, rgba(255, 255, 255, 0.25));
+       --muted-blend: normal;
+       --muted-fg: var(--button-muted-inverted-on-dark-text-color, #263349);
+       --muted-ring: var(--button-muted-inverted-on-dark-focus-outline-color, #0062ff);
+     }
+
+     // states
      &:hover:not(:disabled),
-     &:focus:not(:disabled) {
-       &::before {
-         opacity: 16%;
+     &[aria-pressed="true"] {
+       .button-hover-layer {
+         opacity: 1;
          transform: scale(1);
        }
      }
- 
-     &.disabled,
+
+     &:focus {
+       outline: none;
+     }
+
+     &:focus-visible {
+       outline: 2px solid var(--muted-ring);
+       outline-offset: 2px;
+     }
+
      &:disabled {
-       opacity: 40%;
-     }
- 
-     &.size-small {
-       --padding-y: #{$x1};
-       --padding-x: #{$x1_5};
- 
-       .button-text {
-         font-size: #{$x1_5};
-         line-height: #{$x2};
-       }
- 
+       cursor: not-allowed;
+
+       // not the button itself: that would isolate it
+       &::before,
+       &::after,
        .button-inner-container {
-         gap: #{$x0_5};
+         opacity: 0.4;
        }
-       
-       @include media('>mobile') {
-         --padding-y: #{$x0_5};
-         --padding-x: #{$x1};
- 
-         .button-inner-container {
-           gap: #{$x0_5};
-         }
+
+       // pressed + disabled: the hover layer stays, faded like the rest
+       &[aria-pressed="true"] .button-hover-layer {
+         opacity: 0.4;
        }
      }
- 
-     &.size-medium {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x1_5};
-         line-height: #{$x2};
+
+     @media (prefers-reduced-motion: reduce) {
+       &,
+       .button-hover-layer,
+       .button-icon,
+       [class^="icon-"] {
+         transition: none;
        }
- 
-       @include media('>mobile') {
-         --padding-y: #{$x1};
-         --padding-x: #{$x1_5};
+
+       .button-hover-layer {
+         transform: none;
        }
-     }
- 
-     &.size-large {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x1_75};
-         line-height: #{$x2};
-       }
-     }
- 
-     &.size-extra-large {
-       --padding-y: #{$x1_5};
-       --padding-x: #{$x2};
- 
-       .button-text {
-         font-size: #{$x2};
-         line-height: #{$x2};
-       }
- 
-       @include media('>mobile') {
-         --padding-y: #{$x2};
-         --padding-x: #{$x2_5};
-       }
-     }
- 
-     &.has-icon-left {
-       padding-left: var(--padding-y);
      }
    }
  
    // ====================== MODIFIERS - Sizes ======================
- 
+   // One size set for every type: the same size gives the same footprint whatever the type.
+   // Height = 2 * --padding-y + --label-height (mobile / desktop):
+   //   small 32 / 24px · medium 40 / 32px · large 40 / 40px · extra-large 40 / 48px
+
    &.size-small {
+     --padding-y: #{$x1};
+     --padding-x: #{$x1_5};
+     --text-size: #{$x1_5};
+
+     .button-inner-container {
+       gap: #{$x0_5};
+     }
+
      @include media('>mobile') {
-       --padding-y: #{$x1};
-       --padding-x: #{$x2};
+       --padding-y: #{$x0_5};
+       --padding-x: #{$x1};
      }
    }
- 
-   &.size-medium { /* default button size */ }
- 
+
+   &.size-medium { /* default button size, the base values */ }
+
    &.size-large {
-     --padding-y: #{$x2};
-     --padding-x: #{$x3};
- 
+     --padding-y: #{$x1_5};
+     --padding-x: #{$x2};
+     --text-size: #{$x1_75};
+   }
+
+   &.size-extra-large {
+     --padding-y: #{$x1_5};
+     --padding-x: #{$x2};
+     --text-size: #{$x2};
+
      @include media('>mobile') {
-       --padding-y: #{$x2_5};
-       --padding-x: #{$x4};
-       --letter-spacing: 0.02em;
-       --label-height: #{$x2_5};
+       --padding-y: #{$x2};
+       --padding-x: #{$x2_5};
      }
    }
  
    // ====================== MODIFIERS - Shapes ======================
  
    &.shape-round {
-     --border-radius: #{$x3};
+     --border-radius: #{$rounded-border-radius};
+     // pills and round icon buttons stay truly round
+     corner-shape: round;
    }
  
    // ====================== MODIFIERS - Layout ======================
@@ -356,45 +482,31 @@
    // Opt-in only (textWrap="wrap"): every rule is scoped to this class so the default single-line button is untouched.
 
    &.button-text-wrap {
-     max-width: 100%;
+     // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
+     height: auto;
+     min-height: calc(2 * var(--padding-y) + var(--label-height));
 
      &:not(.button-muted) {
-       // Grow with the label instead of the fixed single-line height; a single line keeps the default height.
-       height: auto;
-       min-height: calc(2 * var(--padding-y) + var(--label-height));
-       // Absorbs the (max #{$x0_125}) border of some variants, so min-height alone drives the single-line height
+       // Absorbs the #{$x0_125} border of the bordered types, so min-height alone drives the single-line height
        padding-top: calc(var(--padding-y) - #{$x0_125});
        padding-bottom: calc(var(--padding-y) - #{$x0_125});
-
-       .button-text {
-         // Offsets the extra 7px of the label line-height so a single line renders at the default button height
-         margin-block: -3.5px;
-       }
-
-       // Icons taller than the label (iconHasCircle, large / on-hover icons) overflow symmetrically, as with the fixed height
-       .button-inner-container > :not(.button-text) {
-         display: flex;
-         align-items: center;
-         height: var(--label-height);
-       }
-
-       .icon-on-hover-container {
-         min-height: var(--label-height);
-       }
      }
 
-     &.button-muted .button-text {
-       // Adds leading between wrapped lines, offset so a single line keeps the default muted height
+     .button-text {
+       // Adds leading between wrapped lines, offset so a single line keeps the default height
        line-height: calc(#{$x2} + #{$x0_5});
        margin-block: -#{$x0_25};
      }
 
-     .button-inner-container {
-       min-width: 0;
+     // Icons taller than the label (iconHasCircle, large / on-hover icons) overflow symmetrically, as with the fixed height
+     .button-inner-container > :not(.button-text) {
+       display: flex;
+       align-items: center;
+       height: var(--label-height);
+     }
 
-       > :not(.button-text) {
-         flex-shrink: 0;
-       }
+     .icon-on-hover-container {
+       min-height: var(--label-height);
      }
 
      .button-text {
