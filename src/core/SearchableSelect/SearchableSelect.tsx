@@ -111,6 +111,9 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
             // Override MUI's static z-index so the menu stacks above any
             // modal/drawer it was opened from (see OverlayStackingService).
             slotProps: { root: { style: { zIndex: menuZIndex } } },
+            // The menu portals to <body>, outside `.vanguard-searchable-select-input`,
+            // so this class is what scopes the menu rules in SearchableSelect.scss.
+            className: 'vanguard-searchable-select-menu',
           }}
           style={isOpen ? { background: 'var(--n000)' } : { background: 'transparent' }}
           ref={inputRef}
