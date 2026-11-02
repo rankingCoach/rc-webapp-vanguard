@@ -1,0 +1,207 @@
+@import '@styles/color-functions';
+
+// The pull tab (useSplitViewResize), ported from the mocks' ChatWindow.module.css: the grab area (col-resize), a 12px
+// strip down the right panel's visible left edge plus, while the tab shows, a 16px safe area round it on the panel's
+// side; and the tab drawn in it as two solid halves joined in the middle, so it can bend, faded together on __tab (--tab-alpha) so
+// their overlap never doubles up; 8px thick, a scrollbar's width. Two keys: the pointer coming near (data-near) grows
+// it in from a short stub to full size in one continuous ease-out move that overshoots a little, then settles; from
+// then on its height holds (on the edge and dragging it only darkens) until the fold into the chevron, which shrinks
+// it first, the anticipation. The pointer is a magnet: near the edge the tab is drawn towards it, at most 6px across
+// and 6px up or down (--mag-x / --mag-y, on `translate`, easing apart from the drag's `transform`). Dragged, it sits 8px
+// to the side it's pulled towards and, past a limit, trails the pointer further (--tab-x), still following it up and
+// down. Pulled well past the narrowest and held, the halves fold into a chevron (armed): letting go closes.
+//
+// It lives on the edge rail (.SplitView-edge-rail), not in the panel: the panel scrolls and clips, the tab straddles
+// its edge. --edge-offset (set inline) is where the visible edge sits inside the rail, px.
+.SplitView-resize-handle {
+  --len: 6px; // each half's length: hidden, a short stub to grow from
+  --thick: 8px;
+  --bend: 0deg;
+  --tab-color: var(--fn-bg-disabled);
+  --tab-alpha: 0;
+  --tab-ease: cubic-bezier(0.34, 1.56, 0.64, 1); // ease-out that overshoots a little, then settles
+  --grow: 420ms;
+  // The grab area, in two parts of one element: a 12px strip down the whole edge (this box), and the tab where it
+  // rests (8 × 68px, shown) with a 16px safe area above, below and on the panel's side (::before). The safe area
+  // doesn't follow the magnet; 16px covers the tab's 6px drift. Towards the left panel it stops where the strip does:
+  // the left panel's scrollbar runs down that edge, and its thumb must stay grabbable in the middle too. A pointer on
+  // the tab there is still on the strip: the magnet draws the tab only 0.4px per px towards it
+  --edge: 12px;
+  --safe: 16px;
+  --tab-w: 8px;
+  --tab-h: 68px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--edge-offset, 0px) - var(--edge) / 2);
+  width: var(--edge);
+  cursor: col-resize;
+  touch-action: none;
+
+  // The safe area round the tab: part of the handle, so it grabs, hovers and drags like the strip. Only while the tab
+  // shows: hidden, there's no grab area to see, so only the strip takes the pointer
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(50% - var(--tab-h) / 2 - var(--safe));
+    left: 0;
+    width: calc(var(--edge) / 2 + var(--tab-w) / 2 + var(--safe));
+    height: calc(var(--tab-h) + var(--safe) * 2);
+    pointer-events: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  // Shown (the pointer near, on it, or dragging): one height throughout. It grows in once, overshooting a little
+  // and settling; the only other change of size is the fold into the chevron
+  &[data-near='true'],
+  &[data-tab='hover'],
+  &[data-tab='drag'],
+  &:focus-visible {
+    --len: 34px;
+    --tab-alpha: 0.6;
+  }
+
+  &[data-near='true'],
+  &[data-tab='hover'],
+  &[data-tab='drag'],
+  &[data-tab='armed'],
+  &:focus-visible {
+    &::before {
+      pointer-events: auto;
+    }
+  }
+
+  // On it, or dragging: only darker
+  &[data-tab='hover'],
+  &:focus-visible {
+    --tab-color: var(--fn-fg-light);
+    --tab-alpha: 0.5;
+  }
+
+  &[data-tab='drag'] {
+    --tab-color: var(--fn-fg-light);
+    --tab-alpha: 0.6;
+  }
+
+  &[data-tab='armed'] {
+    --len: 20px;
+    --bend: 38deg;
+    --tab-color: var(--fn-fg-light);
+    // Solid: the circle behind it (__circle) mustn't show through
+    --tab-alpha: 1;
+  }
+
+  &:focus-visible:not([data-tab='drag'], [data-tab='armed']) {
+    --tab-color: var(--fn-bg-cta);
+    --tab-alpha: 1;
+  }
+
+  // The joint: the halves meet here, at the middle of the edge, moved by --tab-x
+  &__tab {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(var(--tab-x, 0px));
+    // The magnet: drawn towards the pointer, on its own property so it eases apart from the drag's lean
+    translate: var(--mag-x, 0px) var(--mag-y, 0px);
+    opacity: var(--tab-alpha);
+    transition:
+      transform 220ms var(--tab-ease),
+      translate 180ms cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 200ms ease;
+  }
+
+  &[data-tab='drag'] .SplitView-resize-handle__tab,
+  &[data-tab='armed'] .SplitView-resize-handle__tab {
+    transition-duration: 160ms, 160ms;
+  }
+
+  &__top,
+  &__bottom {
+    position: absolute;
+    left: calc(var(--thick) / -2);
+    width: var(--thick);
+    height: calc(var(--len) + var(--thick) / 2);
+    border-radius: calc(var(--thick) / 2);
+    background: var(--tab-color);
+    transition:
+      height var(--grow) var(--tab-ease),
+      width 200ms ease,
+      left 200ms ease,
+      background-color 200ms ease,
+      rotate 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  // Arming: the anticipation — it shrinks first, then folds into the chevron, springing a little.
+  // (Disarming takes the rule above: it straightens and grows back at once.)
+  &[data-tab='armed'] :is(.SplitView-resize-handle__top, .SplitView-resize-handle__bottom) {
+    transition:
+      height 160ms cubic-bezier(0.32, 0.72, 0, 1),
+      width 200ms ease,
+      left 200ms ease,
+      background-color 200ms ease,
+      rotate 280ms var(--tab-ease) 100ms;
+  }
+
+  // Armed: a circle grows out of the arrow's tip (the joint) behind it, until it envelops the chevron, so the
+  // arrow reads as a button over whatever's behind (a photo). 56px, centred 7px left of the tip, the chevron's
+  // middle (its arms reach ~15px left of the tip); it grows from the tip, and shrinks back into it on disarming.
+  &__circle {
+    --d: 56px;
+    --shift: 7px;
+    position: absolute;
+    top: calc(var(--d) / -2);
+    left: calc(var(--d) / -2 - var(--shift));
+    width: var(--d);
+    height: var(--d);
+    border-radius: 50%;
+    background: var(--fn-bg);
+    box-shadow:
+      0 2px 10px rc_transparent(--fn-shadow, 0.14),
+      0 0 0 1px rc_transparent(--fn-shadow, 0.04);
+    transform-origin: calc(var(--d) / 2 + var(--shift)) 50%;
+    scale: 0;
+    transition: scale 180ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  &[data-tab='armed'] .SplitView-resize-handle__circle {
+    scale: 1;
+    // With the fold, after the anticipation
+    transition: scale 360ms var(--tab-ease) 100ms;
+  }
+
+  // Up from the joint; folding, its top end swings left (the chevron's upper arm)
+  &__top {
+    bottom: calc(var(--thick) / -2);
+    transform-origin: 50% calc(100% - var(--thick) / 2);
+    rotate: calc(var(--bend) * -1);
+  }
+
+  // Down from the joint; folding, its bottom end swings left
+  &__bottom {
+    top: calc(var(--thick) / -2);
+    transform-origin: 50% calc(var(--thick) / 2);
+    rotate: var(--bend);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .SplitView-resize-handle {
+    --tab-ease: ease;
+  }
+
+  .SplitView-resize-handle__tab,
+  .SplitView-resize-handle__top,
+  .SplitView-resize-handle__bottom,
+  .SplitView-resize-handle__circle,
+  .SplitView-resize-handle[data-tab='armed']
+    :is(.SplitView-resize-handle__top, .SplitView-resize-handle__bottom, .SplitView-resize-handle__circle) {
+    transition-duration: 120ms;
+    transition-delay: 0s;
+  }
+}

@@ -1,10 +1,12 @@
 import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { classNames } from '@helpers/classNames';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { a, useSpring } from 'react-spring';
 
-import type { ModalSplitViewCollapseToggle, SplitViewElement } from '../ModalSplitView';
+import type { ModalSplitViewCollapseToggle, ModalSplitViewResize, SplitViewElement } from '../ModalSplitView';
 import { SplitViewCollapseFab } from '../SplitViewCollapseFab';
+import { SplitViewResizeHandle } from '../SplitViewResizeHandle';
+import { useSplitViewResize } from '../use-split-view-resize';
 
 interface ModalSplitViewRightOverlayProps {
   elements: [SplitViewElement, SplitViewElement];
@@ -21,10 +23,15 @@ interface ModalSplitViewRightOverlayProps {
    * Trades a per-frame reflow for one reflow at slide end.
    */
   animateOnSlideEnd?: boolean;
+  /**
+   * Opt-in (default off → behaviour unchanged), only with `animateOnSlideEnd` on desktop. A drag handle on the right
+   * panel's left edge, carried with the FAB by an edge rail. See {@link ModalSplitViewResize}.
+   */
+  resize?: ModalSplitViewResize;
 }
 
 export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProps) => {
-  const { elements, isContracted, autoCloseWidth, bottomMargin, animateOnSlideEnd, collapseToggle } = props;
+  const { elements, isContracted, autoCloseWidth, bottomMargin, animateOnSlideEnd, collapseToggle, resize } = props;
 
   const [firstElement, secondElement] = elements;
   const width = useWindowResize();
@@ -33,6 +40,21 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
   const isOpen = autoCloseWidth < width && isContracted;
 
   const slideEnabled = animateOnSlideEnd === true && !isMobile;
+
+  // Honoured only where the right panel slides in as an overlay on desktop; everywhere else the split is as it always was.
+  // The hook gets `resize` as given all the same, so the dragged width and `resetKey` outlast a trip to mobile and back.
+  const activeResize = slideEnabled ? resize : undefined;
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const splitResize = useSplitViewResize({ resize, honoured: slideEnabled, isOpen, panelRef: rightPanelRef });
+  // The dragged width, px (null: the consumer's default). The CSS clamp keeps it valid while the window shrinks,
+  // without a render.
+  const draggedWidth = activeResize ? splitResize.width : null;
+  const rightWidth =
+    activeResize && draggedWidth !== null
+      ? `clamp(${activeResize.minWidth}px, ${draggedWidth}px, calc(100% - ${activeResize.minOtherWidth}px))`
+      : secondElement?.fullWidth;
+  const leftContractedWidth =
+    activeResize && draggedWidth !== null ? `calc(100% - ${rightWidth})` : firstElement?.contractedWidth;
 
   // When sliding the right panel as an overlay, the left panel resizes only once the slide ends.
   // `isLeftResized` flips to true on the open slide's onRest, and back to false the instant a close
@@ -79,10 +101,12 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
     },
   });
 
+  // While the edge is dragged the consumer's own transitions (a width morph in the panel) can stand aside from this class.
   const rightClassName = classNames(
     'SplitView-right-component',
     isMobile ? 'SplitView-right-component--overlay' : undefined,
     isMobile && bottomMargin ? 'SplitView-right-component--with-bottom-margin' : undefined,
+    splitResize.resizing ? 'SplitView-right-component--resizing' : undefined,
   );
 
   const rightStyle = isMobile
@@ -95,8 +119,8 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
       }
     : slideEnabled
       ? {
-          left: firstElement?.contractedWidth,
-          width: secondElement?.fullWidth,
+          left: leftContractedWidth,
+          width: rightWidth,
           opacity: secondElementSpring.opacity,
           // Slide the right panel on top of the static-width left panel, so the left panel does not
           // reflow during the slide — it resizes once on onRest.
@@ -109,22 +133,54 @@ export const ModalSplitViewRightOverlay = (props: ModalSplitViewRightOverlayProp
           opacity: secondElementSpring.opacity,
         };
 
+  // The left panel's width spring keeps the consumer's widths: react-spring reads a string number by number and throws
+  // ('The arity of each "output" value must be equal') when the next one has fewer, which a calc() back to '100%'
+  // does, `immediate` or not. The dragged split goes over it as a plain style, in step with the right panel.
+  const leftDragged = activeResize !== undefined && draggedWidth !== null && isLeftResized;
+
   return (
     <>
       <a.div
         className={classNames('SplitView-left-component')}
         style={{
           ...firstElementSlidingProps,
+          ...(leftDragged ? { width: leftContractedWidth } : undefined),
         }}
+        {...(activeResize ? splitResize.panelProps : undefined)}
       >
         {firstElement?.component}
       </a.div>
 
-      <a.div className={rightClassName} style={rightStyle}>
+      <a.div
+        ref={rightPanelRef}
+        id={activeResize ? splitResize.panelId : undefined}
+        className={rightClassName}
+        style={rightStyle}
+        {...(activeResize ? splitResize.panelProps : undefined)}
+      >
         {secondElement?.component}
       </a.div>
 
-      {collapseToggle && !isMobile && (
+      {activeResize && (
+        // The edge rail: the right panel's left, width and slide (the same spring), so the tab and the FAB ride the slide
+        // and, off the panel that scrolls and clips, aren't clipped. With resize on, the FAB is only the way back while
+        // closed: open, the tab and the consumer's own close do it.
+        <a.div
+          className="SplitView-edge-rail"
+          style={{ left: leftContractedWidth, width: rightWidth, transform: secondElementSpring.transform }}
+        >
+          <SplitViewResizeHandle
+            tab={splitResize.tab}
+            tabX={splitResize.tabX}
+            edgeOffset={activeResize.edgeOffset ?? 0}
+            inert={!isOpen}
+            handleProps={splitResize.handleProps}
+          />
+          {collapseToggle && !isOpen && <SplitViewCollapseFab collapseToggle={collapseToggle} isOpen={isOpen} />}
+        </a.div>
+      )}
+
+      {collapseToggle && !isMobile && !activeResize && (
         <SplitViewCollapseFab collapseToggle={collapseToggle} isOpen={isOpen} animatedLeft={secondElementSpring.fabLeft} />
       )}
     </>
