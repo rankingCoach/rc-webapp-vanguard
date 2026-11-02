@@ -13,6 +13,12 @@ export type { ModalResponseHandler, StandardModalProps } from './ModalRoot/Modal
 export { ModalRoot } from './ModalRoot/ModalRoot';
 export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './ModalService';
 export { ModalService } from './ModalService';
+export type {
+  ModalSplitViewCollapseMode,
+  ModalSplitViewCollapseToggle,
+  ModalSplitViewResize,
+  SplitViewElement,
+} from './ModalSplitView/ModalSplitView';
 export { ModalSplitView } from './ModalSplitView/ModalSplitView';
 export type { Step } from './ModalStepper/ModalStepper';
 export { ModalStepper } from './ModalStepper/ModalStepper';

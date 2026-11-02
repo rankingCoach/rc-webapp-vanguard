@@ -66,3 +66,19 @@
     background: var(--fn-bg-hov-n-gl);
   }
 }
+
+// Edge rail (opt-in via `resize`): rides the right panel's left edge on the panel's own slide spring (same left, width
+// and transform), but, unlike the panel, doesn't scroll or clip, so what straddles that edge stays whole: the pull tab
+// (resize handle) and the FAB (half off the screen while collapsed). It takes no pointer itself, only they do.
+.SplitView-edge-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 5;
+  overflow: visible;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}

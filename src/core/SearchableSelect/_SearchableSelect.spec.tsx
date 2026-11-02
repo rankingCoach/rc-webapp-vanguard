@@ -60,4 +60,14 @@ describe('SearchableSelect component tests', () => {
     const input = await screen.findByTestId('vanguard-searchable-select-input');
     expect(input.textContent?.split(ZERO_WIDTH_SPACE).join('').trim()).toBe('marvel.com');
   });
+
+  test('scopes the menu styles with a dedicated class on the menu root', async () => {
+    const options = makeOptions(['grenierbrasserie.com', 'marvel.com', 'vertigo-imprint.com']);
+    render(<SearchableSelect options={options} />);
+    await openSelect();
+
+    const menu = (await screen.findByRole('listbox')).closest('.vanguard-searchable-select-menu');
+    expect(menu).not.toBeNull();
+    expect(menu?.querySelector('.MuiMenu-paper')).not.toBeNull();
+  });
 });

@@ -131,6 +131,24 @@ export const clearAndInputAndBlur = async (input: HTMLElement, value: string, de
   await userEvent.tab(); // Blur to trigger validation
 };
 
+// Number input helpers
+export const dispatchBeforeInput = (
+  input: HTMLInputElement,
+  inputType: string,
+  data: string,
+  cancelable: boolean = true,
+): boolean => {
+  const event = new InputEvent('beforeinput', { inputType, data, cancelable, bubbles: true });
+  input.dispatchEvent(event);
+  return event.defaultPrevented;
+};
+
+// Real browser editing (unlike userEvent): a lone "-" gets badInput like a user-typed one
+export const nativeInsert = (input: HTMLInputElement, text: string): void => {
+  input.focus();
+  document.execCommand('insertText', false, text);
+};
+
 // Variable replacement helper
 const replaceVariablePatterns = (text: string, variables: Record<string, string | number> = {}) => {
   let pattern = text;

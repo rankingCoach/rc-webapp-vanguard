@@ -8,6 +8,7 @@ import { classNames } from '@helpers/classNames';
 import { debounce } from '@helpers/debounce';
 import { uuidv4 } from '@helpers/generate-uid';
 import { preventInput } from '@helpers/input-preventions/prevent-input';
+import { isBlockedNumericKey } from '@helpers/input-preventions/prevent-numeric-input';
 import { sanitizeHtml } from '@helpers/sanitize-html';
 import { highlightedTextMaxLength } from '@helpers/string-helpers';
 import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
@@ -22,6 +23,8 @@ import { Popover } from '@vanguard/Popover/Popover';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
+
+import { useNumberInputGuard } from './use-number-input-guard';
 
 /**
  * Props: Value
@@ -314,6 +317,13 @@ export const InputBase = (props: rcInputBaseProps) => {
   // Release the slot if the input unmounts while the menu is still open.
   useEffect(() => () => OverlayStackingService.unregister(selectMenuIdRef.current), []);
 
+  // A number input reports value="" for an invalid intermediate (e.g. a lone
+  // "-"), which makes MUI drop the floating label onto that character. Track
+  // badInput so we can keep the label shrunk while such a value is shown.
+  const [numberHasBadInput, setNumberHasBadInput] = useState(false);
+
+  useNumberInputGuard(inputRef, formFieldType === 'InputNumber');
+
   // Highlights backdrop
   const useBackdrop = Boolean(highlightLengthExceeded || highlightWords || highlightUrl || prohibitedWords);
   const backDropRef = useRef<HTMLDivElement>(null);
@@ -444,6 +454,7 @@ export const InputBase = (props: rcInputBaseProps) => {
     if (!label) return { shrink: true, style: labelStyle };
     if (labelType === 'static') return { shrink: true, style: labelStyle };
     if (labelType === 'outer') return { shrink: true, style: labelStyle };
+    if (formFieldType === 'InputNumber' && numberHasBadInput) return { shrink: true, style: labelStyle };
     return null;
   };
 
@@ -786,11 +797,19 @@ export const InputBase = (props: rcInputBaseProps) => {
       e.preventDefault();
     }
 
+    const isShortcut = e.ctrlKey || e.metaKey || e.altKey;
+    if (formFieldType === 'InputNumber' && !isShortcut && isBlockedNumericKey(e.key)) {
+      e.preventDefault();
+    }
+
     preventInput(e, formconfig, value as any);
   };
 
   const onInputFn = (e: React.FormEvent<HTMLDivElement>) => {
     onInput && onInput(e);
+    if (formFieldType === 'InputNumber') {
+      setNumberHasBadInput(!!inputRef.current?.validity?.badInput);
+    }
   };
   const onClickFn = (e: React.MouseEvent) => {
     onClick && onClick(e);

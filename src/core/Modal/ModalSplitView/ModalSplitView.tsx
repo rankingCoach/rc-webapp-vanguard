@@ -24,6 +24,33 @@ export interface ModalSplitViewCollapseToggle {
   verticalPositionPercent?: number;
 }
 
+/**
+ * Opt-in (right-overlay with animateOnSlideEnd, desktop only): the right panel's left edge drags to resize it, and
+ * pulled past `minWidth`, held and let go, closes it through `onCloseByDrag`.
+ *
+ * The panels' own widths (`elements`) are the default split: they should add up to 100%. Once dragged, the right panel
+ * keeps its width in px (clamped between `minWidth` and the split's width less `minOtherWidth`) until `resetKey`
+ * changes, a double click, or a close by drag; then it opens at the default again.
+ *
+ * With `collapseToggle`, the divider FAB then shows only while the panel is closed (the way back): open, it would sit on
+ * the edge with the drag handle. Give the right panel a close control of its own; the close by drag isn't one anyone
+ * can find or reach from the keyboard.
+ */
+export interface ModalSplitViewResize {
+  /** Narrowest right panel, px. */
+  minWidth: number;
+  /** What the left panel keeps beside the widest right panel, px. */
+  minOtherWidth: number;
+  /** Where the visible edge sits inside the right panel, px (a boxed panel's inset). Default 0. */
+  edgeOffset?: number;
+  /** A new value drops the dragged width, so the panel opens at its default again. */
+  resetKey?: string | number;
+  /** The panel was pulled past `minWidth`, held and let go: close it (the consumer owns `isContracted`). */
+  onCloseByDrag: () => void;
+  /** Accessible label of the drag handle. */
+  ariaLabel: string;
+}
+
 export type SplitViewElement =
   | {
       component: React.ReactNode;
@@ -51,6 +78,11 @@ interface ModalSplitViewProps {
   animateOnSlideEnd?: boolean;
   /** Optional round divider FAB (right-overlay desktop only). See {@link ModalSplitViewCollapseToggle}. */
   collapseToggle?: ModalSplitViewCollapseToggle;
+  /**
+   * Opt-in, `right-overlay` + `animateOnSlideEnd` desktop only (default off → behaviour unchanged). A drag handle on
+   * the right panel's left edge. See {@link ModalSplitViewResize}.
+   */
+  resize?: ModalSplitViewResize;
 }
 
 export const ModalSplitView = (props: ModalSplitViewProps) => {
@@ -62,6 +94,7 @@ export const ModalSplitView = (props: ModalSplitViewProps) => {
     bottomMargin,
     animateOnSlideEnd,
     collapseToggle,
+    resize,
   } = props;
 
   if (collapseMode === 'right-overlay') {
@@ -73,6 +106,7 @@ export const ModalSplitView = (props: ModalSplitViewProps) => {
         bottomMargin={bottomMargin}
         animateOnSlideEnd={animateOnSlideEnd}
         collapseToggle={collapseToggle}
+        resize={resize}
       />
     );
   }
