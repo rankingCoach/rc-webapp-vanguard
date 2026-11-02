@@ -278,6 +278,9 @@ importers:
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+      typescript5:
+        specifier: npm:typescript@5.9.3
+        version: typescript@5.9.3
       video.js:
         specifier: 7.17.3
         version: 7.17.3

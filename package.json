@@ -228,6 +228,7 @@
     "tiny-emitter": "2.1.0",
     "ts-alias": "0.0.7",
     "typescript": "7.0.2",
+    "typescript5": "npm:typescript@5.9.3",
     "video.js": "7.17.3",
     "videojs-youtube": "3.0.1",
     "vite": "6.3.5",

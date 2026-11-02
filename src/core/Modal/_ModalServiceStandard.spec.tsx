@@ -71,7 +71,7 @@ describe('openConfirmModal', () => {
       'Positional message',
       'Positive',
       'Negative',
-      'warning',
+      'warn',
       'icon-warning' as any,
       { a: '1' },
       true,
@@ -83,7 +83,7 @@ describe('openConfirmModal', () => {
     expect(component.props.message).toBe('Positional message');
     expect(component.props.positiveCtaText).toBe('Positive');
     expect(component.props.negativeCtaText).toBe('Negative');
-    expect(component.props.headerType).toBe('warning');
+    expect(component.props.headerType).toBe('warn');
     expect(component.props.positiveIconLeft).toBe('icon-warning');
     expect(component.props.replacements).toEqual({ a: '1' });
     expect(component.props.hideHeaderCloseBtn).toBe(true);
@@ -146,7 +146,7 @@ describe('openAcceptModal', () => {
       closeFn,
       'Positional title',
       'Positional message',
-      'warning',
+      'warn',
       'Positive',
       { x: '1' },
       true,
@@ -154,7 +154,7 @@ describe('openAcceptModal', () => {
     const component = ModalService.getModalComponent(modalId);
     expect(component.props.title).toBe('Positional title');
     expect(component.props.message).toBe('Positional message');
-    expect(component.props.headerType).toBe('warning');
+    expect(component.props.headerType).toBe('warn');
     expect(component.props.positiveCtaText).toBe('Positive');
     expect(component.props.replacements).toEqual({ x: '1' });
     expect(component.props.hideHeaderCloseBtn).toBe(true);
@@ -375,7 +375,7 @@ describe('WrapperModal render path (wrapInModal: true)', () => {
       title: 'Wrapped title',
       message: 'Wrapped message',
       padding: '10px',
-      type: 'warning',
+      type: 'warn',
     });
     const component = ModalService.getModalComponent(modalId);
     // The stored top-level component is now the WrapperModal, not Inner.
@@ -383,7 +383,7 @@ describe('WrapperModal render path (wrapInModal: true)', () => {
     expect(component.props.title).toBe('Wrapped title');
     expect(component.props.message).toBe('Wrapped message');
     expect(component.props.padding).toBe('10px');
-    expect(component.props.headerType).toBe('warning');
+    expect(component.props.headerType).toBe('warn');
 
     const child = component.props.children;
     expect(React.isValidElement(child)).toBe(true);

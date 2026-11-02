@@ -5,7 +5,7 @@ Vanguard — one tool, replacing ESLint + Prettier. Same setup as the webapp (`r
 ruleset; the only formatter difference is quote style — Vanguard keeps **single quotes** (translated from
 the old `.prettierrc.js`), the webapp uses double.
 
-Version is pinned in `package.json` (`@biomejs/biome` 2.5.6); editors must use the **project binary**
+Version is pinned in `package.json` (`@biomejs/biome` 2.6.4); editors must use the **project binary**
 from `node_modules`, never a globally installed one, so everyone formats identically.
 
 Prerequisite for both IDEs: `pnpm install` (installs the pinned Biome).

@@ -12,7 +12,8 @@
  *
  * Usage: node scripts/generate-exports-props.js
  */
-const ts = require('typescript');
+// typescript@7 dropped the JS compiler API this script drives; typescript5 is a devDependency alias of TS 5
+const ts = require('typescript5');
 const fs = require('fs');
 const path = require('path');
 

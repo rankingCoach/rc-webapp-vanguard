@@ -4,6 +4,8 @@
 // own TS 5 copy while the root `typescript` stays on 7. A packageExtensions
 // entry is not enough: they declare `typescript` as a peer, and pnpm resolves
 // peers from the root, so the peer has to be turned into a regular dependency.
+// This hook only rewrites dependencies' manifests; the repo's own scripts that
+// drive the API require the `typescript5` devDependency alias instead.
 const TS_API_CONSUMERS = new Set(['vite-plugin-dts', '@vue/language-core', 'vite-plugin-checker']);
 const TS_API_VERSION = '5.9.3';
 
