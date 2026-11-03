@@ -18,7 +18,8 @@
  */
 const fs = require('fs');
 const path = require('path');
-const ts = require('typescript');
+// typescript@7 dropped the JS compiler API this script drives; typescript5 is a devDependency alias of TS 5
+const ts = require('typescript5');
 
 const args = process.argv.slice(2);
 const root = args.find((a) => !a.startsWith('--') && args[args.indexOf(a) - 1] !== '--exclude');

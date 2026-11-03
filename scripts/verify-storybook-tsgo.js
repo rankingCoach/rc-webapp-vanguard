@@ -8,7 +8,7 @@ console.log('🚀 Verifying Storybook TypeScript 7 (tsgo) integration...\n');
 
 try {
   // Check if tsgo is available
-  const version = execSync('npx tsgo --version', { encoding: 'utf8' }).trim();
+  const version = execSync('npx tsc --version', { encoding: 'utf8' }).trim();
   console.log('✅ TypeScript 7 (tsgo) version:', version);
 
   // Check if our custom plugin exists
@@ -46,7 +46,7 @@ try {
   // Test type checking with tsgo on library config
   console.log('\n🔍 Testing tsgo type checking on library configuration...');
   try {
-    execSync('npx tsgo --noEmit --project tsconfig.lib.json', { 
+    execSync('npx tsc --noEmit --project tsconfig.lib.json', { 
       encoding: 'utf8',
       cwd: path.resolve(__dirname, '..')
     });

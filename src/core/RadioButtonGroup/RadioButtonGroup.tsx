@@ -8,7 +8,7 @@ import { AnimatedConditional } from '@vanguard/AnimatedConditional/AnimatedCondi
 import { Label } from '@vanguard/Label/Label';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Form } from '../Form/Form';
@@ -25,7 +25,9 @@ export interface RadioButtonGroupProps<ValueType = string> {
 
   direction?: 'row' | 'column';
   theme?: 'standard' | 'bordered' | 'success';
-  setRadioValueFn: Dispatch<SetStateAction<ValueType>>;
+  // Narrowed from Dispatch<SetStateAction<ValueType>>: the group only ever calls
+  // setRadioValueFn(radio.value) with a concrete value, never a state-updater fn.
+  setRadioValueFn: (value: ValueType) => void;
 
   formconfig?: FormConfigElement;
   testId?: string;

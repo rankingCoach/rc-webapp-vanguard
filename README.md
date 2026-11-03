@@ -229,6 +229,9 @@ When adding new components or assets:
 2. Test functionality thoroughly
 3. Update documentation as needed
 
+Linting, formatting and import sorting run through **Biome** (`biome.json`) — see
+[BIOME-EDITOR-SETUP.md](BIOME-EDITOR-SETUP.md) for editor setup and the CLI.
+
 ## 🆘 Support
 
 - **Issues**: Report problems with installation or configuration
