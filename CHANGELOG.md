@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.9.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.8.0...v2.9.0) (2026-11-03)
+
+
+### Features
+
+* add resize mode to modal split view ([8a45e94](https://github.com/rankingCoach/rc-webapp-vanguard/commit/8a45e945e992f97953b1c648809d263775d1f492))
+* bump ts version to 7 and replace eslint with biome ([69f6f7b](https://github.com/rankingCoach/rc-webapp-vanguard/commit/69f6f7bc05365912ad5b94ce9f89ccc66fe75a7d))
+
+
+### Bug Fixes
+
+*  correct boundary type contracts that forced as-any casts in webapp ([6e76489](https://github.com/rankingCoach/rc-webapp-vanguard/commit/6e76489587201d2544aa70a3ea724405bed9a024))
+* button story type error and biome version bump ([39c4bff](https://github.com/rankingCoach/rc-webapp-vanguard/commit/39c4bff01298964e88ea8124191d782270c3b2d6))
+* **input:** block invalid characters in number inputs ([2bf3b9a](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2bf3b9a49665ca68245b5705161b5da339600eac)), closes [#VAN-66](https://github.com/rankingCoach/rc-webapp-vanguard/issues/VAN-66)
+* **input:** decide number sign/e guard on beforeinput (VAN-66) ([a4cf5f6](https://github.com/rankingCoach/rc-webapp-vanguard/commit/a4cf5f6a4e133301d79d66e75b7f2a13d85ff135))
+* **modal-split-view:** track split edge mid-drag, add aria-controls, export types ([ca8188d](https://github.com/rankingCoach/rc-webapp-vanguard/commit/ca8188d0108fcb7de94c4c3b3482aa3961808323))
+* scope MUI menu styles to the component ([bb6f0c1](https://github.com/rankingCoach/rc-webapp-vanguard/commit/bb6f0c1e14aae0cc95820e6267ecbaf4a712c586))
+* tests not working and fix errors ([0479cb5](https://github.com/rankingCoach/rc-webapp-vanguard/commit/0479cb540a21217f8c75325ce482beb2936153de))
+
 ## [2.8.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.7.0...v2.8.0) (2026-10-27)
 
 
