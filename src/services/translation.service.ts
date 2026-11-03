@@ -36,20 +36,19 @@ class TranslationService {
     let wasTranslated = false;
     let value = key;
 
-    const hasTranslationKey = typeof rcWindow.TranslationsData !== 'undefined' && key in rcWindow.TranslationsData;
+    const hasTranslationKey =
+      typeof rcWindow.TranslationsData !== 'undefined' &&
+      (key in rcWindow.TranslationsData || `${key}_other` in rcWindow.TranslationsData);
 
-    if (typeof rcWindow.TranslationsData !== 'undefined' && rcWindow.TranslationsData[key]) {
+    // English has no ONE value (the key is its text), so its MANY value is exported as `<key>_other` without `<key>`.
+    const variantKey = context === 'other' && rcWindow.TranslationsData?.[`${key}_other`] ? `${key}_other` : key;
+
+    if (typeof rcWindow.TranslationsData !== 'undefined' && rcWindow.TranslationsData[variantKey]) {
       wasTranslated = true;
-
-      if (context === 'other' && rcWindow.TranslationsData[`${key}_other`]) {
-        if (writingStyle === 'impersonal' && rcWindow.TranslationsData[`${key}_other` + '_impersonal'])
-          value = rcWindow.TranslationsData[`${key}_other` + '_impersonal'];
-        else value = rcWindow.TranslationsData[`${key}_other`];
-      } else {
-        if (writingStyle === 'impersonal' && rcWindow.TranslationsData[`${key}_impersonal`])
-          value = rcWindow.TranslationsData[`${key}_impersonal`];
-        else value = rcWindow.TranslationsData[key];
-      }
+      value =
+        writingStyle === 'impersonal' && rcWindow.TranslationsData[`${variantKey}_impersonal`]
+          ? rcWindow.TranslationsData[`${variantKey}_impersonal`]
+          : rcWindow.TranslationsData[variantKey];
     }
 
     if (replacements && typeof replacements === 'object') {
