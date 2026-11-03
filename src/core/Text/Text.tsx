@@ -142,6 +142,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
       value: parsed,
       fixedValue: parsed,
       wasTranslated: translation.wasTranslated,
+      hasTranslationKey: translation.hasTranslationKey,
       // include other properties from the translation object as needed
     };
   }, [replacements, children, context, writingStyle, links]);

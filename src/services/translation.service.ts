@@ -36,7 +36,9 @@ class TranslationService {
     let wasTranslated = false;
     let value = key;
 
-    const hasTranslationKey = typeof rcWindow.TranslationsData !== 'undefined' && key in rcWindow.TranslationsData;
+    const hasTranslationKey =
+      typeof rcWindow.TranslationsData !== 'undefined' &&
+      (key in rcWindow.TranslationsData || `${key}_other` in rcWindow.TranslationsData);
 
     // English has no ONE value (the key is its text), so its MANY value is exported as `<key>_other` without `<key>`.
     const variantKey = context === 'other' && rcWindow.TranslationsData?.[`${key}_other`] ? `${key}_other` : key;

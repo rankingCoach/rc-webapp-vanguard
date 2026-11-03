@@ -21,3 +21,20 @@ describe('translationService.get plural context', () => {
     expect(translationService.get(KEY, { count: 53 }, 'other').value).toBe('53 Bewertung ohne Antwort.');
   });
 });
+
+describe('translationService.get hasTranslationKey', () => {
+  afterEach(() => {
+    delete rcWindow.TranslationsData;
+  });
+
+  it('reports the key as existing when only its MANY value is exported (English)', () => {
+    rcWindow.TranslationsData = { [`${KEY}_other`]: '%count% reviews without a reply.' };
+    expect(translationService.get(KEY, { count: 53 }, 'other').hasTranslationKey).toBe(true);
+    expect(translationService.get(KEY, { count: 1 }, 'one').hasTranslationKey).toBe(true);
+  });
+
+  it('reports a key with neither value as missing', () => {
+    rcWindow.TranslationsData = {};
+    expect(translationService.get(KEY, { count: 53 }, 'other').hasTranslationKey).toBe(false);
+  });
+});
