@@ -1,5 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { Keyword } from '@models/swagger/App/Domain/Common/Entities/Keywords/Keyword';
+import type { AIAssistantProps } from '@vanguard/AIAssistant/AIAssistant';
 import { AIAssistantPanel } from '@vanguard/AIAssistant/AIAssistentPanel/AIAssistantPanel';
 import { useAiAssistantAdjustAndGenerate } from '@vanguard/AIAssistant/useAiAssistant-GenerateAndAdjust';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -10,10 +11,15 @@ import styles from './RteAiAssistant.module.scss';
 import { useRteAiAssistantAi } from './useRteAiAssistant-ai';
 import { useAiAssistantSelection } from './useRteAiAssistant-selection';
 
-type RteAiAssistantProps = { anchorElem: HTMLElement; keywordsToInclude: Keyword[] };
+type RteAiAssistantProps = {
+  anchorElem: HTMLElement;
+  keywordsToInclude: Keyword[];
+  /** The consumer's adjust request. Without it, the deprecated built-in request (see AIAssistant's `adjustCallback`). */
+  adjustCallback?: AIAssistantProps['adjustCallback'];
+};
 
 export const RteAiAssistant = (props: RteAiAssistantProps) => {
-  const { anchorElem, keywordsToInclude } = props;
+  const { anchorElem, keywordsToInclude, adjustCallback } = props;
 
   const [editor] = useLexicalComposerContext();
 
@@ -75,6 +81,7 @@ export const RteAiAssistant = (props: RteAiAssistantProps) => {
       useHtml: true,
       keywordsToInclude: keywordsToInclude,
       hasGenerateHashtagsAdjustOption: true,
+      adjustCallback,
     });
   const { replaceSelection } = useRteAiAssistantAi({
     editor: editor,
