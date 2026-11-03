@@ -4,7 +4,7 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-pnpmfileChecksum: sha256-DUMlWEFgVhQdzArJ6MIUbgetJvTXc8KqnVed+aDciMA=
+pnpmfileChecksum: sha256-kTUL38+k6dGYhJ9TlARsMyw2Yh0mH5VAWUOOag1s/lM=
 
 importers:
 
@@ -5216,6 +5216,7 @@ packages:
   random-string@0.2.0:
     resolution: {integrity: sha512-isA91IquV3ZrFbvwkAtExP8aGL+csx3KGEsEJrvCidzOHioPl5B5g7WyJlk0lMkEz5/i1PqrWTvcdtJHPtrp1g==}
     engines: {node: '>= 0.10.0'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
