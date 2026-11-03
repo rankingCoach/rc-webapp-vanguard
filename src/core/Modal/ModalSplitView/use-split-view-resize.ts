@@ -178,6 +178,8 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
   useEffect(() => {
     const pending = timers.current;
     return () => {
+      // Unmounted mid-drag: the drag's window listeners go with it
+      cancelDragRef.current?.();
       window.clearTimeout(pending.arm);
       window.clearTimeout(pending.lean);
     };
@@ -259,23 +261,28 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLElement>): void => {
-    if (!config || e.button !== 0) return;
+    // One drag at a time: a second pointer (another finger) down mid-drag starts nothing, takes nothing over
+    if (!config || e.button !== 0 || draggingRef.current) return;
     e.preventDefault();
     const el = e.currentTarget;
+    const { pointerId } = e;
     try {
       // The iframe a panel may hold takes the pointer's moves from the page: captured, the handle keeps them
-      el.setPointerCapture(e.pointerId);
+      el.setPointerCapture(pointerId);
     } catch {
-      // A pointer the browser doesn't know (synthetic): the strip still gets its moves while over it
+      // A pointer the browser doesn't know (synthetic): the window still hears its moves and its release (below)
     }
     const edgeOffset = config.edgeOffset ?? 0;
     // Grabbed off the edge (the strip and the safe area round the tab reach past it), the edge keeps that distance from
     // the pointer instead of jumping under it on the first move. The handle is centred on the visible edge.
     const box = el.getBoundingClientRect();
     const grabOffset = e.clientX - (box.left + box.width / 2);
+    // What Escape puts back: the width as it was before this drag (null: the default split)
+    const widthBefore = width;
     let lastX = e.clientX;
     let lean = 0;
     let isArmed = false;
+    let ended = false;
     setDragging(true);
 
     const disarm = (): void => {
@@ -290,6 +297,7 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
     // Dragging, the lean (below) moves it sideways; the magnet keeps it following the pointer up and down
     writeMagnet(handleRef.current, null, e.clientY, DRAG_TRAVEL);
     const move = (ev: globalThis.PointerEvent): void => {
+      if (ev.pointerId !== pointerId) return;
       writeMagnet(handleRef.current, null, ev.clientY, DRAG_TRAVEL);
       // The pointer is the panel's (visible) left; its right is the split's, read on every move as the limits are (the
       // window can move it mid-drag)
@@ -322,14 +330,24 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
       } else disarm();
     };
 
-    const up = (): void => {
+    /** Ends the drag, once: released armed (`close`), the panel closes; any other way, it stays. */
+    const end = (close: boolean): void => {
+      if (ended) return;
+      ended = true;
       cancelDragRef.current = null;
-      el.removeEventListener('pointermove', move);
-      el.removeEventListener('pointerup', up);
-      el.removeEventListener('pointercancel', cancel);
-      el.removeEventListener('lostpointercapture', cancel);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onPointerCancel);
+      window.removeEventListener('keydown', onEscape, true);
+      el.removeEventListener('lostpointercapture', onLostCapture);
+      // Ended with the pointer still down (Escape, going off): the handle gives it back. Its listener is gone first, so
+      // the lostpointercapture this fires ends nothing twice.
+      try {
+        if (el.hasPointerCapture?.(pointerId)) el.releasePointerCapture(pointerId);
+      } catch {
+        // Not captured, or a pointer the browser no longer knows
+      }
       window.clearTimeout(timers.current.lean);
-      const close = isArmed;
       disarm();
       setDragging(false);
       setTabX(0);
@@ -342,21 +360,40 @@ export const useSplitViewResize = (options: UseSplitViewResizeOptions): UseSplit
         onCloseRef.current?.();
       }
     };
-    const cancel = (): void => {
-      disarm();
-      up();
+    const cancel = (): void => end(false);
+    // On the window, not the handle: without the capture (it can throw) a release off the handle would never reach it
+    const onUp = (ev: globalThis.PointerEvent): void => {
+      if (ev.pointerId === pointerId) end(isArmed);
     };
-    el.addEventListener('pointermove', move);
-    el.addEventListener('pointerup', up);
-    el.addEventListener('pointercancel', cancel);
+    const onPointerCancel = (ev: globalThis.PointerEvent): void => {
+      if (ev.pointerId === pointerId) cancel();
+    };
+    const onLostCapture = (ev: globalThis.PointerEvent): void => {
+      if (ev.pointerId === pointerId) cancel();
+    };
+    // Escape takes the drag back: the width as it was, no close. Heard first (the window, capturing) and kept from the
+    // modal around the split, which would otherwise close on it. Only while dragging: otherwise Escape goes its way.
+    const onEscape = (ev: KeyboardEvent): void => {
+      if (ev.key !== 'Escape') return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      cancel();
+      setWidth(widthBefore);
+    };
+
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onPointerCancel);
+    window.addEventListener('keydown', onEscape, true);
     // The capture taken from the handle (by the browser) ends the drag as a cancel would. A handle taken out of the
-    // page doesn't hear this (it's the document's then): going off (`enabled`) ends that drag
-    el.addEventListener('lostpointercapture', cancel);
+    // page doesn't hear this (it's the document's then): going off (`enabled`) or unmounting ends that drag
+    el.addEventListener('lostpointercapture', onLostCapture);
     cancelDragRef.current = cancel;
   };
 
   // Left makes the panel wider (its edge moves left), right narrower. Home / End go to the narrowest / widest: the
-  // value is the panel's width, so they're aria-valuemin / -max, as on any separator or slider
+  // value is the panel's width, so they're aria-valuemin / -max, as on any separator or slider. LTR only, as the split
+  // is (it places its panels by `left`): in RTL neither the keys nor the drag are mirrored.
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>): void => {
     if (!config) return;
     const { min, max } = limitsOf(config, panelRef.current);
