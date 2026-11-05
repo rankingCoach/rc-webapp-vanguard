@@ -2,11 +2,12 @@ import { act, cleanup, fireEvent, render } from '@test-utils/test-utils';
 import React from 'react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { Modal } from '../Modal';
 import { ModalSplitView, ModalSplitViewResize, SplitViewElement } from './ModalSplitView';
 import {
   ARM_DELAY_MS,
-  CLOSE_PULL,
   clampSplitWidth,
+  CLOSE_PULL,
   isPulledToClose,
   rubberBand,
   tabOffsetFor,
@@ -596,6 +597,169 @@ describe('ModalSplitView resize (right-overlay, animateOnSlideEnd)', () => {
       expect(right().style.width).toBe(rightWidthCss(MIN_WIDTH));
     });
 
+    test('without the pointer capture, a release anywhere still ends the drag', () => {
+      vi.mocked(Element.prototype.setPointerCapture).mockImplementationOnce(() => {
+        throw new DOMException('No active pointer', 'NotFoundError');
+      });
+      const { handle, right } = renderSplit(ui());
+      pointerDown(handle(), pointerAtWidth(750));
+      // Off the handle, over the rest of the page: it still drags…
+      fireEvent.pointerMove(document.body, { pointerId: 1, clientX: pointerAtWidth(500), clientY: 300 });
+      expect(right().style.width).toBe(rightWidthCss(500));
+      // …and let go there, it ends
+      fireEvent.pointerUp(document.body, { pointerId: 1 });
+      expect(document.body.style.cursor).toBe('');
+      expect(document.body.style.userSelect).toBe('');
+      expect(right().className).not.toContain('--resizing');
+      expect(right().style.width).toBe(rightWidthCss(500));
+    });
+
+    test("another pointer's moves and release leave the drag alone", () => {
+      const { handle, right } = renderSplit(ui());
+      pointerDown(handle(), pointerAtWidth(750));
+      pointerMove(handle(), pointerAtWidth(500));
+      fireEvent.pointerMove(document.body, { pointerId: 2, clientX: pointerAtWidth(600), clientY: 300 });
+      fireEvent.pointerUp(document.body, { pointerId: 2 });
+      fireEvent.pointerCancel(document.body, { pointerId: 2 });
+      fireEvent.lostPointerCapture(handle(), { pointerId: 2 });
+      expect(right().style.width).toBe(rightWidthCss(500));
+      expect(right().className).toContain('SplitView-right-component--resizing');
+      pointerUp(handle());
+    });
+
+    test("does not re-render the panels' content on every move", () => {
+      let renders = 0;
+      const Counted = () => {
+        renders += 1;
+        return <div>content</div>;
+      };
+      const counted: [SplitViewElement, SplitViewElement] = [
+        { ...elements[0]!, component: <Counted /> },
+        { ...elements[1]!, component: <Counted /> },
+      ];
+      const { handle, right } = renderSplit(ui({ elements: counted }));
+      const afterMount = renders;
+      expect(afterMount).toBeGreaterThanOrEqual(2);
+      pointerDown(handle(), pointerAtWidth(750));
+      // Each move flushed on its own (fireEvent acts): the split takes every width, its content renders none of them
+      for (let w = 620; w >= 440; w -= 20) {
+        pointerMove(handle(), pointerAtWidth(w));
+        expect(right().style.width).toBe(rightWidthCss(w));
+      }
+      pointerUp(handle());
+      expect(renders).toBe(afterMount);
+    });
+
+    describe("the drag's window listeners", () => {
+      const DRAG_EVENTS = ['pointermove', 'pointerup', 'pointercancel', 'keydown'];
+      const captureOf = (options: unknown) =>
+        typeof options === 'boolean' ? options : !!(options as AddEventListenerOptions | undefined)?.capture;
+      /** Watches the window from now: the drag's listeners added and not yet removed. */
+      const watchWindow = () => {
+        const add = vi.spyOn(window, 'addEventListener');
+        const remove = vi.spyOn(window, 'removeEventListener');
+        return {
+          added: () => add.mock.calls.filter(([type]) => DRAG_EVENTS.includes(type)).length,
+          live: () =>
+            add.mock.calls
+              .filter(([type]) => DRAG_EVENTS.includes(type))
+              .filter(
+                ([type, fn, options]) =>
+                  !remove.mock.calls.some(([t, f, o]) => t === type && f === fn && captureOf(o) === captureOf(options)),
+              )
+              .map(([type]) => type),
+        };
+      };
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
+      test('are all gone after a release', () => {
+        const { handle } = renderSplit(ui());
+        const watch = watchWindow();
+        pointerDown(handle(), pointerAtWidth(750));
+        expect(watch.added()).toBe(DRAG_EVENTS.length);
+        pointerUp(handle());
+        expect(watch.live()).toEqual([]);
+      });
+
+      test('are all gone after a cancel, and a second end does nothing', () => {
+        const onCloseByDrag = vi.fn();
+        const { handle } = renderSplit(ui({}, { onCloseByDrag }));
+        const watch = watchWindow();
+        pointerDown(handle(), pointerAtWidth(750));
+        fireEvent.pointerCancel(handle(), { pointerId: 1 });
+        fireEvent.lostPointerCapture(handle(), { pointerId: 1 });
+        pointerUp(handle());
+        expect(watch.live()).toEqual([]);
+        expect(onCloseByDrag).not.toHaveBeenCalled();
+      });
+
+      test('are all gone when it unmounts mid-drag', () => {
+        const { handle, unmount } = renderSplit(ui());
+        const watch = watchWindow();
+        pointerDown(handle(), pointerAtWidth(750));
+        unmount();
+        expect(watch.live()).toEqual([]);
+        // A late release on the page finds nothing to end
+        expect(() => fireEvent.pointerUp(document.body, { pointerId: 1 })).not.toThrow();
+      });
+
+      test('are all gone when it goes off mid-drag', () => {
+        const { handle } = renderSplit(ui());
+        const watch = watchWindow();
+        pointerDown(handle(), pointerAtWidth(750));
+        resizeWindow(500);
+        expect(watch.live()).toEqual([]);
+      });
+
+      test('a second pointer down mid-drag starts no second drag: the first goes on, and unmounting cleans it all', () => {
+        vi.mocked(Element.prototype.setPointerCapture).mockClear();
+        const { handle, right, unmount } = renderSplit(ui());
+        const watch = watchWindow();
+        pointerDown(handle(), pointerAtWidth(600));
+        fireEvent.pointerDown(handle(), { button: 0, pointerId: 2, clientX: pointerAtWidth(500), clientY: 300 });
+        expect(watch.added()).toBe(DRAG_EVENTS.length);
+        expect(Element.prototype.setPointerCapture).toHaveBeenCalledTimes(1);
+        expect(Element.prototype.setPointerCapture).toHaveBeenCalledWith(1);
+        // The second pointer neither resizes nor ends it…
+        fireEvent.pointerMove(document.body, { pointerId: 2, clientX: pointerAtWidth(450), clientY: 300 });
+        fireEvent.pointerUp(document.body, { pointerId: 2 });
+        expect(right().style.width).toBe('75%');
+        expect(right().className).toContain('SplitView-right-component--resizing');
+        // …the first still drags
+        pointerMove(handle(), pointerAtWidth(500));
+        expect(right().style.width).toBe(rightWidthCss(500));
+        unmount();
+        expect(watch.live()).toEqual([]);
+        expect(document.body.style.cursor).toBe('');
+        expect(document.body.style.userSelect).toBe('');
+      });
+
+      test('are all gone after Escape', () => {
+        const { handle } = renderSplit(ui());
+        const watch = watchWindow();
+        pointerDown(handle(), pointerAtWidth(750));
+        fireEvent.keyDown(document.body, { key: 'Escape' });
+        expect(watch.live()).toEqual([]);
+      });
+    });
+
+    test('a pointercancel ends it armed without closing', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      const onCloseByDrag = vi.fn();
+      const { handle, right } = renderSplit(ui({}, { onCloseByDrag }));
+      pointerDown(handle(), pointerAtWidth(750));
+      pointerMove(handle(), pointerAtWidth(MIN_WIDTH - CLOSE_PULL));
+      act(() => {
+        vi.advanceTimersByTime(ARM_DELAY_MS);
+      });
+      expect(handle().getAttribute('data-tab')).toBe('armed');
+      fireEvent.pointerCancel(document.body, { pointerId: 1 });
+      expect(onCloseByDrag).not.toHaveBeenCalled();
+      expect(right().className).not.toContain('--resizing');
+    });
+
     test('follows the split right edge when the window moves it mid-drag', () => {
       const { handle, right, root } = renderSplit(ui());
       pointerDown(handle(), pointerAtWidth(750));
@@ -808,6 +972,81 @@ describe('ModalSplitView resize (right-overlay, animateOnSlideEnd)', () => {
       panelOffsetWidth = 630;
       fireEvent.keyDown(handle(), { key: 'ArrowLeft' });
       expect(right().style.width).toBe(rightWidthCss(MAX_WIDTH));
+    });
+
+    test('Escape mid-drag puts the width back as it was before the drag, and ends it', () => {
+      const { handle, right } = renderSplit(ui());
+      dragTo(handle(), 600);
+      pointerDown(handle(), pointerAtWidth(600));
+      pointerMove(handle(), pointerAtWidth(500));
+      expect(right().style.width).toBe(rightWidthCss(500));
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+      expect(right().style.width).toBe(rightWidthCss(600));
+      expect(document.body.style.cursor).toBe('');
+      expect(right().className).not.toContain('--resizing');
+      // …and the moves after it no longer drag
+      pointerMove(handle(), pointerAtWidth(450));
+      expect(right().style.width).toBe(rightWidthCss(600));
+    });
+
+    test('Escape mid-drag goes back to the default split when it had not been dragged before', () => {
+      const { handle, right } = renderSplit(ui());
+      pointerDown(handle(), pointerAtWidth(750));
+      pointerMove(handle(), pointerAtWidth(500));
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+      expect(right().style.width).toBe('75%');
+    });
+
+    test('Escape on an armed drag does not close the panel', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      const onCloseByDrag = vi.fn();
+      const { handle } = renderSplit(ui({}, { onCloseByDrag }));
+      pointerDown(handle(), pointerAtWidth(750));
+      pointerMove(handle(), pointerAtWidth(MIN_WIDTH - CLOSE_PULL));
+      act(() => {
+        vi.advanceTimersByTime(ARM_DELAY_MS);
+      });
+      expect(handle().getAttribute('data-tab')).toBe('armed');
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+      pointerUp(handle());
+      expect(onCloseByDrag).not.toHaveBeenCalled();
+    });
+
+    test('Escape mid-drag is the drag’s alone: the modal around the split does not close on it', () => {
+      const onClose = vi.fn();
+      const { handle, right } = renderSplit(<Modal onClose={onClose}>{ui()}</Modal>);
+      pointerDown(handle(), pointerAtWidth(750));
+      fireEvent.keyDown(handle(), { key: 'Escape' });
+      expect(onClose).not.toHaveBeenCalled();
+      expect(right().className).not.toContain('--resizing');
+      // Not dragging, Escape goes its way: the modal closes on it
+      fireEvent.keyDown(handle(), { key: 'Escape' });
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    test('Escape mid-drag gives the pointer capture back', () => {
+      const proto = Element.prototype as any;
+      const before = { has: proto.hasPointerCapture, release: proto.releasePointerCapture };
+      proto.hasPointerCapture = vi.fn(() => true);
+      proto.releasePointerCapture = vi.fn();
+      try {
+        const { handle } = renderSplit(ui());
+        pointerDown(handle(), pointerAtWidth(750));
+        fireEvent.keyDown(document.body, { key: 'Escape' });
+        expect(proto.releasePointerCapture).toHaveBeenCalledWith(1);
+        expect(proto.releasePointerCapture).toHaveBeenCalledTimes(1);
+      } finally {
+        proto.hasPointerCapture = before.has;
+        proto.releasePointerCapture = before.release;
+      }
+    });
+
+    test('other keys mid-drag leave it dragging', () => {
+      const { handle, right } = renderSplit(ui());
+      pointerDown(handle(), pointerAtWidth(750));
+      fireEvent.keyDown(document.body, { key: 'a' });
+      expect(right().className).toContain('SplitView-right-component--resizing');
+      pointerUp(handle());
     });
 
     test('other keys leave it alone', () => {

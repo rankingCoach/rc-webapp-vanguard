@@ -35,6 +35,9 @@ export interface ModalSplitViewCollapseToggle {
  * With `collapseToggle`, the divider FAB then shows only while the panel is closed (the way back): open, it would sit on
  * the edge with the drag handle. Give the right panel a close control of its own; the close by drag isn't one anyone
  * can find or reach from the keyboard.
+ *
+ * Escape mid-drag puts the width back as it was before the drag. LTR only, like the split itself (it places its panels
+ * by `left`): in RTL the drag and the arrow keys are not mirrored.
  */
 export interface ModalSplitViewResize {
   /** Narrowest right panel, px. */
