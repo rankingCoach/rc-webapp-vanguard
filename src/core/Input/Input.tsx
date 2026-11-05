@@ -19,7 +19,8 @@ export type InputProps = {
   testId?: string;
   readonly?: boolean;
   type?: 'text' | 'number' | 'email' | 'date' | 'password';
-  size?: 'small' | 'medium'; // @todo implement this ???
+  /** `small`: the compact 32px filled field for toolbars (e.g. a search with a leading icon `adornment`). */
+  size?: 'small' | 'medium';
   isLoading?: boolean;
   loadingText?: string;
   textFieldProps?: TextFieldProps;

@@ -9,6 +9,7 @@ import {
   InputLabelProps,
   InputPopoverProps,
   InputSelectProps,
+  InputSizeProps,
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
@@ -56,7 +57,8 @@ type Props<T extends string = any> = {
   InputLabelProps &
   InputEventsProps &
   InputFormConfigProps &
-  InputSelectProps & {
+  InputSelectProps &
+  InputSizeProps & {
     onChange?: SelectOnChange;
   };
 export type SelectProps<T extends string = any> = Props<T>;
