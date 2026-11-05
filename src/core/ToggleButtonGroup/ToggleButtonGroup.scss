@@ -1,3 +1,92 @@
+@import "@styles/spacings";
 
 .ToggleButtonGroup-container{
+}
+
+/**
+ * Variant: segmented (variant="segmented")
+ * A muted track (the muted button's fill, 2px inset, radius = item radius + inset); ghost items, the pressed one a
+ * white glass chip. 32px tall: 28px items + the 2px inset.
+ */
+.ToggleButtonGroup-segmented {
+  .MuiToggleButtonGroup-root {
+    gap: $x0_25;
+    padding: $x0_25;
+    border-radius: $x0_5 + $x0_25;
+    // the muted button's fill, unblended so the track also shows on dark surfaces
+    background-color: var(--button-muted-background-color);
+    vertical-align: middle;
+
+    .MuiToggleButton-root {
+      box-sizing: border-box;
+      height: $x3 + $x0_5;
+      min-width: $x3 + $x0_5;
+      margin: 0;
+      padding: 6px $x1_5;
+      border: 0;
+      border-radius: $x0_5;
+      background-color: transparent;
+      font-family: var(--text-typeface);
+      font-size: $x1_5;
+      line-height: $x2;
+      font-weight: 500;
+      letter-spacing: 0.48px;
+      text-transform: none;
+      white-space: nowrap;
+      color: var(--button-muted-text-color);
+      transition: background-color 150ms ease;
+
+      &.ToggleButton-icon-only {
+        padding: 6px;
+      }
+
+      // icons take the item's text colour, so the pressed chip's icon reads in both colour schemes
+      svg {
+        color: inherit;
+
+        path {
+          fill: currentColor;
+        }
+      }
+
+      .MuiTouchRipple-root {
+        display: none;
+      }
+
+      &:hover:not(.Mui-selected):not(.Mui-disabled) {
+        background-color: var(--button-default-hover-background-color);
+      }
+
+      // pressed: the muted inverted on-dark glass (white 60%) over the surface colour, so the chip is white in light
+      // and a light glass in dark; dark text. Its hover layer goes on top.
+      --segmented-pressed: var(--button-muted-inverted-on-dark-background-color);
+      --segmented-pressed-hover: var(--button-muted-inverted-on-dark-hover-background-color);
+
+      &.Mui-selected {
+        background: linear-gradient(var(--segmented-pressed), var(--segmented-pressed)), var(--fn-bg-surface);
+        color: var(--button-muted-inverted-on-dark-text-color);
+      }
+
+      &.Mui-selected:hover:not(.Mui-disabled) {
+        background:
+          linear-gradient(var(--segmented-pressed-hover), var(--segmented-pressed-hover)),
+          linear-gradient(var(--segmented-pressed), var(--segmented-pressed)),
+          var(--fn-bg-surface);
+      }
+
+      &.Mui-focusVisible {
+        outline: $x0_25 solid var(--button-muted-focus-outline-color);
+        outline-offset: $x0_25;
+      }
+
+      &.Mui-disabled {
+        color: var(--button-muted-text-color);
+        opacity: 0.4;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+  }
 }
