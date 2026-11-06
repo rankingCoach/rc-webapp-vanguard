@@ -10,14 +10,17 @@ import { TagType } from '@vanguard/TagList/Tag/TagType.enum';
 import React from 'react';
 
 import { ComponentContainer } from '../../ComponentContainer/ComponentContainer';
-import { Text } from '../../Text/Text';
+import { FontWeights, Text } from '../../Text/Text';
+
+export type TagVariant = 'chip' | 'tag' | 'chip-filled';
 
 export interface TagProps {
   id?: number | string;
   text?: string;
   type?: TagType;
   textColor?: string;
-  variant?: 'chip' | 'tag';
+  /** `chip-filled`: the small filled chip (24px, muted fill, 12px medium text, not uppercase). */
+  variant?: TagVariant;
   active?: boolean;
   hidden?: boolean;
   hasDeleteBtn?: boolean;
@@ -64,7 +67,11 @@ export const Tag = (props: TagProps) => {
     <ComponentContainer className={classNames('Tag-container', hidden ? 'hidden' : '')}>
       {applyPopover(
         <div className={`${variant} ${type}`} style={active ? { opacity: '1' } : {}}>
-          <Text color={textColor ?? textColor} translate={false}>
+          <Text
+            color={textColor ?? textColor}
+            fontWeight={variant === 'chip-filled' ? FontWeights.medium : undefined}
+            translate={false}
+          >
             {text}
           </Text>
           <Render if={hasInnerElement}>

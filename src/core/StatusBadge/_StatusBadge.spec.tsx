@@ -111,3 +111,28 @@ describe('Vanguard StatusBadgeIcon ado colours', () => {
     expect(icon.style.backgroundColor).toBe('var(--status-badge-ado-background-color)');
   });
 });
+
+describe('Vanguard StatusBadge glass variant', () => {
+  it('renders the text on the glass pill, without the status icon', async () => {
+    const { container } = await render(
+      <StatusBadge variant={'glass'} status={'danger'} text={'Image'} translate={false} />,
+    );
+    const badge = getBadge('Image');
+    expect(badge.classList.contains(styles.glass)).toBe(true);
+    expect(badge.style.backgroundColor).toBe('');
+    expect(container.querySelector(`.${iconStyles.statusBadgeIcon}`)).toBeNull();
+  });
+
+  it('paints white text on one line, ending in an ellipsis', async () => {
+    await render(<StatusBadge variant={'glass'} status={'neutral'} text={'Image'} translate={false} />);
+    const text = appScreen.getByText('Image');
+    expect(text.style.color).toBe('var(--fn-fg-on-dark)');
+    expect(text.style.whiteSpace).toBe('nowrap');
+    expect(text.style.textOverflow).toBe('ellipsis');
+  });
+
+  it('keeps the other variants off the glass', async () => {
+    await render(<StatusBadge status={'neutral'} text={'Small'} hideIcon translate={false} />);
+    expect(getBadge('Small').classList.contains(styles.glass)).toBe(false);
+  });
+});

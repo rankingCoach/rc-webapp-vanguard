@@ -132,6 +132,16 @@ export type InputSelectProps = {
 };
 
 /**
+ * Props: Size
+ * ---------------------------------------------------------------------------------------------------------------------
+ * `small`: the compact 32px filled field (muted fill, no outline at rest, 13px text; a Select gets 12px medium text and
+ * a 16px chevron). Meant for toolbars, without a visible label (`labelType="hidden"`).
+ */
+export type InputSizeProps = {
+  size?: 'small' | 'medium';
+};
+
+/**
  * Props: Events
  * ---------------------------------------------------------------------------------------------------------------------
  */
@@ -191,6 +201,7 @@ export type rcInputBaseProps = {
   textFieldProps?: TextFieldProps; //use to set any MUI prop which is not publicly exposed in "rcInputBasePropsBase" type
   testId?: string;
 } & InputValueProps &
+  InputSizeProps &
   InputAdornmentProps &
   InputLabelProps &
   InputPopoverProps &
@@ -201,6 +212,12 @@ export type rcInputBaseProps = {
   InputEventsProps &
   InputFormConfigProps &
   InputHelperLinkProps;
+
+const SmallSelectChevron = ({ className }: { className?: string }) => (
+  <Icon className={classNames(className, 'vanguard-input-select-chevron')} color={'var(--fn-fg-light)'}>
+    {IconNames.caretDown}
+  </Icon>
+);
 
 /**
  * ---------------------------------------------------------------------------------------------------------------------
@@ -269,7 +286,10 @@ export const InputBase = (props: rcInputBaseProps) => {
     helperLinkHref,
     labelStyle,
     hideOptionalLabel = false,
+    size = 'medium',
   } = props;
+
+  const isSmall = size === 'small';
 
   let { maxLength } = props;
 
@@ -761,6 +781,7 @@ export const InputBase = (props: rcInputBaseProps) => {
         renderValue: selectRenderValue,
         onOpen: onSelectMenuOpen,
         onClose: onSelectMenuClose,
+        ...(isSmall ? { IconComponent: SmallSelectChevron } : {}),
         MenuProps: {
           // Override MUI's static theme.zIndex.modal so the dropdown stacks above
           // any modal/drawer it was opened from (see OverlayStackingService).
@@ -958,6 +979,7 @@ export const InputBase = (props: rcInputBaseProps) => {
         className,
         getLabelTypeClasses(),
         theme === 'grey' ? 'vanguard-input-grey' : '',
+        isSmall ? 'vanguard-input-small' : '',
         isLoading ? 'vanguard-input-loading' : '',
         roundedNumericCTAType ? 'vanguard-input-type-number-rounded' : '',
         formFieldType === 'ColorPicker' ? 'vanguard-input-type-colorpicker' : '',

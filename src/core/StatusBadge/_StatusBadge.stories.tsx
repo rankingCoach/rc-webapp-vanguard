@@ -10,6 +10,7 @@ import { StatusBadgeAll as _StatusBadgeAll } from "./stories/StatusBadgeAll.stor
 import { StatusBadgeCompact as _StatusBadgeCompact } from "./stories/StatusBadgeCompact.story";
 import { StatusBadgeAllInverted as _StatusBadgeAllInverted } from "./stories/StatusBadgeAllInverted.story";
 import { WithArrowIcons as _WithArrowIcons } from "./stories/WithArrowIcons.story";
+import { StatusBadgeGlass as _StatusBadgeGlass } from "./stories/StatusBadgeGlass.story";
 
 export default {
   ...SbDecorator({
@@ -46,3 +47,4 @@ export const StatusBadgeAll: Story = { ..._StatusBadgeAll };
 export const StatusBadgeAllInverted: Story = { ..._StatusBadgeAllInverted };
 export const StatusBadgeCompact: Story = { ..._StatusBadgeCompact };
 export const WithArrowIcons: Story = { ..._WithArrowIcons };
+export const StatusBadgeGlass: Story = { ..._StatusBadgeGlass };
