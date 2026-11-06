@@ -7,6 +7,26 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ActionBar.module.scss';
 
+const ChildrenRender = (templateProps: ActionBarProps['templateProps']) => {
+    if (!templateProps) {
+      return null;
+    }
+
+    const { template } = templateProps;
+
+    if (template === 'message') {
+      return <ActionBarMessage {...templateProps} />;
+    }
+
+    if (template === 'footer') {
+      return <ActionBarFooter {...templateProps} />;
+    }
+
+    console.error('Error | ActionBar | Invalid template ', template, templateProps);
+    return null;
+  };
+
+
 export type ActionBarProps = {
   show: boolean;
   templateProps?: ActionBarTemplateType;
@@ -55,24 +75,7 @@ export const ActionBar = (props: ActionBarProps) => {
   /**
    * Get Children
    */
-  const Children = () => {
-    if (!templateProps) {
-      return null;
-    }
-
-    const { template } = templateProps;
-
-    if (template === 'message') {
-      return <ActionBarMessage {...templateProps} />;
-    }
-
-    if (template === 'footer') {
-      return <ActionBarFooter {...templateProps} />;
-    }
-
-    console.error('Error | ActionBar | Invalid template ', template, templateProps);
-    return null;
-  };
+  const Children = ChildrenRender.bind(null, templateProps);
 
   /**
    * Return view
