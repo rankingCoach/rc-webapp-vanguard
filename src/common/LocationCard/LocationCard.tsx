@@ -39,6 +39,30 @@ import React, { useMemo, useState } from 'react';
 import imagePlaceholder from './img/placeholder.svg';
 import styles from './LocationCard.module.scss';
 
+const MapMobileViewRender = (address: LocationCardProps['googleLocation']['address'], languageCode: string, props: { exitClick: () => void }) => {
+    const { exitClick } = props;
+    return (
+      <div className={classNames(dFlex, dFlexColumn, gap3, p3, alignItemsCenter, w100, h100, styles.whiteBackground)}>
+        <div className={classNames(styles.componentContainer)}>
+          <LocationCardGoogleMaps
+            lat={address?.geoPoint?.lat?.toString() ?? ''}
+            lng={address?.geoPoint?.lng?.toString() ?? ''}
+            languageCode={languageCode}
+          />
+        </div>
+        <Button
+          size={ButtonSizes.extraLarge}
+          type={ButtonTypes.default}
+          iconRight={IconNames.visibilityOff}
+          onClick={exitClick}
+        >
+          Hide map
+        </Button>
+      </div>
+    );
+  };
+
+
 export enum GBPStatus {
   isVerified = 'isVerified',
   needsVerification = 'needsVerification',
@@ -93,28 +117,7 @@ export const LocationCard = (props: LocationCardProps) => {
     return mobileModalId;
   };
 
-  const MapMobileView = (props: { exitClick: () => void }) => {
-    const { exitClick } = props;
-    return (
-      <div className={classNames(dFlex, dFlexColumn, gap3, p3, alignItemsCenter, w100, h100, styles.whiteBackground)}>
-        <div className={classNames(styles.componentContainer)}>
-          <LocationCardGoogleMaps
-            lat={address?.geoPoint?.lat?.toString() ?? ''}
-            lng={address?.geoPoint?.lng?.toString() ?? ''}
-            languageCode={languageCode}
-          />
-        </div>
-        <Button
-          size={ButtonSizes.extraLarge}
-          type={ButtonTypes.default}
-          iconRight={IconNames.visibilityOff}
-          onClick={exitClick}
-        >
-          Hide map
-        </Button>
-      </div>
-    );
-  };
+  const MapMobileView = MapMobileViewRender.bind(null, address, languageCode);
 
   const showGBPStatus = () => {
     switch (true) {

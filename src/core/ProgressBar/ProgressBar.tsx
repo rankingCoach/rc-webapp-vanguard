@@ -30,6 +30,11 @@ export const ProgressBar = (props: ProgressBarProps) => {
       <LinearProgress
         variant={variant}
         value={!isBlurred ? progressValue : 100}
+        aria-valuenow={
+          (variant === 'determinate' || variant === 'buffer') && progressValue !== undefined
+            ? Math.round(isBlurred ? 100 : progressValue)
+            : undefined
+        }
         className={classNames(styles.root, className)}
         sx={{
           filter: isBlurred ? 'blur(15px)' : '',

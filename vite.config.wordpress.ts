@@ -1,3 +1,4 @@
+import { withBundledUseClientFilter } from './config/rollup-onwarn';
 import { resolve, dirname } from 'node:path';
 import { defineConfig, mergeConfig } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -46,6 +47,7 @@ export default defineConfig(
         fileName: () => 'index.js',
       },
       rollupOptions: {
+        onwarn: withBundledUseClientFilter(BaseViteConfig.build?.rollupOptions?.onwarn),
         output: {
           preserveModules: false,
           entryFileNames: 'index.js',

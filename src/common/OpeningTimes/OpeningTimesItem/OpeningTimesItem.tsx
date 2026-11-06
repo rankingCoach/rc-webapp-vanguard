@@ -9,18 +9,7 @@ import React, { useMemo } from 'react';
 
 import styles from './OpeningTimesItem.module.scss';
 
-export type OpeningTimesItemProps = OpeningHoursDayType & {
-  alwaysOpen?: boolean;
-  noHoursAvailable?: boolean;
-  showAmPm: boolean;
-};
-
-export const OpeningTimesItem = (props: OpeningTimesItemProps) => {
-  const { dayOfWeek, alwaysOpen, openAllDay, open, showAmPm, intervals, noHoursAvailable } = props;
-  const parsedDOW = useMemo(() => parseDay(dayOfWeek ?? ''), [dayOfWeek]);
-  const intervalsCopy = [...intervals];
-
-  const RenderOT = () => {
+const RenderOTRender = (noHoursAvailable: OpeningTimesItemProps['noHoursAvailable'], alwaysOpen: OpeningTimesItemProps['alwaysOpen'], openAllDay: OpeningTimesItemProps['openAllDay'], open: OpeningTimesItemProps['open'], intervalsCopy: OpeningTimesItemProps['intervals'], showAmPm: OpeningTimesItemProps['showAmPm'], dayOfWeek: OpeningTimesItemProps['dayOfWeek']) => {
     if (noHoursAvailable) {
       return <TextOT>No Hours</TextOT>;
     }
@@ -57,6 +46,20 @@ export const OpeningTimesItem = (props: OpeningTimesItemProps) => {
 
     return <TextOT>No Hours</TextOT>;
   };
+
+
+export type OpeningTimesItemProps = OpeningHoursDayType & {
+  alwaysOpen?: boolean;
+  noHoursAvailable?: boolean;
+  showAmPm: boolean;
+};
+
+export const OpeningTimesItem = (props: OpeningTimesItemProps) => {
+  const { dayOfWeek, alwaysOpen, openAllDay, open, showAmPm, intervals, noHoursAvailable } = props;
+  const parsedDOW = useMemo(() => parseDay(dayOfWeek ?? ''), [dayOfWeek]);
+  const intervalsCopy = [...intervals];
+
+  const RenderOT = RenderOTRender.bind(null, noHoursAvailable, alwaysOpen, openAllDay, open, intervalsCopy, showAmPm, dayOfWeek);
 
   return (
     <ComponentContainer className={classNames(dFlex, justifyContentBetween, flexWrap)}>

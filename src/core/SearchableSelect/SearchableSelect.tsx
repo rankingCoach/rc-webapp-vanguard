@@ -103,14 +103,13 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
             // Disables auto focus on MenuItems and allows TextField to be in focus
             autoFocus: false,
             marginThreshold: 0,
-            MenuListProps: {
-              style: {
-                width: inputRef && inputRef.current ? inputRef.current.offsetWidth - 8 : '',
-              },
-            },
+
             // Override MUI's static z-index so the menu stacks above any
             // modal/drawer it was opened from (see OverlayStackingService).
-            slotProps: { root: { style: { zIndex: menuZIndex } } },
+            slotProps: {
+              list: { style: { width: inputRef.current ? inputRef.current.offsetWidth - 8 : '' } },
+              root: { style: { zIndex: menuZIndex } },
+            },
             // The menu portals to <body>, outside `.vanguard-searchable-select-input`,
             // so this class is what scopes the menu rules in SearchableSelect.scss.
             className: 'vanguard-searchable-select-menu',

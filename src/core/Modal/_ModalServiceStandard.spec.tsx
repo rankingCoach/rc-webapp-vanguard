@@ -9,6 +9,11 @@ import { ErrorModal } from '../StandardModals/ErrorModal/ErrorModal';
 import { LoadingModal } from '../StandardModals/LoadingModal/LoadingModal';
 import { ModalService } from './ModalService';
 
+const LintInner397: React.FC<any> = () => <div />;
+
+const LintInner372: React.FC<any> = () => <div />;
+
+
 afterEach(() => {
   ModalService.__resetForTests();
   vi.restoreAllMocks();
@@ -369,7 +374,7 @@ describe('closeEv', () => {
 
 describe('WrapperModal render path (wrapInModal: true)', () => {
   test('wraps a valid element, cloning modalId/close/compactControls onto it and rendering title/message via ModalHeader', () => {
-    const Inner: React.FC<any> = () => <div />;
+    const Inner = LintInner372;
     const modalId = ModalService.open(<Inner original />, {
       wrapInModal: true,
       title: 'Wrapped title',
@@ -394,7 +399,7 @@ describe('WrapperModal render path (wrapInModal: true)', () => {
   });
 
   test('injects compact/expand controls onto the cloned child only when allowCompact is set', () => {
-    const Inner: React.FC<any> = () => <div />;
+    const Inner = LintInner397;
     const modalId = ModalService.open(<Inner />, { wrapInModal: true, allowCompact: true });
     const component = ModalService.getModalComponent(modalId);
     const child = component.props.children as any;

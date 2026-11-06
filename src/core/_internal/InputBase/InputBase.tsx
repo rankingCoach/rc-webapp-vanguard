@@ -13,7 +13,7 @@ import { sanitizeHtml } from '@helpers/sanitize-html';
 import { highlightedTextMaxLength } from '@helpers/string-helpers';
 import { isValidHexColor } from '@helpers/validators/hex-color/hex-color';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
-import { Skeleton, TextField, TextFieldProps } from '@mui/material';
+import { Skeleton } from '@mui/material';
 import { translationService } from '@services/translation.service';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -24,7 +24,96 @@ import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
 
+import type { VanguardTextFieldProps } from '../mui-legacy-props';
+import { MuiTextField as TextField } from './MuiTextField';
 import { useNumberInputGuard } from './use-number-input-guard';
+
+const BottomContainerRender = (label: rcInputBaseProps['label'], length: number, formconfig: rcInputBaseProps['formconfig'], replacements: rcInputBaseProps['replacements'], hasError: boolean, infoText: rcInputBaseProps['infoText'], counter: rcInputBaseProps['counter'], maxLength: rcInputBaseProps['maxLength'], helperLinkText: rcInputBaseProps['helperLinkText'], onHelperLinkClick: rcInputBaseProps['onHelperLinkClick'], value: rcInputBaseProps['value'], helperLinkDisabled: rcInputBaseProps['helperLinkDisabled'], helperLinkHref: rcInputBaseProps['helperLinkHref']) => {
+    // Text Replacements
+    const textReplacements = {
+      field_name: label, // Case text contains field_name
+      length: length ? length : '0', // Case text contains current input length
+      ...(formconfig?.validation as any), //Add the keys from the validation to make sure we have them in input
+      ...formconfig?.validation?.replacements, // Error Messages translation variables
+      ...replacements, // Info Text translation variables
+    };
+
+    // Info Text
+    let helperText: string | ReactNode = '';
+    if (hasError) {
+      helperText = (
+        <Text
+          className={'vanguard-input-error-text'}
+          testId="vanguard-input-error-text"
+          fontWeight={FontWeights.regular}
+          color={'--e500'}
+          replacements={textReplacements}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {formconfig?.errors ? formconfig?.errors[0] : null}
+        </Text>
+      );
+    } else if (infoText) {
+      helperText = (
+        <Text className={'vanguard-input-info-text'} fontWeight={FontWeights.regular} replacements={textReplacements}>
+          {infoText}
+        </Text>
+      );
+    }
+
+    // Counter
+    let counterComponent;
+    if (counter) {
+      counterComponent = (
+        <Text
+          className={'vanguard-input-counter'}
+          fontWeight={FontWeights.regular}
+          color={hasError ? '--e500' : ''}
+          translate={false}
+        >
+          {length ? length : '0'}
+          {maxLength && `/${maxLength}`}
+        </Text>
+      );
+    }
+
+    // HelperLink
+    let helperLinkComponent;
+    if (helperLinkText && onHelperLinkClick) {
+      helperLinkComponent = (
+        <Link
+          onClick={() => {
+            onHelperLinkClick(value ?? '');
+          }}
+          className="vanguard-input-helper-link-button"
+          disabled={helperLinkDisabled}
+          href={helperLinkHref}
+        >
+          {helperLinkText}
+        </Link>
+      );
+    }
+
+    // No bottom container
+    if (!helperText && !counterComponent && !helperLinkComponent) {
+      return null;
+    }
+
+    return (
+      <span className="vanguard-input-bottom-container">
+        <Render if={!!helperText || !!counterComponent}>
+          <span className="vanguard-input-bottom-container-line">
+            {helperText}
+            {counterComponent}
+          </span>
+        </Render>
+
+        {helperLinkComponent}
+      </span>
+    );
+  };
+
 
 /**
  * Props: Value
@@ -188,7 +277,7 @@ export type rcInputBaseProps = {
   popoverHighlight?: PopoverHighlightType;
   type?: React.InputHTMLAttributes<unknown>['type']; //text|number|password|etc
   children?: React.ReactNode;
-  textFieldProps?: TextFieldProps; //use to set any MUI prop which is not publicly exposed in "rcInputBasePropsBase" type
+  textFieldProps?: VanguardTextFieldProps; //use to set any MUI prop which is not publicly exposed in "rcInputBasePropsBase" type
   testId?: string;
 } & InputValueProps &
   InputAdornmentProps &
@@ -516,30 +605,30 @@ export const InputBase = (props: rcInputBaseProps) => {
     </div>
   );
 
-  const ShowAdornment = (what: React.ReactNode): React.ReactNode | null => {
+  const showAdornment = (what: React.ReactNode): React.ReactNode | null => {
     if (!what) return null;
     return what;
   };
 
-  const ShowStartAdornment = (): React.ReactNode | null => {
-    return ShowAdornment(adornment);
+  const showStartAdornment = (): React.ReactNode | null => {
+    return showAdornment(adornment);
   };
 
-  const ShowEndAdornment = (): React.ReactNode | null => {
-    return ShowAdornment(endAdornment);
+  const showEndAdornment = (): React.ReactNode | null => {
+    return showAdornment(endAdornment);
   };
 
   if (adornment) {
     textFieldProps.InputProps = {
       ...textFieldProps.InputProps,
-      ...{ startAdornment: ShowStartAdornment() },
+      ...{ startAdornment: showStartAdornment() },
     };
   }
 
   if (endAdornment) {
     textFieldProps.InputProps = {
       ...textFieldProps.InputProps,
-      ...{ endAdornment: ShowEndAdornment() },
+      ...{ endAdornment: showEndAdornment() },
     };
   }
 
@@ -554,91 +643,7 @@ export const InputBase = (props: rcInputBaseProps) => {
    * UI: Render Input Bottom Container (InfoText/ErrorMessage, Counter)
    * -------
    */
-  const BottomContainer = () => {
-    // Text Replacements
-    const textReplacements = {
-      field_name: label, // Case text contains field_name
-      length: length ? length : '0', // Case text contains current input length
-      ...(formconfig?.validation as any), //Add the keys from the validation to make sure we have them in input
-      ...formconfig?.validation?.replacements, // Error Messages translation variables
-      ...replacements, // Info Text translation variables
-    };
-
-    // Info Text
-    let helperText: string | ReactNode = '';
-    if (hasError) {
-      helperText = (
-        <Text
-          className={'vanguard-input-error-text'}
-          testId="vanguard-input-error-text"
-          fontWeight={FontWeights.regular}
-          color={'--e500'}
-          replacements={textReplacements}
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {formconfig?.errors ? formconfig?.errors[0] : null}
-        </Text>
-      );
-    } else if (infoText) {
-      helperText = (
-        <Text className={'vanguard-input-info-text'} fontWeight={FontWeights.regular} replacements={textReplacements}>
-          {infoText}
-        </Text>
-      );
-    }
-
-    // Counter
-    let counterComponent;
-    if (counter) {
-      counterComponent = (
-        <Text
-          className={'vanguard-input-counter'}
-          fontWeight={FontWeights.regular}
-          color={hasError ? '--e500' : ''}
-          translate={false}
-        >
-          {length ? length : '0'}
-          {maxLength && `/${maxLength}`}
-        </Text>
-      );
-    }
-
-    // HelperLink
-    let helperLinkComponent;
-    if (helperLinkText && onHelperLinkClick) {
-      helperLinkComponent = (
-        <Link
-          onClick={() => {
-            onHelperLinkClick(value ?? '');
-          }}
-          className="vanguard-input-helper-link-button"
-          disabled={helperLinkDisabled}
-          href={helperLinkHref}
-        >
-          {helperLinkText}
-        </Link>
-      );
-    }
-
-    // No bottom container
-    if (!helperText && !counterComponent && !helperLinkComponent) {
-      return null;
-    }
-
-    return (
-      <span className="vanguard-input-bottom-container">
-        <Render if={!!helperText || !!counterComponent}>
-          <span className="vanguard-input-bottom-container-line">
-            {helperText}
-            {counterComponent}
-          </span>
-        </Render>
-
-        {helperLinkComponent}
-      </span>
-    );
-  };
+  const BottomContainer = BottomContainerRender.bind(null, label, length, formconfig, replacements, hasError, infoText, counter, maxLength, helperLinkText, onHelperLinkClick, value, helperLinkDisabled, helperLinkHref);
 
   /**
    * UI: Highlights
@@ -767,11 +772,7 @@ export const InputBase = (props: rcInputBaseProps) => {
           sx: {
             zIndex: selectMenuZIndex,
           },
-          PaperProps: {
-            style: {
-              maxHeight: menuItemHeight * maxMenuItemsUntilScroll,
-            },
-          },
+          slotProps: { paper: { style: { maxHeight: menuItemHeight * maxMenuItemsUntilScroll } } },
         },
       },
     };

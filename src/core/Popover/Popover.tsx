@@ -1,9 +1,10 @@
+import './PopoverPopper/PopoverPopper.scss';
+
 import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { uuidv4 } from '@helpers/generate-uid';
 import { Tooltip } from '@mui/material';
-import { TooltipClasses } from '@mui/material/Tooltip/tooltipClasses';
+import { TooltipClasses } from '@mui/material/Tooltip';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
-import { PopoverPopper } from '@vanguard/Popover/PopoverPopper/PopoverPopper';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
 import React, { useEffect, useRef, useState } from 'react';
@@ -126,22 +127,9 @@ export const Popover = (props: PopoverProps) => {
       title={getTitle()}
       arrow={arrow}
       placement={position}
-      PopperComponent={PopoverPopper}
       open={popoverOpen}
       classes={className}
-      PopperProps={{
-        // Override MUI's static tooltip z-index so the popper stacks above
-        // any modal/drawer it was opened from (see OverlayStackingService).
-        style: { maxWidth: maxWidth, zIndex: popperZIndex },
-        className: theme === 'dark' ? 'MuiTooltip-popper-dark' : '',
-        placement: position,
-      }}
       disableInteractive={!interactive}
-      componentsProps={{
-        tooltip: {
-          style: { maxWidth: maxWidth },
-        },
-      }}
       onMouseEnter={() => {
         if (hideUnderBreakpoint && width < hideUnderBreakpoint) {
           closePopover();
@@ -151,6 +139,19 @@ export const Popover = (props: PopoverProps) => {
       }}
       onMouseLeave={() => {
         closePopover();
+      }}
+      slotProps={{
+        tooltip: {
+          style: { maxWidth: maxWidth },
+        },
+
+        popper: {
+          // Override MUI's static tooltip z-index so the popper stacks above
+          // any modal/drawer it was opened from (see OverlayStackingService).
+          style: { maxWidth: maxWidth, zIndex: popperZIndex },
+          className: `vanguard-popover${theme === 'dark' ? ' MuiTooltip-popper-dark' : ''}`,
+          placement: position,
+        },
       }}
     >
       {renderChildren()}
