@@ -10,6 +10,7 @@ import {
 import * as React from 'react';
 import { ReactNode, useEffect, useState } from 'react';
 
+import type { VanguardLegacyAccordionProps } from '../_internal/mui-legacy-props';
 import { Icon, IconSize } from '../Icon/Icon';
 import { IconNames } from '../Icon/IconNames';
 
@@ -24,7 +25,8 @@ export type AccordionProps = {
   detailsCustomStyle?: object;
   reverse?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
-} & Omit<BaseProps, 'children'>;
+} & Omit<BaseProps, 'children'> &
+  VanguardLegacyAccordionProps;
 
 export const Accordion = (props: AccordionProps) => {
   const {
@@ -64,6 +66,7 @@ export const Accordion = (props: AccordionProps) => {
    */
   return (
     <BaseAccordion
+      slots={{ heading: 'div' }}
       expanded={isExpanded}
       disableGutters={disableGutters}
       variant={variant}

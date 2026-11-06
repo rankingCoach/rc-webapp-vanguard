@@ -14,7 +14,7 @@ export const ToggleButton = (props: Props) => {
 
   return (
     <ComponentContainer testId={testId} className={'ToggleButton-container'}>
-      <ToggleButtonBase {...rest} />
+      <ToggleButtonBase {...rest} tabIndex={rest.tabIndex ?? 0} />
     </ComponentContainer>
   );
 };

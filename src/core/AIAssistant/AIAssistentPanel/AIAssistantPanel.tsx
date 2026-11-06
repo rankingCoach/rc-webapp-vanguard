@@ -12,8 +12,8 @@ import {
   w100,
 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import Collapse from '@mui/material/Collapse/Collapse';
-import Fade from '@mui/material/Fade/Fade';
+import Collapse from '@mui/material/Collapse';
+import Fade from '@mui/material/Fade';
 import Grow from '@mui/material/Grow';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';

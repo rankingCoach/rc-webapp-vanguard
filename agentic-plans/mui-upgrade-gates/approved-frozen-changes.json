@@ -1,0 +1,519 @@
+{
+  "src/core/DatePicker/_DatePickerCompatibility.mui.spec.tsx": {
+    "before_sha256": "a20c551802e193c96c451ec3cea5955d258ded486e34b282d284e372f8f4b211",
+    "after_sha256": "c0e904b5757f1881a018b38af6b879d1123830f2a60d67cb82ac047231bdcf20",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DatePicker/_DatePickerCompatibility.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null,
+    "prior_approval": {
+      "before_sha256": "db02808c030652e01e428116a262c654837111b2064f0d4c418ad4278a64a3e9",
+      "after_sha256": "a20c551802e193c96c451ec3cea5955d258ded486e34b282d284e372f8f4b211",
+      "allowed_change": "User-authorized section DOM query/action adaptations; caret DOM assertions only; behavior assertions byte identical; explicit AST paths in proof",
+      "proof": "out/s5a-two-spec-dom/ast-proof.json",
+      "allowlist": "out/s5a-two-spec-dom/ast-allowlist.json",
+      "source_cause": "@mui/x-date-pickers/PickersTextField/PickersInputBase/PickersInputBase.js:390-435; internals/hooks/useField/useFieldSectionContentProps.js:68-100,106-140; useFieldRootHandleKeyDown.js:65-120",
+      "prior_approval": {
+        "before_sha256": "d78ece0a6cd1f25d7bb25a4bffa108dec7749bb0bb83ef2c963cba0b9e5c7112",
+        "after_sha256": "db02808c030652e01e428116a262c654837111b2064f0d4c418ad4278a64a3e9",
+        "allowed_change": "add modern MediaQueryList listener methods only; full AST/assertion audit unchanged otherwise"
+      }
+    }
+  },
+  "src/core/DatePicker/_DatePickerKeyboardLayoutMuiContract.stories.tsx": {
+    "before_sha256": "2447f68f8c9f8c4686fc7e4e894e2f82f1994fd27c2cb0d5d9540c6bf062ecc9",
+    "after_sha256": "10be78560e19396951fa53bca9a084b16842218fa9b20c6b47573403b60bec16",
+    "allowed_change": "S5a authorized DOM queries and section actions; geometry/value/cursor behavior assertions unchanged; 3 caret DOM assertions replaced with actual section focus",
+    "proof": "out/s5a-browser-dom/ast-proof.json",
+    "allowlist": "out/s5a-browser-dom/ast-allowlist.json",
+    "source_cause": "PickersInputBase/PickersInputBase.js390\u2013435 (sections root + hidden input), useFieldRootProps.js65\u2013120 (section navigation), useFieldCharacterEditing.js135\u2013167 (numeric sections)",
+    "prior_approval": {
+      "before_sha256": "7f0c9870ab980131216107bc14bca183701792c8711550dfb08c46eded218e2a",
+      "after_sha256": "2447f68f8c9f8c4686fc7e4e894e2f82f1994fd27c2cb0d5d9540c6bf062ecc9",
+      "allowed_change": "add modern MediaQueryList listener methods only; full AST/assertion audit unchanged otherwise"
+    }
+  },
+  "src/core/ToggleButton/_ToggleButton.mui.spec.tsx": {
+    "before_sha256": "98d1c4de4a1d411ecae8f4c01b0d7b1d73f9c41cd870ce005c902378b03ec26b",
+    "after_sha256": "f67d3bfbeae7f1e6cf0a7cac9598f621466b9c12b0508b06d64c7318e444be78",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-21, spec-22, spec-23",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06",
+    "prior_approval": {
+      "file": "src/core/ToggleButton/_ToggleButton.mui.spec.tsx",
+      "before_sha256": "8bb8d2897c1fdaa1a7a87a54e250b20625c8e5787071264100960adf6cb480bd",
+      "after_sha256": "98d1c4de4a1d411ecae8f4c01b0d7b1d73f9c41cd870ce005c902378b03ec26b",
+      "allowed_change": "Overseer-approved MUI7.3.11 disabled non-native Space bug fix: only title, preceding comment, final Space count2->1; click/Enter unchanged",
+      "proof": "out/s4a-approved-toggle/ast-proof.json"
+    }
+  },
+  "src/core/DatePicker/_DatePickerV8Context.spec.tsx": {
+    "before_sha256": "95179e7462e55fd3cb1874b03bf6c63602f82d01b48124c98ceb79c164ec0423",
+    "after_sha256": "d30cc475fd74c9e789f420d1bf01f7d1774edf9d3e03a4d0126a3821bda77ffc",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DatePicker/_DatePickerV8Context.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null,
+    "prior_approval": {
+      "before_sha256": "201e93dd8f60b1f111bfcfef08f266a0a68d7f6b9676ed29830d67f80274cb7f",
+      "after_sha256": "95179e7462e55fd3cb1874b03bf6c63602f82d01b48124c98ceb79c164ec0423",
+      "allowed_change": "User-authorized section DOM query/action adaptations; caret DOM assertions only; behavior assertions byte identical; explicit AST paths in proof",
+      "proof": "out/s5a-two-spec-dom/ast-proof.json",
+      "allowlist": "out/s5a-two-spec-dom/ast-allowlist.json",
+      "source_cause": "@mui/x-date-pickers/PickersTextField/PickersInputBase/PickersInputBase.js:390-435; internals/hooks/useField/useFieldSectionContentProps.js:68-100,106-140; useFieldRootHandleKeyDown.js:65-120"
+    }
+  },
+  "src/core/DatePicker/_DatePicker.mui.spec.tsx": {
+    "before_sha256": "db6edd743e21dbef7f5eeeb19f410ebd2775e5aac1b9c6123f76660f24bfb293",
+    "after_sha256": "270dc477c9b3c68666cc55ff91e50e10e2c5e5a61189faab51998f8aec8847e2",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DatePicker/_DatePicker.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null,
+    "prior_approval": {
+      "before_sha256": "f19a4f2f2b8998e88a7414f41515d9e7a00a2bbdbd1b5377fb5629db6a6e40ce",
+      "after_sha256": "db6edd743e21dbef7f5eeeb19f410ebd2775e5aac1b9c6123f76660f24bfb293",
+      "allowed_change": "User approved DOM/section actions plus explicit overseer F15 intermediate-year, F19 undefined, F39 actual focus-return policy; remaining behavior byte identical; pending awake validation; formatting and unused new section-helper import cleanup only, AST and assertion proof retained",
+      "proof": "out/s5a-main-dom-static/ast-proof.json",
+      "allowlist": "out/s5a-main-dom-static/ast-allowlist.json",
+      "source_cause": "useFieldState.js320\u2013338 reference resync; useControlledValue.js53; date-utils.js78\u201383; section/root event sources in explicit allowlist",
+      "static_cleanup_prior_approval": {
+        "before_sha256": "f19a4f2f2b8998e88a7414f41515d9e7a00a2bbdbd1b5377fb5629db6a6e40ce",
+        "after_sha256": "fdc2a202cf30d6f6043edb873e4c2fdb31932aedf41b0657a7fb189e8ec55ac8",
+        "allowed_change": "User approved DOM/section actions plus explicit overseer F15 intermediate-year, F19 undefined, F39 actual focus-return policy; remaining behavior byte identical; pending awake validation",
+        "proof": "out/s5a-main-dom/ast-proof.json",
+        "allowlist": "out/s5a-main-dom/ast-allowlist.json",
+        "source_cause": "useFieldState.js320\u2013338 reference resync; useControlledValue.js53; date-utils.js78\u201383; section/root event sources in explicit allowlist"
+      }
+    }
+  },
+  "src/core/DateTimePicker/_DateTimePicker.mui.spec.tsx": {
+    "before_sha256": "b3aa7b6ac87043bf53308345dac792f19e28ea0496c79e5331777d144cd3f342",
+    "after_sha256": "85cddc59099158902a28053553b76d9181b1a5b2dcffd63918e170647ef486b0",
+    "allowed_change": "User approved DOM/section actions plus explicit overseer F15 intermediate-year, F19 undefined, F39 actual focus-return policy; remaining behavior byte identical; pending awake validation; formatting and unused new section-helper import cleanup only, AST and assertion proof retained",
+    "proof": "out/s5a-main-dom-static/ast-proof.json",
+    "allowlist": "out/s5a-main-dom-static/ast-allowlist.json",
+    "source_cause": "useFieldState.js320\u2013338 reference resync; useControlledValue.js53; date-utils.js78\u201383; section/root event sources in explicit allowlist",
+    "static_cleanup_prior_approval": {
+      "before_sha256": "b3aa7b6ac87043bf53308345dac792f19e28ea0496c79e5331777d144cd3f342",
+      "after_sha256": "c2ef38fb603466c64626d3839b0ce55e880aa2b8b11e8fbc11da78d51febf321",
+      "allowed_change": "User approved DOM/section actions plus explicit overseer F15 intermediate-year, F19 undefined, F39 actual focus-return policy; remaining behavior byte identical; pending awake validation",
+      "proof": "out/s5a-main-dom/ast-proof.json",
+      "allowlist": "out/s5a-main-dom/ast-allowlist.json",
+      "source_cause": "useFieldState.js320\u2013338 reference resync; useControlledValue.js53; date-utils.js78\u201383; section/root event sources in explicit allowlist"
+    }
+  },
+  "src/core/DatePicker/_DatePickerMuiContract.stories.tsx": {
+    "before_sha256": "3a9a69cd53487d6610177ae64520632505279d1dd026bae22e02a306fff9a1e8",
+    "after_sha256": "8b93ffe2d903298f8f4cadec5f08cb50456d937567dff65aa75bd1e391035844",
+    "allowed_change": "S5a authorized DOM queries and section actions; geometry/value/cursor behavior assertions unchanged; 3 caret DOM assertions replaced with actual section focus",
+    "proof": "out/s5a-browser-dom/ast-proof.json",
+    "allowlist": "out/s5a-browser-dom/ast-allowlist.json",
+    "source_cause": "PickersInputBase/PickersInputBase.js390\u2013435 (sections root + hidden input), useFieldRootProps.js65\u2013120 (section navigation), useFieldCharacterEditing.js135\u2013167 (numeric sections)"
+  },
+  "agentic-plans/mui-upgrade-gates/package-fixture/smoke/bundle.test.tsx": {
+    "before_sha256": "d1b3114476ec6fd8e3f5b233239cdd79f4d42f393fad51f38fa6830bacbba232",
+    "after_sha256": "9d44b373f4c9d2956bbe074973282aa5c51e126832cbab68b53ab17ea801d2fb",
+    "allowed_change": "S5a user authorized packed DOM-only query/caret/actions;13 behavior assertions byte identical;2 genuine accessible DOM assertions added",
+    "proof": "out/s5a-packed-dom/ast-proof.json",
+    "allowlist": "out/s5a-packed-dom/ast-allowlist.json",
+    "source_cause": "v9 PickersInputBase.js390\u2013435; useFieldRootProps.js65\u2013120; genuine sections navigation replaces legacy input caret"
+  },
+  "src/core/DatePicker/_DatePicker.spec.tsx": {
+    "before_sha256": "c96cf6b0099719e121c1ea1ccba816f4af57f10f64c5bb249aca3299c693fe4c",
+    "after_sha256": "9a764642aea055e7a6d2841b3bc867defec3918a71dc1d2276dee8bf155d7e18",
+    "allowed_change": "User-authorized sync with master: exact master blob only; not an MUI characterization rewrite",
+    "master_commit": "f02d3f5a2fa9ae287923d24e64b3b3feb6755f01",
+    "proof": "/tmp/mui-upgrade/pre-sync-20261106T122630Z/sync-reapply-integrity.json"
+  },
+  "src/core/Modal/_ModalServiceStandard.spec.tsx": {
+    "before_sha256": "d9c4cd0595854649886ab0469683d1b85c4c5071285955b004c2e52639cb03cb",
+    "after_sha256": "17f4f5deef0a427915f2e6edbf4719f8083abab26b2fb8ba4075fc1c67590473",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Modal/_ModalServiceStandard.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null,
+    "prior_approval": {
+      "before_sha256": "a5b4e89372e4fcefbf7edce3be95e46f26f0dc17fe5573c6f784c24b03b28d66",
+      "after_sha256": "d9c4cd0595854649886ab0469683d1b85c4c5071285955b004c2e52639cb03cb",
+      "allowed_change": "User-authorized sync with master: exact master blob only; not an MUI characterization rewrite",
+      "master_commit": "f02d3f5a2fa9ae287923d24e64b3b3feb6755f01",
+      "proof": "/tmp/mui-upgrade/pre-sync-20261106T122630Z/sync-reapply-integrity.json"
+    }
+  },
+  "src/core/AIAssistant/AIAssistentPanel/_AIAssistantPanel.mui.spec.tsx": {
+    "before_sha256": "113e87ca9309c9e18f043639ab3ccb1aa01b63b55ac4d12d3559c976fb47cbd4",
+    "after_sha256": "8c1867e48086519830a883d36a2a3ffefe21ecd6a22db6589a02c78b1bb0f82d",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/AIAssistant/AIAssistentPanel/_AIAssistantPanel.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Autocomplete/_Autocomplete.mui.spec.tsx": {
+    "before_sha256": "1ecbb1807bae0f2396a72660de1087f020b57e3421d866417aaf08cfff3d254f",
+    "after_sha256": "fac65853efdc787ae6044358bd576a8ec7c4ca627e609744b150acdd308bbe8c",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-1",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06",
+    "prior_approval": {
+      "before_sha256": "1c04c24914478cbe7cb6cddc37b5d306f0f4f0f3b9ae2b7a846a95f538b06b83",
+      "after_sha256": "1ecbb1807bae0f2396a72660de1087f020b57e3421d866417aaf08cfff3d254f",
+      "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+      "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Autocomplete/_Autocomplete.mui.spec.tsx.json",
+      "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+      "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+      "type_data_proof": null
+    }
+  },
+  "src/core/Autocomplete/_AutocompleteSlotCompatibility.spec.tsx": {
+    "before_sha256": "eb11ca4f411e20eab45fde1af04351ba68344ce4c64624a0f6eb9c50075b8c3c",
+    "after_sha256": "ea1d6ce891dbdf133124d85b57fffef7e7d3a8f4fe9668c98c0b1ce18fa55bac",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Autocomplete/_AutocompleteSlotCompatibility.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/theme-types/runtime-data-proof.json"
+  },
+  "src/core/Button/Button.spec.tsx": {
+    "before_sha256": "3a4b98c0c6e867e3424df2b9edb2fc879cd589301bedd61382d609bb4a5f1d9a",
+    "after_sha256": "da7ef4b08b7556abad3c98e23ecc498ef346588cc833d909e3cd0f651047a4d4",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Button/Button.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Button/_ButtonInverted.spec.tsx": {
+    "before_sha256": "45d6514698388bb9ec6741ce92c55970d7727f68a3c29abcd68509d141ed2a37",
+    "after_sha256": "35356c15b8f74183cc765098beb296ca21796535c6fb9f0c8e6099c8c929ec5f",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Button/_ButtonInverted.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/DatePicker/_DatePickerControlledSync.spec.tsx": {
+    "before_sha256": "ef0ba3db089ecd5b19a8adf83ccbdc1413e22ff8be46c824b3e7232fc354c75f",
+    "after_sha256": "8cd04c03496309a0862a8ed71dc43244389c3568258192d693313a25d6a4e737",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DatePicker/_DatePickerControlledSync.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/DatePicker/_DatePickerKeyboardSync.spec.tsx": {
+    "before_sha256": "e8f7c13d4e533349834ca5bd2dc4a693026269ec71d708148d12034c397853ee",
+    "after_sha256": "201c907d660b976bdbb40182d16429c6fb31b381111d22d6ff53e2ba7dea8457",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DatePicker/_DatePickerKeyboardSync.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/DateRangePicker/_DateRangePicker.mui.spec.tsx": {
+    "before_sha256": "b46b158a0230bc833b20b1103268741ebc96cdf48162e80306c3ad54b918f77d",
+    "after_sha256": "187e40085561161359af9c4e016d3e80f9b2ae5279f2a4293718c9bd682266a2",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DateRangePicker/_DateRangePicker.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/DateRangePicker/_DateRangePicker.spec.tsx": {
+    "before_sha256": "5b2f21ef1e81580769656a3bf2fd1754d16e3c6f490b92bdc80e98fc95b03f14",
+    "after_sha256": "a95273d121b1ba9b94faa81392d0653e5888482cfb89ecec55076948fbf544ee",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/DateRangePicker/_DateRangePicker.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Drawer/_Drawer.mui.spec.tsx": {
+    "before_sha256": "ab5a799f3550a0f074dc3987f5d756724193339d320bd518b1174d227ff3ec86",
+    "after_sha256": "a881a61c23b2fed153ab4f4bdef914d369d3f5c23a84a86cec20adc3b0934a57",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Drawer/_Drawer.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/FormControl/_FormControl.mui.spec.tsx": {
+    "before_sha256": "0a05063ed8bbc0e72342556c8f86bcb0a3568a408e049b3b233370780cdeffaa",
+    "after_sha256": "623114353f22f0ef89cb7811f285e5011d18d58298a92aca59411a9e2567dd95",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/FormControl/_FormControl.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Menu/_MenuV9Compatibility.spec.tsx": {
+    "before_sha256": "8c231e12756aea78f81dccb908d512ef1ad68ddd2b10e4419d3378143d8737b5",
+    "after_sha256": "921d8d76d47e04c790256e0db0927f27c392729695958227dab8b700f3a223af",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Menu/_MenuV9Compatibility.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Modal/ModalRoot/_ModalRootRender.spec.tsx": {
+    "before_sha256": "bf6eb7cbcb8c3afffcdd5ad238d7a24ebb1c2bc01dc5b43d721777ffe1bc2c74",
+    "after_sha256": "a9a756348cfafa0b7d7c6a3c8f89084fa14bb3e7d446403980774f93cc120d54",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Modal/ModalRoot/_ModalRootRender.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Modal/ModalStepper/ModalStepper.spec.tsx": {
+    "before_sha256": "be4985e2dd1b24344a05f79ec74b6d3788cef6a9059b37d04e2667862c0c884d",
+    "after_sha256": "32ed80a8761c97dd169b43dfbdf212e0f8b257ef4509a690017837e10e765838",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Modal/ModalStepper/ModalStepper.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null,
+    "whitespace_cleanup": {
+      "before_sha256": "33c0151ffbd665759d59b4dfdd922845031a78ffb0c8264bea8df46dcff116d6",
+      "removed": "Two trailing-whitespace-only blank lines; no AST node change",
+      "proof": "out/lint-zero-work/ModalStepper-whitespace-proof.json"
+    }
+  },
+  "src/core/Modal/_ModalCompact.spec.tsx": {
+    "before_sha256": "fa2e526a36393839a3d01dd145e4fd67de17ff64855f3dadc3406b11aa2aa871",
+    "after_sha256": "df53a2dc22f1e672c29c98f94f7eaff68b8878e0632c7874aa643acbfa263989",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Modal/_ModalCompact.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Modal/_ModalServiceWindowing.spec.tsx": {
+    "before_sha256": "84e7d17b963ab1c550423f4a6b8e4936d8301a19d4b87ffc6a1a5d27264eb518",
+    "after_sha256": "fc934ba304299f1c1f3417315e64b9ce2d04d2fd0ea843a51fd036a23b793d01",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Modal/_ModalServiceWindowing.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Popover/PopoverPopper/_PopoverPopper.mui.spec.tsx": {
+    "before_sha256": "25f9d1bddceed9e1db9803c7899db490ab267e7a9bd20382a7385131c4d6f3d5",
+    "after_sha256": "23bf92fd49188f8d0e75507c56e2f5eabdebd69b005501369e291d87bd74c188",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Popover/PopoverPopper/_PopoverPopper.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/PopoverModal/_PopoverModal.mui.spec.tsx": {
+    "before_sha256": "999c2743347ebf3b008f2d7f329b142c755370f5ac22707862a2c481a710dec4",
+    "after_sha256": "c5cfb0db2dba3e5987ed3b5dc13bfcc06936bbb6ed0ce20a89c02a3ed848dce1",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-16",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06",
+    "prior_approval": {
+      "before_sha256": "aa3b3ae78fcab2af925b11292802151618585ef53bae959d2f0c8ab4148c5ddb",
+      "after_sha256": "999c2743347ebf3b008f2d7f329b142c755370f5ac22707862a2c481a710dec4",
+      "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+      "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/PopoverModal/_PopoverModal.mui.spec.tsx.json",
+      "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+      "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+      "type_data_proof": null
+    }
+  },
+  "src/core/ProgressBar/_ProgressBar.mui.spec.tsx": {
+    "before_sha256": "a2f4398b77366a200393c4e6faef4afb931b3b8b04695d9aef28ae2dfa2b72fc",
+    "after_sha256": "bcc4359769c093e5d591fbce482510f64382849abe32c71d86d25e1815b77196",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/ProgressBar/_ProgressBar.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/SearchableSelect/_SearchableSelect.mui.spec.tsx": {
+    "before_sha256": "df2b6003663543a54e8c835c33fb2fc4d830913ee5c0346c575d0eaafe7089b9",
+    "after_sha256": "e0c201e25c5c3a9f61ee4b75f5e555e54172cc84c44fe1b3152dce14d56da049",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/SearchableSelect/_SearchableSelect.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Select/_Select.mui.spec.tsx": {
+    "before_sha256": "5f17771f2a1d751c2ef945da3d69ed40441cdcd4a98b2732930bd603e42a6b1c",
+    "after_sha256": "e2e511167c5faf4eafa67b75c9eea60790b249992e2f3e7f7653ff3cc2eecc14",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-19",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06",
+    "prior_approval": {
+      "before_sha256": "0b2273d11b0f755f048f71de2213c7cccd8ca73197861c0181e238800277c327",
+      "after_sha256": "5f17771f2a1d751c2ef945da3d69ed40441cdcd4a98b2732930bd603e42a6b1c",
+      "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+      "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Select/_Select.mui.spec.tsx.json",
+      "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+      "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+      "type_data_proof": null
+    }
+  },
+  "src/core/Slider/_Slider.mui.spec.tsx": {
+    "before_sha256": "18fff2d3ce05e41d3f56a5cb2d6090490023ac23ee785635dff112a26b7b3c28",
+    "after_sha256": "8b4c5ac4acff782f10ad5c0886e19aaeb4a1c150bb8cb025a780d99270a3eb91",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-20",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06",
+    "prior_approval": {
+      "before_sha256": "e19794fad50ca73d016838f5121cf2eae2aa0777e5f4183f0208a35d37541b2d",
+      "after_sha256": "18fff2d3ce05e41d3f56a5cb2d6090490023ac23ee785635dff112a26b7b3c28",
+      "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+      "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Slider/_Slider.mui.spec.tsx.json",
+      "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+      "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+      "type_data_proof": null
+    }
+  },
+  "src/core/Snackbar/_Snackbar.mui.spec.tsx": {
+    "before_sha256": "b065522225e1433900348196c571fb174a4e1cfd99c992f208d5ac2e8aab8b5a",
+    "after_sha256": "c1c95e8d26511e5bf166442a75bf2e6b92f9242c2fadf26d3251a394b863d81d",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Snackbar/_Snackbar.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx": {
+    "before_sha256": "d19d2acacd278a9dbd55806b438eeabc80cea02956e6f0d4ca12d755de28f7bf",
+    "after_sha256": "ce5794c3653e6955e72d3b7948cc2e72487afb80d1a1516f56184b7b2e12d314",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/Snackbar/_SnackbarRemaining.spec.tsx": {
+    "before_sha256": "716cf2a16447c69112ced89fe1ded93799d8c911b9f814d380b0c3ad507122cf",
+    "after_sha256": "2cf7fd7db3b901cd9c8144e7d96d4c17379b364ee8768ebf287726960fbecec1",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Snackbar/_SnackbarRemaining.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/theme-types/runtime-data-proof.json"
+  },
+  "src/core/Snackbar/_SnackbarSlotCompatibility.spec.tsx": {
+    "before_sha256": "5eef4d259b68e9e7601b5c5b4233d0c2a111136fd183324ddc020e9337945295",
+    "after_sha256": "14d5be3bb9e66b3a421efd5fe7669c0e285e3e035c0d10f8f636e4e6e5b619cd",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/Snackbar/_SnackbarSlotCompatibility.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/theme-types/runtime-data-proof.json"
+  },
+  "src/core/ToggleButtonGroup/_ToggleButtonGroup.mui.spec.tsx": {
+    "before_sha256": "2a93f8a5bbe062b7ca268d8693bbbefd17d04444627ac4183b55a0946a1c04b7",
+    "after_sha256": "ed545c3b4f25156855da8be6bc4ec64260e29ce66221fcdd54ec40743fe8f99c",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/ToggleButtonGroup/_ToggleButtonGroup.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/TogglerWithText/TogglerWithText.spec.tsx": {
+    "before_sha256": "b9c5e1b1ab7bca76ed16529e92ea1a9830960be20e70d18b132145a0f4ead786",
+    "after_sha256": "394c7a9a8d8802046329fae6373b7723de0acf34b899ffc3acc7338a13b88bb9",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/TogglerWithText/TogglerWithText.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/_internal/InputBase/_InputBase.mui.spec.tsx": {
+    "before_sha256": "0dac12c8d78fdee24514edc553962df9e6b8c616e3fa55250f202149c4a84b67",
+    "after_sha256": "0a2c11e9f5353b4ddae332b37caaab9f82dff5e79616e70c8019c1613adb97d8",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/_internal/InputBase/_InputBase.mui.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/_internal/InputBase/_MuiTextFieldCompatibility.spec.tsx": {
+    "before_sha256": "ae9501ee4b397ccd4fe59694415e1f87f604732cc05e98c83cea25e0f89004e0",
+    "after_sha256": "2441d0327b659337f91b558a1b0d770ab051581614de2c05521d4687ff6b00eb",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/_internal/InputBase/_MuiTextFieldCompatibility.spec.tsx.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/theme-types/runtime-data-proof.json"
+  },
+  "src/core/_internal/_mui-slot-compat.spec.ts": {
+    "before_sha256": "1304f4630dfe92c11f04cff685000d401f38142af61fde64187d6ef8315ef4a1",
+    "after_sha256": "a6e0397405131debab6d497beebc301bcbbbc7d89ea78bd9edd4f36bd66a6417",
+    "allowed_change": "User-authorized lint/static-hygiene refactor only: expect nodes and decoded test/describe titles byte-identical; no test removals. Existing four S5b quirk REDs remain unchanged, not waived.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/final-ast-proofs/src/core/_internal/_mui-slot-compat.spec.ts.json",
+    "runtime_proof": "agentic-plans/mui-upgrade-gates/out/lint-zero-work/runtime-all-refactors/preservation-proof.json",
+    "authority": "Overseer relay: user requires lint-zero, permits frozen lint-only hoists and five unchanged typed theme fixtures, 2026-11-06",
+    "type_data_proof": null
+  },
+  "src/core/MenuItem/_MenuItem.mui.spec.tsx": {
+    "before_sha256": "9b2a1360e4c1d90d74a304f5a905424b6f483705bbe09a35c7a7c1dad0258461",
+    "after_sha256": "abb37de19d3c9f3b36275d16dd1fe0a28fcebe11c60384bb59366f2306dd8639",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-14, spec-15, spec-13",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06",
+    "prior_approval": {
+      "before_sha256": "b809370a82908fa58eb06e23c03e0cc766bb606b711f7077fe4da538d966b777",
+      "after_sha256": "9b2a1360e4c1d90d74a304f5a905424b6f483705bbe09a35c7a7c1dad0258461",
+      "allowed_change": "User MenuItem Option A: only two context requirement/support cases and metadata MenuList wrapper; nine story names/args byte-identical. No production fallback/private import/export.",
+      "proof": "agentic-plans/mui-upgrade-gates/out/s5b-menuitem-option-a/ast-proof.json",
+      "source_cause": [
+        "@mui/material/MenuItem/MenuItem.mjs:188",
+        "@mui/material/MenuList/MenuListContext.mjs:16"
+      ],
+      "runtime_proof": [
+        "agentic-plans/mui-upgrade-gates/out/s5b-menuitem-option-a/standalone-green-process.json",
+        "agentic-plans/mui-upgrade-gates/out/s5b-menuitem-option-a/stories-green-process.json"
+      ],
+      "authority": "Explicit user breaking-change decision relayed by overseer; precise bundled-context boundary approved"
+    }
+  },
+  "src/core/MenuItem/_MenuItem.stories.tsx": {
+    "before_sha256": "f6b35caad07968c7a45317e168358f4cdaf5d12856170d1310c34eb43e1e59a2",
+    "after_sha256": "57a4261b382dbd8f0f9ebbcfcfef1f8ce8a7dcb61a432671c333b11e42809b8b",
+    "allowed_change": "User MenuItem Option A: only two context requirement/support cases and metadata MenuList wrapper; nine story names/args byte-identical. No production fallback/private import/export.",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-menuitem-option-a/ast-proof.json",
+    "source_cause": [
+      "@mui/material/MenuItem/MenuItem.mjs:188",
+      "@mui/material/MenuList/MenuListContext.mjs:16"
+    ],
+    "runtime_proof": [
+      "agentic-plans/mui-upgrade-gates/out/s5b-menuitem-option-a/standalone-green-process.json",
+      "agentic-plans/mui-upgrade-gates/out/s5b-menuitem-option-a/stories-green-process.json"
+    ],
+    "authority": "Explicit user breaking-change decision relayed by overseer; precise bundled-context boundary approved"
+  },
+  "src/core/Menu/_Menu.mui.spec.tsx": {
+    "before_sha256": "87635ec4382473151be1f6551c19e03501d4fbc9f8fb92ef954223b6ac8b22f6",
+    "after_sha256": "648596efc3819515f38518b32c4717257adcd05d6b4894e26b8dfcdeb7113075",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: spec-8, spec-9, spec-10",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06"
+  },
+  "src/core/Menu/_MenuMuiContract.stories.tsx": {
+    "before_sha256": "4e84cc015dbc464e3cd11c723e84eb1e61c7a6bc707e35a07e579ed0e7b080ac",
+    "after_sha256": "5cf23ba5eea80e365e5b8d6cd4fe2bb73fb10884ca45d1aa36c57ed55adb0644",
+    "allowed_change": "Explicitly authorized C/D upstream v9 quirk fixes only: storybook-1",
+    "proof": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/ast-proof.json",
+    "ledger": "agentic-plans/mui-upgrade-gates/out/s5b-v9-quirk-flips/change-ledger.json",
+    "authority": "Overseer C/D authorization and Select native guard correction, 2026-11-06"
+  }
+}

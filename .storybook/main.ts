@@ -24,6 +24,8 @@ import { tsgoChecker } from "./vite-plugin-tsgo-checker.ts";
 // exclude: ['**/exampleDirectory/**'],
 // },
 // };
+const v8Coverage = process.env.VANGUARD_V8_COVERAGE === "1";
+
 const ignoredFolders = ["__model_mocks__", "@stores"];
 
 const mockAliases = createMockAliases(SRC_BASE, ignoredFolders);
@@ -37,7 +39,7 @@ const config: StorybookConfig = {
   ],
 
   addons: [
-    "@storybook/addon-coverage",
+    ...(!v8Coverage ? ["@storybook/addon-coverage"] : []),
     "@storybook/addon-docs",
     "@storybook/addon-vitest"
   ],
@@ -55,6 +57,13 @@ const config: StorybookConfig = {
 
     // Create a modified BaseViteConfig without external dependencies for Storybook
     const storybookBaseConfig = { ...loadedConfig.config };
+    if (v8Coverage) {
+      // vite-plugin-ts erases TypeScript with sourceMap:false before generating its Babel map.
+      // Use Vite's TS transform so V8 coverage maps to the original source.
+      storybookBaseConfig.plugins = (storybookBaseConfig.plugins ?? []).filter(
+        plugin => !plugin || typeof plugin !== "object" || !("name" in plugin) || plugin.name !== "vite:vue-jsx",
+      );
+    }
     if (storybookBaseConfig.build?.rollupOptions) {
       // Remove external dependencies for Storybook build
       delete storybookBaseConfig.build.rollupOptions.external;
@@ -86,12 +95,12 @@ const config: StorybookConfig = {
         //   filename: "bundle-analysis.html", // Output file name
         //   template: "treemap", // Visualization type ('treemap', 'sunburst', etc.)
         // }),
-        istanbul({
+        ...(!v8Coverage ? [istanbul({
           include: ["**/stories/**"],
           exclude: ["node_modules", "test/"],
           extension: [".ts", ".tsx"],
           requireEnv: false,
-        }),
+        })] : []),
         createMissingAssetsPlugin(),
         // Add TypeScript 7 (tsgo) type checking
         tsgoChecker({

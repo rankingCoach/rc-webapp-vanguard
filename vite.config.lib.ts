@@ -1,3 +1,4 @@
+import { withBundledUseClientFilter } from './config/rollup-onwarn';
 import { defineConfig, build, Connect, UserConfig, mergeConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
@@ -129,7 +130,7 @@ export const BaseViteConfig: UserConfig = {
     rollupOptions: {
       // input: getViteEntryFiles,
 
-      onwarn(warning, warn) {
+      onwarn: withBundledUseClientFilter((warning, warn) => {
         // Check if the warning is the one you want to ignore and silence it
         if (warning.message.includes("use-dynamic-import")) {
           // You could include more specific conditions to target the exact warning
@@ -137,7 +138,7 @@ export const BaseViteConfig: UserConfig = {
         }
         // Otherwise pass all other warnings to the default handler
         warn(warning);
-      },
+      }),
       external: ["react", "react-dom", "react-redux", "@reduxjs/toolkit", "react-is", "react/jsx-runtime", "imask", "react-imask"],
 
       output: {
