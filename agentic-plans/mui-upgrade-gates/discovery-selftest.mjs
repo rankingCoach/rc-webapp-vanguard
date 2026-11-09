@@ -23,7 +23,7 @@ try {
   }
   for (const pattern of ['out/**', 'agentic-plans/**']) assert.ok(proof.coverageExclude.includes(pattern));
   assert.ok(files.spec.includes('config/_regex.spec.ts'), 'legitimate config test preserved');
-  assert.deepEqual(files.scripts, ['scripts/_codemod-button-sizes.spec.ts', 'scripts/_mui-public-imports.spec.ts', 'scripts/_mui-v7-public-imports.spec.ts', 'scripts/_rollup-onwarn.spec.ts'].sort());
+  assert.deepEqual(files.scripts, ['scripts/_codemod-button-sizes.spec.ts', 'scripts/_mui-public-imports.spec.ts', 'scripts/_mui-v7-public-imports.spec.ts', 'scripts/_rollup-onwarn.spec.ts', 'scripts/_storybook-config.spec.ts'].sort());
   if (option('compare')) {
     const before = JSON.parse(fs.readFileSync(option('compare'))).files;
     const removed = before.spec.filter(f => !files.spec.includes(f));

@@ -35,8 +35,8 @@ def main():
  stories=[t for t in load(coverage/'tests.json')['testResults'] if '.stories.' in t['name']]
  assert sum(len(t['assertionResults']) for t in stories)==1292,'incomplete Storybook'
  scripts=[s['file'] for s in selected if s['project']=='scripts']
- assert len(scripts)==4
- out['scripts_runtime']=assert_runtime(load(O/'scripts-tests.json'),scripts,37)
+ assert len(scripts)==5
+ out['scripts_runtime']=assert_runtime(load(O/'scripts-tests.json'),scripts,42)
  for p in [coverage.parent/(coverage.name+'.log'),O/'coverage.log',O/'scripts.log']:
   if not p.exists():continue
   assert not re.search(r'Unhandled (?:Errors|Error|Rejection)|Uncaught Exception',p.read_text(),re.I),str(p)
@@ -74,5 +74,5 @@ def main():
    if consumer=='default-mui':assert not (P/consumer/'types-mui-gated.log').read_text().strip()
  out['installed_bytes']=bytes_proof;out['runtime_counts']=load(P/'runtime-counts.json');assert out['runtime_counts']['aggregate']==18
  (O/'s5b-stage-audit.json').write_text(json.dumps(out,indent=2)+'\n')
- print('PASS: 3069 component tests +37 scripts complete;35 mapped thresholds;0 visible directive warnings;0 TS diagnostics;frozen/bytes/pins/types;18 packed runtime')
+ print('PASS: 3069 component tests +42 scripts complete;35 mapped thresholds;0 visible directive warnings;0 TS diagnostics;frozen/bytes/pins/types;18 packed runtime')
 if __name__=='__main__':main()

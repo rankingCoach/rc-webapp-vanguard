@@ -173,3 +173,12 @@ three in MUI-present fixtures. The latter explicitly install the three exact rep
 pins. No source aliases or ancestor dependency fallback are accepted. The guard
 selftest proves an actual worktree fixture is rejected and tests clean/contaminated
 ancestors plus absent/owned/missing MUI resolution.
+
+
+Storybook builds share only aliases, CSS, esbuild/optimizeDeps and explicitly
+required resolution/transform plugins. Library output settings, dts and asset-
+analysis build plugins are excluded. Coverage is off in normal development and
+static production builds. Set `VANGUARD_ISTANBUL_COVERAGE=1` for the two Istanbul
+paths; `VANGUARD_V8_COVERAGE=1` always takes precedence and disables both.
+The fifth mandatory Node file `scripts/_storybook-config.spec.ts` contributes
+five cases (total42), protecting default isolation and explicit/V8 coverage modes.

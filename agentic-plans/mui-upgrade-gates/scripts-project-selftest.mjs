@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createVitest } from 'vitest/node';
-const expected = ['scripts/_codemod-button-sizes.spec.ts', 'scripts/_mui-public-imports.spec.ts', 'scripts/_mui-v7-public-imports.spec.ts', 'scripts/_rollup-onwarn.spec.ts'].sort();
+const expected = ['scripts/_codemod-button-sizes.spec.ts', 'scripts/_mui-public-imports.spec.ts', 'scripts/_mui-v7-public-imports.spec.ts', 'scripts/_rollup-onwarn.spec.ts', 'scripts/_storybook-config.spec.ts'].sort();
 const ctx = await createVitest('test', { watch: false });
 try {
   const specs = await ctx.globTestSpecifications();

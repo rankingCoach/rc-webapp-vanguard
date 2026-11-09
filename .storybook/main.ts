@@ -25,6 +25,8 @@ import { tsgoChecker } from "./vite-plugin-tsgo-checker.ts";
 // },
 // };
 const v8Coverage = process.env.VANGUARD_V8_COVERAGE === "1";
+// Instrumentation is opt-in, including normal production/static builds.
+const istanbulCoverage = process.env.VANGUARD_ISTANBUL_COVERAGE === "1" && !v8Coverage;
 
 const ignoredFolders = ["__model_mocks__", "@stores"];
 
@@ -39,7 +41,7 @@ const config: StorybookConfig = {
   ],
 
   addons: [
-    ...(!v8Coverage ? ["@storybook/addon-coverage"] : []),
+    ...(istanbulCoverage ? ["@storybook/addon-coverage"] : []),
     "@storybook/addon-docs",
     "@storybook/addon-vitest"
   ],
@@ -53,21 +55,28 @@ const config: StorybookConfig = {
       path.resolve(__dirname, "../vite.config.lib.ts"),
     );
     if (!loadedConfig) throw new Error("Could not load the shared Vite configuration");
-    const istanbul = (await import("vite-plugin-istanbul")).default;
+    const istanbul = istanbulCoverage ? (await import("vite-plugin-istanbul")).default : undefined;
 
-    // Create a modified BaseViteConfig without external dependencies for Storybook
-    const storybookBaseConfig = { ...loadedConfig.config };
-    if (v8Coverage) {
-      // vite-plugin-ts erases TypeScript with sourceMap:false before generating its Babel map.
-      // Use Vite's TS transform so V8 coverage maps to the original source.
-      storybookBaseConfig.plugins = (storybookBaseConfig.plugins ?? []).filter(
-        plugin => !plugin || typeof plugin !== "object" || !("name" in plugin) || plugin.name !== "vite:vue-jsx",
-      );
-    }
-    if (storybookBaseConfig.build?.rollupOptions) {
-      // Remove external dependencies for Storybook build
-      delete storybookBaseConfig.build.rollupOptions.external;
-    }
+    // Share only resolution, styling and transforms. Library output/declaration
+    // settings and build-only plugins must not enter Storybook's application build.
+    const shared = loadedConfig.config;
+    const sharedPluginNames = new Set([
+      "vite-tsconfig-paths",
+      "ignore-dynamic-import-warning",
+      ...(!v8Coverage ? ["vite:vue-jsx"] : []),
+    ]);
+    const storybookBaseConfig: UserConfig = {
+      // Logging policy is safe to reuse; no library mode/output options are copied.
+      ...(shared.build?.rollupOptions?.onwarn ? { build: { rollupOptions: { onwarn: shared.build.rollupOptions.onwarn } } } : {}),
+      resolve: shared.resolve,
+      css: shared.css,
+      esbuild: shared.esbuild,
+      optimizeDeps: shared.optimizeDeps,
+      plugins: (shared.plugins ?? []).flat().filter(
+        plugin => plugin && typeof plugin === "object" && "name" in plugin
+          && typeof plugin.name === "string" && sharedPluginNames.has(plugin.name),
+      ),
+    };
     // theming.css references webapp-hosted fonts; bundle the local copies instead.
     // Must come before the generic "/vanguard" alias, which points into the webapp checkout.
     storybookBaseConfig.resolve = {
@@ -95,7 +104,7 @@ const config: StorybookConfig = {
         //   filename: "bundle-analysis.html", // Output file name
         //   template: "treemap", // Visualization type ('treemap', 'sunburst', etc.)
         // }),
-        ...(!v8Coverage ? [istanbul({
+        ...(istanbul ? [istanbul({
           include: ["**/stories/**"],
           exclude: ["node_modules", "test/"],
           extension: [".ts", ".tsx"],
