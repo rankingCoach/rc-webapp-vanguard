@@ -90,3 +90,27 @@
     }
   }
 }
+
+// rounded: the track and its items as pills
+.ToggleButtonGroup-segmented-rounded {
+  .MuiToggleButtonGroup-root,
+  .MuiToggleButtonGroup-root .MuiToggleButton-root {
+    border-radius: 999px;
+  }
+}
+
+// segmentedSize="large": a 48px track (44px items + the 2px inset) with 16px labels
+.ToggleButtonGroup-segmented-large {
+  .MuiToggleButtonGroup-root .MuiToggleButton-root {
+    height: $x5 + $x0_5;
+    min-width: $x5 + $x0_5;
+    padding: $x1_5 $x2_5;
+    font-size: $x2;
+    line-height: $x2_5;
+    letter-spacing: normal;
+
+    &.ToggleButton-icon-only {
+      padding: $x1_5;
+    }
+  }
+}

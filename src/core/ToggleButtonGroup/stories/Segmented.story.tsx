@@ -8,7 +8,8 @@ import { Story } from "./_ToggleButtonGroup.default";
 
 const SOURCES = ["My Library", "Stock", "Logos"];
 
-// variant="segmented": a 32px muted track, the pressed item a white chip; text items and icon-only items
+// variant="segmented": a 32px muted track, the pressed item a white chip; text items and icon-only items.
+// `rounded` makes the track and items pills, `segmentedSize="large"` a 48px track with 16px labels.
 export const Segmented: Story = {
   render: () => {
     const [source, setSource] = useState("My Library");
@@ -45,6 +46,22 @@ export const Segmented: Story = {
             <Icon>{IconNames.bulletList}</Icon>
           </ToggleButton>
         </ToggleButtonGroup>
+        <ToggleButtonGroup
+          variant="segmented"
+          rounded
+          segmentedSize="large"
+          exclusive
+          aria-label="Source, as a page's main switch"
+          value={source}
+          onChange={(_e, value) => value && setSource(value)}
+          data-testid="segmented-rounded-large"
+        >
+          {SOURCES.map((label) => (
+            <ToggleButton key={label} value={label}>
+              {label}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
         <ToggleButtonGroup variant="segmented" exclusive value="a" data-testid="segmented-disabled">
           <ToggleButton value="a">Enabled</ToggleButton>
           <ToggleButton value="b" disabled>
@@ -68,6 +85,17 @@ export const Segmented: Story = {
       expect(getComputedStyle(library).fontWeight, "font weight").toBe("500");
       expect(getComputedStyle(library).borderRadius, "item radius").toBe("4px");
       expect(getComputedStyle(sources).borderRadius, "track radius").toBe("6px");
+    });
+
+    // rounded + large: a 48px pill track with 44px pill items and 16px labels
+    const pill = canvas.getByTestId("segmented-rounded-large");
+    const pillItem = within(pill).getByRole("button", { name: "My Library" });
+    await waitFor(() => {
+      expect(pill.getBoundingClientRect().height, "large track height").toBe(48);
+      expect(pillItem.getBoundingClientRect().height, "large item height").toBe(44);
+      expect(getComputedStyle(pillItem).fontSize, "large font size").toBe("16px");
+      expect(getComputedStyle(pillItem).borderRadius, "pill item").toBe("999px");
+      expect(getComputedStyle(pill).borderRadius, "pill track").toBe("999px");
     });
 
     // pressed: the white chip; the others transparent on the track
