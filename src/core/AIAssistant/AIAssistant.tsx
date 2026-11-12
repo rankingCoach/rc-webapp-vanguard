@@ -31,7 +31,14 @@ export type AIAssistantProps = {
   anchorElem: HTMLElement | null; // Panel will position to this element
   generateBtnText?: string;
   generateCallback: (command?: string, keepShort?: boolean) => Promise<string>; // REQUIRED: A callback that will be called when the "Generate" button is clicked
-  adjustCallback?: (text: string, option: AIAssistantAdjustOptions, command?: string) => Promise<string>; // OPTIONAL: if not provided, default ADJUST endpoint will be used
+  /**
+   * The consumer's adjust request: resolves to the adjusted text. Recommended.
+   *
+   * Without it, Vanguard adjusts through its own built-in request (its own SDK, to the page's origin). That usage is
+   * deprecated, and editors show it struck through: see {@link AIAssistant}. The built-in request will be removed in the
+   * next major version (VAN-64).
+   */
+  adjustCallback?: (text: string, option: AIAssistantAdjustOptions, command?: string) => Promise<string>;
   useHtml?: boolean; // OPTIONAL: if true, will use HTML instead of plain text
   onKeepCallback?: () => void; // OPTIONAL: if provided, will be called when the "Keep" button is clicked
   onCloseCallback?: () => void; //OPTIONAL: if provided, will be called when the close button is clicked
@@ -48,7 +55,22 @@ export type AIAssistantProps = {
   forbiddenAjustOptions?: AIAssistantAdjustOptions[];
 };
 
-export const AIAssistant = (props: AIAssistantProps) => {
+/**
+ * AIAssistant's call signatures (VAN-64). With `adjustCallback` it matches the first, the recommended one. Without it,
+ * the second, which is deprecated: editors show that usage struck through, while it still works as before.
+ */
+export type AIAssistantComponent = {
+  /** Generates and adjusts text: `generateCallback` and `adjustCallback` make the requests, with your own SDK. */
+  (props: AIAssistantProps & { adjustCallback: NonNullable<AIAssistantProps['adjustCallback']> }): React.JSX.Element;
+  /**
+   * @deprecated Pass `adjustCallback` and make the adjust request with your own SDK. Without it, AIAssistant adjusts
+   * through Vanguard's built-in request (its own SDK, with a hardcoded empty base URL: the page's origin), which will be
+   * removed in the next major version (VAN-64).
+   */
+  (props: AIAssistantProps): React.JSX.Element;
+};
+
+export const AIAssistant: AIAssistantComponent = (props: AIAssistantProps) => {
   const {
     id = `AIAssistant_${uuidv4()}`,
     children,

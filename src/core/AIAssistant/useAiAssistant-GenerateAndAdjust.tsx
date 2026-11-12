@@ -59,6 +59,75 @@ export const useAiAssistantAdjustAndGenerate = (props: AIAssistantProps) => {
     }
   };
 
+  /**
+   * The request Vanguard makes itself when there is no `adjustCallback`: Vanguard's own SDK, with its hardcoded empty
+   * `apiBase`, so it goes to the page's origin (VAN-64).
+   *
+   * @deprecated Pass `adjustCallback` (or `aiAdjustCallback` on RichTextEditor) and make the request with your own SDK.
+   * This fallback will be removed in the next major version.
+   */
+  const legacyAdjustRequest = (text: string, option: AIAssistantAdjustOptions, command?: string) => {
+    aiStore
+      .postClientAiTextAdjustByLocationId(
+        getPathId(),
+        {
+          aiText: {
+            outputFormat: useHtml ? AITextOutputFormat.HTML_TAGS : AITextOutputFormat.MARKDOWN,
+            text: text,
+            objectType: AITextObjectType.App_Domain_AI_Entities_Text_AIText,
+          },
+          command: command,
+          expand: option === 'expand',
+          shorten: option === 'shorten',
+          generateHashtags: option === 'generateHashtags',
+          keywordsToIntegrate:
+            option === 'includeKeywords' && keywordsToInclude
+              ? ({
+                  elements: keywordsToInclude,
+                  objectType: KeywordsObjectType.App_Domain_Common_Entities_Keywords_Keywords,
+                } as unknown as Keywords)
+              : undefined,
+          tone: mapAdjustOptionsToBE(option),
+          keepShort: keepShort,
+        },
+        {},
+      )
+      .subscribe({
+        next: (response) => {
+          setGeneratedText(response.aiText?.adjustedText ?? '');
+          setGeneratedCount(generatedCount + 1);
+        },
+        error: (error) => {
+          setPanelStatus('closed');
+          console.error('Error while adjusting text ', error);
+          if (error.response.data.error === aiBudgetExceededMessage) {
+            ModalService.open(<AIBudgetEnd close={() => {}} />);
+            return;
+          }
+          ModalService.open(
+            <ErrorModal
+              close={() => null}
+              source={'AI_ASSISTANT'}
+              title={'Oh snap! Something went wrong!'}
+              message={
+                'The application has encountered an unknown error. Please contact customer support for further help.'
+              }
+              ctaPositive={{
+                text: 'contact our support',
+                cta: () => {
+                  supportService.show();
+                },
+                icon: IconNames.arrowRight,
+              }}
+              ctaPosition={'center'}
+            />,
+          );
+          setGeneratedText('');
+          setGeneratedCount(generatedCount + 1);
+        },
+      });
+  };
+
   const onAdjustClick = (text: string, option: AIAssistantAdjustOptions, command?: string) => {
     setPanelStatus('writing');
     if (panelStatus !== 'writing') {
@@ -78,68 +147,7 @@ export const useAiAssistantAdjustAndGenerate = (props: AIAssistantProps) => {
           },
         );
       } else {
-        /**
-         * DEFAULT REQUEST
-         */
-        aiStore
-          .postClientAiTextAdjustByLocationId(
-            getPathId(),
-            {
-              aiText: {
-                outputFormat: useHtml ? AITextOutputFormat.HTML_TAGS : AITextOutputFormat.MARKDOWN,
-                text: text,
-                objectType: AITextObjectType.App_Domain_AI_Entities_Text_AIText,
-              },
-              command: command,
-              expand: option === 'expand',
-              shorten: option === 'shorten',
-              generateHashtags: option === 'generateHashtags',
-              keywordsToIntegrate:
-                option === 'includeKeywords' && keywordsToInclude
-                  ? ({
-                      elements: keywordsToInclude,
-                      objectType: KeywordsObjectType.App_Domain_Common_Entities_Keywords_Keywords,
-                    } as unknown as Keywords)
-                  : undefined,
-              tone: mapAdjustOptionsToBE(option),
-              keepShort: keepShort,
-            },
-            {},
-          )
-          .subscribe({
-            next: (response) => {
-              setGeneratedText(response.aiText?.adjustedText ?? '');
-              setGeneratedCount(generatedCount + 1);
-            },
-            error: (error) => {
-              setPanelStatus('closed');
-              console.error('Error while adjusting text ', error);
-              if (error.response.data.error === aiBudgetExceededMessage) {
-                ModalService.open(<AIBudgetEnd close={() => {}} />);
-                return;
-              }
-              ModalService.open(
-                <ErrorModal
-                  close={() => null}
-                  source={'AI_ASSISTANT'}
-                  title={'Oh snap! Something went wrong!'}
-                  message={
-                    'The application has encountered an unknown error. Please contact customer support for further help.'
-                  }
-                  ctaPositive={{
-                    text: 'contact our support',
-                    cta: () => {
-                      supportService.show();
-                    },
-                    icon: IconNames.arrowRight,
-                  }}
-                  ctaPosition={'center'}
-                />,
-              );
-              setGeneratedText('');
-              setGeneratedCount(generatedCount + 1);
-            },
-          });
+        legacyAdjustRequest(text, option, command);
       }
     }
   };

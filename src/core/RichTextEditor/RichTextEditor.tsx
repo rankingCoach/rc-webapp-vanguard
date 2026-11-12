@@ -13,6 +13,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { Keyword } from '@models/swagger/App/Domain/Common/Entities/Keywords/Keyword';
 import { translationService } from '@services/translation.service';
+import type { AIAssistantProps } from '@vanguard/AIAssistant/AIAssistant';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import {
   ControlledValuePlugin,
@@ -38,6 +39,13 @@ export type RichTextEditorProps = {
   toolbarPortalElem?: HTMLElement;
   toolbarContainerClassName?: string;
   useAiAssistant?: boolean;
+  /**
+   * With `useAiAssistant`: the consumer's adjust request for the selected text (as AIAssistant's `adjustCallback`).
+   * Recommended. Without it, the AI assistant adjusts through Vanguard's own built-in request. That usage is deprecated,
+   * and editors show it struck through: see {@link RichTextEditor}. The built-in request will be removed in the next
+   * major version (VAN-64).
+   */
+  aiAdjustCallback?: AIAssistantProps['adjustCallback'];
   keywords?: string[];
   keywordsToInclude?: Keyword[];
   onChange?: (html: string, plainText: string) => void;
@@ -45,7 +53,27 @@ export type RichTextEditorProps = {
   onBlur?: () => void;
 };
 
-export const RichTextEditor = (props: RichTextEditorProps) => {
+/**
+ * RichTextEditor's call signatures (VAN-64). Without the AI assistant, or with it and `aiAdjustCallback`, it matches a
+ * recommended one. With the AI assistant and no `aiAdjustCallback`, the last, which is deprecated: editors show that
+ * usage struck through, while it still works as before.
+ */
+export type RichTextEditorComponent = {
+  /** A rich text editor, without the AI assistant. */
+  (props: RichTextEditorProps & { useAiAssistant?: false }): React.JSX.Element;
+  /** A rich text editor whose AI assistant adjusts the selection through `aiAdjustCallback`, with your own SDK. */
+  (
+    props: RichTextEditorProps & { aiAdjustCallback: NonNullable<RichTextEditorProps['aiAdjustCallback']> },
+  ): React.JSX.Element;
+  /**
+   * @deprecated With `useAiAssistant`, pass `aiAdjustCallback` and make the adjust request with your own SDK. Without it,
+   * the AI assistant adjusts through Vanguard's built-in request (its own SDK, with a hardcoded empty base URL: the
+   * page's origin), which will be removed in the next major version (VAN-64).
+   */
+  (props: RichTextEditorProps): React.JSX.Element;
+};
+
+export const RichTextEditor: RichTextEditorComponent = (props: RichTextEditorProps) => {
   const {
     id = 'RichTextEditor',
     defaultValue,
@@ -59,6 +87,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     useAiAssistant = false,
     keywords,
     keywordsToInclude,
+    aiAdjustCallback,
   } = props;
 
   const [floatingAnchor, setFloatingAnchor] = useState<HTMLElement | undefined>();
@@ -107,7 +136,11 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
           {defaultValue ? <DefaultValuePlugin defaultValue={defaultValue} /> : <></>}
           {value ? <ControlledValuePlugin value={value} /> : <></>}
           {useAiAssistant && floatingAnchor ? (
-            <RteAiAssistant anchorElem={floatingAnchor} keywordsToInclude={keywordsToInclude ?? []} />
+            <RteAiAssistant
+              anchorElem={floatingAnchor}
+              keywordsToInclude={keywordsToInclude ?? []}
+              adjustCallback={aiAdjustCallback}
+            />
           ) : (
             <></>
           )}
