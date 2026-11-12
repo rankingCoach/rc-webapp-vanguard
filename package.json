@@ -53,7 +53,7 @@
     "test:w:c": "vitest --coverage --watch --project storybook --project spec --project scripts",
     "verify-tsgo": "node scripts/verify-tsgo.js",
     "verify-storybook-tsgo": "node scripts/verify-storybook-tsgo.js",
-    "prepack": "pnpm run build",
+    "prepare": "pnpm run build",
     "vanguard": "node scripts/vanguard-cli.js",
     "vanguard:init": "node scripts/vanguard-cli.js init",
     "vanguard:list": "node scripts/vanguard-cli.js list",
