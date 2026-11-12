@@ -98,6 +98,10 @@ export { ModalRoot } from './core/Modal/ModalRoot/ModalRoot.tsx';
 export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './core/Modal/ModalService.tsx';
 export { ModalService } from './core/Modal/ModalService.tsx';
 
+// OverlayStacking: the shared z-index ledger used by ModalService, Drawer and Popover
+export type { OverlayKind } from './core/OverlayStacking/OverlayStackingService.ts';
+export { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from './core/OverlayStacking/OverlayStackingService.ts';
+
 // PageSectionLoading
 export type { PageSectionLoadingProps } from './common/PageSectionLoading/PageSectionLoading.tsx';
 export { PageSectionLoading } from './common/PageSectionLoading/PageSectionLoading.tsx';
