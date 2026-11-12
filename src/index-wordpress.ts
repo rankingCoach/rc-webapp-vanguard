@@ -98,6 +98,10 @@ export { ModalRoot } from './core/Modal/ModalRoot/ModalRoot.tsx';
 export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './core/Modal/ModalService.tsx';
 export { ModalService } from './core/Modal/ModalService.tsx';
 
+// Error logging (VAN-64): ModalService can open an ErrorModal, which logs through the consumer's logger
+export type { VanguardErrorLogEntry, VanguardErrorLogger } from './core/RcErrorBoundry/error-logger';
+export { setVanguardErrorLogger } from './core/RcErrorBoundry/error-logger';
+
 // PageSectionLoading
 export type { PageSectionLoadingProps } from './common/PageSectionLoading/PageSectionLoading.tsx';
 export { PageSectionLoading } from './common/PageSectionLoading/PageSectionLoading.tsx';

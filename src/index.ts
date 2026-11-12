@@ -650,7 +650,8 @@ export { Rating } from './core/Rating';
 
 // RcErrorBoundary
 export type { ErrorBoundaryProps } from './core/RcErrorBoundry';
-export { ErrorBoundary, generateErrorBoundaryData } from './core/RcErrorBoundry';
+export type { VanguardErrorLogEntry, VanguardErrorLogger } from './core/RcErrorBoundry';
+export { ErrorBoundary, generateErrorBoundaryData, setVanguardErrorLogger } from './core/RcErrorBoundry';
 
 // RcNavLink
 export type { LinkComponentProps } from './core/RcNavLink';
