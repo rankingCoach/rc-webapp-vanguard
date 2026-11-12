@@ -133,6 +133,25 @@ export const WritingFade: Story = {
   },
 };
 
+// The writing bar and the menu share one spot: the outgoing layer must be gone before the incoming one shows,
+// or both bars are visible on top of each other during the swap.
+export const StateSwapNoOverlap: Story = {
+  render: () => <Harness initial="open" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const { writing, main } = layers(canvasElement);
+    await expectShown(main);
+
+    await userEvent.click(canvas.getByTestId('set-writing'));
+    await waitFor(() => expect(getComputedStyle(main).visibility).toBe('hidden'), { timeout: 120 });
+    await expectShown(writing);
+
+    await userEvent.click(canvas.getByTestId('set-open'));
+    await waitFor(() => expect(getComputedStyle(writing).visibility).toBe('hidden'), { timeout: 120 });
+    await expectShown(main);
+  },
+};
+
 export const AdjustCollapseAndToneGrow: Story = {
   render: () => <Harness initial="open" onAdjust={fn()} />,
   play: async ({ canvasElement }) => {

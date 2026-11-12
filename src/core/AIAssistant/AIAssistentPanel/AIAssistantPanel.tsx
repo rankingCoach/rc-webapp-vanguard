@@ -31,6 +31,9 @@ import animation from '../_assets/ai-loader-loop.json';
 import { AIAssistantAdjustOptions, AIAssistantProps, AIAssistantStatus } from '../AIAssistant';
 import styles from './AIAssistantPanel.module.scss';
 
+// The writing bar and the menu share one spot: the outgoing one leaves at once, so they never show together.
+const STATE_SWAP_TIMEOUT = { enter: 225, exit: 0 };
+
 export type AIAssistantPanelProps = Omit<AIAssistantProps, 'children' | 'anchorElem' | 'adjustCallback'> & {
   status?: AIAssistantStatus;
   setStatus?: (status: AIAssistantStatus) => void;
@@ -173,7 +176,7 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
         <Grow in={status !== 'closed'} timeout={350}>
           <div className={styles.topLine}>
             <div>
-              <Fade in={status === 'writing'}>
+              <Fade in={status === 'writing'} timeout={STATE_SWAP_TIMEOUT}>
                 <div className={classNames(styles.container, styles.menu, className)}>
                   <StyledSVG width="13" height="16" src={rcLogoSvg} />
                   <div className={styles.animation}>
@@ -195,7 +198,7 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
             </div>
 
             <div>
-              <Fade in={status === 'open' || status === 'adjust' || status === 'needsCommand'}>
+              <Fade in={status === 'open' || status === 'adjust' || status === 'needsCommand'} timeout={STATE_SWAP_TIMEOUT}>
                 <div className={classNames(styles.container, className)}>
                   <div className={styles.menu}>
                     <div className={classNames(dFlex, dFlexRow, alignItemsCenter, w100, justifyContentBetween)}>
