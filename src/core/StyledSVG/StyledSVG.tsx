@@ -1,7 +1,7 @@
 import { SVGProps } from 'react';
 import styled from 'styled-components';
 
-import SVG from './index.tsx';
+import SVG from './InlineSvg.tsx';
 
 export type RcSvgProps = SVGProps<unknown> & {
   hovercolor?: string;

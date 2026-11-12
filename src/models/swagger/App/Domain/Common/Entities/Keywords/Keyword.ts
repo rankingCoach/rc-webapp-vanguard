@@ -10,29 +10,33 @@ export type Keyword = {
   /**
    * The alias for the keyword
    */
-  alias?: string;
+  alias?: string | null;
   /**
    * The hashed value of the keyword name
    */
-  hash?: string;
+  hash?: string | null;
   /**
    * The keyword name
+   *
+   * The authoritative length rules live in SetupService::cleanDedupeAndLengthPartitionKeywordNames().
+   * min is relaxed to 1 here to admit single-character Japanese keywords; the constraint fires
+   * unreliably via repo-update validation and is not the primary enforcement point.
    */
-  name?: string;
+  name?: string | null;
   /**
    * For keywords statistics
    */
-  statisticsValue?: number;
+  statisticsValue?: number | null;
   /**
    * For keywords statistics
    */
-  statisticsThreshold?: number;
+  statisticsThreshold?: number | null;
   /**
    * The fully qualified class name of the object
    */
-  objectType: (typeof KeywordObjectType)[keyof typeof KeywordObjectType];
+  objectType: (typeof KeywordObjectType)[keyof typeof KeywordObjectType] | null;
   /**
    * The internal identifier of the entity
    */
-  id?: number;
+  id?: number | null;
 };

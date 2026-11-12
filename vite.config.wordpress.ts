@@ -1,37 +1,33 @@
 import { withBundledUseClientFilter } from './config/rollup-onwarn';
-import { resolve, dirname } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { defineConfig, mergeConfig } from 'vite';
 import dts from 'vite-plugin-dts';
-import fs from 'fs';
+import ts from 'typescript5';
 
 import { BaseViteConfig } from './vite.config.lib';
 
-// helper: collect imported files recursively from entry
-function collectImports(entryFile, collected = new Set()) {
-  if (!fs.existsSync(entryFile) || collected.has(entryFile)) return collected;
-  collected.add(entryFile);
-
-  const content = fs.readFileSync(entryFile, 'utf-8');
-  const importRegex = /from ["'](\..+?)["']/g;
-  let match;
-
-  while ((match = importRegex.exec(content))) {
-    const resolved = resolve(dirname(entryFile), `${match[1]}.ts`);
-    const resolvedTsx = resolve(dirname(entryFile), `${match[1]}.tsx`);
-    const resolvedIndex = resolve(dirname(entryFile), `${match[1]}/index.ts`);
-    const resolvedIndexTsx = resolve(dirname(entryFile), `${match[1]}/index.tsx`);
-
-    if (fs.existsSync(resolved)) collectImports(resolved, collected);
-    else if (fs.existsSync(resolvedTsx)) collectImports(resolvedTsx, collected);
-    else if (fs.existsSync(resolvedIndex)) collectImports(resolvedIndex, collected);
-    else if (fs.existsSync(resolvedIndexTsx)) collectImports(resolvedIndexTsx, collected);
-  }
-
-  return collected;
+/**
+ * Source files reachable from the WordPress entry, resolved by the TypeScript compiler itself (path aliases,
+ * explicit `.tsx` extensions and index files included), so every module index.d.ts re-exports gets a declaration.
+ */
+export function collectDeclarationSources(entryFile: string, tsconfigPath: string): string[] {
+  const parsed = ts.getParsedCommandLineOfConfigFile(tsconfigPath, {}, {
+    ...ts.sys,
+    onUnRecoverableConfigFileDiagnostic: (diagnostic) => {
+      throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+    },
+  });
+  const program = ts.createProgram([entryFile], { ...parsed!.options, noEmit: true });
+  const sourceRoot = resolve(__dirname, 'src') + sep;
+  return program
+    .getSourceFiles()
+    .map((file) => resolve(file.fileName))
+    .filter((file) => file.startsWith(sourceRoot) && !file.endsWith('.d.ts'));
 }
 
 const ENTRY = resolve(__dirname, 'src/index-wordpress.ts');
-const includedFiles = Array.from(collectImports(ENTRY));
+const TSCONFIG = resolve(__dirname, './tsconfig.dts.json');
+const includedFiles = collectDeclarationSources(ENTRY, TSCONFIG);
 
 export default defineConfig(
   mergeConfig(BaseViteConfig, {
@@ -70,7 +66,7 @@ export default defineConfig(
         include: includedFiles, // only imported files from entry
         outDir: 'dist-wordpress/types',
         insertTypesEntry: true,
-        tsconfigPath: resolve(__dirname, './tsconfig.lib.json'),
+        tsconfigPath: TSCONFIG,
         compilerOptions: { declarationMap: false },
         rollupTypes: false, // preserve folder structure
         beforeWriteFile: (filePath, content) => {

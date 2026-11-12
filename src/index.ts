@@ -207,7 +207,7 @@ export { StatusBadge } from './core/StatusBadge';
 export { StatusBadgeIcon } from './core/StatusBadge';
 
 // Autocomplete
-export type { AutocompleteProps } from './core/Autocomplete';
+export type { AutocompleteOptionState, AutocompleteProps } from './core/Autocomplete';
 export { Autocomplete } from './core/Autocomplete';
 
 // SVG
@@ -359,8 +359,52 @@ export { LineChartBase } from './core/Charts';
 export type { ClipboardTextProps } from './core/ClipboardText';
 export { ClipboardText } from './core/ClipboardText';
 
+// Breadcrumbs
+export type { BreadcrumbsProps } from './core/Breadcrumbs';
+export { Breadcrumbs } from './core/Breadcrumbs';
+
+// Chip
+export type { ChipProps } from './core/Chip';
+export { Chip } from './core/Chip';
+
 // Collapse
 export { Collapse } from './core/Collapse';
+
+// DataTable
+export type {
+  DataTableCellProps,
+  DataTableProps,
+  DataTableRowProps,
+  DataTableSectionProps,
+} from './core/DataTable';
+export {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableFoot,
+  DataTableHead,
+  DataTableRow,
+} from './core/DataTable';
+
+// Fade
+export type { FadeProps } from './core/Fade';
+export { Fade } from './core/Fade';
+
+// FocusTrap
+export type { FocusTrapProps } from './core/FocusTrap';
+export { FocusTrap } from './core/FocusTrap';
+
+// Pagination
+export type { PaginationProps } from './core/Pagination';
+export { Pagination } from './core/Pagination';
+
+// TreeView
+export type { TreeItemProps, TreeViewProps } from './core/TreeView';
+export { TreeItem, TreeView } from './core/TreeView';
+
+// VanguardThemeProvider
+export type { VanguardThemeProviderProps } from './core/VanguardThemeProvider';
+export { VanguardThemeProvider } from './core/VanguardThemeProvider';
 
 // ColorPicker
 export type { ColorPickerProps } from './core/ColorPicker';
@@ -660,7 +704,16 @@ export { Star } from './core/StarRating';
 export { StarRating } from './core/StarRating';
 
 // Table
-export type { TableColumnProps, TableDataProps, TableOptionsProps, TableProps, TableRowProps } from './core/Table';
+export type {
+  TableClientPagination,
+  TableColumnProps,
+  TableDataProps,
+  TableOptionsProps,
+  TableProps,
+  TableRowProps,
+  TableSort,
+  TableSortDirection,
+} from './core/Table';
 export type { TableBodyProps } from './core/Table';
 export type { TableCellProps } from './core/Table';
 export type { TableFooterProps } from './core/Table';
@@ -709,7 +762,10 @@ export type {
 export { useSelectiveDynamicImport } from './custom-hooks/use-dynamic-import/use-selective-dynamic-import.ts';
 export type { FormConfig, FormConfigElement, FormFieldType } from './custom-hooks/useFormConfig.ts';
 export { useFormConfig } from './custom-hooks/useFormConfig.ts';
+export type { UseMediaQueryOptions } from './custom-hooks/use-media-query';
+export { useMediaQuery } from './custom-hooks/use-media-query';
 export { classNames } from './helpers/classNames';
+export { hexToRgb, hexToRgba } from './helpers/hex-to-rgba';
 
 // Examples
 export type { SelectiveImportExampleProps } from './examples/SelectiveImportExample';

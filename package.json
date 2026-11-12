@@ -20,10 +20,10 @@
     "dev": "vite --config vite.config.app.ts",
     "build": "node scripts/analyze-dynamic-imports.js && pnpm run build-lib && pnpm run build-wordpress",
     "build-lib": "vite build --config vite.config.lib.ts && node scripts/fix-dynamic-imports.js && echo 'default' > dist/.version",
-    "build-wordpress": "vite build --config vite.config.wordpress.ts && node scripts/fix-dynamic-imports.js ; mv dist-wordpress/types/src/index-wordpress.d.ts dist-wordpress/types/index.d.ts ; echo 'wp' > dist-wordpress/.version && node scripts/cleanup-wordpress-assets.js",
+    "build-wordpress": "vite build --config vite.config.wordpress.ts && node scripts/fix-dynamic-imports.js ; echo 'wp' > dist-wordpress/.version && node scripts/cleanup-wordpress-assets.js",
     "build-wordpress-no-clean": "vite build --config vite.config.wordpress.ts",
     "postinstall": "node scripts/clean-assets-based-on-vanguardrc.js",
-    "build:analyze": "pnpm run build-lib && echo '\ud83d\udcca Bundle analysis saved to dist/bundle-analysis.html'",
+    "build:analyze": "pnpm run build-lib && echo '📊 Bundle analysis saved to dist/bundle-analysis.html'",
     "build-app": "tsc --project tsconfig.app.json && vite build --config vite.config.app.ts",
     "generate-dts": "vite build --config vite.config.lib.ts",
     "husky": "husky install",
@@ -53,7 +53,7 @@
     "test:w:c": "vitest --coverage --watch --project storybook --project spec --project scripts",
     "verify-tsgo": "node scripts/verify-tsgo.js",
     "verify-storybook-tsgo": "node scripts/verify-storybook-tsgo.js",
-    "prepare": "pnpm run build",
+    "prepack": "pnpm run build",
     "vanguard": "node scripts/vanguard-cli.js",
     "vanguard:init": "node scripts/vanguard-cli.js init",
     "vanguard:list": "node scripts/vanguard-cli.js list",
@@ -75,54 +75,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.js"
     },
-    "./core/*": {
-      "types": "./dist/types/core/*.d.ts",
-      "import": "./dist/core/*.js",
-      "require": "./dist/core/*.js"
-    },
-    "./common/*": {
-      "types": "./dist/types/common/*.d.ts",
-      "import": "./dist/common/*.js",
-      "require": "./dist/common/*.js"
-    },
-    "./components/*": {
-      "types": "./dist/types/components/*.d.ts",
-      "import": "./dist/components/*.js",
-      "require": "./dist/components/*.js"
-    },
-    "./custom-hooks/*": {
-      "types": "./dist/types/custom-hooks/*.d.ts",
-      "import": "./dist/custom-hooks/*.js",
-      "require": "./dist/custom-hooks/*.js"
-    },
-    "./services/*": {
-      "types": "./dist/types/services/*.d.ts",
-      "import": "./dist/services/*.js",
-      "require": "./dist/services/*.js"
-    },
-    "./stores/*": {
-      "types": "./dist/types/stores/*.d.ts",
-      "import": "./dist/stores/*.js",
-      "require": "./dist/stores/*.js"
-    },
-    "./helpers/*": {
-      "types": "./dist/types/helpers/*.d.ts",
-      "import": "./dist/helpers/*.js",
-      "require": "./dist/helpers/*.js"
-    },
-    "./models/*": {
-      "types": "./dist/types/models/*.d.ts",
-      "import": "./dist/models/*.js",
-      "require": "./dist/models/*.js"
-    },
-    "./styles/*": {
-      "types": "./dist/types/styles/*.d.ts",
-      "import": "./dist/styles/*.js",
-      "require": "./dist/styles/*.js"
-    },
-    "./styles": "./dist/styles.js",
     "./style.css": "./dist/vanguard.css",
-    "./dist/*": "./dist/*"
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "files": [
     "LICENSE",
@@ -131,8 +86,6 @@
     "scripts"
   ],
   "peerDependencies": {
-    "@emotion/react": "11.14.0",
-    "@emotion/styled": "11.14.1",
     "@reduxjs/toolkit": ">=1.7.1",
     "imask": "7.6.1",
     "react": ">=19.2.0",
@@ -155,9 +108,6 @@
     "@googlemaps/js-api-loader": "1.16.2",
     "@lexical/react": "0.12.6",
     "@lexical/rich-text": "0.12.6",
-    "@mui/material": "9.5.0",
-    "@mui/system": "9.5.0",
-    "@mui/x-date-pickers": "9.17.0",
     "@nozbe/microfuzz": "1.0.0",
     "@originjs/vite-plugin-commonjs": "1.0.3",
     "@react-google-maps/api": "2.19.3",
@@ -244,6 +194,9 @@
     "storybook": "$storybook"
   },
   "dependencies": {
+    "@mui/material": "9.5.0",
+    "@mui/system": "9.5.0",
+    "@mui/x-date-pickers": "9.17.0",
     "@testing-library/react": "16.3.0",
     "date-fns": "2.30.0",
     "dom-serializer": "2.0.0",

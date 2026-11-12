@@ -6,6 +6,9 @@ import { playwright } from '@vitest/browser-playwright';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
+// Agent worktrees and evidence copies under .claude/ hold stale duplicates of the suites; never collect them.
+const staleCopies = ['.claude/**', '.kilocode/**', 'out/**', 'agentic-plans/**', 'storybook-static/**', 'dist/**', 'dist-wordpress/**'];
+
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
@@ -33,13 +36,14 @@ export default defineConfig({
   },
   test: {
     // Evidence copies are never product code or tests, regardless of .gitignore.
-    coverage: { exclude: [...coverageConfigDefaults.exclude, 'out/**', 'agentic-plans/**'] },
+    coverage: { exclude: [...coverageConfigDefaults.exclude, ...staleCopies] },
     projects: [
       {
         test: {
           name: 'scripts',
           environment: 'node',
           include: ['scripts/**/_*.spec.ts'],
+          exclude: [...configDefaults.exclude, ...staleCopies],
         },
       },
       {
@@ -60,7 +64,7 @@ export default defineConfig({
         ],
         test: {
           name: 'storybook',
-          exclude: [...configDefaults.exclude, 'out/**', 'agentic-plans/**'],
+          exclude: [...configDefaults.exclude, ...staleCopies],
           browser: {
             enabled: true,
             headless: true,
@@ -76,7 +80,7 @@ export default defineConfig({
           name: 'spec',
           environment: 'jsdom',
           include: ['**/_*.spec.{ts,tsx}'],
-          exclude: [...configDefaults.exclude, 'scripts/**', 'out/**', 'agentic-plans/**'],
+          exclude: [...configDefaults.exclude, 'scripts/**', ...staleCopies],
           setupFiles: ['src/test-utils/vitest.setup.tsx'],
         },
       },

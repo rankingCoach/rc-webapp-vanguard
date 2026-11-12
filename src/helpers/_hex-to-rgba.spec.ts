@@ -86,3 +86,13 @@ describe('hexToRgba (MUI hexToRgb contract)', () => {
     });
   });
 });
+
+describe('hexToRgb (public root export)', () => {
+  it.each([
+    ['#fff', 'rgb(255, 255, 255)'],
+    ['#1A2b3C', 'rgb(26, 43, 60)'],
+  ])('converts %s to %s', async (hex, expected) => {
+    const { hexToRgb } = await import('@helpers/hex-to-rgba');
+    expect(hexToRgb(hex)).toBe(expected);
+  });
+});

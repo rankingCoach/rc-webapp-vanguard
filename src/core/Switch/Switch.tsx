@@ -13,7 +13,7 @@ import { FontWeights, Text, TextReplacements, TextTypes } from '../Text/Text';
  */
 export interface SwitchProps {
   /** Accepts a loading boolean for simplicity but only reacts to the true value of boolean , loading is considered false*/
-  value: LoadingBoolean;
+  value: LoadingBoolean | null;
   readOnly?: boolean;
 
   children?: string | React.ReactNode; // Label text

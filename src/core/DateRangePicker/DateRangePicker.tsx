@@ -107,7 +107,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
   /**
    * Default static ranges to be able to show the user in static range dropdown
    */
-  const staticRanges = useRef(ranges ?? useDateRangePickerStaticRanges());
+  const defaultStaticRanges = useDateRangePickerStaticRanges();
+  const staticRanges = useRef(ranges ?? defaultStaticRanges);
 
   /**
    * The selected state of the component allows us to switch from the date range picker and static ranges

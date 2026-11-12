@@ -1,6 +1,15 @@
 export type { CtaWithIconProps } from './common/CtaWithIcon/CtaWithIcon';
 export { CtaWithIcon } from './common/CtaWithIcon/CtaWithIcon';
-export type { TableColumnProps, TableDataProps, TableOptionsProps, TableProps, TableRowProps } from './Table';
+export type {
+  TableClientPagination,
+  TableColumnProps,
+  TableDataProps,
+  TableOptionsProps,
+  TableProps,
+  TableRowProps,
+  TableSort,
+  TableSortDirection,
+} from './Table';
 export { Table } from './Table';
 export type { TableBodyProps } from './TableBody/TableBody';
 export { TableBody } from './TableBody/TableBody';
