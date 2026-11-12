@@ -31,7 +31,7 @@ import animation from '../_assets/ai-loader-loop.json';
 import { AIAssistantAdjustOptions, AIAssistantProps, AIAssistantStatus } from '../AIAssistant';
 import styles from './AIAssistantPanel.module.scss';
 
-export type AIAssistantPanelProps = Omit<AIAssistantProps, 'children' | 'anchorElem'> & {
+export type AIAssistantPanelProps = Omit<AIAssistantProps, 'children' | 'anchorElem' | 'adjustCallback'> & {
   status?: AIAssistantStatus;
   setStatus?: (status: AIAssistantStatus) => void;
   anchorElem?: HTMLElement; // We'll position the panel relative to this element

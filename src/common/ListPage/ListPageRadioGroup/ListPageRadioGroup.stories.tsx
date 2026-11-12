@@ -3,8 +3,8 @@ import React from 'react';
 import { disableControls, SbDecorator } from '@test-utils/get-storybook-decorator';
 import { StoryObj } from '@storybook/react';
 import { fn, within } from 'storybook/test';
-import { ListPageRadioFilter } from '@models/common/ListPageFilters/ListPageRadioFilter';
-import { ListPageFilterType } from '@models/common/ListPageFilters/ListPageFilter';
+import { ListPageRadioFilter } from '@common/ListPage/ListPageFilters/ListPageRadioFilter';
+import { ListPageFilterType } from '@common/ListPage/ListPageFilters/ListPageFilter';
 
 export default {
   ...SbDecorator({

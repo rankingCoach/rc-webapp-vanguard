@@ -10,6 +10,8 @@ import React, { createContext, ReactNode, Suspense, useEffect, useMemo, useState
 
 import { TablePlaceholder, TableRowPlaceholder } from './common/TablePlaceholder/TablePlaceholder';
 import styles from './Table.module.scss';
+import { filterRowsByText, rowsToCsv, saveCsvFile } from './TableToolbar/table-toolbar-data';
+import { TableToolbar, TableToolbarOptions } from './TableToolbar/TableToolbar';
 
 const TableBody = lazyImport(() => import('@vanguard/Table/TableBody/TableBody'), 'TableBody');
 
@@ -62,6 +64,8 @@ export interface TableColumnProps {
   sortable?: boolean;
   /** Value used for sorting; default `row[alias]`. Numbers compare numerically, everything else as natural text. */
   sortValue?: (row: TableRowProps) => unknown;
+  /** The cell as text for the toolbar's search and CSV export; default the plain `row[alias]`, `sortValue`, or the rendered text. */
+  exportValue?: (row: TableRowProps) => unknown;
   center?: boolean;
   end?: boolean;
   sticky?: boolean;
@@ -97,6 +101,10 @@ export type TableProps = {
   onSortChange?: (sort: TableSort) => void;
   /** Client-side paging of `data.collections`; ignores `pagination`/`onNextPage`/`onPrevPage`. */
   clientPagination?: TableClientPagination;
+  /** Test id of the container; prefixes the toolbar control ids (`table` when unset). */
+  testId?: string;
+  /** Optional toolbar: search, CSV download, column picker, title and actions. Off by default. */
+  toolbar?: TableToolbarOptions;
 } & BlurredMessageProps;
 
 export type TableContextType = {
@@ -172,28 +180,75 @@ export const Table = (props: TableProps) => {
     defaultSort = null,
     onSortChange,
     clientPagination,
+    testId,
+    toolbar,
   } = props;
   const totalCount = pagination.total;
 
   // Rendered straight from props (no state copy), so new data shows in the same render.
-  const columnsData: Array<TableColumnProps> = data.columns ?? [];
+  const allColumns: Array<TableColumnProps> = data.columns ?? [];
+
+  // Toolbar: column picker (hidden aliases), search text
+  const columnPicker = typeof toolbar?.columnPicker === 'object' ? toolbar.columnPicker : undefined;
+  const [hiddenColumnsState, setHiddenColumnsState] = useState<string[]>(columnPicker?.defaultHiddenColumns ?? []);
+  const hiddenColumns = (toolbar?.columnPicker ? (columnPicker?.hiddenColumns ?? hiddenColumnsState) : []).filter(
+    (alias) => allColumns.some((column) => column.alias === alias),
+  );
+  const columnsData = allColumns.filter((column) => !hiddenColumns.includes(column.alias));
+  const onToggleColumn = (alias: string) => {
+    const next = hiddenColumns.includes(alias)
+      ? hiddenColumns.filter((hidden) => hidden !== alias)
+      : [...hiddenColumns, alias];
+    if (next.length >= allColumns.length) return; // at least one column stays visible
+    if (columnPicker?.hiddenColumns === undefined) setHiddenColumnsState(next);
+    columnPicker?.onHiddenColumnsChange?.(next);
+  };
+
+  const search = typeof toolbar?.search === 'object' ? toolbar.search : undefined;
+  const [searchState, setSearchState] = useState('');
+  const searchText = toolbar?.search ? (search?.value ?? searchState) : '';
+  const filtersClientSide = !!toolbar?.search && !search?.onChange;
   const optionsData: object = data.options ?? {};
 
   const [sortState, setSortState] = useState<TableSort | null>(defaultSort);
   const sort = sortProp !== undefined ? sortProp : sortState;
   const onSortToggle = (alias: string) => {
     const next: TableSort =
-      sort?.key === alias ? { key: alias, direction: sort.direction === 'asc' ? 'desc' : 'asc' } : { key: alias, direction: 'asc' };
+      sort?.key === alias
+        ? { key: alias, direction: sort.direction === 'asc' ? 'desc' : 'asc' }
+        : { key: alias, direction: 'asc' };
     if (sortProp === undefined) setSortState(next);
     onSortChange?.(next);
   };
-  const sortedRows = useMemo(() => sortRows(data.collections ?? [], columnsData, sort), [data.collections, columnsData, sort]);
+  const filteredRows = useMemo(
+    () =>
+      filtersClientSide
+        ? filterRowsByText(data.collections ?? [], searchText, columnsData, search?.fields)
+        : (data.collections ?? []),
+    [data.collections, filtersClientSide, searchText, columnsData, search?.fields],
+  );
+  const sortedRows = useMemo(() => sortRows(filteredRows, allColumns, sort), [filteredRows, allColumns, sort]);
 
   const [clientOffset, setClientOffset] = useState(0);
+  const onSearchTextChange = (text: string) => {
+    if (search?.value === undefined) setSearchState(text);
+    setClientOffset(0);
+    search?.onChange?.(text);
+  };
+  const onDownload = () => {
+    const download = typeof toolbar?.download === 'object' ? toolbar.download : undefined;
+    const exportColumns = download?.columns
+      ? download.columns
+          .map((alias) => allColumns.find((column) => column.alias === alias))
+          .filter((column): column is TableColumnProps => !!column)
+      : columnsData;
+    saveCsvFile(rowsToCsv(sortedRows, exportColumns), download?.filename ?? 'table.csv');
+  };
   const pageSize = clientPagination?.pageSize ?? 0;
   const clientLastOffset = pageSize > 0 ? Math.max(0, Math.ceil(sortedRows.length / pageSize) - 1) * pageSize : 0;
   const effectiveClientOffset = Math.min(clientOffset, clientLastOffset);
-  const rowsData = pageSize > 0 ? sortedRows.slice(effectiveClientOffset, effectiveClientOffset + pageSize) : sortedRows;
+  const rowsData =
+    pageSize > 0 ? sortedRows.slice(effectiveClientOffset, effectiveClientOffset + pageSize) : sortedRows;
   const clientPaginationData: TablePaginationProps | undefined =
     pageSize > 0
       ? {
@@ -262,8 +317,28 @@ export const Table = (props: TableProps) => {
     onSortToggle,
   };
 
+  const toolbarView = toolbar ? (
+    <TableToolbar
+      testId={testId ?? 'table'}
+      options={toolbar}
+      searchText={searchText}
+      onSearchTextChange={onSearchTextChange}
+      columns={allColumns}
+      hiddenColumns={hiddenColumns}
+      onToggleColumn={onToggleColumn}
+      onDownload={onDownload}
+    />
+  ) : null;
+
   if (isLoading) {
-    return <TablePlaceholder />;
+    return toolbarView ? (
+      <>
+        {toolbarView}
+        <TablePlaceholder />
+      </>
+    ) : (
+      <TablePlaceholder />
+    );
   }
 
   /*
@@ -274,7 +349,8 @@ export const Table = (props: TableProps) => {
 
   return (
     <TableProvider.Provider value={{ ...context }}>
-      <ComponentContainer className={classNames(styles.container, containerClassName)}>
+      {toolbarView}
+      <ComponentContainer className={classNames(styles.container, containerClassName)} testId={testId}>
         <table className={classNames(styles.table, className)}>
           <Render if={columnsData.length > 0}>
             <TableHeader

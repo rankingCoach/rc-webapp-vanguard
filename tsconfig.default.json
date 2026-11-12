@@ -56,10 +56,6 @@
         "src/stores",
         "src/stores/*"
       ],
-      "@models/*": [
-        "src/models",
-        "src/models/*"
-      ],
       "@common/*": [
         "src/components/_common/",
         "src/components/_common/*"

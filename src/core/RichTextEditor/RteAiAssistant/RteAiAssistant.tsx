@@ -1,6 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { Keyword } from '@models/swagger/App/Domain/Common/Entities/Keywords/Keyword';
-import type { AIAssistantProps } from '@vanguard/AIAssistant/AIAssistant';
+import type { AIAssistantAdjustCallback, AIAssistantKeyword } from '@vanguard/AIAssistant/AIAssistant';
 import { AIAssistantPanel } from '@vanguard/AIAssistant/AIAssistentPanel/AIAssistantPanel';
 import { useAiAssistantAdjustAndGenerate } from '@vanguard/AIAssistant/useAiAssistant-GenerateAndAdjust';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,9 +12,9 @@ import { useAiAssistantSelection } from './useRteAiAssistant-selection';
 
 type RteAiAssistantProps = {
   anchorElem: HTMLElement;
-  keywordsToInclude: Keyword[];
-  /** The consumer's adjust request. Without it, the deprecated built-in request (see AIAssistant's `adjustCallback`). */
-  adjustCallback?: AIAssistantProps['adjustCallback'];
+  keywordsToInclude: AIAssistantKeyword[];
+  /** The consumer's adjust request (see `AIAssistantAdjustCallback`). */
+  adjustCallback: AIAssistantAdjustCallback;
 };
 
 export const RteAiAssistant = (props: RteAiAssistantProps) => {

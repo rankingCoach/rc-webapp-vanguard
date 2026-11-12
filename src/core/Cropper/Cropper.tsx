@@ -5,7 +5,6 @@ import { InfoIcon } from '@common/InfoIcon/InfoIcon';
 import { useToggle } from '@custom-hooks/useToggle';
 import { dFlexColumn, gap2, mt2 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { GetCampaignByFieldsQueryParams } from '@models/business-processor/GetCampaignByFieldsQueryParams';
 import { Collapse } from '@vanguard/Collapse/Collapse/Collapse';
 import { InternalFile } from '@vanguard/FileSelect/MediaItemSelectInput';
 import { galleryFindRational } from '@vanguard/Gallery/Gallery/gallery-find-rational';
@@ -34,7 +33,8 @@ export type ExtendedCropperProps = {
 
 export type RcCropperProps = {
   imageFile: File | Blob;
-  close: (value?: ModalResponse<GetCampaignByFieldsQueryParams>) => void;
+  /** Called without data: the cropper hands its result to `save`. */
+  close: (value?: ModalResponse<never>) => void;
   closeAfterCrop?: boolean;
   save: SaveFunction;
 } & ExtendedCropperProps;

@@ -1,6 +1,5 @@
 import { act, cleanup, render, screen } from '@test-utils/test-utils';
 import { ErrorModal } from '@vanguard/StandardModals/ErrorModal/ErrorModal';
-import axios from 'axios';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -12,21 +11,24 @@ import { ErrorBoundary } from './RcErrorBoundry';
 vi.mock('lottie-web', () => ({ default: { loadAnimation: () => ({ destroy: () => {} }) } }));
 vi.mock('lottie-web/build/player/lottie_light', () => ({ default: { loadAnimation: () => ({ destroy: () => {} }) } }));
 
-/** Every way Vanguard could reach the network on its own: its bundled axios, and fetch. */
+/** Every way Vanguard could reach the network on its own: fetch and XMLHttpRequest. */
 const watchNetwork = () => {
-  const request = vi.spyOn(axios, 'request').mockImplementation(() => new Promise(() => {}));
+  const xhrOpen = vi.spyOn(XMLHttpRequest.prototype, 'open').mockImplementation(() => {});
   const fetchSpy = vi.fn(() => new Promise<Response>(() => {}));
   vi.stubGlobal('fetch', fetchSpy);
   return {
-    request,
-    calls: () => request.mock.calls.length + fetchSpy.mock.calls.length,
-    urls: () => request.mock.calls.map(([opts]) => String((opts as { url?: string }).url)),
+    calls: () => xhrOpen.mock.calls.length + fetchSpy.mock.calls.length,
   };
 };
 
 const flush = () => act(async () => {});
 
-describe('Vanguard error logging: the consumer’s logger, the built-in request deprecated (VAN-64)', () => {
+/** A child that fails to render: the boundary's cue. */
+const Boom = () => {
+  throw new Error('render failed');
+};
+
+describe('Vanguard error logging: only through the consumer’s logger', () => {
   let network: ReturnType<typeof watchNetwork>;
   beforeEach(() => {
     network = watchNetwork();
@@ -101,32 +103,33 @@ describe('Vanguard error logging: the consumer’s logger, the built-in request 
       expect(consoleError).toHaveBeenCalled();
     });
 
-    test('without a logger it still PUTs the log itself (deprecated), as before', async () => {
-      generateErrorBoundaryData('error_modal_logs', new Error('boom'), undefined, undefined, 'SRC');
+    test('without a logger it goes to console.error, and makes no request', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
       generateErrorBoundaryData('error_modal_logs', new Error('boom'), undefined, undefined, 'SRC');
       await flush();
-      expect(network.request).toHaveBeenCalledTimes(2);
-      expect(network.urls()[0]).toContain('/rest_api/v1/log');
-      expect(network.urls()[0]).toContain('type=error_modal_logs');
+      expect(network.calls()).toBe(0);
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.stringContaining('error_modal_logs'),
+        expect.objectContaining({ error: 'Error', message: 'boom', source: 'SRC' }),
+      );
     });
 
-    test('without a logger its Observable is the request’s, as before: the response on success, an error on failure', async () => {
-      network.request.mockImplementationOnce(() => Promise.resolve({ data: { status: 201 } }) as never);
+    test('without a logger its Observable emits {} once and completes, never errors', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       const next = vi.fn();
-      generateErrorBoundaryData('t').subscribe({ next });
-      await flush();
-      expect(next).toHaveBeenCalledWith({ status: 201 });
-
-      network.request.mockImplementationOnce(() => Promise.reject(new Error('500')) as never);
       const error = vi.fn();
-      generateErrorBoundaryData('t').subscribe({ error });
+      const complete = vi.fn();
+      generateErrorBoundaryData('t').subscribe({ next, error, complete });
       await flush();
-      expect(error).toHaveBeenCalledTimes(1);
+      expect(next).toHaveBeenCalledWith({});
+      expect(error).not.toHaveBeenCalled();
+      expect(complete).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('setVanguardErrorLogger', () => {
-    test('null resets the registration (back to the deprecated built-in request)', () => {
+    test('null resets the registration (back to console.error)', () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       const logger = vi.fn();
       setVanguardErrorLogger(logger);
       setVanguardErrorLogger(null);
@@ -230,10 +233,15 @@ describe('Vanguard error logging: the consumer’s logger, the built-in request 
       );
     });
 
-    test('without a logger it still logs through the built-in (deprecated) request on show, as before', async () => {
+    test('without a logger it logs to console.error on show, and makes no request', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
       render(<ErrorModal close={() => {}} source={'AI_ASSISTANT'} />);
       await flush();
-      expect(network.urls().some((url) => url.includes('/rest_api/v1/log'))).toBe(true);
+      expect(network.calls()).toBe(0);
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.stringContaining('error_modal_logs'),
+        expect.objectContaining({ source: 'AI_ASSISTANT' }),
+      );
     });
 
     test('still renders when the logger throws', async () => {
@@ -254,9 +262,6 @@ describe('Vanguard error logging: the consumer’s logger, the built-in request 
       setVanguardErrorLogger(() => {
         throw new Error('logger down');
       });
-      const Boom = () => {
-        throw new Error('render failed');
-      };
       const onError = vi.fn();
       render(
         <ErrorBoundary onError={onError} isModal>
@@ -271,7 +276,7 @@ describe('Vanguard error logging: the consumer’s logger, the built-in request 
   });
 });
 
-describe('the logger registration is public (VAN-64)', () => {
+describe('the logger registration is public', () => {
   test.each([
     ['the RcErrorBoundry barrel', () => import('./index')],
     ['the package root', () => import('../../index')],

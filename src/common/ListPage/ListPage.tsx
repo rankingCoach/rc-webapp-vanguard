@@ -3,7 +3,7 @@ import {mb3, pt2, textAlignCenter} from "@globalStyles";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {classNames} from "@helpers/classNames";
 import {ListPageEmpty} from "@common/ListPage/ListPageEmpty/ListPageEmpty";
-import {ListPageFilters} from "@models/common/ListPageFilters/ListPageFilters";
+import {ListPageFilters} from "@common/ListPage/ListPageFilters/ListPageFilters";
 import {ListPageHeaderWithActions} from "@common/ListPage/ListPageHeaderWithActions/ListPageHeaderWithActions";
 import {useScrollToTop} from "@helpers/scroll-to-top";
 import {useAppDispatch} from "@custom-hooks/use-app-dispatch";

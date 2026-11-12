@@ -34,6 +34,7 @@ export { Button, ButtonSizes, ButtonTextColors, ButtonTypes } from './core/Butto
 
 // Form
 export type { FormStatus } from './core/Form';
+export type { ValidationResultWithInfo } from './core/Form';
 export { extractErrorScopes, extractSetErrorsFromConfig, Form } from './core/Form';
 
 // CheckBox
@@ -161,7 +162,7 @@ export type { RenderProps } from './core/Render';
 export { Render } from './core/Render';
 
 // Switch
-export type { SwitchProps } from './core/Switch';
+export type { LoadingBoolean, SwitchProps } from './core/Switch';
 export { Switch } from './core/Switch';
 
 // Skeleton
@@ -307,7 +308,14 @@ export { ActionCardHeader } from './core/ActionCard';
 export { ActionCardInfo } from './core/ActionCard';
 
 // AIAssistant
-export type { AIAssistantProps } from './core/AIAssistant';
+export type {
+  AIAssistantAdjustCallback,
+  AIAssistantAdjustContext,
+  AIAssistantAdjustOptions,
+  AIAssistantKeyword,
+  AIAssistantProps,
+  AIAssistantStatus,
+} from './core/AIAssistant';
 export { AIAssistant } from './core/AIAssistant';
 
 // Alert
@@ -531,7 +539,7 @@ export { FormControl } from './core/FormControl';
 //Gallery
 export type { MediaItemFile } from './core/Gallery';
 export type { GalleryChange } from './core/Gallery';
-export { Gallery, GALLERY_PHOTO_SCOPE } from './core/Gallery';
+export { Gallery, GALLERY_PHOTO_SCOPE, GalleryMediaItemType } from './core/Gallery';
 export { GalleryMediaItem } from './core/Gallery';
 export { PhotoPlaceholder } from './core/Gallery';
 
@@ -658,7 +666,7 @@ export type { LinkComponentProps } from './core/RcNavLink';
 export { RcNavLink } from './core/RcNavLink';
 
 // RichTextEditor
-export type { RichTextEditorProps } from './core/RichTextEditor';
+export type { RichTextEditorAiProps, RichTextEditorProps } from './core/RichTextEditor';
 export { RichTextEditor } from './core/RichTextEditor';
 export type { SanitizeHtmlOptions } from './helpers/sanitize-html';
 export { sanitizeHtml } from './helpers/sanitize-html';
@@ -719,6 +727,12 @@ export type { TableBodyProps } from './core/Table';
 export type { TableCellProps } from './core/Table';
 export type { TableFooterProps } from './core/Table';
 export type { TableHeaderProps } from './core/Table';
+export type {
+  TableToolbarColumnPicker,
+  TableToolbarDownload,
+  TableToolbarOptions,
+  TableToolbarSearch,
+} from './core/Table';
 export type { CtaWithIconProps } from './core/Table';
 export { Table } from './core/Table';
 export { TableBody } from './core/Table';

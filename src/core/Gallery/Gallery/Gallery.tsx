@@ -5,8 +5,6 @@ import { dFlex, dFlexColumn, gap1, mb1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { downloadZipFile } from '@helpers/download-helpers';
 import { uuidv4 } from '@helpers/generate-uid';
-import { LocationMediaItemScope } from '@models/swagger/App/Domain/Presence/Entities/Locations/MediaItems/LocationMediaItem';
-import { MediaItemType } from '@models/swagger/DDD/Domain/Common/Entities/MediaItems/MediaItem';
 import { ExtendedCropperProps } from '@vanguard/Cropper/Cropper';
 import { ContentType } from '@vanguard/Documents/Document.types';
 import { ImageContentProcessor } from '@vanguard/FileSelect/MediaItemProcessors/ImageContentProcessor';
@@ -41,7 +39,7 @@ import { GalleryFeedbackModal } from './GalleryFeedbackModal/GalleryFeedbackModa
 import { GalleryMediaItem, GalleryMediaItemAction } from './GalleryMediaItem/GalleryMediaItem';
 import { GalleryPlaceholderFormat, PhotoPlaceholder } from './PhotoPlaceholder/PhotoPlaceholder';
 
-export const GALLERY_PHOTO_SCOPE = LocationMediaItemScope.PHOTO;
+export const GALLERY_PHOTO_SCOPE = 'PHOTO';
 
 export type MediaItemFile = {
   publicUrl?: string;
@@ -51,6 +49,8 @@ export type MediaItemFile = {
     toBeDeleted?: boolean;
     isAIGenerated?: boolean;
     removed?: boolean;
+    /** A video's duration as the backend formats it; shown instead of the measured one when set. */
+    videoDuration?: string | null;
     objectType: string;
   };
   mediaItemContent?: {
@@ -67,7 +67,8 @@ export type MediaItemFile = {
   file?: File | Blob;
   fileType?: ContentType;
   metadata?: MediaItemMetadata;
-  type?: (typeof MediaItemType)[keyof typeof MediaItemType];
+  /** Usually a `GalleryMediaItemType` value (`photo`, `video`, `DOCUMENT`). */
+  type?: string;
   isInvalid?: boolean;
   validationErrors?: { text: string; replacements?: TextReplacements }[];
 };

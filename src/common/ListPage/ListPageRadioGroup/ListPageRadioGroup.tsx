@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import styles from "./ListPageRadioGroup.module.scss";
 import {useSelector} from "react-redux";
 import {useAppDispatch} from "@custom-hooks/use-app-dispatch";
-import {ListPageRadioFilter} from "@models/common/ListPageFilters/ListPageRadioFilter";
+import {ListPageRadioFilter} from "@common/ListPage/ListPageFilters/ListPageRadioFilter";
 import {mt2} from "@globalStyles";
 import {classNames} from "@helpers/classNames";
 import {useFilterDisabledState} from "@custom-hooks/useFilterDisabledState";

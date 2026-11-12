@@ -1,6 +1,5 @@
 import { mb2 } from '@globalStyles';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Keyword } from '@models/swagger/App/Domain/Common/Entities/Keywords/Keyword';
 import { AIAssistantPanel } from '@vanguard/AIAssistant/AIAssistentPanel/AIAssistantPanel';
 import { Button, ButtonTypes, ButtonSizes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
@@ -25,20 +24,48 @@ export type AIAssistantAdjustOptions =
   | 'bold'
   | 'witty';
 
+/**
+ * A keyword the assistant may work into the text (`includeKeywords`). Only these fields are typed: a backend `Keyword`
+ * fits as is. Vanguard doesn't read it; it hands `keywordsToInclude` to your `adjustCallback` (see
+ * {@link AIAssistantAdjustContext}).
+ */
+export type AIAssistantKeyword = {
+  id?: number | null;
+  name?: string | null;
+  objectType?: string | null;
+};
+
+/** What the component knows about the adjust request beyond the text: everything a backend adjust request needs. */
+export type AIAssistantAdjustContext = {
+  /** The component's `keywordsToInclude` (`[]` when unset), for `option === 'includeKeywords'`. */
+  keywordsToInclude: AIAssistantKeyword[];
+  /** The text is HTML (the component's `useHtml`; always so in RichTextEditor), else Markdown. */
+  useHtml: boolean;
+  /** The component's `keepShort`. */
+  keepShort?: boolean;
+};
+
+/**
+ * The consumer's adjust request, made with its own SDK: resolves to the adjusted text. Vanguard makes no request of its
+ * own. Show your own error (or AI budget) modal from it; when it rejects, Vanguard resets the panel.
+ *
+ * `command` is the free-text instruction, set for `option === 'command'`.
+ */
+export type AIAssistantAdjustCallback = (
+  text: string,
+  option: AIAssistantAdjustOptions,
+  command: string | undefined,
+  context: AIAssistantAdjustContext,
+) => Promise<string>;
+
 export type AIAssistantProps = {
   id?: string;
   children?: React.ReactElement;
   anchorElem: HTMLElement | null; // Panel will position to this element
   generateBtnText?: string;
   generateCallback: (command?: string, keepShort?: boolean) => Promise<string>; // REQUIRED: A callback that will be called when the "Generate" button is clicked
-  /**
-   * The consumer's adjust request: resolves to the adjusted text. Recommended.
-   *
-   * Without it, Vanguard adjusts through its own built-in request (its own SDK, to the page's origin). That usage is
-   * deprecated, and editors show it struck through: see {@link AIAssistant}. The built-in request will be removed in the
-   * next major version (VAN-64).
-   */
-  adjustCallback?: (text: string, option: AIAssistantAdjustOptions, command?: string) => Promise<string>;
+  /** REQUIRED: the adjust request, made by the consumer (see {@link AIAssistantAdjustCallback}). */
+  adjustCallback: AIAssistantAdjustCallback;
   useHtml?: boolean; // OPTIONAL: if true, will use HTML instead of plain text
   onKeepCallback?: () => void; // OPTIONAL: if provided, will be called when the "Keep" button is clicked
   onCloseCallback?: () => void; //OPTIONAL: if provided, will be called when the close button is clicked
@@ -47,7 +74,7 @@ export type AIAssistantProps = {
   needsCommandOnGenerate?: boolean;
   hasGenerateHashtagsAdjustOption?: boolean;
   hasIncludeKeywordsAdjustOption?: boolean;
-  keywordsToInclude?: Keyword[];
+  keywordsToInclude?: AIAssistantKeyword[];
   value: string; // A state variable that will contain generated text (bind it to input)
   setValue: (value: string) => void; // A setter for the state variable, will be uset to set generated text
   disabled?: boolean;
@@ -55,22 +82,7 @@ export type AIAssistantProps = {
   forbiddenAjustOptions?: AIAssistantAdjustOptions[];
 };
 
-/**
- * AIAssistant's call signatures (VAN-64). With `adjustCallback` it matches the first, the recommended one. Without it,
- * the second, which is deprecated: editors show that usage struck through, while it still works as before.
- */
-export type AIAssistantComponent = {
-  /** Generates and adjusts text: `generateCallback` and `adjustCallback` make the requests, with your own SDK. */
-  (props: AIAssistantProps & { adjustCallback: NonNullable<AIAssistantProps['adjustCallback']> }): React.JSX.Element;
-  /**
-   * @deprecated Pass `adjustCallback` and make the adjust request with your own SDK. Without it, AIAssistant adjusts
-   * through Vanguard's built-in request (its own SDK, with a hardcoded empty base URL: the page's origin), which will be
-   * removed in the next major version (VAN-64).
-   */
-  (props: AIAssistantProps): React.JSX.Element;
-};
-
-export const AIAssistant: AIAssistantComponent = (props: AIAssistantProps) => {
+export const AIAssistant = (props: AIAssistantProps) => {
   const {
     id = `AIAssistant_${uuidv4()}`,
     children,

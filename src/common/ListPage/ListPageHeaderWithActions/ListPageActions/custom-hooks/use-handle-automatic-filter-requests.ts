@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ListPageFilterType } from '@models/common/ListPageFilters/ListPageFilter';
-import { ListPageSwitchFilter } from '@models/common/ListPageFilters/ListPageSwitchFilter';
+import { ListPageFilterType } from '@common/ListPage/ListPageFilters/ListPageFilter';
+import { ListPageSwitchFilter } from '@common/ListPage/ListPageFilters/ListPageSwitchFilter';
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { convertStateFiltersToQueryParams } from '@custom-hooks/use-bind-query-param-to-redux-state.ts';
 

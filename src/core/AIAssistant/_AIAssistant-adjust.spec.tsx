@@ -1,6 +1,5 @@
 import { act, cleanup, fireEvent, render, renderHook, screen } from '@test-utils/test-utils';
 import { ModalService } from '@vanguard/Modal/ModalService';
-import axios from 'axios';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -23,52 +22,75 @@ const baseProps = (overrides: Partial<AIAssistantProps> = {}): AIAssistantProps 
   value: 'Some text',
   setValue: vi.fn(),
   generateCallback: vi.fn(() => Promise.resolve('generated')),
+  adjustCallback: vi.fn(() => Promise.resolve('adjusted')),
   ...overrides,
 });
 
 const flush = () => act(async () => {});
 
-describe('AIAssistant adjust: the consumer’s callback, the built-in request deprecated (VAN-64)', () => {
-  let axiosRequest: ReturnType<typeof vi.spyOn>;
+describe('AIAssistant adjust: only through the consumer’s adjustCallback', () => {
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let xhrOpen: ReturnType<typeof vi.spyOn>;
   beforeEach(() => {
-    axiosRequest = vi.spyOn(axios, 'request').mockImplementation(() => new Promise(() => {}));
+    fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
+    xhrOpen = vi.spyOn(XMLHttpRequest.prototype, 'open').mockImplementation(() => {});
   });
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
   });
 
+  test('adjustCallback is a required prop', () => {
+    // @ts-expect-error adjustCallback is required: Vanguard has no request of its own to fall back to
+    const props: AIAssistantProps = {
+      anchorElem: null,
+      value: '',
+      setValue: () => {},
+      generateCallback: async () => '',
+    };
+    expect(props.adjustCallback).toBeUndefined();
+  });
+
   describe('the hook, called directly', () => {
-    test('without adjustCallback it still adjusts through the built-in (deprecated) request, as before', async () => {
-      const { result } = renderHook(() => useAiAssistantAdjustAndGenerate(baseProps()));
+    test('adjustCallback gets text, option, command and the request context; its text is set; Vanguard requests nothing', async () => {
+      const setValue = vi.fn();
+      const adjustCallback = vi.fn(() => Promise.resolve('adjusted'));
+      const keywordsToInclude = [{ id: 1, name: 'pizza' }];
+      const { result } = renderHook(() =>
+        useAiAssistantAdjustAndGenerate(
+          baseProps({ setValue, adjustCallback, keywordsToInclude, useHtml: true, keepShort: true }),
+        ),
+      );
       act(() => result.current.setPanelStatus('open'));
-      act(() => result.current.onAdjustClick('Some text', 'expand'));
-      await flush();
-      expect(axiosRequest).toHaveBeenCalledTimes(1);
-      expect(String((axiosRequest.mock.calls[0][0] as { url?: string }).url)).toContain('/app/api/client/ai/text/');
+      act(() => result.current.onAdjustClick('Some text', 'includeKeywords', 'cmd'));
       expect(result.current.panelStatus).toBe('writing');
+      await flush();
+      expect(adjustCallback).toHaveBeenCalledWith('Some text', 'includeKeywords', 'cmd', {
+        keywordsToInclude,
+        useHtml: true,
+        keepShort: true,
+      });
+      expect(setValue).toHaveBeenCalledWith('adjusted');
+      expect(result.current.panelStatus).toBe('open');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(xhrOpen).not.toHaveBeenCalled();
+    });
+
+    test('without keywordsToInclude, useHtml and keepShort the context has [], false and undefined', async () => {
+      const adjustCallback = vi.fn(() => Promise.resolve('adjusted'));
+      const { result } = renderHook(() => useAiAssistantAdjustAndGenerate(baseProps({ adjustCallback })));
       act(() => result.current.setPanelStatus('open'));
       act(() => result.current.onAdjustClick('Some text', 'shorten'));
       await flush();
-      expect(axiosRequest).toHaveBeenCalledTimes(2);
-    });
-
-    test('with adjustCallback: it gets text, option and command, its text is set, and Vanguard requests nothing', async () => {
-      const setValue = vi.fn();
-      const adjustCallback = vi.fn(() => Promise.resolve('adjusted'));
-      const { result } = renderHook(() => useAiAssistantAdjustAndGenerate(baseProps({ setValue, adjustCallback })));
-      act(() => result.current.setPanelStatus('open'));
-      act(() => result.current.onAdjustClick('Some text', 'shorten', 'cmd'));
-      expect(result.current.panelStatus).toBe('writing');
-      await flush();
-      expect(adjustCallback).toHaveBeenCalledWith('Some text', 'shorten', 'cmd');
-      expect(setValue).toHaveBeenCalledWith('adjusted');
-      expect(result.current.panelStatus).toBe('open');
-      expect(axiosRequest).not.toHaveBeenCalled();
+      expect(adjustCallback).toHaveBeenCalledWith('Some text', 'shorten', undefined, {
+        keywordsToInclude: [],
+        useHtml: false,
+        keepShort: undefined,
+      });
     });
 
     test('a rejected adjustCallback leaves writing and opens no modal of Vanguard’s own', async () => {
-      vi.spyOn(console, 'log').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       const open = vi.spyOn(ModalService, 'open');
       const adjustCallback = vi.fn(() => Promise.reject(new Error('budget')));
       const { result } = renderHook(() => useAiAssistantAdjustAndGenerate(baseProps({ adjustCallback })));
@@ -77,27 +99,17 @@ describe('AIAssistant adjust: the consumer’s callback, the built-in request de
       await flush();
       expect(result.current.panelStatus).not.toBe('writing');
       expect(open).not.toHaveBeenCalled();
-      expect(axiosRequest).not.toHaveBeenCalled();
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(xhrOpen).not.toHaveBeenCalled();
     });
   });
 
   describe('the component', () => {
-    const openPanel = () => fireEvent.click(screen.getByText('Use AI Assistant'));
-    const anchor = () => {
+    test('the Adjust action is offered', () => {
       const anchorElem = document.createElement('div');
       document.body.appendChild(anchorElem);
-      return anchorElem;
-    };
-
-    test('without adjustCallback the Adjust action is still offered, as before', () => {
-      render(<AIAssistant {...baseProps({ anchorElem: anchor() })} />);
-      openPanel();
-      expect(screen.getByText('Adjust')).toBeTruthy();
-    });
-
-    test('with adjustCallback the Adjust action is offered', () => {
-      render(<AIAssistant {...baseProps({ anchorElem: anchor(), adjustCallback: () => Promise.resolve('x') })} />);
-      openPanel();
+      render(<AIAssistant {...baseProps({ anchorElem })} />);
+      fireEvent.click(screen.getByText('Use AI Assistant'));
       expect(screen.getByText('Adjust')).toBeTruthy();
     });
   });

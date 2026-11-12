@@ -4,6 +4,10 @@ import { PageSection, PageSectionRoundedEdges } from '@vanguard/PageSection';
 import { RichTextEditor } from '../RichTextEditor';
 import { Story, initialValue } from './_RichTextEditor.default';
 
+/** Stands in for the consumer's adjust request: tags the selection so the replacement is visible. */
+const storyAiAdjust = (text: string, option: string): Promise<string> =>
+  new Promise((resolve) => setTimeout(() => resolve(`<p>[${option}] ${text}</p>`), 800));
+
 export const RichTextEditorStory: Story = {
   args: {
     placeholder: 'Enter text',
@@ -20,6 +24,7 @@ export const RichTextEditorStory: Story = {
             onChange={setContent}
             placeholder={props.placeholder}
             useAiAssistant={true}
+            aiAdjustCallback={storyAiAdjust}
           />
 
           <div style={{ height: '350px', overflow: 'scroll' }}>

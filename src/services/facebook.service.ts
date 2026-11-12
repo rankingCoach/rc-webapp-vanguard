@@ -1,6 +1,10 @@
 import { getPathIdAsStr } from '@helpers/get-path-id';
-import { FacebookConnection } from '@models/swagger/App/Domain/Presence/Entities/ListingServices/Facebook/Locations/Connection/FacebookConnection';
 import { rcWindow } from '@stores/window.store';
+
+/** The field of the backend's Facebook connection that `mapFacebookTokenInitUrl` reads. */
+export type FacebookTokenInitSettings = {
+  facebookTokenConnectFlowInitUrl?: string | null;
+};
 
 export const FACEBOOK_BASE_SCOPES = [
   'pages_manage_metadata',
@@ -215,7 +219,7 @@ export class FacebookService extends BaseFacebookService {
     return null;
   }
 
-  mapFacebookTokenInitUrl(settings: FacebookConnection) {
+  mapFacebookTokenInitUrl(settings: FacebookTokenInitSettings) {
     let facebookTokenInitUrl = settings.facebookTokenConnectFlowInitUrl;
 
     if (facebookTokenInitUrl === undefined) {

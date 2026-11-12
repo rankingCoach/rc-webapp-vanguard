@@ -1,6 +1,6 @@
 /**
- * One error log entry, as Vanguard used to PUT it to `/rest_api/v1/log` itself (VAN-64): the consumer now sends it
- * wherever its own API lives.
+ * One error log entry (ErrorModal, ErrorBoundary, `generateErrorBoundaryData`). Vanguard makes no request: the consumer
+ * sends it wherever its own API lives, through the logger it registers with `setVanguardErrorLogger`.
  */
 export type VanguardErrorLogEntry = {
   /** The caller's error details (the ErrorModal's `err`, a React `ErrorInfo`, …). */
@@ -30,18 +30,14 @@ let registrations: { logger: VanguardErrorLogger }[] = [];
 
 const activeLogger = (): VanguardErrorLogger | null => registrations[registrations.length - 1]?.logger ?? null;
 
-/** A consumer logger is registered: Vanguard logs through it instead of its deprecated built-in request. */
-export const hasVanguardErrorLogger = (): boolean => activeLogger() !== null;
-
 /**
- * Registers the consumer's error logger: Vanguard then logs through it and makes no request of its own. Recommended: call
- * it once at bootstrap. Without one, Vanguard still PUTs its logs itself, which is deprecated and will be removed in the
- * next major version (VAN-64). The latest registration is active.
+ * Registers the consumer's error logger: call it once at bootstrap. Vanguard makes no request of its own; without a
+ * logger, its error logs only go to `console.error`. The latest registration is active.
  *
  * Returns its teardown: it removes this registration only, so the newest live one before it becomes active again.
  * Teardowns are idempotent and safe out of order (disposing an older one leaves a newer one active; a disposed one never
- * comes back). `null` removes every registration (back to the deprecated built-in request); teardowns of the removed ones then do nothing,
- * and its own teardown is a no-op.
+ * comes back). `null` removes every registration (back to `console.error`); teardowns of the removed ones then do nothing, and its
+ * own teardown is a no-op.
  */
 export const setVanguardErrorLogger = (logger: VanguardErrorLogger | null): (() => void) => {
   if (logger === null) {
@@ -60,13 +56,16 @@ const reportLoggerFailure = (reason: unknown): void => {
 };
 
 /**
- * Hands one entry to the registered logger, now. Never throws and never rejects: a failing logger can't break the
- * ErrorModal or the error boundary showing the error. Resolves to what the logger returned (`{}` without one, or when
- * it failed).
+ * Hands one entry to the registered logger, now (to `console.error` without one). Never throws and never rejects: a
+ * failing logger can't break the ErrorModal or the error boundary showing the error. Resolves to what the logger
+ * returned (`{}` without one, or when it failed).
  */
 export const logVanguardError = (type: string, entry: VanguardErrorLogEntry): Promise<unknown> => {
   const logger = activeLogger();
-  if (!logger) return Promise.resolve({});
+  if (!logger) {
+    console.error(`Vanguard error log (${type}), no logger registered (setVanguardErrorLogger)`, entry);
+    return Promise.resolve({});
+  }
   try {
     return Promise.resolve(logger(type, entry)).then(
       (result) => result ?? {},

@@ -2,8 +2,6 @@ import { useLazyImage } from '@custom-hooks/useLazyImage';
 import { classNames } from '@helpers/classNames';
 import { secondsToTimeDuration } from '@helpers/data-formatters';
 import { updateImageUrlWithBaseRequest } from '@helpers/update-image-url-with-base-request';
-import { PostMediaItemVideoSettings } from '@models/swagger/App/Domain/Presence/Entities/Locations/Posts/MediaItems/PostMediaItemVideoSettings';
-import { MediaItemType } from '@models/swagger/DDD/Domain/Common/Entities/MediaItems/MediaItem';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { GalleryPlaceholderFormat } from '@vanguard/Gallery/Gallery/PhotoPlaceholder/PhotoPlaceholder';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
@@ -14,6 +12,7 @@ import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
 import React from 'react';
 
 import { MediaItemFile } from '../Gallery';
+import { GalleryMediaItemType } from '../gallery-media-item-type';
 import styles from './GalleryMediaItem.module.scss';
 
 export type GalleryMediaItemAction = {
@@ -124,11 +123,10 @@ export const GalleryMediaItem = (props: Props) => {
           </div>
         </Render>
 
-        <Render if={mediaItem.fileType?.includes('video') || mediaItem.type === MediaItemType.video}>
+        <Render if={mediaItem.fileType?.includes('video') || mediaItem.type === GalleryMediaItemType.video}>
           <div className={classNames(styles.videoMetadataContainer)}>
             <Text type={TextTypes.textCaption} color={'--fn-bg'} className={classNames(styles.videoDuration)}>
-              {(mediaItem.settings as PostMediaItemVideoSettings)?.videoDuration ??
-                secondsToTimeDuration(mediaItem.metadata?.videoMetadata?.duration)}
+              {mediaItem.settings?.videoDuration ?? secondsToTimeDuration(mediaItem.metadata?.videoMetadata?.duration)}
             </Text>
           </div>
         </Render>

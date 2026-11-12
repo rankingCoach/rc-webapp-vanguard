@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import styles from '../ListPageHeaderWithActions.module.scss';
 import { ListPageProps } from '@common/ListPage/ListPage';
 import { ListPageCheckboxGroup } from '@common/ListPage/ListPageCheckboxGroup/ListPageCheckboxGroup';
-import { ListPageFilterType } from '@models/common/ListPageFilters/ListPageFilter';
-import { ListPageCheckboxFilter } from '@models/common/ListPageFilters/ListPageCheckboxFilter';
+import { ListPageFilterType } from '@common/ListPage/ListPageFilters/ListPageFilter';
+import { ListPageCheckboxFilter } from '@common/ListPage/ListPageFilters/ListPageCheckboxFilter';
 import { useSelector } from 'react-redux';
-import { ListPageSelectorFilter } from '@models/common/ListPageFilters/ListPageSelectorFilter';
+import { ListPageSelectorFilter } from '@common/ListPage/ListPageFilters/ListPageSelectorFilter';
 import { ListPageSelector } from '@common/ListPage/ListPageSelector/ListPageSelector';
 import { mt2 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { ListPageDateRangePicker } from '@common/ListPage/ListPageDateRangePicker/ListPageDateRangePicker';
 import { useBindQueryParamToState } from '@custom-hooks/use-bind-query-param-to-state';
-import { ListPageDateRangeFilter } from '@models/common/ListPageFilters/ListPageDateRangeFilter';
+import { ListPageDateRangeFilter } from '@common/ListPage/ListPageFilters/ListPageDateRangeFilter';
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { ListPageSwitchGroup } from '@common/ListPage/ListPageSwitchGroup/ListPageSwitchGroup';
-import { ListPageSwitchFilter } from '@models/common/ListPageFilters/ListPageSwitchFilter';
+import { ListPageSwitchFilter } from '@common/ListPage/ListPageFilters/ListPageSwitchFilter';
 import { ListPageRadioGroup } from '@common/ListPage/ListPageRadioGroup/ListPageRadioGroup';
-import { ListPageRadioFilter } from '@models/common/ListPageFilters/ListPageRadioFilter';
+import { ListPageRadioFilter } from '@common/ListPage/ListPageFilters/ListPageRadioFilter';
 import {
   useHandleAutomaticFilterRequests,
 } from '@common/ListPage/ListPageHeaderWithActions/ListPageActions/custom-hooks/use-handle-automatic-filter-requests';

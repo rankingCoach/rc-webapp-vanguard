@@ -19,3 +19,9 @@ export type { TableFooterProps } from './TableFooter/TableFooter';
 export { TableFooter } from './TableFooter/TableFooter';
 export type { TableHeaderProps } from './TableHeader/TableHeader';
 export { TableHeader } from './TableHeader/TableHeader';
+export type {
+  TableToolbarColumnPicker,
+  TableToolbarDownload,
+  TableToolbarOptions,
+  TableToolbarSearch,
+} from './TableToolbar/TableToolbar';

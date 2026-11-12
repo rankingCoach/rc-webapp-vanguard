@@ -21,7 +21,6 @@ export default defineConfig({
       '@test-utils/test-utils': path.resolve(dirname, 'test-utils/test-utils.tsx'),
       '@test-utils': path.resolve(dirname, 'src/test-utils'),
       '@common': path.resolve(dirname, 'src/common'),
-      '@models': path.resolve(dirname, 'src/models'),
       '@services': path.resolve(dirname, 'src/services'),
       '@stores': path.resolve(dirname, 'src/stores'),
       '@redux-stores': path.resolve(dirname, 'src/stores'),
