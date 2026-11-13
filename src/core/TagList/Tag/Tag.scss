@@ -1,4 +1,5 @@
 @import '@styles/color-functions';
+@import '@styles/spacings';
 .Tag-container {
   display: flex;
   flex-direction: row;
@@ -84,6 +85,40 @@
       border-radius: 5px;
       opacity: 0.2;
       padding: 4px 8px;
+    }
+  }
+
+  /**
+   * Chip filled (variant="chip-filled")
+   * The small filled chip: 24px (4px + 16px line + 4px), the muted button's fill, 12px medium text, not uppercase.
+   */
+  .chip-filled {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: $x0_5;
+    box-sizing: border-box;
+    height: $x3;
+    padding: $x0_5 10px;
+    border-radius: 999px;
+    background-color: var(--button-muted-background-color);
+    white-space: nowrap;
+
+    // over the Text's own type classes (its weight is set by Tag)
+    span.rc-text {
+      font-size: $x1_5;
+      line-height: $x2;
+      letter-spacing: 0.48px;
+      text-transform: none;
+      color: var(--button-muted-text-color);
+    }
+
+    // the delete button fits the 16px line
+    .tag-btn-delete {
+      width: $x2;
+      height: $x2;
+      margin-right: -$x0_5;
     }
   }
 }

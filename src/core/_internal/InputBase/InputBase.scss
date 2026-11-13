@@ -444,4 +444,89 @@
       }
     }
   }
+
+  /**
+   * -------------------------------------------------------------------------------------------------------------------
+   * SIZE: Small (size="small")
+   * The compact 32px filled field: the muted button's fill, no outline, an inset ring while focused.
+   * -------------------------------------------------------------------------------------------------------------------
+   */
+  &.vanguard-input-small {
+    .MuiOutlinedInput-root {
+      height: $x4;
+      border-radius: $x0_5;
+      font-size: 13px;
+      line-height: $x2;
+      // the hover fill is a layer over the rest fill, as on the muted button
+      --vanguard-input-small-hover: var(--button-muted-hover-background-color);
+      background: var(--button-muted-background-color);
+      transition:
+        background-color 150ms ease,
+        box-shadow 150ms ease;
+
+      .MuiOutlinedInput-input {
+        box-sizing: border-box;
+        height: 100%;
+        padding: 0 $x1_5;
+        color: var(--fn-fg);
+      }
+
+      &.MuiInputBase-adornedStart .MuiOutlinedInput-input {
+        padding-left: 0;
+      }
+
+      &.MuiInputBase-adornedEnd .MuiOutlinedInput-input {
+        padding-right: 0;
+      }
+
+      fieldset {
+        border: 0;
+        background: none;
+      }
+
+      &:hover:not(.Mui-disabled):not(.Mui-focused) {
+        background:
+          linear-gradient(var(--vanguard-input-small-hover), var(--vanguard-input-small-hover)),
+          var(--button-muted-background-color);
+      }
+
+      &.Mui-focused {
+        box-shadow: inset 0 0 0 $x0_25 var(--ado-base);
+      }
+
+      &.Mui-error {
+        box-shadow: inset 0 0 0 $x0_25 var(--e500);
+      }
+    }
+
+    // the adornments as passed (an Icon, or an InputAdornment): a 16px icon 10px in, the text 6px after it
+    .MuiInputBase-adornedStart > :first-child {
+      flex-shrink: 0;
+      margin-left: 10px;
+      margin-right: 6px;
+    }
+
+    .MuiInputBase-adornedEnd > .MuiOutlinedInput-input + :not(fieldset) {
+      flex-shrink: 0;
+      margin-left: 6px;
+      margin-right: $x0_5;
+    }
+
+    // Select: a muted Button at size medium (12px medium text, its tracking); the chevron keeps its own lane
+    .MuiSelect-select.MuiOutlinedInput-input {
+      min-height: 0;
+      padding: $x1 $x4 $x1 $x1_5;
+      font-size: $x1_5;
+      line-height: $x2;
+      font-weight: 500;
+      letter-spacing: 0.48px;
+      color: var(--fn-fg);
+    }
+
+    .vanguard-input-select-chevron {
+      top: calc(50% - #{$x1});
+      right: $x1;
+      transition: transform 150ms ease;
+    }
+  }
 }

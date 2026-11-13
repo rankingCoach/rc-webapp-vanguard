@@ -183,3 +183,24 @@ export const InteractiveExample: Story = {
     await expect(selectedText).toBeInTheDocument();
   },
 };
+// A single Icon child marks the button icon-only (ToggleButton-icon-only), so a segmented group can square it
+export const IconOnlyMarker: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: "10px" }}>
+      <ToggleButton value="grid" aria-label="Grid view" testId="icon-only-toggle">
+        <Icon>{IconNames.image}</Icon>
+      </ToggleButton>
+      <ToggleButton value="text" testId="text-toggle">
+        Text
+      </ToggleButton>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const iconButton = within(canvas.getByTestId("icon-only-toggle")).getByRole("button");
+    const textButton = within(canvas.getByTestId("text-toggle")).getByRole("button");
+
+    await expect(iconButton).toHaveClass("ToggleButton-icon-only");
+    await expect(textButton).not.toHaveClass("ToggleButton-icon-only");
+  },
+};

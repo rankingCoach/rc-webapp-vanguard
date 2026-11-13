@@ -1,7 +1,7 @@
 {
   "id": "component:input",
   "kind": "component",
-  "summary": "Text input with label, validation, counters, and adornment support used in forms.",
-  "keywords": ["input", "text", "form", "validation", "adornment", "counter", "control"],
+  "summary": "Text input with label, validation, counters, and adornment support used in forms. `size=\"small\"` is the compact 32px filled toolbar field, e.g. a search: `<Input size=\"small\" labelType=\"hidden\" adornment={<Icon>{IconNames.search}</Icon>} />`.",
+  "keywords": ["input", "text", "form", "validation", "adornment", "counter", "control", "compact", "small", "search", "toolbar", "filled"],
   "tags": ["forms", "input", "ui"]
 }

@@ -36,7 +36,8 @@ const getIconSvg = (button: HTMLElement) => button.querySelector<SVGElement>('sv
 const textColorDescription = `
 The default button takes a \`textColor\` from a fixed set (\`ButtonTextColors\`). It colours the label and the icon,
 at rest and on hover/focus (derived: 25% towards black). The fill, focus ring and disabled state stay the default
-button's. Today the set holds \`ado\` (\`--ado-base\`), used by the Needs-you row action.
+button's. The set holds \`ado\` (\`--ado-base\`), used by the Needs-you row action, and \`neutral\` (\`--fn-fg\`),
+for a quiet action that must not read as a link (a row's ⋮ on a white tile).
 
 Other button types ignore \`textColor\`. It takes precedence over the deprecated \`color\` / \`hoverColor\`.
 `;
@@ -83,6 +84,24 @@ export const ButtonDefaultTextColor: ButtonStory = {
           </Button>
         </Row>
       ))}
+      <Row label="Neutral (--fn-fg): a quiet action that does not read as a link" background="#ffffff">
+        <Button
+          type={ButtonTypes.default}
+          textColor={ButtonTextColors.neutral}
+          onClick={args.onClick}
+          testId="text-color-neutral"
+        >
+          Neutral
+        </Button>
+        <Button
+          type={ButtonTypes.default}
+          textColor={ButtonTextColors.neutral}
+          icon={IconNames.kebabMenu}
+          ariaLabel="More"
+          onClick={args.onClick}
+          testId="text-color-neutral-icon"
+        />
+      </Row>
       <Row label="Ignored by other types" background="#ffffff">
         <Button
           type={ButtonTypes.primary}
@@ -130,6 +149,20 @@ export const ButtonDefaultTextColor: ButtonStory = {
     const disabled = button('text-color-white-disabled');
     await expect(disabled).toBeDisabled();
     await expect(getComputedStyle(getLabel(disabled)!).color).not.toBe(ADO_BASE);
+
+    // neutral takes the text colour, for the label and for an icon-only button
+    const neutral = button('text-color-neutral');
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--fn-fg').trim();
+    const textProbe = document.createElement('span');
+    textProbe.style.color = textColor;
+    canvasElement.appendChild(textProbe);
+    const resolvedTextColor = getComputedStyle(textProbe).color;
+    textProbe.remove();
+    await expect(neutral.className).toMatch(/text-color-neutral/);
+    await expect(getComputedStyle(getLabel(neutral)!).color).toBe(resolvedTextColor);
+    const neutralIcon = button('text-color-neutral-icon');
+    await waitFor(() => expect(getIconSvg(neutralIcon)).not.toBeNull());
+    await expect(getComputedStyle(getIconSvg(neutralIcon)!).color).toBe(resolvedTextColor);
 
     // other types ignore textColor
     const primary = button('text-color-primary-ignored');

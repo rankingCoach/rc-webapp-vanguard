@@ -1,7 +1,7 @@
 {
   "id": "component:status-badge",
   "kind": "component",
-  "summary": "Small badge indicating status, review or boost states with optional icon and color variants. Supports an Ado-coloured `ado` status and a `size=\"compact\"` (18px, 11px bold) pill, e.g. the \"New\" badge: `<StatusBadge status=\"ado\" size=\"compact\" hideIcon text=\"New\" />`.",
-  "keywords": ["status", "badge", "indicator", "status-badge", "review", "pill", "compact", "new", "ado"],
+  "summary": "Small badge indicating status, review or boost states with optional icon and color variants. Supports an Ado-coloured `ado` status and a `size=\"compact\"` (18px, 11px bold) pill, e.g. the \"New\" badge: `<StatusBadge status=\"ado\" size=\"compact\" hideIcon text=\"New\" />`. A `variant=\"glass\"` label (dark translucent fill with a blur, white 12px text) sits on photos: `<StatusBadge variant=\"glass\" status=\"neutral\" text=\"Image\" />`.",
+  "keywords": ["status", "badge", "indicator", "status-badge", "review", "pill", "compact", "new", "ado", "glass", "overlay", "photo", "image-label"],
   "tags": ["labels", "status", "ui"]
 }

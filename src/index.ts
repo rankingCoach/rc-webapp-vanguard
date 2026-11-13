@@ -144,7 +144,7 @@ export { BigAssEditModal } from './core/CustomModals';
 export { EditModal } from './core/CustomModals';
 
 // Tags
-export type { TagProps } from './core/TagList';
+export type { TagProps, TagVariant } from './core/TagList';
 export { Tag } from './core/TagList';
 export { TagType } from './core/TagList';
 export { TagList } from './core/TagList';

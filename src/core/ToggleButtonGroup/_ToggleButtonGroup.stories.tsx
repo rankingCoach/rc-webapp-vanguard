@@ -8,6 +8,7 @@ import { Vertical as _Vertical } from "./stories/Vertical.story";
 import { Disabled as _Disabled } from "./stories/Disabled.story";
 import { InteractiveExclusive as _InteractiveExclusive } from "./stories/InteractiveExclusive.story";
 import { InteractiveMultiple as _InteractiveMultiple } from "./stories/InteractiveMultiple.story";
+import { Segmented as _Segmented } from "./stories/Segmented.story";
 
 export default {
   ...SbDecorator({
@@ -29,3 +30,4 @@ export const Vertical: Story = { ..._Vertical };
 export const Disabled: Story = { ..._Disabled };
 export const InteractiveExclusive: Story = { ..._InteractiveExclusive };
 export const InteractiveMultiple: Story = { ..._InteractiveMultiple };
+export const Segmented: Story = { ..._Segmented };

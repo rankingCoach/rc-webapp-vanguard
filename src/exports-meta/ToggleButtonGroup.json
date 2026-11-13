@@ -1,7 +1,7 @@
 {
   "id": "component:toggle-button-group",
   "kind": "component",
-  "summary": "Group component managing multiple toggle buttons and their selection state.",
-  "keywords": ["toggle", "group", "buttons", "selection", "control"],
+  "summary": "Group component managing multiple toggle buttons and their selection state. `variant=\"segmented\"` is the 32px segmented control (muted track, pressed item a white chip) for text or icon-only items: `<ToggleButtonGroup variant=\"segmented\" exclusive value={v} onChange={...}>`.",
+  "keywords": ["toggle", "group", "buttons", "selection", "control", "segmented", "segmented-control", "button-group", "tabs", "view-switch"],
   "tags": ["controls", "input", "ui"]
 }
