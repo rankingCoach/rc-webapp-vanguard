@@ -8,9 +8,7 @@ import React from 'react';
 
 import { TogglerWithText } from './TogglerWithText';
 
-describe('TogglerWithText component tests', () => {
-  test('should render', async () => {
-    const Left = () => {
+const LintLeft13 = () => {
       return (
         <div className={classNames(dFlex, alignItemsCenter, gap1)}>
           <Text>Annual</Text>
@@ -20,6 +18,33 @@ describe('TogglerWithText component tests', () => {
         </div>
       );
     };
+
+const LintLeft40 = () => {
+      return (
+        <div className={classNames(dFlex, alignItemsCenter, gap1)}>
+          <Text>Annual</Text>
+          <Text color={'--a3500'} type={TextTypes.textHelp} fontWeight={FontWeights.bold}>
+            Save 33%
+          </Text>
+        </div>
+      );
+    };
+
+const LintLeft67 = () => {
+      return (
+        <div className={classNames(dFlex, alignItemsCenter, gap1)}>
+          <Text>Annual</Text>
+          <Text color={'--a3500'} type={TextTypes.textHelp} fontWeight={FontWeights.bold}>
+            Save 33%
+          </Text>
+        </div>
+      );
+    };
+
+
+describe('TogglerWithText component tests', () => {
+  test('should render', async () => {
+    const Left = LintLeft13;
 
     render(
       <TogglerWithText
@@ -37,16 +62,7 @@ describe('TogglerWithText component tests', () => {
   });
 
   test('should render click left option', async () => {
-    const Left = () => {
-      return (
-        <div className={classNames(dFlex, alignItemsCenter, gap1)}>
-          <Text>Annual</Text>
-          <Text color={'--a3500'} type={TextTypes.textHelp} fontWeight={FontWeights.bold}>
-            Save 33%
-          </Text>
-        </div>
-      );
-    };
+    const Left = LintLeft40;
 
     render(
       <TogglerWithText
@@ -64,16 +80,7 @@ describe('TogglerWithText component tests', () => {
   });
 
   test('should render click right option', async () => {
-    const Left = () => {
-      return (
-        <div className={classNames(dFlex, alignItemsCenter, gap1)}>
-          <Text>Annual</Text>
-          <Text color={'--a3500'} type={TextTypes.textHelp} fontWeight={FontWeights.bold}>
-            Save 33%
-          </Text>
-        </div>
-      );
-    };
+    const Left = LintLeft67;
 
     render(
       <TogglerWithText

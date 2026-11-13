@@ -1,2 +1,2 @@
-export type { RichTextEditorProps } from './RichTextEditor';
+export type { RichTextEditorAiProps, RichTextEditorProps } from './RichTextEditor';
 export { RichTextEditor } from './RichTextEditor';

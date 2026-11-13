@@ -11,8 +11,8 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { Keyword } from '@models/swagger/App/Domain/Common/Entities/Keywords/Keyword';
 import { translationService } from '@services/translation.service';
+import type { AIAssistantAdjustCallback, AIAssistantKeyword } from '@vanguard/AIAssistant/AIAssistant';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import {
   ControlledValuePlugin,
@@ -30,20 +30,38 @@ import { RteAiAssistant } from './RteAiAssistant/RteAiAssistant';
 import { RteLinkEditor } from './RteLinkEditor/RteLinkEditor';
 import { RteToolbar } from './RteToolbar/RteToolbar';
 
-export type RichTextEditorProps = {
+type RichTextEditorBaseProps = {
   id?: string;
   defaultValue?: string; // Initial value, must be HTML content
   value?: string; // Controlled state value, must be HTML content | Use to change content from outside of RTE | DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING
   placeholder?: string;
   toolbarPortalElem?: HTMLElement;
   toolbarContainerClassName?: string;
-  useAiAssistant?: boolean;
   keywords?: string[];
-  keywordsToInclude?: Keyword[];
+  /** Handed to `aiAdjustCallback` for the `includeKeywords` option. */
+  keywordsToInclude?: AIAssistantKeyword[];
   onChange?: (html: string, plainText: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 };
+
+/**
+ * The AI assistant (adjusts the selected text) is opt in. With `useAiAssistant` (also a `boolean` that may be `true`),
+ * `aiAdjustCallback` is required: the consumer makes the adjust request with its own SDK, Vanguard makes none.
+ */
+export type RichTextEditorAiProps =
+  | {
+      useAiAssistant?: false;
+      /** Unused without `useAiAssistant`. */
+      aiAdjustCallback?: AIAssistantAdjustCallback;
+    }
+  | {
+      useAiAssistant: true;
+      /** REQUIRED with `useAiAssistant`: the adjust request for the selected text (see `AIAssistantAdjustCallback`). */
+      aiAdjustCallback: AIAssistantAdjustCallback;
+    };
+
+export type RichTextEditorProps = RichTextEditorBaseProps & RichTextEditorAiProps;
 
 export const RichTextEditor = (props: RichTextEditorProps) => {
   const {
@@ -59,6 +77,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     useAiAssistant = false,
     keywords,
     keywordsToInclude,
+    aiAdjustCallback,
   } = props;
 
   const [floatingAnchor, setFloatingAnchor] = useState<HTMLElement | undefined>();
@@ -106,8 +125,12 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
 
           {defaultValue ? <DefaultValuePlugin defaultValue={defaultValue} /> : <></>}
           {value ? <ControlledValuePlugin value={value} /> : <></>}
-          {useAiAssistant && floatingAnchor ? (
-            <RteAiAssistant anchorElem={floatingAnchor} keywordsToInclude={keywordsToInclude ?? []} />
+          {useAiAssistant && aiAdjustCallback && floatingAnchor ? (
+            <RteAiAssistant
+              anchorElem={floatingAnchor}
+              keywordsToInclude={keywordsToInclude ?? []}
+              adjustCallback={aiAdjustCallback}
+            />
           ) : (
             <></>
           )}

@@ -339,12 +339,21 @@
    * -------------------------------------------------------------------------------------------------------------------
    */
   &.vanguard-input-loading {
+    // Must out-rank `.MuiOutlinedInput-root .MuiOutlinedInput-input { color }` above, or the text shows through the skeleton.
     textarea,
-    input {
+    input,
+    .MuiOutlinedInput-root .MuiOutlinedInput-input {
       color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+
+    // Keyword/URL highlight marks would otherwise float over the skeleton.
+    .vanguard-input-backdrop {
+      visibility: hidden;
     }
 
     .vanguard-textarea-skeleton {
+      box-sizing: border-box;
       width: 100%;
       position: absolute;
       top: 0;
@@ -354,6 +363,7 @@
     }
 
     .vanguard-input-skeleton {
+      box-sizing: border-box;
       width: 100%;
       position: absolute;
       top: 0;

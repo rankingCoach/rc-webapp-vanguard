@@ -5,6 +5,9 @@ import { Modal } from './Modal';
 import { ModalService } from './ModalService';
 import { OverlayStackingService } from '../OverlayStacking/OverlayStackingService';
 
+const LintWindow269 = ({ close }: { close: () => void }) => <Modal fullscreen onClose={close} />;
+
+
 /** Opened like an Ado window: it may go compact and joins stacks. */
 const stackedWindowOpts = { fullscreen: true, allowCompact: true, allowStacking: true };
 const stackedBamOpts = { fullscreen: true, allowStacking: true };
@@ -266,7 +269,7 @@ describe('overlap docking', () => {
 });
 
 describe('optional BAM stack maximum', () => {
-  const Window = ({ close }: { close: () => void }) => <Modal fullscreen onClose={close} />;
+  const Window = LintWindow269;
   const open = (close = vi.fn()) => ModalService.open(<Window close={close} />, stackedWindowOpts);
   test('unconfigured is unlimited; enabling a maximum keeps newest and closes backmost once', async () => {
     ModalService.setStackingEnabled(true);

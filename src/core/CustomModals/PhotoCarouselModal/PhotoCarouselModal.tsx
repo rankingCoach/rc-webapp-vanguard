@@ -1,13 +1,13 @@
 import { dFlexColumn, mb3, w100 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { updateImageUrlWithBaseRequest } from '@helpers/update-image-url-with-base-request';
-import { MediaItemType } from '@models/swagger/DDD/Domain/Common/Entities/MediaItems/MediaItem';
 import { StandardModalProps } from '@vanguard/Modal/ModalRoot/ModalRoot';
 import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
 import React, { useEffect, useState } from 'react';
 
 import { ComponentContainer } from '../../ComponentContainer/ComponentContainer';
 import { MediaItemFile } from '../../Gallery/Gallery/Gallery';
+import { GalleryMediaItemType } from '../../Gallery/Gallery/gallery-media-item-type';
 import { Modal } from '../../Modal/Modal';
 import { ModalBody } from '../../Modal/ModalBody/ModalBody';
 import { ModalHeader } from '../../Modal/Modalheader/ModalHeader';
@@ -54,7 +54,7 @@ export const PhotoCarouselModal = (props: Props) => {
                 gallery.map((el: MediaItemFile) => {
                   // TODO: REFACTOR THIS
                   // This is very ugly implemented, but it was made on speed in order to finish the projects.
-                  if ((el.file && el.fileType?.includes('video')) || el.type === MediaItemType.video) {
+                  if ((el.file && el.fileType?.includes('video')) || el.type === GalleryMediaItemType.video) {
                     let videoURL = '';
 
                     if (el.file) {

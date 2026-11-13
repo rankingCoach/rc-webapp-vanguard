@@ -3,12 +3,13 @@ import './Autocomplete.scss';
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { classNames } from '@helpers/classNames';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason, Chip } from '@mui/material';
+import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason } from '@mui/material';
 import {
   AutocompleteProps as MUIAutocompleteProps,
-  AutocompleteRenderGetTagProps,
   AutocompleteRenderOptionState,
-} from '@mui/material/Autocomplete/Autocomplete';
+  AutocompleteRenderValueGetItemProps,
+} from '@mui/material/Autocomplete';
+import { useThemeProps } from '@mui/material/styles';
 import { translationService } from '@services/translation.service';
 import {
   InputBase,
@@ -17,6 +18,9 @@ import {
   InputPopoverProps,
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
+import { CheckBoxIcon } from '@vanguard/CheckBox/CheckBoxIcon/CheckBoxIcon';
+import { Chip } from '@vanguard/Chip/Chip';
+import { mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
@@ -27,10 +31,39 @@ import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Text } from '../Text/Text';
 
+/** State handed to a custom `renderOption`. */
+export interface AutocompleteOptionState {
+  /** The option is part of the current value (use it for a checkbox). */
+  selected: boolean;
+  inputValue: string;
+  index: number;
+}
+
 /**
  * Autocomplete Props
  */
 export type AutocompleteProps = {
+  /**
+   * When true, `value` is the single source of truth (MUI controlled mode): the input/chips always show `value`
+   * and a selection only changes through `onChange`. Default false keeps the legacy uncontrolled behaviour.
+   */
+  controlled?: boolean;
+  /** Text of an option (input value, highlight, chip label). Overrides the `optionKey` lookup. */
+  getOptionLabel?: (option: any) => string;
+  /** Whether `option` represents `value`. Overrides the `optionKey` / identity comparison. */
+  isOptionEqualToValue?: (option: any, value: any) => boolean;
+  /** Custom option row; must return an `<li {...optionProps}>`. Same signature as MUI. */
+  renderOption?: (
+    optionProps: React.HTMLAttributes<HTMLLIElement> & { key?: React.Key },
+    option: any,
+    state: AutocompleteOptionState,
+  ) => React.ReactNode;
+  /** Prefix every default option row with a checkbox reflecting its selection (for `multiple`). */
+  showOptionCheckbox?: boolean;
+  /** Size of the chips of a `multiple` Autocomplete. Default 'medium'. */
+  chipSize?: 'small' | 'medium';
+  /** Accessible name of the input when there is no visible label. */
+  inputAriaLabel?: string;
   className?: string;
   testId?: string;
   optionKey?: string; //If the option is an object, then use this key to get option's value
@@ -46,7 +79,7 @@ export type AutocompleteProps = {
   autoSelect?: boolean;
   adornment?: React.ReactNode[];
 } & InputLabelProps &
-  InputValueProps &
+  Omit<InputValueProps, 'value'> &
   InputFormConfigProps &
   InputPopoverProps &
   Pick<
@@ -64,6 +97,17 @@ export type AutocompleteProps = {
     | 'onFocus'
     | 'blurOnSelect'
     | 'autoComplete'
+    | 'loading'
+    | 'loadingText'
+    | 'disableCloseOnSelect'
+    | 'clearOnBlur'
+    | 'openOnFocus'
+    | 'inputValue'
+    | 'clearText'
+    | 'openText'
+    | 'closeText'
+    | 'size'
+    | 'fullWidth'
   >;
 
 /**
@@ -101,8 +145,41 @@ export const Autocomplete = (props: AutocompleteProps) => {
     isLoading,
     autoSelect = true,
     adornment,
+    controlled = false,
+    getOptionLabel: consumerGetOptionLabel,
+    isOptionEqualToValue: consumerIsOptionEqualToValue,
+    renderOption: consumerRenderOption,
+    showOptionCheckbox = false,
+    chipSize,
+    inputAriaLabel,
     ...rest
   } = props;
+
+  // Resolve only the intercepted callback; Vanguard's own defaults retain their precedence.
+  const effective = useThemeProps({
+    props: rest as Partial<MUIAutocompleteProps<any, any, any, any>> & {
+      ListboxComponent?: React.ElementType;
+      componentsProps?: MUIAutocompleteProps<any, any, any, any>['slotProps'];
+      renderTags?: unknown;
+    },
+    name: 'MuiAutocomplete',
+  });
+  const {
+    onInputChange,
+    renderValue: consumerRenderValue,
+    ListboxComponent,
+    componentsProps,
+    ...forwarded
+  } = effective;
+  // slotProps was always replaced by this wrapper. Keep that boundary while
+  // translating the legacy aliases that MUI previously consumed underneath it.
+  const slotMapped = mapLegacySlots(
+    { ...forwarded, slotProps: componentsProps as MUIAutocompleteProps<any, any, any, any>['slotProps'] },
+    { ListboxProps: 'listbox', ChipProps: 'chip' },
+    { PaperComponent: 'paper', PopperComponent: 'popper' },
+  );
+  delete slotMapped.renderTags;
+  const listboxProps = slotMapped.slotProps?.listbox;
 
   const dispatch = useAppDispatch();
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
@@ -175,7 +252,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
     }
   }, [formconfig]);
 
-  const [val, setVal] = useState((value ?? multiple) ? [] : null); //Autocompletes's Value
+  const [uncontrolledVal, setVal] = useState((value ?? multiple) ? [] : null); //Autocompletes's Value
+  const val = controlled ? (value ?? (multiple ? [] : null)) : uncontrolledVal;
   useEffect(() => {
     if (formconfig) {
       setTimeout(() => {
@@ -185,7 +263,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     }
   }, [formconfig?.stateValue]);
 
-  const ShowAdornment = (index?: number): React.ReactNode | null => {
+  const showAdornment = (index?: number): React.ReactNode | null => {
     if (!adornment || index === undefined) return null;
     return adornment[index];
   };
@@ -196,14 +274,23 @@ export const Autocomplete = (props: AutocompleteProps) => {
    * -------------------------------------------------------------------------------------------------------------------
    */
 
-  const renderTags = (value: any[], getTagProps: AutocompleteRenderGetTagProps) => {
+  const renderValue = (value: any[], getItemProps: AutocompleteRenderValueGetItemProps<true>) => {
     if (!multiple) return null;
     return (
       <div className={'vanguard-input-tags'}>
         {value.map((option: any, index) => (
           <Chip
-            label={<Text>{optionKey && option ? option[optionKey] : option}</Text>}
-            {...getTagProps({ index })}
+            label={
+              consumerGetOptionLabel ? (
+                <Text translate={false}>{consumerGetOptionLabel(option)}</Text>
+              ) : (
+                <Text>{optionKey && option ? option[optionKey] : option}</Text>
+              )
+            }
+            size={chipSize}
+            {...getItemProps({ index })}
+            testId={`${testId ?? 'autocomplete'}-chip-${index}`}
+            data-tag-index={index}
             key={index}
             style={{ height: '100%' }}
           />
@@ -322,11 +409,21 @@ export const Autocomplete = (props: AutocompleteProps) => {
    * OPTIONS & DROPDOWN MENU
    * -------------------------------------------------------------------------------------------------------------------
    */
+  const renderOptionCheckbox = (selected: boolean) =>
+    showOptionCheckbox ? (
+      <span className={'vanguard-autocomplete-option-checkbox'} aria-hidden={true}>
+        <CheckBoxIcon isChecked={selected} intermediate={false} hoverMode={'border'} size={'small'} />
+      </span>
+    ) : null;
+
   const renderOption = (
-    props: React.HTMLAttributes<HTMLLIElement>,
+    props: React.HTMLAttributes<HTMLLIElement> & { key?: React.Key },
     option: any,
-    { inputValue }: AutocompleteRenderOptionState,
+    { inputValue, selected, index }: AutocompleteRenderOptionState,
   ) => {
+    if (consumerRenderOption) {
+      return consumerRenderOption(props, option, { inputValue, selected, index });
+    }
     if (highlightOptions) {
       const title = getOptionLabel(option);
       const matches = match(title, inputValue);
@@ -334,7 +431,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
       return (
         <li {...props} key={title}>
           <div className={'option-style'}>
-            {ShowAdornment(option.key)}
+            {renderOptionCheckbox(selected)}
+            {showAdornment(option?.key)}
             <span>
               {parts.map((part, index) => (
                 <span
@@ -355,6 +453,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     const title = getOptionLabel(option);
     return (
       <li {...props} key={title}>
+        {renderOptionCheckbox(selected)}
         <div>{title}</div>
       </li>
     );
@@ -364,9 +463,11 @@ export const Autocomplete = (props: AutocompleteProps) => {
    * Returns the "Option Label" that is used to set input's value when an option is being selected
    */
   const getOptionLabel = (option?: any) => {
+    if (consumerGetOptionLabel) {
+      return option === null || option === undefined ? '' : consumerGetOptionLabel(option);
+    }
     const keys = Object.keys(option ?? {});
-    //@ts-ignore @TODO @AdrianKott check this!
-    if (option === [] || keys.length === 0) {
+    if ((Array.isArray(option) && option.length === 0) || keys.length === 0) {
       return '';
     }
     if (typeof option === 'object') {
@@ -390,6 +491,9 @@ export const Autocomplete = (props: AutocompleteProps) => {
    *    value: The value to test against.
    */
   const isOptionEqualToValue = (option: any, value: any): boolean => {
+    if (consumerIsOptionEqualToValue) {
+      return value !== null && value !== undefined && consumerIsOptionEqualToValue(option, value);
+    }
     if (!value) {
       return false;
     }
@@ -458,7 +562,14 @@ export const Autocomplete = (props: AutocompleteProps) => {
   return (
     <ComponentContainer className={getContainerClasses()}>
       <MuiAutocomplete
-        {...rest}
+        {...slotMapped}
+        onInputChange={(event, inputValue, reason) => {
+          onInputChange?.(
+            event,
+            inputValue,
+            reason === 'selectOption' || reason === 'removeOption' || reason === 'blur' ? 'reset' : reason,
+          );
+        }}
         data-testid={testId}
         id={id}
         ref={autoRef}
@@ -469,7 +580,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
         multiple={multiple}
         options={options}
         noOptionsText={getNoOptionsText()}
-        renderTags={renderTags}
+        renderValue={multiple ? renderValue : consumerRenderValue}
         renderOption={renderOption}
         isOptionEqualToValue={isOptionEqualToValue}
         getOptionLabel={getOptionLabel}
@@ -480,6 +591,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
         onOpen={onListboxOpen}
         onClose={onListboxClose}
         slotProps={{
+          ...slotMapped.slotProps,
+          listbox: { component: ListboxComponent, ...listboxProps },
           popper: {
             // Override MUI's static z-index via `sx` (not `style`) so the
             // listbox stacks above any modal/drawer it was opened from (see
@@ -490,13 +603,23 @@ export const Autocomplete = (props: AutocompleteProps) => {
           },
         }}
         renderInput={(params) => {
+          // MANUAL v9 compatibility bridge: these are MUI-generated field props,
+          // not consumer overrides. Keep Vanguard's existing adornment/ref merge path.
+          const { slotProps: fieldSlots, ...fieldProps } = params;
           return (
             <InputBase
               formconfig={formconfig}
               inputRef={innerInputRef}
               isLoading={isLoading}
               testId={`${testId}-input`}
-              textFieldProps={params}
+              textFieldProps={{
+                ...fieldProps,
+                InputProps: fieldSlots.input,
+                inputProps: inputAriaLabel
+                  ? { ...fieldSlots.htmlInput, 'aria-label': inputAriaLabel }
+                  : fieldSlots.htmlInput,
+                InputLabelProps: fieldSlots.inputLabel,
+              }}
               required={required}
               infoText={infoText}
               label={label}
@@ -509,7 +632,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
               onChange={onInputChangeFn}
               formFieldType={'Autocomplete'}
               replacements={replacements}
-              adornment={ShowAdornment(adornmentIndex)}
+              adornment={showAdornment(adornmentIndex)}
             />
           );
         }}

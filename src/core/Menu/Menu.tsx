@@ -1,5 +1,8 @@
 import { uuidv4 } from '@helpers/generate-uid';
 import { Menu as MuiMenu, MenuProps as MuiMenuProps } from '@mui/material';
+import { useThemeProps } from '@mui/material/styles';
+import type { VanguardLegacyMenuProps } from '@vanguard/_internal/mui-legacy-props';
+import { mapLegacyModalAliases, mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { useEffect, useRef, useState } from 'react';
@@ -17,11 +20,21 @@ export type MenuProps = {
   height?: React.CSSProperties['height'];
   maxWidth?: React.CSSProperties['maxWidth'];
   maxHeight?: React.CSSProperties['maxHeight'];
-} & Omit<MuiMenuProps, 'children'> & {
+} & Omit<MuiMenuProps, 'children'> &
+  VanguardLegacyMenuProps & {
     children?: React.ReactNode;
   };
 
-export const Menu = ({ testId, items, children, width, height, maxWidth, maxHeight, ...rest }: MenuProps) => {
+export const Menu = (inProps: MenuProps) => {
+  const { testId, items, children, width, height, maxWidth, maxHeight, disableEscapeKeyDown, ...rest } = useThemeProps({
+    props: inProps,
+    name: 'MuiMenu',
+  });
+  const mapped = mapLegacySlots(
+    mapLegacyModalAliases(rest),
+    { MenuListProps: 'list', PaperProps: 'paper', TransitionProps: 'transition', BackdropProps: 'backdrop' },
+    { TransitionComponent: 'transition', BackdropComponent: 'backdrop' },
+  );
   const sizeStyle = width || height || maxWidth || maxHeight ? { width, height, maxWidth, maxHeight } : undefined;
 
   /**
@@ -46,19 +59,42 @@ export const Menu = ({ testId, items, children, width, height, maxWidth, maxHeig
     return () => OverlayStackingService.unregister(menuIdRef.current);
   }, [rest.open]);
 
+  const paper = sizeStyle ? rest.slotProps?.paper : mapped.slotProps?.paper;
+  const root = mapped.slotProps?.root;
+  // Preserve the existing whole-style replacement when a caller supplies paper.style.
+  const sizePaper = (resolved: Exclude<typeof paper, (...args: never[]) => unknown>) => ({
+    style: sizeStyle,
+    ...resolved,
+  });
+  const stackRoot = (resolved: Exclude<typeof root, (...args: never[]) => unknown>) => ({
+    ...resolved,
+    style: { ...resolved?.style, zIndex: menuZIndex },
+  });
   const slotProps = {
-    ...rest.slotProps,
+    ...mapped.slotProps,
     ...(sizeStyle
-      ? { paper: { style: { ...sizeStyle, ...rest.slotProps?.paper?.['style'] }, ...rest.slotProps?.paper } }
+      ? {
+          paper:
+            typeof paper === 'function'
+              ? (state: Parameters<typeof paper>[0]) => sizePaper(paper(state))
+              : sizePaper(paper),
+        }
       : {}),
-    // Override MUI's static z-index so the menu stacks above any modal/drawer
-    // it was opened from (see OverlayStackingService). Caller style is merged
-    // in (not replaced) so it can't clobber the zIndex override.
-    root: { ...rest.slotProps?.root, style: { ...rest.slotProps?.root?.['style'], zIndex: menuZIndex } },
+    root: typeof root === 'function' ? (state: Parameters<typeof root>[0]) => stackRoot(root(state)) : stackRoot(root),
   };
 
   return (
-    <MuiMenu data-testid={testId} {...rest} slotProps={slotProps} className={styles.menu}>
+    <MuiMenu
+      data-testid={testId}
+      disableAutoFocus={false}
+      {...mapped}
+      slotProps={slotProps}
+      className={styles.menu}
+      onClose={(event, reason) => {
+        if (disableEscapeKeyDown && reason === 'escapeKeyDown') return;
+        rest.onClose?.(event, reason);
+      }}
+    >
       {items ? items.map(({ key, ...itemProps }, index) => <MenuItem key={key ?? index} {...itemProps} />) : children}
     </MuiMenu>
   );

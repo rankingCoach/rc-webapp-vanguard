@@ -34,6 +34,7 @@ export { Button, ButtonSizes, ButtonTextColors, ButtonTypes } from './core/Butto
 
 // Form
 export type { FormStatus } from './core/Form';
+export type { ValidationResultWithInfo } from './core/Form';
 export { extractErrorScopes, extractSetErrorsFromConfig, Form } from './core/Form';
 
 // CheckBox
@@ -164,7 +165,7 @@ export type { RenderProps } from './core/Render';
 export { Render } from './core/Render';
 
 // Switch
-export type { SwitchProps } from './core/Switch';
+export type { LoadingBoolean, SwitchProps } from './core/Switch';
 export { Switch } from './core/Switch';
 
 // Skeleton
@@ -210,7 +211,7 @@ export { StatusBadge } from './core/StatusBadge';
 export { StatusBadgeIcon } from './core/StatusBadge';
 
 // Autocomplete
-export type { AutocompleteProps } from './core/Autocomplete';
+export type { AutocompleteOptionState, AutocompleteProps } from './core/Autocomplete';
 export { Autocomplete } from './core/Autocomplete';
 
 // SVG
@@ -310,7 +311,14 @@ export { ActionCardHeader } from './core/ActionCard';
 export { ActionCardInfo } from './core/ActionCard';
 
 // AIAssistant
-export type { AIAssistantProps } from './core/AIAssistant';
+export type {
+  AIAssistantAdjustCallback,
+  AIAssistantAdjustContext,
+  AIAssistantAdjustOptions,
+  AIAssistantKeyword,
+  AIAssistantProps,
+  AIAssistantStatus,
+} from './core/AIAssistant';
 export { AIAssistant } from './core/AIAssistant';
 
 // Alert
@@ -362,8 +370,52 @@ export { LineChartBase } from './core/Charts';
 export type { ClipboardTextProps } from './core/ClipboardText';
 export { ClipboardText } from './core/ClipboardText';
 
+// Breadcrumbs
+export type { BreadcrumbsProps } from './core/Breadcrumbs';
+export { Breadcrumbs } from './core/Breadcrumbs';
+
+// Chip
+export type { ChipProps } from './core/Chip';
+export { Chip } from './core/Chip';
+
 // Collapse
 export { Collapse } from './core/Collapse';
+
+// DataTable
+export type {
+  DataTableCellProps,
+  DataTableProps,
+  DataTableRowProps,
+  DataTableSectionProps,
+} from './core/DataTable';
+export {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableFoot,
+  DataTableHead,
+  DataTableRow,
+} from './core/DataTable';
+
+// Fade
+export type { FadeProps } from './core/Fade';
+export { Fade } from './core/Fade';
+
+// FocusTrap
+export type { FocusTrapProps } from './core/FocusTrap';
+export { FocusTrap } from './core/FocusTrap';
+
+// Pagination
+export type { PaginationProps } from './core/Pagination';
+export { Pagination } from './core/Pagination';
+
+// TreeView
+export type { TreeItemProps, TreeViewProps } from './core/TreeView';
+export { TreeItem, TreeView } from './core/TreeView';
+
+// VanguardThemeProvider
+export type { VanguardThemeProviderProps } from './core/VanguardThemeProvider';
+export { VanguardThemeProvider } from './core/VanguardThemeProvider';
 
 // ColorPicker
 export type { ColorPickerProps } from './core/ColorPicker';
@@ -490,7 +542,7 @@ export { FormControl } from './core/FormControl';
 //Gallery
 export type { MediaItemFile } from './core/Gallery';
 export type { GalleryChange } from './core/Gallery';
-export { Gallery, GALLERY_PHOTO_SCOPE } from './core/Gallery';
+export { Gallery, GALLERY_PHOTO_SCOPE, GalleryMediaItemType } from './core/Gallery';
 export { GalleryMediaItem } from './core/Gallery';
 export { PhotoPlaceholder } from './core/Gallery';
 
@@ -609,14 +661,15 @@ export { Rating } from './core/Rating';
 
 // RcErrorBoundary
 export type { ErrorBoundaryProps } from './core/RcErrorBoundry';
-export { ErrorBoundary, generateErrorBoundaryData } from './core/RcErrorBoundry';
+export type { VanguardErrorLogEntry, VanguardErrorLogger } from './core/RcErrorBoundry';
+export { ErrorBoundary, generateErrorBoundaryData, setVanguardErrorLogger } from './core/RcErrorBoundry';
 
 // RcNavLink
 export type { LinkComponentProps } from './core/RcNavLink';
 export { RcNavLink } from './core/RcNavLink';
 
 // RichTextEditor
-export type { RichTextEditorProps } from './core/RichTextEditor';
+export type { RichTextEditorAiProps, RichTextEditorProps } from './core/RichTextEditor';
 export { RichTextEditor } from './core/RichTextEditor';
 export type { SanitizeHtmlOptions } from './helpers/sanitize-html';
 export { sanitizeHtml } from './helpers/sanitize-html';
@@ -663,11 +716,26 @@ export { Star } from './core/StarRating';
 export { StarRating } from './core/StarRating';
 
 // Table
-export type { TableColumnProps, TableDataProps, TableOptionsProps, TableProps, TableRowProps } from './core/Table';
+export type {
+  TableClientPagination,
+  TableColumnProps,
+  TableDataProps,
+  TableOptionsProps,
+  TableProps,
+  TableRowProps,
+  TableSort,
+  TableSortDirection,
+} from './core/Table';
 export type { TableBodyProps } from './core/Table';
 export type { TableCellProps } from './core/Table';
 export type { TableFooterProps } from './core/Table';
 export type { TableHeaderProps } from './core/Table';
+export type {
+  TableToolbarColumnPicker,
+  TableToolbarDownload,
+  TableToolbarOptions,
+  TableToolbarSearch,
+} from './core/Table';
 export type { CtaWithIconProps } from './core/Table';
 export { Table } from './core/Table';
 export { TableBody } from './core/Table';
@@ -712,7 +780,10 @@ export type {
 export { useSelectiveDynamicImport } from './custom-hooks/use-dynamic-import/use-selective-dynamic-import.ts';
 export type { FormConfig, FormConfigElement, FormFieldType } from './custom-hooks/useFormConfig.ts';
 export { useFormConfig } from './custom-hooks/useFormConfig.ts';
+export type { UseMediaQueryOptions } from './custom-hooks/use-media-query';
+export { useMediaQuery } from './custom-hooks/use-media-query';
 export { classNames } from './helpers/classNames';
+export { hexToRgb, hexToRgba } from './helpers/hex-to-rgba';
 
 // Examples
 export type { SelectiveImportExampleProps } from './examples/SelectiveImportExample';

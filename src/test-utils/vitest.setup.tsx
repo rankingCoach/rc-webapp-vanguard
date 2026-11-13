@@ -5,6 +5,11 @@ import { afterEach } from 'vitest';
 
 import { PersistGates } from '../components/PersistGates';
 import { storeNonPersist } from './get-storybook-decorator';
+import { installPointerCapture } from './pointer-capture';
+
+if (typeof navigator !== 'undefined' && /\bjsdom\b/i.test(navigator.userAgent)) {
+  installPointerCapture();
+}
 
 afterEach(() => cleanup());
 

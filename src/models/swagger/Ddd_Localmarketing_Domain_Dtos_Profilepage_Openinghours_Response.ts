@@ -1,7 +1,0 @@
-import { Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Errors_Object } from '@models/swagger//Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Errors_Object';
-import { Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Object } from '@models/swagger//Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Object';
-
-export type Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Response = {
-  openingHours?: Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Object;
-  errors?: Ddd_Localmarketing_Domain_Dtos_Profilepage_Openinghours_Errors_Object;
-};

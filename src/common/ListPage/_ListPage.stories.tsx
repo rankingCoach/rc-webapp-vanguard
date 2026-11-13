@@ -2,18 +2,27 @@ import { ListPage } from '@common/ListPage/ListPage';
 import { disableControls, SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
 import { StoryObj } from '@storybook/react';
-import { ListPageCheckboxFilter } from '@models/common/ListPageFilters/ListPageCheckboxFilter';
-import { PostStatus, PostType } from '@models/swagger/App/Domain/Presence/Entities/Locations/Posts/Post';
-import { ListPageSelectorFilter } from '@models/common/ListPageFilters/ListPageSelectorFilter';
+import { ListPageCheckboxFilter } from '@common/ListPage/ListPageFilters/ListPageCheckboxFilter';
+import { ListPageSelectorFilter } from '@common/ListPage/ListPageFilters/ListPageSelectorFilter';
 import { classNames } from '@helpers/classNames';
 import { dFlex } from '@globalStyles';
-import { ListPageSwitchFilter } from '@models/common/ListPageFilters/ListPageSwitchFilter';
+import { ListPageSwitchFilter } from '@common/ListPage/ListPageFilters/ListPageSwitchFilter';
 import { ListPageSwitchGroup } from '@common/ListPage/ListPageSwitchGroup/ListPageSwitchGroup';
-import { ListPageDateRangeFilter } from '@models/common/ListPageFilters/ListPageDateRangeFilter';
+import { ListPageDateRangeFilter } from '@common/ListPage/ListPageFilters/ListPageDateRangeFilter';
 import moment from 'moment/moment';
 import { within } from 'storybook/test';
 import { IconNames } from '@vanguard/Icon';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button';
+
+/** Sample filter values (a post's type and status). */
+const PostType = { POST: 'POST', EVENT: 'EVENT' } as const;
+const PostStatus = {
+  PUBLISHING: 'PUBLISHING',
+  PUBLISHED: 'PUBLISHED',
+  NOT_APPROVED: 'NOT_APPROVED',
+  DRAFT: 'DRAFT',
+  ERROR: 'ERROR',
+} as const;
 
 const Card: React.FC<{ item: { id: number; name: string } }> = ({ item }) => {
   return <div style={{ padding: '8px', border: '1px dashed gray', marginBottom: '8px' }}>{item.name}</div>;

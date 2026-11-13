@@ -36,10 +36,6 @@
         "./src/common",
         "./src/common/*"
       ],
-      "@models/*": [
-        "./src/models",
-        "./src/models/*"
-      ],
       "@test-utils/test-utils": [
         "./test-utils/test-utils"
       ],

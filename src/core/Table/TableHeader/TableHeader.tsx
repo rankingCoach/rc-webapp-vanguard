@@ -1,5 +1,7 @@
 import { classNames } from '@helpers/classNames';
-import { TableContextType, TableProvider } from '@vanguard/Table/Table';
+import { Icon, IconSize } from '@vanguard/Icon/Icon';
+import { IconNames } from '@vanguard/Icon/IconNames';
+import { TableColumnProps, TableContextType, TableProvider } from '@vanguard/Table/Table';
 import React, { Context, ReactNode, useContext } from 'react';
 
 import { FontWeights, Text, TextTypes } from '../../Text/Text';
@@ -13,11 +15,23 @@ export interface TableHeaderProps {
   hasGreyTheme?: boolean;
 }
 
+const renderHeaderText = (text: TableColumnProps['text']): ReactNode => {
+  if (typeof text === 'function') return text();
+  if (typeof text === 'string') {
+    return (
+      <Text type={TextTypes.text} fontWeight={FontWeights.bold}>
+        {text}
+      </Text>
+    );
+  }
+  return text;
+};
+
 export const TableHeader = (props: TableHeaderProps) => {
   const { children, order = undefined, className = undefined, provider = TableProvider, hasGreyTheme } = props;
 
   const context = useContext<TableContextType>(provider);
-  const { data } = context;
+  const { data, sort, onSortToggle } = context;
   const columns = data?.columns ?? [];
   const options = data?.options ?? {};
   const columnsCount = columns?.length;
@@ -34,9 +48,14 @@ export const TableHeader = (props: TableHeaderProps) => {
               const seamShadowClass = item.seamShadow ? styles.tableSeamShadow : '';
               const greyClass = hasGreyTheme ? styles.greyTheme : '';
               const cssClasses = [orderClass];
+              const isSortable = !!item.sortable && !!onSortToggle;
+              const sortDirection = sort?.key === item.alias ? sort.direction : undefined;
+              const ariaSort = isSortable ? (sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : 'none') : undefined;
               return (
                 <th
                   key={i}
+                  scope={'col'}
+                  aria-sort={ariaSort}
                   className={classNames(
                     'vanguard-table-cell',
                     'table-cell',
@@ -49,12 +68,24 @@ export const TableHeader = (props: TableHeaderProps) => {
                   style={item?.styles ? { ...item.styles } : undefined}
                 >
                   <div className={classNames(centerClass, endClass)}>
-                    {typeof item.text !== 'string' ? (
-                      item.text()
+                    {isSortable ? (
+                      <button
+                        type={'button'}
+                        className={classNames('vanguard-table-sort-button', styles.sortButton)}
+                        data-testid={`table-sort-${item.alias}`}
+                        onClick={() => onSortToggle?.(item.alias)}
+                      >
+                        {renderHeaderText(item.text)}
+                        <span className={styles.sortIcon} aria-hidden={true}>
+                          {sortDirection ? (
+                            <Icon type={IconSize.small}>
+                              {sortDirection === 'asc' ? IconNames.arrowUp : IconNames.arrowDown}
+                            </Icon>
+                          ) : null}
+                        </span>
+                      </button>
                     ) : (
-                      <Text type={TextTypes.text} fontWeight={FontWeights.bold}>
-                        {item.text}
-                      </Text>
+                      renderHeaderText(item.text)
                     )}
                   </div>
                 </th>

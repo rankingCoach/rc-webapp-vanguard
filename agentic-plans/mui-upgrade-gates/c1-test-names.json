@@ -1,0 +1,5 @@
+[
+  "Autocomplete MUI contract multiple + chips (renderTags) clicking a chip delete icon removes it with reason \"removeOption\"",
+  "Autocomplete MUI contract multiple + chips (renderTags) ArrowLeft from the empty input moves focus to the last chip, then the previous one",
+  "Autocomplete MUI contract splitCommaTag Enter splits comma separated free text into tags with reason \"selectOption\""
+]

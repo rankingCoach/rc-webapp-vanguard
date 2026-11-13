@@ -98,6 +98,10 @@ export { ModalRoot } from './core/Modal/ModalRoot/ModalRoot.tsx';
 export type { ComponentWithId, ModalOpts, ModalWindowMetadata, ModalWindow, ModalWindowEvent } from './core/Modal/ModalService.tsx';
 export { ModalService } from './core/Modal/ModalService.tsx';
 
+// Error logging (VAN-64): ModalService can open an ErrorModal, which logs through the consumer's logger
+export type { VanguardErrorLogEntry, VanguardErrorLogger } from './core/RcErrorBoundry/error-logger';
+export { setVanguardErrorLogger } from './core/RcErrorBoundry/error-logger';
+
 // OverlayStacking: the shared z-index ledger used by ModalService, Drawer and Popover
 export type { OverlayKind } from './core/OverlayStacking/OverlayStackingService.ts';
 export { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from './core/OverlayStacking/OverlayStackingService.ts';

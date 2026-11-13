@@ -1,9 +1,10 @@
+import './PopoverPopper/PopoverPopper.scss';
+
 import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { uuidv4 } from '@helpers/generate-uid';
 import { Tooltip } from '@mui/material';
-import { TooltipClasses } from '@mui/material/Tooltip/tooltipClasses';
+import { TooltipClasses } from '@mui/material/Tooltip';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
-import { PopoverPopper } from '@vanguard/Popover/PopoverPopper/PopoverPopper';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
 import React, { useEffect, useRef, useState } from 'react';
@@ -27,7 +28,22 @@ export interface PopoverProps {
    * The popover does not appear when the window width is below this given parameter
    */
   hideUnderBreakpoint?: number;
+  /**
+   * Position the popper with `position: fixed` from viewport coordinates only (Popper `strategy: 'fixed'` +
+   * `computeStyles.adaptive: false`). Use it on pages rendered in quirks mode (no doctype), where the default
+   * placement math reads the document height as the viewport and throws the popover off-screen.
+   */
+  fixedPosition?: boolean;
+  /** Also open while the child has keyboard focus (and close on blur). */
+  openOnFocus?: boolean;
+  /** Use the message as the child's accessible description instead of its label (MUI `describeChild`). */
+  describeChild?: boolean;
 }
+
+const FIXED_POPPER_OPTIONS = {
+  strategy: 'fixed' as const,
+  modifiers: [{ name: 'computeStyles', options: { adaptive: false } }],
+};
 
 /**
  * ---------------------------------------------------------------------------------------------------------------------
@@ -46,6 +62,9 @@ export const Popover = (props: PopoverProps) => {
     theme = 'dark',
     hideUnderBreakpoint,
     className,
+    fixedPosition = false,
+    openOnFocus = false,
+    describeChild = false,
   } = props;
 
   const width = useWindowResize();
@@ -61,6 +80,8 @@ export const Popover = (props: PopoverProps) => {
    */
   const popperIdRef = useRef<string>(`popover-popper-${uuidv4()}`);
   const [popperZIndex, setPopperZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const isHiddenByBreakpoint = () => !!hideUnderBreakpoint && width < hideUnderBreakpoint;
 
   const openPopover = () => {
     setPopperZIndex(OverlayStackingService.register(popperIdRef.current, 'popover'));
@@ -126,24 +147,12 @@ export const Popover = (props: PopoverProps) => {
       title={getTitle()}
       arrow={arrow}
       placement={position}
-      PopperComponent={PopoverPopper}
       open={popoverOpen}
       classes={className}
-      PopperProps={{
-        // Override MUI's static tooltip z-index so the popper stacks above
-        // any modal/drawer it was opened from (see OverlayStackingService).
-        style: { maxWidth: maxWidth, zIndex: popperZIndex },
-        className: theme === 'dark' ? 'MuiTooltip-popper-dark' : '',
-        placement: position,
-      }}
       disableInteractive={!interactive}
-      componentsProps={{
-        tooltip: {
-          style: { maxWidth: maxWidth },
-        },
-      }}
+      describeChild={describeChild}
       onMouseEnter={() => {
-        if (hideUnderBreakpoint && width < hideUnderBreakpoint) {
+        if (isHiddenByBreakpoint()) {
           closePopover();
           return;
         }
@@ -151,6 +160,28 @@ export const Popover = (props: PopoverProps) => {
       }}
       onMouseLeave={() => {
         closePopover();
+      }}
+      {...(openOnFocus
+        ? {
+            onFocus: () => {
+              if (!isHiddenByBreakpoint()) openPopover();
+            },
+            onBlur: () => closePopover(),
+          }
+        : {})}
+      slotProps={{
+        tooltip: {
+          style: { maxWidth: maxWidth },
+        },
+
+        popper: {
+          // Override MUI's static tooltip z-index so the popper stacks above
+          // any modal/drawer it was opened from (see OverlayStackingService).
+          style: { maxWidth: maxWidth, zIndex: popperZIndex },
+          className: `vanguard-popover${theme === 'dark' ? ' MuiTooltip-popper-dark' : ''}`,
+          placement: position,
+          ...(fixedPosition ? { popperOptions: FIXED_POPPER_OPTIONS } : {}),
+        },
       }}
     >
       {renderChildren()}

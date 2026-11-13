@@ -1,0 +1,22 @@
+{
+  // Declaration emit only (vite-plugin-dts). tsconfig.lib.json scopes the type check; vite-plugin-dts emits only
+  // tsconfig files, so this list must also hold every module the public types import (services, stores, ...).
+  "extends": "./tsconfig.lib.json",
+  "include": [
+    "src/global.d.ts",
+    "src/index.ts",
+    "src/index-wordpress.ts",
+    "src/styles.ts",
+    "src/rootReducer.ts",
+    "src/global.slice.ts",
+    "src/core",
+    "src/common",
+    "src/custom-hooks",
+    "src/styles",
+    "src/helpers",
+    "src/services",
+    "src/stores",
+    "src/examples"
+  ],
+  "exclude": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.stories.tsx", "**/*.story.tsx", "**/stories/**", "src/custom-hooks/use-dynamic-import/assets/**"]
+}

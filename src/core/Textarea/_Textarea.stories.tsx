@@ -36,6 +36,7 @@ import { TestAdornmentProp as _TestAdornmentProp } from "./stories/TestAdornment
 import { TestAutoFocusProp as _TestAutoFocusProp } from "./stories/TestAutoFocusProp.story";
 import { TestLabelProp as _TestLabelProp } from "./stories/TestLabelProp.story";
 import { TestHighlightWordsProp as _TestHighlightWordsProp } from "./stories/TestHighlightWordsProp.story";
+import { TestLoadingHidesText as _TestLoadingHidesText } from "./stories/TestLoadingHidesText.story";
 
 // All story exports
 export const TestDisabledProp = { ..._TestDisabledProp };
@@ -59,3 +60,4 @@ export const TestAdornmentProp = { ..._TestAdornmentProp };
 export const TestAutoFocusProp = { ..._TestAutoFocusProp };
 export const TestLabelProp = { ..._TestLabelProp };
 export const TestHighlightWordsProp = { ..._TestHighlightWordsProp };
+export const TestLoadingHidesText = { ..._TestLoadingHidesText };

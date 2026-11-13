@@ -1,4 +1,6 @@
-import { defineConfig, build, Connect, UserConfig, mergeConfig } from "vite";
+import { withBundledUseClientFilter } from './config/rollup-onwarn';
+import { defineConfig, build, Connect, Plugin, UserConfig, mergeConfig } from "vite";
+import fs from "fs";
 import react from "@vitejs/plugin-react";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import { esbuildCommonjs } from "@originjs/vite-plugin-commonjs";
@@ -56,7 +58,11 @@ export const BaseViteConfig: UserConfig = {
       entryRoot: "src", // Where your types are located
       outDir: "dist/types", // Where to output .d.ts files
       insertTypesEntry: true, // Creates a `types` entry in package.json
-      tsconfigPath: resolve(__dirname, "./tsconfig.lib.json"),
+      // tsconfig.dts.json widens tsconfig.lib.json to every module the public declarations import.
+      tsconfigPath: resolve(__dirname, "./tsconfig.dts.json"),
+      // The WordPress entry has its own declaration build (vite.config.wordpress.ts).
+      exclude: ["src/index-wordpress.ts", "**/*.spec.ts", "**/*.spec.tsx", "**/*.stories.tsx", "**/*.story.tsx", "**/stories/**",
+        "src/custom-hooks/use-dynamic-import/assets/**"],
       // Note: vite-plugin-dts needs the TS JS compiler API, which TS 7 dropped -- it gets its own TS 5 copy via .pnpmfile.cjs
       // This is acceptable as .d.ts generation is separate from type checking
       compilerOptions: {
@@ -129,7 +135,7 @@ export const BaseViteConfig: UserConfig = {
     rollupOptions: {
       // input: getViteEntryFiles,
 
-      onwarn(warning, warn) {
+      onwarn: withBundledUseClientFilter((warning, warn) => {
         // Check if the warning is the one you want to ignore and silence it
         if (warning.message.includes("use-dynamic-import")) {
           // You could include more specific conditions to target the exact warning
@@ -137,7 +143,7 @@ export const BaseViteConfig: UserConfig = {
         }
         // Otherwise pass all other warnings to the default handler
         warn(warning);
-      },
+      }),
       external: ["react", "react-dom", "react-redux", "@reduxjs/toolkit", "react-is", "react/jsx-runtime", "imask", "react-imask"],
 
       output: {
@@ -211,8 +217,34 @@ export const BaseViteConfig: UserConfig = {
   },
 };
 
-export default defineConfig(
-  mergeConfig(BaseViteConfig, {
-    plugins: [],
-  }),
-);
+/**
+ * Lexical ships CJS wrappers that pick `X.dev.js` or `X.prod.js` from `process.env.NODE_ENV` at runtime, so
+ * Rollup emitted both variants. Resolve the wrapper straight to its production sibling instead.
+ */
+export const lexicalProductionVariant = (): Plugin => ({
+  name: "lexical-production-variant",
+  enforce: "pre",
+  async resolveId(source, importer, options) {
+    if (!/^(lexical|@lexical\/)/.test(source)) return null;
+    const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+    if (!resolved || resolved.external) return resolved;
+    const production = resolved.id.replace(/\.js$/, ".prod.js");
+    return production !== resolved.id && fs.existsSync(production) ? { ...resolved, id: production } : resolved;
+  },
+});
+
+/** Library-only policy; the WordPress build (vite.config.wordpress.ts) reuses BaseViteConfig, not this. */
+export const LibraryOnlyConfig: UserConfig = {
+  // The asset folder is consumed through the import.meta.glob URL modules (use-dynamic-import); copying it as a
+  // public dir shipped every image a second time as an unused raw file.
+  publicDir: false,
+  plugins: [lexicalProductionVariant()],
+  build: {
+    rollupOptions: {
+      // React subpaths (react-dom/server, react-dom/client, react/jsx-dev-runtime) come from the consumer's React.
+      external: [/^react\//, /^react-dom\//],
+    },
+  },
+};
+
+export default defineConfig(mergeConfig(BaseViteConfig, LibraryOnlyConfig));

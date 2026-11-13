@@ -1,0 +1,118 @@
+{
+  "baseline": "Accepted S5a source snapshot frozen before S5b; existing runtime uses only",
+  "input_manifest_sha256": "47951839bf5e15c1a8db012e9e7b2a073b0c4e884211d7c19799afe904b5eaf1",
+  "uses": [
+    {
+      "file": "src/core/_internal/InputBase/_MuiTextFieldCompatibility.spec.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/_internal/InputBase/MuiTextField.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/AIAssistant/AIAssistentPanel/AIAssistantPanel.tsx",
+      "specifier": "@mui/material/Collapse"
+    },
+    {
+      "file": "src/core/AIAssistant/AIAssistentPanel/AIAssistantPanel.tsx",
+      "specifier": "@mui/material/Fade"
+    },
+    {
+      "file": "src/core/AIAssistant/AIAssistentPanel/AIAssistantPanel.tsx",
+      "specifier": "@mui/material/Grow"
+    },
+    {
+      "file": "src/core/AppBar/AppBar.tsx",
+      "specifier": "@mui/material/AppBar"
+    },
+    {
+      "file": "src/core/AppBar/AppBar.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Autocomplete/_AutocompleteSlotCompatibility.spec.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Autocomplete/Autocomplete.tsx",
+      "specifier": "@mui/material/Autocomplete"
+    },
+    {
+      "file": "src/core/Autocomplete/Autocomplete.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/DatePicker/_DatePickerKeyboardSync.spec.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/AdapterMoment"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/DateField"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/DatePicker"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/dateViewRenderers"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/hooks"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/models"
+    },
+    {
+      "file": "src/core/DatePicker/DatePicker.tsx",
+      "specifier": "@mui/x-date-pickers/PickersLayout"
+    },
+    {
+      "file": "src/core/Drawer/Drawer.tsx",
+      "specifier": "@mui/material/Drawer"
+    },
+    {
+      "file": "src/core/Menu/Menu.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Popover/Popover.tsx",
+      "specifier": "@mui/material/Tooltip"
+    },
+    {
+      "file": "src/core/PopoverModal/PopoverModal.tsx",
+      "specifier": "@mui/material/Backdrop"
+    },
+    {
+      "file": "src/core/PopoverModal/PopoverModal.tsx",
+      "specifier": "@mui/material/Portal"
+    },
+    {
+      "file": "src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Snackbar/_SnackbarRemaining.spec.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Snackbar/_SnackbarSlotCompatibility.spec.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Snackbar/Snackbar.tsx",
+      "specifier": "@mui/material/styles"
+    },
+    {
+      "file": "src/core/Toolbar/Toolbar.tsx",
+      "specifier": "@mui/material/Toolbar"
+    }
+  ]
+}

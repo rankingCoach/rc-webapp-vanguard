@@ -1,0 +1,35 @@
+@import "./src/styles/spacings";
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $x1 $x2;
+  padding-bottom: $x2;
+}
+
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $x1;
+  margin-left: auto;
+}
+
+.search {
+  width: 260px;
+  max-width: 100%;
+}
+
+.columnItem {
+  min-width: 200px;
+}
+
+.columnCheckBox {
+  pointer-events: none;
+}

@@ -7,7 +7,7 @@ import { classNames } from '@helpers/classNames';
 import {
   ListPageCheckboxFilter,
   ListPageCheckboxFilterOption,
-} from '@models/common/ListPageFilters/ListPageCheckboxFilter';
+} from '@common/ListPage/ListPageFilters/ListPageCheckboxFilter';
 import { useFilterDisabledState } from '@custom-hooks/useFilterDisabledState';
 import { FontWeights, TextTypes, Text } from '@vanguard/Text';
 import { CheckBox } from '@vanguard/CheckBox';

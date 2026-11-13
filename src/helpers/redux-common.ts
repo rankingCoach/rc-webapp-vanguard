@@ -1,7 +1,6 @@
 import { ActionReducerMapBuilder, AsyncThunk, current, Draft, PayloadAction } from '@reduxjs/toolkit';
 import { REHYDRATE } from 'redux-persist';
 
-import { BaseModel } from '../models/BaseModel';
 import { capitalizeFirstLetter } from './string-helpers';
 
 type Opts<T, InitialState = any, MappedState = any> = {
@@ -340,7 +339,7 @@ export class ReduxGenerator<T extends {}> {
     });
   }
 
-  public linkThunkToState<ThunkType extends BaseModel, ThunkReturn, ThunkConfig>(
+  public linkThunkToState<ThunkType extends { data: any }, ThunkReturn, ThunkConfig>(
     builder: ActionReducerMapBuilder<T>,
     thunk: AsyncThunk<Partial<any>, Partial<any>, Partial<any>>, // @todo VERIFY THIS WHY IT DOES NOT WORK PROPERLY
     opts?: LinkThunkToStateOpts<T>,
