@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.9.2...v2.10.0) (2026-11-13)
+
+
+### Features
+
+* **overlay-stacking:** export OverlayStackingService from the package root (VAN-90) ([4615288](https://github.com/rankingCoach/rc-webapp-vanguard/commit/4615288e63ff8b5506ba4afbe8ab4f531544304a))
+* **overlay-stacking:** export the ledger from the WordPress entry too (VAN-90) ([28526e4](https://github.com/rankingCoach/rc-webapp-vanguard/commit/28526e4fe897cda67a14f70f759106acead0b9eb))
+
 ### [2.9.2](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.9.1...v2.9.2) (2026-11-10)
 
 ### [2.9.1](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.9.0...v2.9.1) (2026-11-03)
