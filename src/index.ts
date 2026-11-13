@@ -126,6 +126,9 @@ export { ModalFooter } from './core/Modal';
 export { ModalHeader } from './core/Modal';
 export { ModalRoot } from './core/Modal';
 export { ModalService } from './core/Modal';
+// OverlayStacking: the shared z-index ledger used by ModalService, Drawer and Popover
+export type { OverlayKind } from './core/OverlayStacking';
+export { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from './core/OverlayStacking';
 export type {
   ModalSplitViewCollapseMode,
   ModalSplitViewCollapseToggle,

@@ -1,0 +1,7 @@
+{
+  "id": "helper:overlay-stacking-service",
+  "kind": "helper",
+  "summary": "Shared z-index ledger for modals, drawers and popovers. Call register(id, kind, baseZIndex) when an app overlay shows to get a z-index above every open vanguard overlay, and unregister(id) when it hides.",
+  "keywords": ["overlay", "z-index", "stacking", "layer", "modal", "drawer", "popover", "service"],
+  "tags": ["overlays", "helpers", "service"]
+}
