@@ -26,6 +26,8 @@ import { Text } from '@vanguard/Text/Text';
 import moment from 'moment';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import '../_internal/InputBase/InputBase.scss';
+
 import styles from './DatePicker.module.scss';
 
 export interface DatePickerProps {
@@ -85,71 +87,76 @@ const PickerInput = React.forwardRef<HTMLDivElement, DatePickerFieldProps>((fiel
     }
     published.current = false;
   });
+  // `vanguard-input` brings the shared Input look (label, asterisk, helper text); the picker field's own
+  // MuiPickers* classes get the Input box metrics in DatePicker.module.scss.
   return (
-    <DateField
-      {...fieldProps}
-      ref={ref}
-      label={
-        context.label ? (
-          <>
-            {translationService.get(context.label, undefined).value}
-            {!(context.formconfig?.validation?.required ?? context.required) && (
-              <span className="vanguard-input-label-optional">
-                {translationService.get('Optional', undefined).value}
-              </span>
-            )}
-          </>
-        ) : undefined
-      }
-      slotProps={{
-        textField: {
-          slotProps: {
-            htmlInput: { autoComplete: 'off', 'aria-invalid': fieldError },
-            input: {
-              sx: { cursor: 'pointer' },
-              ...(!desktop && {
-                'aria-labelledby': undefined,
-                'aria-label': picker.value?.isValid()
-                  ? `Choose date, selected date is ${picker.value.format('MMM D, YYYY')}`
-                  : 'Choose date',
-              }),
+    <div className={'vanguard-input'}>
+      <DateField
+        {...fieldProps}
+        ref={ref}
+        fullWidth
+        label={
+          context.label ? (
+            <>
+              {translationService.get(context.label, undefined).value}
+              {!(context.formconfig?.validation?.required ?? context.required) && (
+                <span className="vanguard-input-label-optional">
+                  {translationService.get('Optional', undefined).value}
+                </span>
+              )}
+            </>
+          ) : undefined
+        }
+        slotProps={{
+          textField: {
+            slotProps: {
+              htmlInput: { autoComplete: 'off', 'aria-invalid': fieldError },
+              input: {
+                sx: { cursor: 'pointer' },
+                ...(!desktop && {
+                  'aria-labelledby': undefined,
+                  'aria-label': picker.value?.isValid()
+                    ? `Choose date, selected date is ${picker.value.format('MMM D, YYYY')}`
+                    : 'Choose date',
+                }),
+              },
             },
           },
-        },
-      }}
-      onError={(error) => setFieldError(error !== null)}
-      required={context.formconfig?.validation?.required ?? context.required}
-      fieldRef={fieldRef}
-      helperText={
-        context.formconfig?.hasError ? (
-          <Text testId="vanguard-input-error-text" color="--e500" aria-live="polite" aria-atomic="true">
-            {context.formconfig.errors?.[0]}
-          </Text>
-        ) : undefined
-      }
-      onInputCapture={() => {
-        sectionsBeforeInput.current = fieldRef.current?.getSections();
-        published.current = false;
-      }}
-      onInput={() => {
-        if (!desktop) return;
-        pendingEdit.current = true;
-        renderEdit((version) => version + 1);
-      }}
-      onKeyDownCapture={(event) => {
-        published.current = false;
-        if (!desktop && !picker.disabled && !picker.readOnly && event.key === 'Enter') context.onClick?.();
-      }}
-      onChange={(date) => {
-        published.current = true;
-        pendingClear.current = date === null;
-        context.onChange?.(date, true);
-      }}
-      readOnly={!desktop}
-      onClick={() => {
-        if (!picker.disabled && !picker.readOnly) context.onClick?.();
-      }}
-    />
+        }}
+        onError={(error) => setFieldError(error !== null)}
+        required={context.formconfig?.validation?.required ?? context.required}
+        fieldRef={fieldRef}
+        helperText={
+          context.formconfig?.hasError ? (
+            <Text testId="vanguard-input-error-text" color="--e500" aria-live="polite" aria-atomic="true">
+              {context.formconfig.errors?.[0]}
+            </Text>
+          ) : undefined
+        }
+        onInputCapture={() => {
+          sectionsBeforeInput.current = fieldRef.current?.getSections();
+          published.current = false;
+        }}
+        onInput={() => {
+          if (!desktop) return;
+          pendingEdit.current = true;
+          renderEdit((version) => version + 1);
+        }}
+        onKeyDownCapture={(event) => {
+          published.current = false;
+          if (!desktop && !picker.disabled && !picker.readOnly && event.key === 'Enter') context.onClick?.();
+        }}
+        onChange={(date) => {
+          published.current = true;
+          pendingClear.current = date === null;
+          context.onChange?.(date, true);
+        }}
+        readOnly={!desktop}
+        onClick={() => {
+          if (!picker.disabled && !picker.readOnly) context.onClick?.();
+        }}
+      />
+    </div>
   );
 });
 
