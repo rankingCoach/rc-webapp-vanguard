@@ -313,6 +313,8 @@
  * Immersive backdrop (`backdrop="immersive"`)
  * ---------------------------------------------------------------------------------------------------------------------
  * The whole screen frosted under a dark pool, darkest in the middle; the content sits straight on it, without a panel.
+ * The pool fades along an S-curve, in many small steps, and levels out before its rim: a fade that changes pace at
+ * once, or stops at full pace, shows as a ring.
  */
 // The pool is the only layer over the page: the window's own dim would grey its clear edges.
 .modalRoot:has(.modal-backdrop-immersive) {
@@ -328,8 +330,14 @@
   background: radial-gradient(
     closest-side,
     color-mix(in srgb, var(--modal-immersive-pool) 86%, transparent) 0%,
-    color-mix(in srgb, var(--modal-immersive-pool) 72%, transparent) 50%,
-    color-mix(in srgb, var(--modal-immersive-pool) 45%, transparent) 75%,
+    color-mix(in srgb, var(--modal-immersive-pool) 85%, transparent) 15%,
+    color-mix(in srgb, var(--modal-immersive-pool) 81%, transparent) 30%,
+    color-mix(in srgb, var(--modal-immersive-pool) 73%, transparent) 45%,
+    color-mix(in srgb, var(--modal-immersive-pool) 61%, transparent) 58%,
+    color-mix(in srgb, var(--modal-immersive-pool) 47%, transparent) 70%,
+    color-mix(in srgb, var(--modal-immersive-pool) 34%, transparent) 80%,
+    color-mix(in srgb, var(--modal-immersive-pool) 25%, transparent) 88%,
+    color-mix(in srgb, var(--modal-immersive-pool) 20%, transparent) 95%,
     color-mix(in srgb, var(--modal-immersive-pool) 18%, transparent) 100%
   );
 
