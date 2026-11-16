@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './ListPageSelector.module.scss';
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { useSelector } from 'react-redux';
-import { ListPageSelectorFilter } from '@models/common/ListPageFilters/ListPageSelectorFilter';
+import { ListPageSelectorFilter } from '@common/ListPage/ListPageFilters/ListPageSelectorFilter';
 import { Select, SelectOnChange, SelectOptionProp } from '@vanguard/Select';
 
 export interface ListPageSelectorProps {

@@ -2,12 +2,13 @@ import React, { useRef, useState } from "react";
 import { AIAssistant } from "../AIAssistant";
 import { Textarea } from "@vanguard/Textarea/Textarea";
 import { within, expect, userEvent } from "storybook/test";
-import { Story, createMockGenerateCallback, Container } from "./_AIAssistant.default";
+import { Story, createMockGenerateCallback, createMockAdjustCallback, Container } from "./_AIAssistant.default";
 
 export const Default: Story = {
   args: {
     anchorElem: null, // Will be set in render
     generateCallback: createMockGenerateCallback(),
+    adjustCallback: createMockAdjustCallback(),
     value: "",
     setValue: () => {},
   },

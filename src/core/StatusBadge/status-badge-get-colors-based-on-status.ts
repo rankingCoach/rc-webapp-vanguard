@@ -1,5 +1,3 @@
-import { BoostCampaignStatus } from '@models/swagger/App/Domain/Ads/Entities/Locations/Engagement/Boosts/BoostCampaign';
-import { PostStatus } from '@models/swagger/App/Domain/Presence/Entities/Locations/Posts/Post';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { StatusBadgeStatus } from '@vanguard/StatusBadge/StatusBadge';
 
@@ -36,7 +34,7 @@ export const getColorsBasedOnStatus = (
         bgColor: '--w100',
         iconName: IconNames.close,
       };
-    case PostStatus.NOT_APPROVED:
+    case 'NOT_APPROVED':
       return {
         reverseColor: '--e400',
         iconColor: '--e900',
@@ -44,7 +42,7 @@ export const getColorsBasedOnStatus = (
         bgColor: '--e100',
         iconName: IconNames.close,
       };
-    case PostStatus.SCHEDULED:
+    case 'SCHEDULED':
       return {
         reverseColor: '--a1500',
         iconColor: '--a1900',
@@ -52,9 +50,8 @@ export const getColorsBasedOnStatus = (
         bgColor: '--a1100',
         iconName: IconNames.close,
       };
-    case BoostCampaignStatus.ARCHIVED:
-    case BoostCampaignStatus.DRAFT:
-    case PostStatus.DRAFT:
+    case 'ARCHIVED':
+    case 'DRAFT':
       return {
         reverseColor: '--n400',
         iconColor: '--n400',
@@ -62,8 +59,8 @@ export const getColorsBasedOnStatus = (
         bgColor: '--n100',
         iconName: IconNames.close,
       };
-    case BoostCampaignStatus.DELETED:
-    case PostStatus.ERROR:
+    case 'DELETED':
+    case 'ERROR':
     case 'deleted':
     case 'danger':
       return {
@@ -81,7 +78,7 @@ export const getColorsBasedOnStatus = (
         bgColor: '--i100',
         iconName: IconNames.help,
       };
-    case BoostCampaignStatus.PAUSED:
+    case 'PAUSED':
     case 'warning':
       return {
         reverseColor: '--w400',
@@ -99,7 +96,7 @@ export const getColorsBasedOnStatus = (
         bgColor: '--e100',
         iconName: IconNames.lock,
       };
-    case BoostCampaignStatus.ACTIVE:
+    case 'ACTIVE':
     case 'success':
       return {
         reverseColor: '--s900',
@@ -116,7 +113,7 @@ export const getColorsBasedOnStatus = (
         bgColor: '--s100',
         iconName: IconNames.check,
       };
-    case PostStatus.PUBLISHED:
+    case 'PUBLISHED':
     case 'connected':
     case 'published':
       return {
@@ -126,7 +123,7 @@ export const getColorsBasedOnStatus = (
         bgColor: '--s100',
         iconName: IconNames.check,
       };
-    case PostStatus.PUBLISHING:
+    case 'PUBLISHING':
     case 'publishing':
       return {
         reverseColor: '--n400',

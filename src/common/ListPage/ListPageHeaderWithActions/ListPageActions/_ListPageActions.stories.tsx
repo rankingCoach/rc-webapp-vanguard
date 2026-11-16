@@ -1,7 +1,7 @@
 import { StoryObj } from '@storybook/react';
 import { disableControls, SbDecorator } from '@test-utils/get-storybook-decorator';
-import { ListPageCheckboxFilter } from '@models/common/ListPageFilters/ListPageCheckboxFilter';
-import { ListPageSelectorFilter } from '@models/common/ListPageFilters/ListPageSelectorFilter';
+import { ListPageCheckboxFilter } from '@common/ListPage/ListPageFilters/ListPageCheckboxFilter';
+import { ListPageSelectorFilter } from '@common/ListPage/ListPageFilters/ListPageSelectorFilter';
 import { ListPageActions } from '@common/ListPage/ListPageHeaderWithActions/ListPageActions/ListPageActions';
 
 export default {

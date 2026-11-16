@@ -17,7 +17,11 @@ export const ToggleButton = (props: Props) => {
 
   return (
     <ComponentContainer testId={testId} className={'ToggleButton-container'}>
-      <ToggleButtonBase {...rest} className={classNames(className, isIconOnly ? 'ToggleButton-icon-only' : '')} />
+      <ToggleButtonBase
+        {...rest}
+        tabIndex={rest.tabIndex ?? 0}
+        className={classNames(className, isIconOnly ? 'ToggleButton-icon-only' : '')}
+      />
     </ComponentContainer>
   );
 };

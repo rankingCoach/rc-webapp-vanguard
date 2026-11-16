@@ -26,6 +26,13 @@
  *
  * Kinds are tracked so callers can ask "what's the topmost <kind>" without
  * having to keep their own parallel maps.
+ *
+ * Public API (exported from the package root): apps that render their own
+ * overlay outside ModalService/Drawer/Popover, such as a non-blocking toast or
+ * call popup, claim a slot so it layers with vanguard's overlays. Call
+ * `register(id, 'popover', baseZIndex)` when it shows and use the returned
+ * z-index, then `unregister(id)` when it hides. The method signatures here are
+ * public API, so changing them needs a semver bump.
  */
 export const OVERLAY_BASE_Z_INDEX = 1100;
 

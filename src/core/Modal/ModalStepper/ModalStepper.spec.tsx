@@ -13,6 +13,352 @@ import { useSelector } from 'react-redux';
 import styles from '../ModalStepper/ModalStepperSteps/ModalStepperStep/ModalStepperStep.module.scss';
 import { ModalStepper, Step } from './ModalStepper';
 
+interface TestSlice {
+    state: 'clean' | 'dirty';
+  }
+
+  const initialState: TestSlice = {
+    state: 'clean',
+  };
+  const G = new ReduxGenerator<TestSlice>();
+  const slice = createSlice({
+    name: 'testSlice',
+    initialState,
+    reducers: {
+      ...G.genAll(initialState),
+    },
+  });
+  const rootReducer = combineReducers({
+    root: slice.reducer,
+  });
+
+  const store = configureStore({
+    reducer: rootReducer,
+  });
+
+  type RootState = ReturnType<typeof rootReducer>;
+
+  const useTestGaSetupStepperConfig = (): Step[] => {
+    const { state } = useSelector((state: RootState) => state.root);
+    const prepareStep = (step: Step): Step => {
+      if (state === 'dirty') {
+        if (step.footerOptions?.positive) {
+          step.footerOptions.positive.text = 'Dirty positive cta';
+        }
+      }
+
+      return step;
+    };
+    return [
+      {
+        name: 'hidden1',
+        component: <ComponentContainer>Hidden1</ComponentContainer>,
+        isHidden: true,
+      },
+      {
+        name: 'visible1',
+        component: <ComponentContainer>Visible1</ComponentContainer>,
+      },
+      {
+        name: 'visible2',
+        component: <ComponentContainer>Visible2</ComponentContainer>,
+      },
+      {
+        name: 'hidden2',
+        component: <ComponentContainer>Hidden2</ComponentContainer>,
+        isHidden: true,
+      },
+      {
+        name: 'visible3',
+        component: <ComponentContainer>Visible3</ComponentContainer>,
+      },
+      {
+        name: 'hidden3',
+        component: <ComponentContainer>Hidden3</ComponentContainer>,
+        isHidden: true,
+      },
+      {
+        name: 'visible4',
+        component: <ComponentContainer>Visible4</ComponentContainer>,
+      },
+      {
+        name: 'visible5',
+        component: <ComponentContainer>Visible5</ComponentContainer>,
+      },
+      {
+        name: 'hidden4',
+        component: <ComponentContainer>Hidden4</ComponentContainer>,
+        isHidden: true,
+      },
+      {
+        name: 'hidden5',
+        component: <ComponentContainer>Hidden5</ComponentContainer>,
+        isHidden: true,
+      },
+      prepareStep({
+        name: 'hidden6',
+        component: <ComponentContainer>Hidden6</ComponentContainer>,
+        isHidden: true,
+        footerOptions: {
+          positive: {
+            cta: () => {},
+            text: 'Clean positive cta',
+          },
+          negative: {
+            cta: () => {},
+            text: 'Clean negative cta',
+          },
+        },
+      }),
+    ];
+  };
+
+const StepperWrapper = () => {
+      const [activeStep, setActiveStep] = useState<string>();
+      const steps: Step[] = useTestGaSetupStepperConfig();
+      const dispatch = useAppDispatch();
+      const { setState } = slice.actions;
+      useEffect(() => {
+        setActiveStep('hidden6');
+        dispatch(setState('dirty'));
+      }, []);
+
+      return <ModalStepper steps={steps} activeStep={activeStep} />;
+    };
+
+const StepChangeCallbackHarness = (steps: Step[], onStepChange: (step: number) => void) => {
+      const [step, setStep] = useState('step1');
+
+      useEffect(() => {
+        setStep('step3');
+      }, []);
+
+      return (
+        <div>
+          <ModalStepper onStepChange={onStepChange} activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+
+const WithInitialStepChangedHarness171 = ({ steps }: { steps: Step[] }) => {
+      const [step, setStep] = useState(3);
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+const WithInitialStepChangedHarness198 = ({ steps }: { steps: Step[] }) => {
+      const [step, setStep] = useState('step3');
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+const WithStepChangedHarness225 = ({ steps }: { steps: Step[] }) => {
+      const [step, setStep] = useState(1);
+
+      useEffect(() => {
+        setStep(3);
+      }, []);
+
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+const WithStepChangedHarness257 = ({ steps }: { steps: Step[] }) => {
+      const [step, setStep] = useState('step1');
+
+      useEffect(() => {
+        setStep('step3');
+      }, []);
+
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+
+const LintWithCustomStep694 = () => {
+      const [step, setStep] = useState('visible1');
+      const steps: Step[] = [
+        {
+          name: 'visible1',
+          component: <ComponentContainer>Visible1</ComponentContainer>,
+          footerOptions: {
+            positive: {
+              cta: () => {
+                setStep('hidden2');
+              },
+              text: 'Positive changed changed',
+            },
+          },
+        },
+        {
+          name: 'visible2',
+          component: <ComponentContainer>Visible2</ComponentContainer>,
+        },
+        {
+          name: 'hidden1',
+          component: <ComponentContainer>Hidden1</ComponentContainer>,
+          isHidden: true,
+        },
+        {
+          name: 'visible3',
+          component: <ComponentContainer>Visible3</ComponentContainer>,
+        },
+        {
+          name: 'hidden2',
+          component: <ComponentContainer>Hidden2</ComponentContainer>,
+          isHidden: true,
+        },
+      ];
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+const LintWithCustomStep743 = () => {
+      const [step, setStep] = useState('visible1');
+      const steps: Step[] = [
+        {
+          name: 'visible1',
+          component: <ComponentContainer>Visible1</ComponentContainer>,
+          footerOptions: {
+            positive: {
+              cta: () => {
+                setStep('hidden1');
+              },
+              text: 'Positive changed changed',
+            },
+          },
+        },
+        {
+          name: 'visible2',
+          component: <ComponentContainer>Visible2</ComponentContainer>,
+        },
+        {
+          name: 'hidden1',
+          component: <ComponentContainer>Hidden1</ComponentContainer>,
+          isHidden: true,
+        },
+        {
+          name: 'visible3',
+          component: <ComponentContainer>Visible3</ComponentContainer>,
+        },
+      ];
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+const LintTestComponent521 = () => {
+      const [currentStep, setCurrentStep] = useState<string | undefined>(undefined);
+      const steps: Step[] = [
+        {
+          name: 'visible1',
+          component: <ComponentContainer>Visible1</ComponentContainer>,
+          footerOptions: {
+            positive: {
+              cta: () => {
+                setCurrentStep('hidden2');
+              },
+              text: 'Go to hidden 2',
+            },
+          },
+        },
+        {
+          name: 'hidden1',
+          component: <ComponentContainer>Hidden1</ComponentContainer>,
+          isHidden: true,
+        },
+        {
+          name: 'hidden2',
+          component: <ComponentContainer>Hidden2</ComponentContainer>,
+          isHidden: true,
+        },
+      ];
+      return <ModalStepper activeStep={currentStep} steps={steps} />;
+    };
+
+const LintWithCustomStep1311 = () => {
+      const [step, setStep] = useState('step1');
+
+      const steps: Step[] = [
+        {
+          name: 'step1',
+          component: <ComponentContainer>Step1</ComponentContainer>,
+          footerOptions: {
+            positive: {
+              cta: () => {
+                setStep('step2');
+              },
+              text: 'Positive changed',
+            },
+          },
+        },
+        {
+          name: 'step2',
+          component: <ComponentContainer>Step2</ComponentContainer>,
+        },
+        {
+          name: 'step3',
+          component: <ComponentContainer>Step3</ComponentContainer>,
+        },
+      ];
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+const LintWithCustomStep1355 = () => {
+      const [step, setStep] = useState('step2');
+
+      const steps: Step[] = [
+        {
+          name: 'step1',
+          component: <ComponentContainer>Step1</ComponentContainer>,
+        },
+        {
+          name: 'step2',
+          component: <ComponentContainer>Step2</ComponentContainer>,
+          footerOptions: {
+            negative: {
+              cta: () => {
+                setStep('step1');
+              },
+              text: 'Negative changed',
+            },
+          },
+        },
+        {
+          name: 'step3',
+          component: <ComponentContainer>Step3</ComponentContainer>,
+        },
+      ];
+      return (
+        <div>
+          <ModalStepper activeStep={step} steps={steps} />
+        </div>
+      );
+    };
+
+
 describe('ModalStepper uncontrolled component tests', () => {
   beforeEach(async () => {
     const steps: Step[] = [
@@ -168,16 +514,9 @@ describe('BigAssModal manual control', () => {
         component: <ComponentContainer>Step3</ComponentContainer>,
       },
     ];
-    const WithInitialStepChanged = () => {
-      const [step, setStep] = useState(3);
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithInitialStepChanged = WithInitialStepChangedHarness171;
 
-    await render(<WithInitialStepChanged />);
+    await render(<WithInitialStepChanged steps={steps} />);
     await appScreen.findByText('Step3');
   });
   test('should be able to init to any text step by name', async () => {
@@ -195,16 +534,9 @@ describe('BigAssModal manual control', () => {
         component: <ComponentContainer>Step3</ComponentContainer>,
       },
     ];
-    const WithInitialStepChanged = () => {
-      const [step, setStep] = useState('step3');
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithInitialStepChanged = WithInitialStepChangedHarness198;
 
-    await render(<WithInitialStepChanged />);
+    await render(<WithInitialStepChanged steps={steps} />);
     await appScreen.findByText('Step3');
   });
   test('should be able to change to any numbered step by index', async () => {
@@ -222,21 +554,9 @@ describe('BigAssModal manual control', () => {
         component: <ComponentContainer>Step3</ComponentContainer>,
       },
     ];
-    const WithStepChanged = () => {
-      const [step, setStep] = useState(1);
+    const WithStepChanged = WithStepChangedHarness225;
 
-      useEffect(() => {
-        setStep(3);
-      }, []);
-
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
-
-    await render(<WithStepChanged />);
+    await render(<WithStepChanged steps={steps} />);
     await appScreen.findByText('Step3');
   });
   test('should be able to change to any text step by name', async () => {
@@ -254,21 +574,9 @@ describe('BigAssModal manual control', () => {
         component: <ComponentContainer>Step3</ComponentContainer>,
       },
     ];
-    const WithStepChanged = () => {
-      const [step, setStep] = useState('step1');
+    const WithStepChanged = WithStepChangedHarness257;
 
-      useEffect(() => {
-        setStep('step3');
-      }, []);
-
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
-
-    await render(<WithStepChanged />);
+    await render(<WithStepChanged steps={steps} />);
     await appScreen.findByText('Step3');
   });
 
@@ -288,19 +596,7 @@ describe('BigAssModal manual control', () => {
       },
     ];
     let thisWillChange = null;
-    const WithStepChanged = () => {
-      const [step, setStep] = useState('step1');
-
-      useEffect(() => {
-        setStep('step3');
-      }, []);
-
-      return (
-        <div>
-          <ModalStepper onStepChange={(step) => (thisWillChange = step)} activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithStepChanged = StepChangeCallbackHarness.bind(null, steps, (step) => (thisWillChange = step));
 
     await render(<WithStepChanged />);
     expect(thisWillChange).toBe(3);
@@ -308,37 +604,7 @@ describe('BigAssModal manual control', () => {
 });
 describe('ModalStepper custom footer', () => {
   test('with custom positive', async () => {
-    const WithCustomStep1 = () => {
-      const [step, setStep] = useState('step1');
-
-      const steps: Step[] = [
-        {
-          name: 'step1',
-          component: <ComponentContainer>Step1</ComponentContainer>,
-          footerOptions: {
-            positive: {
-              cta: () => {
-                setStep('step2');
-              },
-              text: 'Positive changed',
-            },
-          },
-        },
-        {
-          name: 'step2',
-          component: <ComponentContainer>Step2</ComponentContainer>,
-        },
-        {
-          name: 'step3',
-          component: <ComponentContainer>Step3</ComponentContainer>,
-        },
-      ];
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithCustomStep1 = LintWithCustomStep1311;
     await render(<WithCustomStep1 />);
 
     await appScreen.findByText('Positive changed');
@@ -352,37 +618,7 @@ describe('ModalStepper custom footer', () => {
     await appScreen.findByText('Step2');
   });
   test('with custom negative', async () => {
-    const WithCustomStep1 = () => {
-      const [step, setStep] = useState('step2');
-
-      const steps: Step[] = [
-        {
-          name: 'step1',
-          component: <ComponentContainer>Step1</ComponentContainer>,
-        },
-        {
-          name: 'step2',
-          component: <ComponentContainer>Step2</ComponentContainer>,
-          footerOptions: {
-            negative: {
-              cta: () => {
-                setStep('step1');
-              },
-              text: 'Negative changed',
-            },
-          },
-        },
-        {
-          name: 'step3',
-          component: <ComponentContainer>Step3</ComponentContainer>,
-        },
-      ];
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithCustomStep1 = LintWithCustomStep1355;
     await render(<WithCustomStep1 />);
 
     await appScreen.findByText('Negative changed');
@@ -518,34 +754,7 @@ describe('BigAssModal with hidden steps', () => {
 
 describe('BigAssModal with hidden steps with ending on hidden step', () => {
   beforeEach(async () => {
-    const TestComponent = () => {
-      const [currentStep, setCurrentStep] = useState<string | undefined>(undefined);
-      const steps: Step[] = [
-        {
-          name: 'visible1',
-          component: <ComponentContainer>Visible1</ComponentContainer>,
-          footerOptions: {
-            positive: {
-              cta: () => {
-                setCurrentStep('hidden2');
-              },
-              text: 'Go to hidden 2',
-            },
-          },
-        },
-        {
-          name: 'hidden1',
-          component: <ComponentContainer>Hidden1</ComponentContainer>,
-          isHidden: true,
-        },
-        {
-          name: 'hidden2',
-          component: <ComponentContainer>Hidden2</ComponentContainer>,
-          isHidden: true,
-        },
-      ];
-      return <ModalStepper activeStep={currentStep} steps={steps} />;
-    };
+    const TestComponent = LintTestComponent521;
 
     await render(<TestComponent />);
   });
@@ -563,119 +772,10 @@ describe('BigAssModal with hidden steps with ending on hidden step', () => {
   });
 });
 describe('BigAssModal with hidden steps and custom footer', () => {
-  interface TestSlice {
-    state: 'clean' | 'dirty';
-  }
 
-  const initialState: TestSlice = {
-    state: 'clean',
-  };
-  const G = new ReduxGenerator<TestSlice>();
-  const slice = createSlice({
-    name: 'testSlice',
-    initialState,
-    reducers: {
-      ...G.genAll(initialState),
-    },
-  });
-  const rootReducer = combineReducers({
-    root: slice.reducer,
-  });
-
-  const store = configureStore({
-    reducer: rootReducer,
-  });
-
-  type RootState = ReturnType<typeof rootReducer>;
-
-  const useTestGaSetupStepperConfig = (): Step[] => {
-    const { state } = useSelector((state: RootState) => state.root);
-    const prepareStep = (step: Step): Step => {
-      if (state === 'dirty') {
-        if (step.footerOptions?.positive) {
-          step.footerOptions.positive.text = 'Dirty positive cta';
-        }
-      }
-
-      return step;
-    };
-    return [
-      {
-        name: 'hidden1',
-        component: <ComponentContainer>Hidden1</ComponentContainer>,
-        isHidden: true,
-      },
-      {
-        name: 'visible1',
-        component: <ComponentContainer>Visible1</ComponentContainer>,
-      },
-      {
-        name: 'visible2',
-        component: <ComponentContainer>Visible2</ComponentContainer>,
-      },
-      {
-        name: 'hidden2',
-        component: <ComponentContainer>Hidden2</ComponentContainer>,
-        isHidden: true,
-      },
-      {
-        name: 'visible3',
-        component: <ComponentContainer>Visible3</ComponentContainer>,
-      },
-      {
-        name: 'hidden3',
-        component: <ComponentContainer>Hidden3</ComponentContainer>,
-        isHidden: true,
-      },
-      {
-        name: 'visible4',
-        component: <ComponentContainer>Visible4</ComponentContainer>,
-      },
-      {
-        name: 'visible5',
-        component: <ComponentContainer>Visible5</ComponentContainer>,
-      },
-      {
-        name: 'hidden4',
-        component: <ComponentContainer>Hidden4</ComponentContainer>,
-        isHidden: true,
-      },
-      {
-        name: 'hidden5',
-        component: <ComponentContainer>Hidden5</ComponentContainer>,
-        isHidden: true,
-      },
-      prepareStep({
-        name: 'hidden6',
-        component: <ComponentContainer>Hidden6</ComponentContainer>,
-        isHidden: true,
-        footerOptions: {
-          positive: {
-            cta: () => {},
-            text: 'Clean positive cta',
-          },
-          negative: {
-            cta: () => {},
-            text: 'Clean negative cta',
-          },
-        },
-      }),
-    ];
-  };
 
   beforeEach(async () => {
-    const StepperWrapper = () => {
-      const [activeStep, setActiveStep] = useState<string>();
-      const steps: Step[] = useTestGaSetupStepperConfig();
-      const dispatch = useAppDispatch();
-      const { setState } = slice.actions;
-      useEffect(() => {
-        setActiveStep('hidden6');
-        dispatch(setState('dirty'));
-      }, []);
 
-      return <ModalStepper steps={steps} activeStep={activeStep} />;
-    };
     await render(<StepperWrapper />, undefined, store);
   });
 
@@ -691,46 +791,7 @@ describe('BigAssModal with hidden steps and custom footer', () => {
 });
 describe('navigation to hidden component by name', () => {
   test('can navigate to hidden component by name', async () => {
-    const WithCustomStep = () => {
-      const [step, setStep] = useState('visible1');
-      const steps: Step[] = [
-        {
-          name: 'visible1',
-          component: <ComponentContainer>Visible1</ComponentContainer>,
-          footerOptions: {
-            positive: {
-              cta: () => {
-                setStep('hidden2');
-              },
-              text: 'Positive changed changed',
-            },
-          },
-        },
-        {
-          name: 'visible2',
-          component: <ComponentContainer>Visible2</ComponentContainer>,
-        },
-        {
-          name: 'hidden1',
-          component: <ComponentContainer>Hidden1</ComponentContainer>,
-          isHidden: true,
-        },
-        {
-          name: 'visible3',
-          component: <ComponentContainer>Visible3</ComponentContainer>,
-        },
-        {
-          name: 'hidden2',
-          component: <ComponentContainer>Hidden2</ComponentContainer>,
-          isHidden: true,
-        },
-      ];
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithCustomStep = LintWithCustomStep694;
     await render(<WithCustomStep />);
     const user = userEvent.setup();
     const positiveCTA = await getModalPositiveCta();
@@ -740,41 +801,7 @@ describe('navigation to hidden component by name', () => {
     await appScreen.findByText('Hidden2');
   });
   test('when on a hidden component stepper should remain on last step', async () => {
-    const WithCustomStep = () => {
-      const [step, setStep] = useState('visible1');
-      const steps: Step[] = [
-        {
-          name: 'visible1',
-          component: <ComponentContainer>Visible1</ComponentContainer>,
-          footerOptions: {
-            positive: {
-              cta: () => {
-                setStep('hidden1');
-              },
-              text: 'Positive changed changed',
-            },
-          },
-        },
-        {
-          name: 'visible2',
-          component: <ComponentContainer>Visible2</ComponentContainer>,
-        },
-        {
-          name: 'hidden1',
-          component: <ComponentContainer>Hidden1</ComponentContainer>,
-          isHidden: true,
-        },
-        {
-          name: 'visible3',
-          component: <ComponentContainer>Visible3</ComponentContainer>,
-        },
-      ];
-      return (
-        <div>
-          <ModalStepper activeStep={step} steps={steps} />
-        </div>
-      );
-    };
+    const WithCustomStep = LintWithCustomStep743;
     await render(<WithCustomStep />);
     const user = userEvent.setup();
     const positiveCTA = await getModalPositiveCta();

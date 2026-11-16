@@ -99,7 +99,7 @@ describe('Vanguard inverted primary & shimmer buttons', () => {
 /**
  * Type-level checks: compiled by `tsc -p tsconfig.spec.json`, never run.
  */
-export const invertedTypeChecks = () => {
+const invertedTypeChecks = () => {
   const ok: ButtonProps[] = [
     { inverted: true },
     // allowed by the types (so spreading ButtonProps over a fixed type keeps compiling), ignored at runtime
@@ -134,3 +134,5 @@ export const invertedTypeChecks = () => {
 
   return [ok, existing, invalid];
 };
+
+void invertedTypeChecks;

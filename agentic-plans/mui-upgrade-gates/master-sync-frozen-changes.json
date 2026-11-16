@@ -1,0 +1,16 @@
+{
+  "src/core/DatePicker/_DatePicker.spec.tsx": {
+    "before_sha256": "c96cf6b0099719e121c1ea1ccba816f4af57f10f64c5bb249aca3299c693fe4c",
+    "after_sha256": "9a764642aea055e7a6d2841b3bc867defec3918a71dc1d2276dee8bf155d7e18",
+    "allowed_change": "User-authorized sync with master: exact master blob only; not an MUI characterization rewrite",
+    "master_commit": "f02d3f5a2fa9ae287923d24e64b3b3feb6755f01",
+    "proof": "/tmp/mui-upgrade/pre-sync-20261106T122630Z/sync-reapply-integrity.json"
+  },
+  "src/core/Modal/_ModalServiceStandard.spec.tsx": {
+    "before_sha256": "a5b4e89372e4fcefbf7edce3be95e46f26f0dc17fe5573c6f784c24b03b28d66",
+    "after_sha256": "d9c4cd0595854649886ab0469683d1b85c4c5071285955b004c2e52639cb03cb",
+    "allowed_change": "User-authorized sync with master: exact master blob only; not an MUI characterization rewrite",
+    "master_commit": "f02d3f5a2fa9ae287923d24e64b3b3feb6755f01",
+    "proof": "/tmp/mui-upgrade/pre-sync-20261106T122630Z/sync-reapply-integrity.json"
+  }
+}

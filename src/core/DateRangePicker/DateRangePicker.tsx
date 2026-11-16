@@ -107,7 +107,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
   /**
    * Default static ranges to be able to show the user in static range dropdown
    */
-  const staticRanges = useRef(ranges ?? useDateRangePickerStaticRanges());
+  const defaultStaticRanges = useDateRangePickerStaticRanges();
+  const staticRanges = useRef(ranges ?? defaultStaticRanges);
 
   /**
    * The selected state of the component allows us to switch from the date range picker and static ranges
@@ -656,13 +657,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 selectedState === 'date-range-picker' ? 'date-range-picker-dropdown-predefined' : '',
               )}
             >
-              <div
-                ref={popoverRef}
-                style={{
-                  width: 53 + 185,
-                  top: 20,
-                }}
-              >
+              <div ref={popoverRef} className={'date-range-picker-dropdown-content'}>
                 <DateRangePickerBase
                   onChange={(e) => pickerChange(e, 'left')}
                   view={'calendar'}

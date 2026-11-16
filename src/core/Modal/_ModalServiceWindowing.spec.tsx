@@ -6,6 +6,9 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { OverlayStackingService } from '../OverlayStacking/OverlayStackingService';
 import { ModalService, ModalWindowEvent } from './ModalService';
 
+const LintClosable55: React.FC<{ close: () => void }> = () => <div />;
+
+
 const originalWindowSize = { width: window.innerWidth, height: window.innerHeight };
 const bounds = { x: 20, y: 30, width: 400, height: 300 };
 
@@ -52,7 +55,7 @@ describe('opening windowed modals', () => {
     ModalService.subscribeWindowEvents((event) => events.push(event));
     ModalService.subscribePresentation(presentations);
 
-    const Closable: React.FC<{ close: () => void }> = () => <div />;
+    const Closable = LintClosable55;
     const evictedClose = vi.fn(() => openWindow('reopened'));
     const evicted = ModalService.open(<Closable close={evictedClose} />, {
       fullscreen: true,

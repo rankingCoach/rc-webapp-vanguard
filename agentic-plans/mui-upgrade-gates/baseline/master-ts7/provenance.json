@@ -1,0 +1,11 @@
+{
+  "master": "f02d3f5a2fa9ae287923d24e64b3b3feb6755f01",
+  "evidence": "/tmp/mui-upgrade/pre-sync-20261106T122630Z/master-baseline",
+  "typescript": "7.0.2",
+  "biome": "2.6.4",
+  "app": 0,
+  "lib": 0,
+  "lintErrors": 42,
+  "lintFileRulePairs": 20,
+  "historicalBaselines": "../ baseline files preserved; pre-sync TS5.9/ESLint counts are not current allowances."
+}

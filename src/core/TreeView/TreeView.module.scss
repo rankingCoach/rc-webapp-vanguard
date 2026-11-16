@@ -1,0 +1,76 @@
+@import "@styles/spacings";
+
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  color: var(--fn-fg);
+}
+
+.group {
+  list-style: none;
+  margin: 0 0 0 $x2;
+  padding: 0;
+}
+
+.indentGuide .group {
+  margin-left: $x1_75;
+  padding-left: 10px;
+  border-left: 1px solid var(--fn-divider-gl);
+}
+
+.item {
+  outline: 0;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: $x0_5;
+  min-width: 0;
+  padding: $x0_5 $x1;
+  border-radius: $x0_5;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background: var(--fn-bg-hov-n-gl);
+  }
+}
+
+.dense .content {
+  padding: $x0_125 6px;
+  min-height: 24px;
+}
+
+.item:focus-visible > .content {
+  outline: 2px solid var(--p500);
+  outline-offset: -2px;
+}
+
+.selected > .content {
+  background: var(--p100);
+}
+
+.disabled > .content {
+  opacity: 0.5;
+  cursor: default;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+.iconContainer {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: $x2;
+}
+
+.label {
+  flex: 1 1 auto;
+  min-width: 0;
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './ListPageSwitchGroup.module.scss';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
-import { ListPageSwitchFilter, ListPageSwitchFilterOption } from '@models/common/ListPageFilters/ListPageSwitchFilter';
+import { ListPageSwitchFilter, ListPageSwitchFilterOption } from '@common/ListPage/ListPageFilters/ListPageSwitchFilter';
 import { alignItemsCenter, dFlex, gap1_5, mr3, mt2, pl1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { FontWeights, TextTypes, Text } from '@vanguard/Text';

@@ -15,19 +15,15 @@ import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContai
 import { FontWeights, LinkReplacements, Text, TextTypes } from '@vanguard/Text/Text';
 import React from 'react';
 
-export interface TutorialStepProps {
-  title: string;
-  description: string;
-  description2?: string;
-  descriptionOnTop?: boolean;
-  descriptionLinks?: LinkReplacements;
-  component?: React.ReactNode;
-}
+const PreviewSectionRender = (component: TutorialStepProps['component']) => {
+    return (
+      <div className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter, gap4)}>
+        {component && <div className={classNames(pt4, pb8)}>{component}</div>}
+      </div>
+    );
+  };
 
-export const TutorialStep = (props: TutorialStepProps) => {
-  const { title, description, description2, descriptionOnTop, descriptionLinks, component } = props;
-
-  const DetailsSection = () => {
+const DetailsSectionRender = (description: TutorialStepProps['description'], description2: TutorialStepProps['description2'], descriptionLinks: TutorialStepProps['descriptionLinks']) => {
     return (
       <div>
         <Text textAlign={'center'}>{description}</Text>
@@ -40,13 +36,22 @@ export const TutorialStep = (props: TutorialStepProps) => {
     );
   };
 
-  const PreviewSection = () => {
-    return (
-      <div className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter, gap4)}>
-        {component && <div className={classNames(pt4, pb8)}>{component}</div>}
-      </div>
-    );
-  };
+
+export interface TutorialStepProps {
+  title: string;
+  description: string;
+  description2?: string;
+  descriptionOnTop?: boolean;
+  descriptionLinks?: LinkReplacements;
+  component?: React.ReactNode;
+}
+
+export const TutorialStep = (props: TutorialStepProps) => {
+  const { title, description, description2, descriptionOnTop, descriptionLinks, component } = props;
+
+  const DetailsSection = DetailsSectionRender.bind(null, description, description2, descriptionLinks);
+
+  const PreviewSection = PreviewSectionRender.bind(null, component);
 
   return (
     <ComponentContainer className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter, gap3)}>

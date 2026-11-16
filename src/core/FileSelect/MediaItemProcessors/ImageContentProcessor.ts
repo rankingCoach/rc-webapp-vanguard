@@ -1,9 +1,12 @@
 import { NonEmptyArray } from '@helpers/array-helpers';
-import { LocationMediaItemContentObjectType } from '@models/swagger/App/Domain/Presence/Entities/Locations/MediaItems/LocationMediaItemContent';
 import { ContentType, MediaItemFileType } from '@vanguard/Documents/Document.types';
 import { MediaItemFile } from '@vanguard/Gallery/Gallery/Gallery';
 
 import { MediaItemProcessor } from './MediaItemProcessor';
+
+/** The backend's `objectType` for an uploaded media item's content. */
+const MEDIA_ITEM_CONTENT_OBJECT_TYPE =
+  'App\\Domain\\Presence\\Entities\\Locations\\MediaItems\\LocationMediaItemContent';
 
 type ImageContentProcessorProps = {};
 
@@ -50,8 +53,7 @@ export class ImageContentProcessor extends MediaItemProcessor {
         ...mediaItem,
         mediaItemContent: {
           base64EncodedContent: imageContent,
-          objectType:
-            LocationMediaItemContentObjectType.App_Domain_Presence_Entities_Locations_MediaItems_LocationMediaItemContent,
+          objectType: MEDIA_ITEM_CONTENT_OBJECT_TYPE,
         },
       });
     }

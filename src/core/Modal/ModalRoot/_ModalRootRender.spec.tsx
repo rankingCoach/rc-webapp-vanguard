@@ -12,6 +12,14 @@ import { ModalService } from '../ModalService';
 import { useModalPresentation } from '../use-modal-presentation';
 import { ModalRoot } from './ModalRoot';
 
+const LintProbe371 = () => {
+    const { presented, modalId } = useModalPresentation();
+    return <span data-testid={`probe-${modalId}`} data-presented={String(presented)} />;
+  };
+
+const LintOutside388 = () => <span data-testid="outside" data-presented={String(useModalPresentation().presented)} />;
+
+
 beforeAll(() => {
   // Deterministic, instant transitions instead of driving react-spring frame by frame.
   Globals.assign({ skipAnimation: true });
@@ -368,10 +376,7 @@ describe('setStackTitle', () => {
 
 describe('presented state (isModalPresented / useModalPresentation)', () => {
   /** Rendered inside <Modal>, so it also proves the hook survives Modal's presentation reset. */
-  const Probe = () => {
-    const { presented, modalId } = useModalPresentation();
-    return <span data-testid={`probe-${modalId}`} data-presented={String(presented)} />;
-  };
+  const Probe = LintProbe371;
   const windowOpts = { fullscreen: true, allowCompact: true, allowStacking: true };
   const openWith = (opts: object) => ModalService.open(<Modal fullscreen><Probe /></Modal>, opts);
   const hookPresented = (id: string) => appScreen.getByTestId(`probe-${id}`).getAttribute('data-presented') === 'true';
@@ -385,7 +390,7 @@ describe('presented state (isModalPresented / useModalPresentation)', () => {
   };
 
   test('outside a service modal the hook reports presented with no owner', () => {
-    const Outside = () => <span data-testid="outside" data-presented={String(useModalPresentation().presented)} />;
+    const Outside = LintOutside388;
     render(<Outside />);
     expect(appScreen.getByTestId('outside').getAttribute('data-presented')).toBe('true');
     expect(ModalService.isModalPresented('missing')).toBe(false);

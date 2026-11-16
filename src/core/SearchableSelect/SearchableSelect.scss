@@ -20,6 +20,10 @@
     .MuiOutlinedInput-input {
       padding-left: 14px;
       padding-right: 32px;
+      // Our end adornment is positioned absolutely; v9 must not reserve another 28px.
+      &[role='combobox'] {
+        padding-right: 32px;
+      }
       margin-right: 0;
     }
   }

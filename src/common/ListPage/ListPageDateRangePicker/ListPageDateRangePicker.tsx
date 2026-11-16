@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import styles from './ListPageDateRangePicker.module.scss';
-import { ListPageDateRangeFilter } from '@models/common/ListPageFilters/ListPageDateRangeFilter';
+import { ListPageDateRangeFilter } from '@common/ListPage/ListPageFilters/ListPageDateRangeFilter';
 import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import moment from 'moment';
 import { useSelector } from 'react-redux';

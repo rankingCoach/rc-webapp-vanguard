@@ -1,0 +1,1 @@
+{ "extends": "./tsconfig.base.json", "files": ["fixtures/_helpers.ts", "fixtures/mui-typed.tsx", "fixtures/undeclared-types.tsx", "fixtures/realistic-usage.tsx"] }

@@ -31,6 +31,50 @@ import * as aiLoaderLoop from './assets/ai-loader-loop.json';
 import * as loadingOptimization from './assets/loading-optimization.json';
 import { MainStore, MainStorePersistor } from './main.store';
 
+const ToggleWithNodeRender = (props: TogglerWithTextProps): React.ReactElement => {
+    const left = (): React.ReactElement => {
+      return (
+        <div className={classNames(dFlex, alignItemsCenter, gap1)}>
+          <Text>Annual</Text>
+          <Text color={'--a3500'} type={TextTypes.textHelp} fontWeight={FontWeights.bold}>
+            Save 33%
+          </Text>
+        </div>
+      );
+    };
+
+    return (
+      <div>
+        <TogglerWithText
+          {...props}
+          left={{ component: left(), value: 'Annual' }}
+          right={'Monthly'}
+          togglerState={'left'}
+        />
+      </div>
+    );
+  };
+
+const CustomEditModalRender = (props: StandardModalProps<null>): React.ReactElement => {
+    const { close } = props;
+    return (
+      <EditModal
+        title={'Edit business details'}
+        close={close}
+        closeOnSave={false}
+        savable={false}
+        saveCallback={(): void => {}}
+        cancelCallback={(): void => {}}
+        savingInProgress={true}
+        requestGotError={true}
+        testId={'business-profile-details-edit-modal'}
+      >
+        Some content
+      </EditModal>
+    );
+  };
+
+
 export const ANIMATION_SPEED_MODIFIER = 1;
 const WELCOME_TEXT = 'Your project setup is now complete';
 const SUMMARY_TEXT = 'Here is a summary';
@@ -78,48 +122,9 @@ export const BODY_AFTER_SCROLL_UP_TRANSITION_DELAY: number = 50 * ANIMATION_SPEE
 export const FADE_BACK_IN_AFTER_SCROLL_UP: number = 500 * ANIMATION_SPEED_MODIFIER;
 
 export const App = () => {
-  const ToggleWithNode = (props: TogglerWithTextProps): React.ReactElement => {
-    const Left = (): React.ReactElement => {
-      return (
-        <div className={classNames(dFlex, alignItemsCenter, gap1)}>
-          <Text>Annual</Text>
-          <Text color={'--a3500'} type={TextTypes.textHelp} fontWeight={FontWeights.bold}>
-            Save 33%
-          </Text>
-        </div>
-      );
-    };
+  const ToggleWithNode = ToggleWithNodeRender.bind(null);
 
-    return (
-      <div>
-        <TogglerWithText
-          {...props}
-          left={{ component: Left(), value: 'Annual' }}
-          right={'Monthly'}
-          togglerState={'left'}
-        />
-      </div>
-    );
-  };
-
-  const CustomEditModal = (props: StandardModalProps<null>): React.ReactElement => {
-    const { close } = props;
-    return (
-      <EditModal
-        title={'Edit business details'}
-        close={close}
-        closeOnSave={false}
-        savable={false}
-        saveCallback={(): void => {}}
-        cancelCallback={(): void => {}}
-        savingInProgress={true}
-        requestGotError={true}
-        testId={'business-profile-details-edit-modal'}
-      >
-        Some content
-      </EditModal>
-    );
-  };
+  const CustomEditModal = CustomEditModalRender.bind(null);
 
   const openModal = (): void => {
     const modalId = ModalService.open(

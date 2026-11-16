@@ -13,7 +13,7 @@ import { TextWrapBalancer } from '@vanguard/Text/TextWrapBalancer/TextWrapBalanc
 import parse from 'html-react-parser';
 import * as React from 'react';
 import { JSX, useMemo, useState } from 'react';
-import { renderToString } from 'react-dom/server';
+import { renderToString } from 'react-dom/server.browser';
 
 import { childrenAsText } from './child-to-text';
 
