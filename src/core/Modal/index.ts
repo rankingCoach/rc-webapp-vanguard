@@ -1,5 +1,5 @@
 export { FullScreenModalContainer } from './FullScreenModalContainer/FullScreenModalContainer';
-export type { ModalProps } from './Modal';
+export type { ModalBackdrop, ModalProps } from './Modal';
 export { Modal } from './Modal';
 export { ModalBody } from './ModalBody/ModalBody';
 export { ModalProvider, useModalContext } from './ModalContext';

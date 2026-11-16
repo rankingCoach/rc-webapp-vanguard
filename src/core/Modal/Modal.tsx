@@ -39,7 +39,15 @@ type Props = {
    * Clicks on it do not trigger outside-click closing.
    */
   outerContent?: React.ReactNode;
+  /**
+   * What lies behind the content. `dimmed` (default): the usual dimmed page with the content on a surface panel.
+   * `immersive`: the whole screen frosted under a dark pool, with the content straight on it and no panel; the
+   * content is on dark, so its texts and buttons take their light colours (`onDark` buttons).
+   */
+  backdrop?: ModalBackdrop;
 } & ModalOpts;
+
+export type ModalBackdrop = 'dimmed' | 'immersive';
 
 /**
  * Module-scoped LIFO registry of modals that opt into Esc-to-close. The Esc
@@ -78,6 +86,7 @@ export const Modal = (props: Props) => {
     closeOnEsc = true,
     closeOnOutsideClick = true,
     outerContent,
+    backdrop = 'dimmed',
   } = props;
   let { fullscreen, width, maxWidth, minHeight } = props;
 
@@ -157,7 +166,8 @@ export const Modal = (props: Props) => {
   const getContainerClassName = () => {
     const positionClass = `modal-position-${modalPosition}`;
     const fullscreenClass = fullscreen ? 'modal-fullscreen' : '';
-    return classNames(positionClass, fullscreenClass, className,
+    const backdropClass = backdrop === 'immersive' ? 'modal-backdrop-immersive' : '';
+    return classNames(positionClass, fullscreenClass, backdropClass, className,
       allowCompact ? 'modal-compact-enabled' : '', isCompact ? 'modal-compact' : '', stacked ? 'modal-stacked' : '');
   };
 
@@ -188,6 +198,7 @@ export const Modal = (props: Props) => {
             size={ButtonSizes.large}
             icon={IconNames.close}
             rounded
+            onDark={backdrop === 'immersive'}
             onClick={() => onClose?.()}
           />
         </div>

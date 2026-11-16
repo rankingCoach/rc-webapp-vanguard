@@ -308,3 +308,38 @@
     &:not(.modal-compact) > .modal-content-wrapper { transition: none; }
   }
 }
+
+/**
+ * Immersive backdrop (`backdrop="immersive"`)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * The whole screen frosted under a dark pool, darkest in the middle; the content sits straight on it, without a panel.
+ */
+.rc-modal.modal-backdrop-immersive {
+  --modal-immersive-pool: #263349;
+
+  padding: $x3;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--modal-immersive-pool) 86%, transparent) 0%,
+    color-mix(in srgb, var(--modal-immersive-pool) 72%, transparent) 50%,
+    color-mix(in srgb, var(--modal-immersive-pool) 45%, transparent) 75%,
+    color-mix(in srgb, var(--modal-immersive-pool) 18%, transparent) 100%
+  );
+
+  .modal-content {
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #fff;
+  }
+
+  // The close button leaves the missing panel for the screen's corner.
+  .modal-content .modal-close-btn {
+    position: fixed;
+    top: $x2;
+    right: $x2;
+  }
+}

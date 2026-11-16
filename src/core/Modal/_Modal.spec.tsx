@@ -43,6 +43,29 @@ describe('nested service modals', () => {
   });
 });
 
+describe('Modal backdrop', () => {
+  test('dimmed by default: no immersive class, the close button is the usual one', () => {
+    render(
+      <Modal onClose={vi.fn()} testId="plain-modal">
+        <div>content</div>
+      </Modal>,
+    );
+
+    expect(appScreen.getByTestId('plain-modal').classList.contains('modal-backdrop-immersive')).toBe(false);
+  });
+
+  test('backdrop="immersive" adds the immersive class', () => {
+    render(
+      <Modal onClose={vi.fn()} backdrop="immersive" testId="immersive-modal">
+        <div>content</div>
+      </Modal>,
+    );
+
+    expect(appScreen.getByTestId('immersive-modal').classList.contains('modal-backdrop-immersive')).toBe(true);
+    expect(appScreen.queryByTestId(CLOSE_BTN)).not.toBeNull();
+  });
+});
+
 describe('Modal close button', () => {
   test('does not render a close button when onClose is not provided', () => {
     render(

@@ -110,7 +110,7 @@ export { FrostedGlass } from './core/FrostedGlass';
 
 // Modals
 export type { EditModalProps } from './core/CustomModals';
-export type { ModalProps } from './core/Modal';
+export type { ModalBackdrop, ModalProps } from './core/Modal';
 export type { ModalFooterAction, ModalFooterProps, SubButtonProps } from './core/Modal';
 export type { ModalType } from './core/Modal';
 export type { ModalResponse } from './core/Modal';
