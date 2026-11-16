@@ -314,6 +314,11 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * The whole screen frosted under a dark pool, darkest in the middle; the content sits straight on it, without a panel.
  */
+// The pool is the only layer over the page: the window's own dim would grey its clear edges.
+.modalRoot:has(.modal-backdrop-immersive) {
+  background-color: transparent;
+}
+
 .rc-modal.modal-backdrop-immersive {
   --modal-immersive-pool: #263349;
 

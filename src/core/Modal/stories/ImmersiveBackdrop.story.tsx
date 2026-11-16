@@ -7,6 +7,12 @@ import { Button, ButtonSizes, ButtonTypes } from "@vanguard/Button/Button";
 import { Text, TextTypes, FontWeights } from "@vanguard/Text/Text";
 import { Story, closeAllModals } from "./_Modal.default";
 
+// A page with something on it, so the frosting has what to blur.
+const PAGE_TILE_COLORS = [
+  "rgb(99, 102, 241)", "rgb(14, 165, 233)", "rgb(16, 185, 129)", "rgb(245, 158, 11)",
+  "rgb(239, 68, 68)", "rgb(168, 85, 247)", "rgb(20, 184, 166)", "rgb(100, 116, 139)",
+];
+
 const ImmersiveModal = ({ close }: { close: () => void }) => {
   return (
     <Modal
@@ -52,6 +58,8 @@ export const ImmersiveBackdrop: Story = {
     await expect(getComputedStyle(panel).backgroundColor).toBe("rgba(0, 0, 0, 0)");
     await expect(getComputedStyle(panel).boxShadow).toBe("none");
     await expect(getComputedStyle(modal).backgroundImage).toContain("radial-gradient");
+    const modalRoot = modal.closest(".modalRoot") as HTMLElement;
+    await expect(getComputedStyle(modalRoot).backgroundColor).toBe("rgba(0, 0, 0, 0)");
 
     await userEvent.click(screen.getByTestId("modal-close-cta"));
     await waitFor(() => expect(screen.queryByTestId("immersive-modal")).not.toBeInTheDocument());
@@ -64,6 +72,11 @@ export const ImmersiveBackdrop: Story = {
     return (
       <div>
         <Button onClick={openModal}>Open Modal</Button>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginTop: 24 }}>
+          {PAGE_TILE_COLORS.map((color) => (
+            <div key={color} style={{ height: 180, borderRadius: 16, background: color }} />
+          ))}
+        </div>
       </div>
     );
   },
