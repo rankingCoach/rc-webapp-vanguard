@@ -11,6 +11,9 @@ import React from 'react';
 import { Text, TextTypes } from '../../Text/Text';
 import styles from './TableCell.module.scss';
 
+const ObjectCellRender = (cellOption: TableOptionsPostOrPrefixProps) => <>{cellOption.value}</>;
+
+
 export interface TableCellProps {
   row?: any;
   column?: TableColumnProps;
@@ -53,9 +56,7 @@ export const TableCellContent = (props: TableCellContentProps) => {
 
   let ObjectCmp = null;
   if (cellOption?.value && typeof cellOption?.value === 'object') {
-    ObjectCmp = () => {
-      return <>{cellOption.value}</>;
-    };
+    ObjectCmp = ObjectCellRender.bind(null, cellOption);
   }
 
   return cellOption && cellOption.value && cellOption.columnAlias == column?.alias ? (

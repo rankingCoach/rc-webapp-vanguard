@@ -1,5 +1,0 @@
-import { LocationListingService } from '@models/swagger/App/Domain/Presence/Entities/Locations/ListingServices/LocationListingService';
-
-export type FacebookLocationSelectResponseDto = {
-  facebookLocationListingService: LocationListingService;
-};

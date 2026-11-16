@@ -1,8 +1,9 @@
 import { convertStateFiltersToQueryParams } from '@custom-hooks/use-bind-query-param-to-redux-state';
-import { ListPageCheckboxFilter } from '@models/common/ListPageFilters/ListPageCheckboxFilter';
-import { ListPageFilterType } from '@models/common/ListPageFilters/ListPageFilter';
-import { PostType } from '@models/swagger/App/Domain/Presence/Entities/Locations/Posts/Post';
+import { ListPageCheckboxFilter } from '@common/ListPage/ListPageFilters/ListPageCheckboxFilter';
+import { ListPageFilterType } from '@common/ListPage/ListPageFilters/ListPageFilter';
 import { describe, expect, it } from 'vitest';
+
+const PostType = { POST: 'POST', EVENT: 'EVENT' } as const;
 
 describe('Serialization tests of list page checkbox filters', () => {
   it("querySerializationType array should result in 'element in [type1,type2]'", () => {

@@ -3,12 +3,12 @@ import { getQueryParam, setQueryParam } from '@helpers/url-params';
 import {
   ListPageCheckboxFilter,
   ListPageCheckboxFilterOption,
-} from '@models/common/ListPageFilters/ListPageCheckboxFilter';
-import { ListPageFilter, ListPageFilterType } from '@models/common/ListPageFilters/ListPageFilter';
-import { ListPageRadioFilter } from '@models/common/ListPageFilters/ListPageRadioFilter';
-import { ListPageRangeFilter } from '@models/common/ListPageFilters/ListPageRangeFilter';
-import { ListPageSelectorFilter } from '@models/common/ListPageFilters/ListPageSelectorFilter';
-import { ListPageSwitchFilter } from '@models/common/ListPageFilters/ListPageSwitchFilter';
+} from '@common/ListPage/ListPageFilters/ListPageCheckboxFilter';
+import { ListPageFilter, ListPageFilterType } from '@common/ListPage/ListPageFilters/ListPageFilter';
+import { ListPageRadioFilter } from '@common/ListPage/ListPageFilters/ListPageRadioFilter';
+import { ListPageRangeFilter } from '@common/ListPage/ListPageFilters/ListPageRangeFilter';
+import { ListPageSelectorFilter } from '@common/ListPage/ListPageFilters/ListPageSelectorFilter';
+import { ListPageSwitchFilter } from '@common/ListPage/ListPageFilters/ListPageSwitchFilter';
 import { CaseReducerActions } from '@reduxjs/toolkit';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';

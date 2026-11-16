@@ -69,3 +69,19 @@
     }
   }
 }
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: $x0_5;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sort-icon {
+  display: inline-flex;
+  min-width: $x2;
+}

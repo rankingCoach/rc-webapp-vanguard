@@ -1,2 +1,2 @@
-export type { SwitchProps } from './Switch';
+export type { LoadingBoolean, SwitchProps } from './Switch';
 export { Switch } from './Switch';

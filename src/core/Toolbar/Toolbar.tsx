@@ -1,7 +1,7 @@
 import './Toolbar.scss';
 
 import { Toolbar as ToolbarBase } from '@mui/material';
-import { ToolbarProps } from '@mui/material/Toolbar/Toolbar';
+import { ToolbarProps } from '@mui/material/Toolbar';
 import React from 'react';
 
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';

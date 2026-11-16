@@ -8,6 +8,22 @@ import { describe, expect, test } from 'vitest';
 
 import { DateRangePicker, DateRangePickerProps, DateRangePickerReturn } from './DateRangePicker';
 
+const DateRangeRenderHarness = (onChangeCb: (args: any) => void, props: DateRangePickerProps) => {
+    const [, setData] = useState<DateRangePickerReturn | undefined>();
+    return (
+      <div>
+        <DateRangePicker
+          {...props}
+          onChange={(data) => {
+            typeof onChangeCb === 'function' && onChangeCb(data);
+            setData(data);
+          }}
+        />
+      </div>
+    );
+  };
+
+
 const isElementVisible = (element: HTMLElement): boolean => {
   const style = getComputedStyle(element);
   return document.body.contains(element) && style.display !== 'none' && style.visibility !== 'hidden';
@@ -100,20 +116,7 @@ const clickRangeSelectorItem = async (testId: string, itemLabel: string | null =
  * @param onChangeCb
  */
 const useRenderer = (testId: string, onChangeCb: (args: any) => void | null) => {
-  const DTRender = (props: DateRangePickerProps) => {
-    const [, setData] = useState<DateRangePickerReturn | undefined>();
-    return (
-      <div>
-        <DateRangePicker
-          {...props}
-          onChange={(data) => {
-            typeof onChangeCb === 'function' && onChangeCb(data);
-            setData(data);
-          }}
-        />
-      </div>
-    );
-  };
+  const DTRender = DateRangeRenderHarness.bind(null, onChangeCb);
   return {
     component: DTRender,
   };

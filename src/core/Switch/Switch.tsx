@@ -1,11 +1,13 @@
 import './Switch.scss';
 
 import { classNames } from '@helpers/classNames';
-import { LoadingBoolean } from '@models/common/LoadingBoolean';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { ChangeEventHandler } from 'react';
 
 import { FontWeights, Text, TextReplacements, TextTypes } from '../Text/Text';
+
+/** A boolean that can also be `'loading'` (treated as `false`). */
+export type LoadingBoolean = boolean | 'loading';
 
 /**
  * Props @todo Implement formConfig
@@ -13,7 +15,7 @@ import { FontWeights, Text, TextReplacements, TextTypes } from '../Text/Text';
  */
 export interface SwitchProps {
   /** Accepts a loading boolean for simplicity but only reacts to the true value of boolean , loading is considered false*/
-  value: LoadingBoolean;
+  value: LoadingBoolean | null;
   readOnly?: boolean;
 
   children?: string | React.ReactNode; // Label text

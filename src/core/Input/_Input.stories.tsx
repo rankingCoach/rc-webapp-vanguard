@@ -24,6 +24,7 @@ import { WithEvents as _WithEvents } from "./stories/WithEvents.story";
 import { WithLoading as _WithLoading } from "./stories/WithLoading.story";
 import { WithReplacements as _WithReplacements } from "./stories/WithReplacements.story";
 import { AllProps as _AllProps } from "./stories/AllProps.story";
+import { SmallSize as _SmallSize } from "./stories/SmallSize.story";
 
 // Validation Stories
 import { RequiredValidation as _RequiredValidation } from "./stories/validation/stories/RequiredValidation.story";
@@ -89,6 +90,7 @@ export const WithEvents: Story = { ..._WithEvents };
 export const WithLoading: Story = { ..._WithLoading };
 export const WithReplacements: Story = { ..._WithReplacements };
 export const AllProps: Story = { ..._AllProps };
+export const SmallSize: Story = { ..._SmallSize };
 
 // Validation Stories Exports
 export const RequiredValidation = { ..._RequiredValidation };

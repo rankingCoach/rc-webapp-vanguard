@@ -1,7 +1,33 @@
-import { BadRequestException } from '@models/swagger/DDD/Infrastructure/Exceptions/BadRequestException';
-import { ValidationErrors } from '@models/swagger/DDD/Infrastructure/Validation/ValidationErrors';
-import { ValidationResult } from '@models/swagger/DDD/Infrastructure/Validation/ValidationResult';
 import { PayloadAction } from '@reduxjs/toolkit';
+
+/**
+ * One failed validation rule of a backend `BadRequestException`: the same shape as the consumer's generated
+ * `ValidationResult` model, so the results can be stored as that type.
+ */
+export type ValidationResult = {
+  propertyName?: string;
+  errorMessage?: string;
+  receivedValue?: string;
+  className?: string;
+  objectType: string;
+};
+
+/** The validation errors of one property, at `jsonPath` in the request body. */
+export type ValidationError = {
+  jsonPath?: string;
+  elements?: ValidationResult[];
+  objectType: string;
+};
+
+export type ValidationErrors = {
+  elements?: ValidationError[];
+  objectType: string;
+};
+
+/** The rejected payload of a backend 400: only its `validationErrors` are read. */
+export type BadRequestException = {
+  validationErrors?: ValidationErrors;
+};
 
 export type ValidationResultWithInfo = ValidationResult & {
   info: unknown;
@@ -10,7 +36,7 @@ export const extractErrorScopes = <T extends Record<string, string>>(
   request: PayloadAction<any, any, any>,
 ): ValidationResult[] => {
   const payloadErrors = request.payload as unknown as BadRequestException;
-  const errors = payloadErrors.validationErrors as ValidationErrors;
+  const errors = payloadErrors.validationErrors;
   const formattedErrors: ValidationResultWithInfo[] = [];
 
   errors?.elements?.map((item) => {

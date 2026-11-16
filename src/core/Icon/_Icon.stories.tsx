@@ -21,6 +21,7 @@ import { WithOnMouseEnter as _WithOnMouseEnter } from "./stories/WithOnMouseEnte
 import { WithOnMouseLeave as _WithOnMouseLeave } from "./stories/WithOnMouseLeave.story";
 import { WithRole as _WithRole } from "./stories/WithRole.story";
 import { WithSizeLarge as _WithSizeLarge } from "./stories/WithSizeLarge.story";
+import { FileManagerIcons as _FileManagerIcons } from "./stories/FileManagerIcons.story";
 
 export const Default: Story = { ..._Default };
 export const WithColor: Story = { ..._WithColor };
@@ -49,3 +50,4 @@ export default {
     component: Icon,
   }),
 };
+export const FileManagerIcons: Story = { ..._FileManagerIcons };

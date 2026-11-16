@@ -11,6 +11,62 @@
         }
       }
 
+      // MUI X 9 renders the field as PickersTextField (section spans, not an <input>), so the
+      // Input metrics from InputBase.scss (`.MuiOutlinedInput-*`) are mirrored on its own classes.
+      .MuiPickersOutlinedInput-root {
+        font-family: var(--text-typeface);
+        font-weight: var(--theme-weight-regular);
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: normal;
+        padding: 0;
+        cursor: pointer;
+        color: var(--fn-fg);
+        background: var(--fn-bg);
+        transition: all 0.2s ease-in-out;
+
+        .MuiPickersInputBase-sectionsContainer {
+          // MUI X fixes this at 182px, which stops the field shrinking in narrow rows.
+          width: auto;
+          min-width: 0;
+          padding: 12px 18px;
+          z-index: 1;
+          cursor: pointer;
+        }
+
+        .MuiPickersOutlinedInput-notchedOutline {
+          top: 0;
+          padding: 0;
+          border-width: 1px;
+          border-style: solid;
+          border-color: var(--fn-brd-gl);
+          z-index: 0;
+        }
+
+        &:hover .MuiPickersOutlinedInput-notchedOutline {
+          border-color: var(--fn-fg-cta);
+        }
+
+        &.Mui-focused .MuiPickersOutlinedInput-notchedOutline {
+          border-width: 1px;
+          border-color: var(--fn-bg-cta);
+        }
+
+        &.Mui-error .MuiPickersOutlinedInput-notchedOutline {
+          border-width: 1px;
+          border-color: var(--e500);
+        }
+
+        &.Mui-disabled {
+          opacity: 40%;
+
+          .MuiPickersOutlinedInput-notchedOutline {
+            border-color: var(--fn-brd-gl);
+            background: var(--fn-bg-disabled);
+          }
+        }
+      }
+
       .MuiInputAdornment-root {
         z-index: 1;
 

@@ -160,6 +160,9 @@ export enum IconNames {
   ado = 'ado',
   adoActive = 'ado-active',
   paypal = 'paypal',
+  bookmark = 'bookmark',
+  bookmarkActive = 'bookmark-active',
+  folder = 'folder',
 }
 
 export const IconNamesArr = Object.values(IconNames);

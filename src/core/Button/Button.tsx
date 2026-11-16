@@ -52,11 +52,14 @@ export enum ButtonTypes {
 export enum ButtonTextColors {
   /** Ado's colour (`--ado-base`), e.g. the Needs-you row action */
   ado = 'ado',
+  /** The text colour (`--fn-fg`): a quiet action that must not read as a link, e.g. a row's ⋮ on a white tile */
+  neutral = 'neutral',
 }
 
 // One class per text colour, generated from `$default-text-colors` in Button.module.scss
 const TEXT_COLOR_CLASSES: Record<ButtonTextColors, string> = {
   [ButtonTextColors.ado]: styles.textColorAdo,
+  [ButtonTextColors.neutral]: styles.textColorNeutral,
 };
 
 type eventFn = (event: React.MouseEvent) => void;

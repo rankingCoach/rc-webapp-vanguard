@@ -5,12 +5,13 @@ import { classNames } from '@helpers/classNames';
 import React from 'react';
 
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
-import { Tag, TagProps } from './Tag/Tag';
+import { Tag, TagProps, TagVariant } from './Tag/Tag';
 
 interface Props {
   tags?: TagProps[];
   className?: string;
-  variant?: 'chip' | 'tag';
+  /** `chip-filled`: the small filled chip (24px, muted fill, 12px medium text, not uppercase). */
+  variant?: TagVariant;
 }
 
 export const TagList = (props: Props) => {
@@ -18,7 +19,7 @@ export const TagList = (props: Props) => {
 
   return (
     <ComponentContainer
-      className={classNames(`TagList-container ${className ?? ''} ${variant === 'chip' ? gap0_5 : gap1}`)}
+      className={classNames(`TagList-container ${className ?? ''} ${variant === 'tag' ? gap1 : gap0_5}`)}
     >
       {tags &&
         tags.length &&

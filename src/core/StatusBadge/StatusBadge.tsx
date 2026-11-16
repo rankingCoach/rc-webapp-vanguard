@@ -56,7 +56,11 @@ export interface StatusBadgeProps {
   numberValue?: number;
   icon?: IconNames;
   hideIcon?: boolean;
-  variant?: 'small' | 'big';
+  /**
+   * `glass`: the dark glass label for photos (dark translucent fill with a backdrop blur, white 12px text, 24px tall).
+   * Text only: `status`, the icon props and `size` are ignored.
+   */
+  variant?: 'small' | 'big' | 'glass';
   /** Only applies to the `small` variant. `compact`: 18px tall, 11px bold text. */
   size?: StatusBadgeSize;
   iconVariant?: StatusBadgeIconVariant;
@@ -95,6 +99,23 @@ export const StatusBadge = (props: StatusBadgeProps) => {
   const hasIconReverse = iconVariant === 'reverse';
   if (hasIconReverse) {
     iconColor = bgColor;
+  }
+
+  if (variant === 'glass') {
+    return (
+      <div className={classNames(className, styles.glass)}>
+        <Text
+          type={TextTypes.textCaption}
+          color={'--fn-fg-on-dark'}
+          fontWeight={fontWeight}
+          textWrap={'no-wrap'}
+          ellipsis
+          translate={translate}
+        >
+          {text}
+        </Text>
+      </div>
+    );
   }
 
   const isCompact = size === 'compact';

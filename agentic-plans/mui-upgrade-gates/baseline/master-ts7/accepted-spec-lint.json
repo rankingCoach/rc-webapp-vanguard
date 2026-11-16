@@ -1,0 +1,413 @@
+{
+  "authority": "Overseer sync checkpoint disposition 2026-11-06; no source refactor, suppression, or team config change",
+  "diagnostics": [
+    {
+      "severity": "error",
+      "message": "Do not define component Controlled inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 66,
+          "column": 9
+        },
+        "end": {
+          "line": 66,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Controlled inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 107,
+          "column": 9
+        },
+        "end": {
+          "line": 107,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Controlled inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 87,
+          "column": 9
+        },
+        "end": {
+          "line": 87,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Controlled inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 53,
+          "column": 9
+        },
+        "end": {
+          "line": 53,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Echo inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerControlledSync.spec.tsx",
+        "start": {
+          "line": 35,
+          "column": 9
+        },
+        "end": {
+          "line": 35,
+          "column": 13
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Echo inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerControlledSync.spec.tsx",
+        "start": {
+          "line": 50,
+          "column": 9
+        },
+        "end": {
+          "line": 50,
+          "column": 13
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Echo inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerKeyboardSync.spec.tsx",
+        "start": {
+          "line": 76,
+          "column": 9
+        },
+        "end": {
+          "line": 76,
+          "column": 13
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Controlled inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/DatePicker/_DatePickerV8Context.spec.tsx",
+        "start": {
+          "line": 51,
+          "column": 9
+        },
+        "end": {
+          "line": 51,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Probe inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/FormControl/_FormControl.mui.spec.tsx",
+        "start": {
+          "line": 63,
+          "column": 11
+        },
+        "end": {
+          "line": 63,
+          "column": 16
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Probe inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/FormControl/_FormControl.mui.spec.tsx",
+        "start": {
+          "line": 82,
+          "column": 11
+        },
+        "end": {
+          "line": 82,
+          "column": 16
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Custom inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Select/_Select.mui.spec.tsx",
+        "start": {
+          "line": 277,
+          "column": 11
+        },
+        "end": {
+          "line": 277,
+          "column": 17
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Parent inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Slider/_Slider.mui.spec.tsx",
+        "start": {
+          "line": 453,
+          "column": 13
+        },
+        "end": {
+          "line": 453,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component SlideLeft inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_Snackbar.mui.spec.tsx",
+        "start": {
+          "line": 270,
+          "column": 13
+        },
+        "end": {
+          "line": 270,
+          "column": 22
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Transition inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 107,
+          "column": 11
+        },
+        "end": {
+          "line": 107,
+          "column": 21
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Themed inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 76,
+          "column": 9
+        },
+        "end": {
+          "line": 76,
+          "column": 15
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Local inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx",
+        "start": {
+          "line": 80,
+          "column": 9
+        },
+        "end": {
+          "line": 80,
+          "column": 14
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Themed inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_SnackbarRemaining.spec.tsx",
+        "start": {
+          "line": 76,
+          "column": 9
+        },
+        "end": {
+          "line": 76,
+          "column": 15
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Local inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_SnackbarRemaining.spec.tsx",
+        "start": {
+          "line": 80,
+          "column": 9
+        },
+        "end": {
+          "line": 80,
+          "column": 14
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Transition inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/Snackbar/_SnackbarRemaining.spec.tsx",
+        "start": {
+          "line": 22,
+          "column": 11
+        },
+        "end": {
+          "line": 22,
+          "column": 21
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Controlled inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/ToggleButtonGroup/_ToggleButtonGroup.mui.spec.tsx",
+        "start": {
+          "line": 147,
+          "column": 13
+        },
+        "end": {
+          "line": 147,
+          "column": 23
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Custom inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/_internal/InputBase/_InputBase.mui.spec.tsx",
+        "start": {
+          "line": 541,
+          "column": 11
+        },
+        "end": {
+          "line": 541,
+          "column": 17
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Custom inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/_internal/InputBase/_InputBase.mui.spec.tsx",
+        "start": {
+          "line": 794,
+          "column": 13
+        },
+        "end": {
+          "line": 794,
+          "column": 19
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Explicit inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/_internal/_mui-slot-compat.spec.ts",
+        "start": {
+          "line": 26,
+          "column": 9
+        },
+        "end": {
+          "line": 26,
+          "column": 17
+        }
+      },
+      "advices": []
+    },
+    {
+      "severity": "error",
+      "message": "Do not define component Legacy inside a function.",
+      "category": "lint/correctness/noComponentHookFactories",
+      "location": {
+        "path": "src/core/_internal/_mui-slot-compat.spec.ts",
+        "start": {
+          "line": 25,
+          "column": 9
+        },
+        "end": {
+          "line": 25,
+          "column": 15
+        }
+      },
+      "advices": []
+    }
+  ]
+}
