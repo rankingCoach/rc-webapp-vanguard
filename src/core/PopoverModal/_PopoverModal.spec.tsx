@@ -49,6 +49,14 @@ describe('PopoverModal overlay-stacking z-index', () => {
 
     expect(OverlayStackingService.register('after', 'modal')).toBe(OVERLAY_BASE_Z_INDEX + 1);
   });
+
+  test('claims only the card slot without `dimRestOfPage`', () => {
+    renderOpenPopoverModal();
+
+    expect(OverlayStackingService.getTopmostZIndex('backdrop')).toBe(OVERLAY_BASE_Z_INDEX);
+    expect(getPopperZIndex()).toBe(OVERLAY_BASE_Z_INDEX + 1);
+    expect(OverlayStackingService.getTopmostZIndex()).toBe(OVERLAY_BASE_Z_INDEX + 1);
+  });
 });
 
 describe('PopoverModal dim backdrop', () => {
@@ -98,6 +106,14 @@ describe('PopoverModal dim backdrop', () => {
     renderDimmed({ renderInPortal: true });
 
     expect(OverlayStackingService.register('later-modal', 'modal')).toBeGreaterThan(getPopperZIndex());
+  });
+
+  test('is not reported as a popover by kind-filtered ledger queries', () => {
+    const { backdrop } = renderDimmed({ renderInPortal: true });
+
+    const backdropZIndex = Number(getComputedStyle(backdrop).zIndex);
+    expect(OverlayStackingService.getTopmostZIndex('popover')).toBe(getPopperZIndex());
+    expect(OverlayStackingService.getTopmostZIndex('backdrop')).toBe(backdropZIndex);
   });
 
   // React portals still bubble through the React tree, so the stopPropagation must keep shielding the host.

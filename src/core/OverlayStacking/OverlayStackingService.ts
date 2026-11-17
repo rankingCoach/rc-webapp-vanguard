@@ -25,7 +25,10 @@
  *   register(m4, 'modal')         -> 9004   (floor inherited 9000, order 4)
  *
  * Kinds are tracked so callers can ask "what's the topmost <kind>" without
- * having to keep their own parallel maps.
+ * having to keep their own parallel maps. PopoverModal's dim backdrop
+ * (`dimRestOfPage`) registers as `'backdrop'` right before its card, so
+ * `getTopmostZIndex('popover')` reports the card, never the backdrop; slot
+ * order and the unfiltered `getTopmostZIndex()` still count every kind.
  *
  * Public API (exported from the package root): apps that render their own
  * overlay outside ModalService/Drawer/Popover, such as a non-blocking toast or
@@ -36,7 +39,8 @@
  */
 export const OVERLAY_BASE_Z_INDEX = 1100;
 
-export type OverlayKind = 'modal' | 'popover' | 'drawer';
+/** `'backdrop'`: a dim layer slotted right below the overlay it dims, never reported as that overlay's kind. */
+export type OverlayKind = 'modal' | 'popover' | 'drawer' | 'backdrop';
 
 class OverlayStackingServiceClass {
   private order = new Map<string, number>();
