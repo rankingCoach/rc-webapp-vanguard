@@ -142,6 +142,13 @@ describe('OverlayStackingService.getTopmostZIndex', () => {
     expect(OverlayStackingService.getTopmostZIndex('drawer')).toBe(BASE);
   });
 
+  it('with kind: a backdrop slot is never reported as a popover', () => {
+    OverlayStackingService.register('bd', 'backdrop'); // 1
+    expect(OverlayStackingService.getTopmostZIndex('popover')).toBe(BASE);
+    expect(OverlayStackingService.getTopmostZIndex('backdrop')).toBe(BASE + 1);
+    expect(OverlayStackingService.getTopmostZIndex()).toBe(BASE + 1);
+  });
+
   it('handles a deep stack of 10 without gaps', () => {
     const ids: string[] = [];
     for (let i = 0; i < 10; i++) {
@@ -208,5 +215,15 @@ describe('OverlayStackingService — mixed-kind stacking', () => {
     expect(OverlayStackingService.getTopmostZIndex('modal')).toBe(BASE + 1);
     expect(OverlayStackingService.getTopmostZIndex('drawer')).toBe(BASE + 2);
     expect(OverlayStackingService.getTopmostZIndex()).toBe(BASE + 2);
+  });
+
+  it('backdrop between modal and popover keeps global order; each kind query sees only its own slot', () => {
+    OverlayStackingService.register('m', 'modal'); // 1
+    OverlayStackingService.register('bd', 'backdrop'); // 2
+    OverlayStackingService.register('p', 'popover'); // 3
+    expect(OverlayStackingService.getTopmostZIndex('modal')).toBe(BASE + 1);
+    expect(OverlayStackingService.getTopmostZIndex('backdrop')).toBe(BASE + 2);
+    expect(OverlayStackingService.getTopmostZIndex('popover')).toBe(BASE + 3);
+    expect(OverlayStackingService.getTopmostZIndex()).toBe(BASE + 3);
   });
 });

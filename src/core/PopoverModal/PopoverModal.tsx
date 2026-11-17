@@ -149,7 +149,7 @@ export const PopoverModal = (props: PopoverModalProps) => {
     const backdropId = backdropIdRef.current;
     const popperId = popperIdRef.current;
     if (dimRestOfPage) {
-      setBackdropStackZIndex(OverlayStackingService.register(backdropId, 'popover'));
+      setBackdropStackZIndex(OverlayStackingService.register(backdropId, 'backdrop'));
     }
     setStackZIndex(OverlayStackingService.register(popperId, 'popover'));
     // Runs on close, on `dimRestOfPage` change and on unmount, so slots never leak.
