@@ -709,3 +709,117 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
       2. The two rc-webapp form screens.
       3. One Input-adornment screen (verifier to pick).
       4. `tierB-inputs.json` (Tier B #2 after group A).
+6. **Select complete** (verifier): Tier A PASS, WordPress static + runtime PASS (wp-mui 5/5 incl. the Select smoke), Tier B PASS.
+   1. Type check asked by the verifier: `realistic-usage.tsx(36,45)` TS2322 on the 2-arg Select `onChange` is **pre-existing**. It is already present in the pre-Select package run (`xnfTOG`), and the producing types (`InputEventsProps.onChange` & `SelectOnChange`) are byte-identical to 9d3b75b.
+   2. Proposed follow-up (type-only, watchdog): make Select's `onChange` accept the 2-arg form without the intersection conflict, when the TextField frame work touches InputBase's prop types.
+7. **Tier B follow-ups (verifier):**
+   1. Logs is CLOSED as a capture artefact.
+   2. **AgentChatAdmin REOPENED as a real, visible delta.**
+      1. In the fully disabled option group, the middle/last pills got a 1px grey left edge.
+      2. Cause: the D13 tie. MUI's (0,3,0) disabled-join `border-left: 1px solid transparent` vs the consumer's (0,3,0) border.
+      3. Fix: the ToggleButtonGroup parity rules carry the host element type (`:is(button, div, a, span, li)`, +0,0,1), so the disabled-join rule is (0,3,1) and the enabled join rules (0,2,1); the consumer's (0,3,0) still wins on enabled chips, as before.
+      4. Story `--agent-chat-admin-disabled-group-keeps-transparent-joins`: red, then green.
+      5. My earlier differential story missed it because an inline consumer `<style>` comes after emotion's runtime styles. Lesson recorded: differential "live MUI" columns are only valid when the consumer CSS order matches the app's. Otherwise, pin MUI's values explicitly.
+   3. The fix ships in the F3 pack (HANDOFF 5b, snapshot `5f8feb1`) and is committed separately after PASS.
+   4. Verification now runs from paired shadows (.472 on :6011, the candidate on :6010) built from one source snapshot.
+
+## 21. D15: who won equal-specificity ties before (facts per shape)
+
+### Setup at base 9d3b75b and in rc-webapp
+
+1. Vanguard: no `createCache`, `StyledEngineProvider`, `injectFirst` or `insertionPoint` in `src`, `.storybook` or
+   `index.html`; only `StyledSVG/provider.tsx` has a `CacheProvider`. MUI therefore uses emotion's default cache:
+   the first `<style data-emotion="css">` is appended to the end of `<head>` on the first styled render, and later
+   tags go right after the last emotion tag.
+2. rc-webapp `html/react/src`: same, no emotion configuration anywhere. Default cache.
+3. rc-webapp build (`vite.config.ts`, default `cssCodeSplit`): `app-build/index.html` has one static
+   `<link rel=stylesheet href=index-<ver>.css>` (the entry CSS). `main.tsx` calls `createRoot().render()` and then
+   `import("@rankingcoach/vanguard/style.css")`; Vite's preload helper appends that `<link>`
+   (`assets/vanguard-*.css`, plus `App-*.css`) synchronously during the call, before React's scheduled render
+   inserts the first emotion tag. 81 lazy routes; each route chunk's CSS is appended by the preload helper on
+   navigation, so after emotion.
+
+### Who won ties, per shape
+
+| Shape | Order in `<head>` | Consumer CSS vs MUI emotion at equal specificity |
+|---|---|---|
+| Built app, entry CSS (e.g. AgentChatAdmin `optionGroup`, ScreenSizeSelector) | entry link, vanguard link, emotion | emotion wins |
+| Built app, lazy route CSS (e.g. LogsPage, ColorSchemeToggle, AdminColorSchemeToggle, FrequencySelect) | ..., emotion, route link | **consumer wins** |
+| Storybook dev (rc-webapp :6011, measured on AgentChatAdmin story) | 88 module style tags, then emotion (index 88 of 91) | emotion wins |
+| Vanguard skin vs MUI (all shapes) | vanguard CSS before emotion | emotion wins |
+
+1. Measured: Storybook dev order (script `css-order.mjs` in the scratchpad). Read from files: built `index.html`,
+   the entry bundle's `__vite__mapDeps` (vanguard CSS listed with the `App` chunk), `main.tsx` order.
+2. Not measured: the built app in a browser (rule: no live app). The built-app rows are static inference; the
+   one step that is inference rather than file content is "Vite's preload `<link>` is appended before React's
+   first render inserts emotion". Cheapest proof without the app: serve `app-build/` on a local static port with
+   no backend and read `<head>` order once, or a prod Storybook build (`storybook build`) which uses the same
+   preload helper for lazy CSS. Both are Storybook/test-kit-shaped; the watchdog decides.
+3. The EntityListPage `compactSelect` rule (D13 finding) is a story fixture only (`stories/_fixtures`), so it has
+   no production shape.
+
+### Consequence for D13 (+type bump)
+
+1. Storybook dev and the built app disagree for lazy route CSS. A bump reproduces Storybook (emotion always last);
+   production lazy routes need the ported MUI rule to LOSE equal ties to route CSS.
+2. Without emotion, the candidate's production order is entry link, vanguard link, route link. Ported MUI rules at
+   their native specificity, emitted after the Vanguard skin inside `style.css`, reproduce production for all
+   three rows: entry consumers lose (vanguard link is later), route consumers win (route link is later), skin
+   loses (later in the same file). The bump only adds wrong wins over lazy route CSS.
+3. Inventory of built rc-webapp rules that target Mui classes (`consumer-mui-inventory.mjs/json`, scratchpad):
+   52 rules, 12 entry, 40 lazy. InputBase 0/19, ToggleButton 4/14, OutlinedInput 1/14, Autocomplete 2/3,
+   ToggleButtonGroup 2/2, Select 0/2, Menu/Paper/Slider/FormControl/FormHelperText 1/0 each.
+4. Concrete divergence today: ColorSchemeToggle and AdminColorSchemeToggle (lazy) set `border-color` on
+   `.x .MuiToggleButton-root` (0,2,0). MUI's middle/last join `.css .MuiToggleButtonGroup-middleButton`
+   (0,2,0) loses to them in production, so their joins take the consumer colour; the candidate's bumped
+   `.MuiToggleButtonGroup-horizontal :is(button,...).MuiToggleButtonGroup-middleButton` (0,2,1) wins and paints
+   the join transparent. Expected pixel effect is nil when neighbours share that border colour (margin-left -1
+   overlaps), but the mechanism is wrong. Select lazy rules (PresenceKeywords (0,4,0), FrequencySelect (0,2,0))
+   resolve the same in production and candidate.
+5. Proposal (D15, for the watchdog): replace the +type bump with "native specificity, one compat partial emitted
+   last in `style.css`" (ToggleButtonGroup parity block, TextField/Select base, later InputBase). Storybook-based
+   verification then compares against production order: differential stories inject consumer CSS before the
+   vanguard CSS for entry consumers and after it for route consumers. AgentChatAdmin stays correct (entry,
+   vanguard later). Until decided, 5b stays as sent.
+
+### D15 APPROVED (watchdog) and implemented (handoff 5c)
+
+1. Ported MUI rules keep emotion's specificity and live in `src/styles/mui-compat.scss` (ToggleButton paint,
+   ToggleButtonGroup joins, TextField/Select/Menu base). No component imports them.
+2. Builds: `config/mui-compat-last.ts` (vite plugin `vanguard-mui-compat-last`, in `vite.config.lib.ts`, inherited
+   by the WordPress config) compiles that file and appends it after everything else in `vanguard.css`, behind the
+   marker `/*! vanguard:mui-compat (D15) must stay last */`.
+3. Dev/test: `.storybook/preview.tsx` and `src/test-utils/vitest.setup.tsx` import the file and keep its `<style>`
+   last in `<head>` (`src/styles/keep-mui-compat-last.ts`).
+4. +type bumps removed: ToggleButtonGroup joins/disabled joins/root/fullWidth, every TextField.scss block (FormControl,
+   InputLabel, asterisk, InputBase root, notched outline, Select, Select icon, native input, helper text, Modal,
+   Backdrop, Popover paper, Menu list, MenuItem). D3 has no bump to keep: the ButtonBase reset is single-class.
+   InputBase.scss no longer `@import`s TextField.scss.
+5. Guard (a): `scripts/_mui-compat-order.spec.ts` checks both built `vanguard.css` files: exactly one compat block,
+   at the end, identical to a fresh compile, and none of its selectors in the part before it. Guard (b): see the
+   rc-webapp note `agentic-plans/ui-sdk-rc-webapp-consumer-notes.md`.
+6. Production-order fixtures: `src/test-utils/consumer-css.tsx` (`EntryCss` prepends to `<head>`, `RouteCss` is a
+   body `<style>`), pixel check `agentic-plans/uisdk-tools/pixel-diff.mjs` (snaps each element to whole pixels).
+
+### Decisions for the user
+
+1. Before release, open the built rc-webapp once (not authorised inside this work) and read `<head>`: expected entry
+   CSS link, then the vanguard CSS link, then (no emotion tag for migrated components), then route CSS links as you
+   navigate. Eyeball the entry-chunk consumers whose rules tie with ported MUI rules (12 rules, 7 places):
+   1. `root-components.scss`: `.MuiAutocomplete-paper`, `.MuiAutocomplete-listbox`, `.MuiMenu-root > .MuiPaper-root`.
+   2. ComposedInputs slider track (`.MuiSlider-rail`).
+   3. SetupKeywordChipsEditor add input (`.vanguard-input .MuiOutlinedInput-input`).
+   4. ScreenSizeSelector (ToggleButtonGroup, 5 rules).
+   5. CompetitorSelectionSearch helper text margin.
+   6. AgentChatAdminSettingsModal option chips.
+2. Other rc-webapp shapes not covered by the three-row table: `RenderRoot.tsx`, the public widgets and the
+   WidgetPreview/WidgetImageRender hosts import `@rankingcoach/vanguard/style.css` statically, so there the vanguard
+   CSS position follows import order inside that bundle. Same eyeball check if any of them shows a ported component.
+3. WordPress (no consumer doc or fixture in reach prescribes an enqueue order; the WordPress plugin that consumes
+   `dist-wordpress` is not on this machine). Before: emotion was appended last, so MUI won every equal tie against
+   theme CSS. Now `vanguard.css` position decides: theme CSS enqueued BEFORE it behaves as before; theme CSS enqueued
+   AFTER it wins equal ties against the ported rules. WordPress loads plugins before the theme, so plugin
+   `wp_enqueue_scripts` callbacks usually run first and the theme stylesheet lands after Vanguard: the risky order
+   is the likely default. Scope: only exact ties with Mui classes (Select/Input/Form are what the WordPress bundle
+   exports); generic theme rules on elements (0,0,1) or `input[type=text]` (0,1,1) resolve as before. Mitigation if
+   wanted: enqueue `vanguard.css` with the theme stylesheet as a dependency (or at a later priority). RISK LOGGED.
