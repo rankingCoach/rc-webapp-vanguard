@@ -137,11 +137,16 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     const RO = (win as typeof window).ResizeObserver;
     const observer = RO && 'nodeType' in anchor ? new RO(onEvent) : null;
     observer?.observe(anchor as Element);
+    // ResizeObserver never reports non-replaced inline boxes (an inline text anchor); a web font swapping in after
+    // open changes their width (verifier handoff 12, describe-child-chip 63 vs 66). Re-position when fonts load.
+    const fonts = (node.ownerDocument as Document).fonts as (EventTarget & FontFaceSet) | undefined;
+    fonts?.addEventListener?.('loadingdone', onEvent);
     return () => {
       cancelled = true;
       for (const t of targets) t.removeEventListener('scroll', onEvent);
       win.removeEventListener('resize', onEvent);
       observer?.disconnect();
+      fonts?.removeEventListener?.('loadingdone', onEvent);
     };
   }, [anchor, open, options.strategy, disablePortal]);
 

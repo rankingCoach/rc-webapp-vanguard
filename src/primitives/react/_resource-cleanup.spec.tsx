@@ -266,6 +266,45 @@ describe('own-core resources are released', () => {
     expect(vendor()).toBe(userSelectBefore);
   });
 
+  it('OwnPopper font-set listener: only while open, removed on close and unmount; absent font set is a no-op', () => {
+    const fonts = new EventTarget();
+    const live = new Set<unknown>();
+    const add = fonts.addEventListener.bind(fonts);
+    const remove = fonts.removeEventListener.bind(fonts);
+    fonts.addEventListener = ((type: string, fn: EventListener) => {
+      live.add(`${type}`);
+      add(type, fn);
+    }) as typeof fonts.addEventListener;
+    fonts.removeEventListener = ((type: string, fn: EventListener) => {
+      live.delete(`${type}`);
+      remove(type, fn);
+    }) as typeof fonts.removeEventListener;
+    Object.defineProperty(document, 'fonts', { configurable: true, value: fonts });
+    try {
+      const view = render(<PopperHarness open={false} />);
+      settle();
+      expect([...live]).toEqual([]);
+      view.rerender(<PopperHarness open />);
+      settle();
+      expect([...live]).toEqual(['loadingdone']);
+      view.rerender(<PopperHarness open={false} />);
+      settle();
+      expect([...live]).toEqual([]);
+      view.rerender(<PopperHarness open />);
+      settle();
+      done(view);
+      settle();
+      expect([...live]).toEqual([]);
+    } finally {
+      delete (document as unknown as { fonts?: unknown }).fonts;
+    }
+    // jsdom has no font set: opening a popper must not throw.
+    const view = render(<PopperHarness open />);
+    settle();
+    done(view);
+    settle();
+  });
+
   it('Backdrop in a Portal (Fade timers, portal node), closed mid-exit then unmounted', () => {
     const before = baseline();
     const tree = (open: boolean) => (

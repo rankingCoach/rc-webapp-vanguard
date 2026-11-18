@@ -294,3 +294,54 @@ export const FollowsAnchorResizeAfterOpen: Story = {
     await expect(el.style.transform).toBe(fresh);
   },
 };
+
+const InlineAnchor = () => {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  return (
+    <div style={{ padding: 60 }}>
+      <span ref={setAnchor} data-inline-anchor style={{ fontFamily: 'monospace', fontSize: 12 }}>
+        {'3 Accounts'}
+      </span>
+      {anchor ? (
+        <OwnPopper open anchorEl={anchor} placement="top" data-testid="inline-late">
+          <div style={{ width: 140, height: 30, background: '#eee' }}>{'1001, 1002, 1003'}</div>
+        </OwnPopper>
+      ) : null}
+    </div>
+  );
+};
+
+/**
+ * Handoff 12 (describe-child-chip, 63 vs 66): an inline text anchor changes width when a web font swaps in after the
+ * popper opened. ResizeObserver never reports non-replaced inline boxes, so the font set's `loadingdone` re-positions.
+ * Simulated: the anchor's font changes outside React, then the font set fires loadingdone.
+ */
+export const FollowsInlineAnchorAfterFontSwap: Story = {
+  render: () => <InlineAnchor />,
+  play: async () => {
+    const el = await waitFor(() => {
+      const node = document.querySelector<HTMLElement>('[data-testid="inline-late"]');
+      if (!node?.getAttribute('data-popper-placement')) throw new Error('not placed yet');
+      return node;
+    });
+    const anchor = document.querySelector<HTMLElement>('[data-inline-anchor]') as HTMLElement;
+    const before = anchor.getBoundingClientRect().width;
+    anchor.style.fontSize = '20px';
+    await expect(anchor.getBoundingClientRect().width).not.toBe(before);
+    document.fonts.dispatchEvent(new Event('loadingdone'));
+    await new Promise((r) => setTimeout(r, 50));
+    const clone = el.cloneNode(true) as HTMLElement;
+    clone.removeAttribute('style');
+    Object.assign(clone.style, { position: 'absolute', top: '0', left: '0', visibility: 'hidden' });
+    el.parentNode?.appendChild(clone);
+    const inst = createPopper(anchor, clone, {
+      placement: 'top',
+      modifiers: [{ name: 'eventListeners', enabled: false }],
+    });
+    await inst.update();
+    const fresh = clone.style.transform;
+    inst.destroy();
+    clone.remove();
+    await expect(el.style.transform).toBe(fresh);
+  },
+};
