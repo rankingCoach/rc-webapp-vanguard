@@ -1134,3 +1134,30 @@ Source (read-only, rc-webapp `html/react/src`, swagger and model mocks excluded)
    until modelled (§23 rule).
 3. Props-actually-passed lists drive the "modelled props" routing (Menu-style hybrid router) and the Tier A story set
    per component: every prop with ≥1 rc-webapp site gets a parity story before the component's MUI path is removed.
+
+### 32.1 Reachability map (verifier 2, replaces the zero-usage list)
+
+`rc-webapp tmp/research/vanguard-ui-sdk-visual-baseline/v2/reachability-map.md` at Vanguard ef2ee15, 300 value
+exports: used directly 230, indirectly 50 (import graph + service methods, e.g. ConfirmModal ← openConfirmModal, 67
+sites), WordPress only 4 (EditableCard, SlideTransition, TextHighlighted, useFormStore), unreachable 16 with evidence
+(AdvancedMarker(F), AIBudgetEnd, CsvContentValidator, DragAndDropFile, FormControl, GoogleMapsMarker(+Default),
+IMaskInput, MarkerF, OnboardingWelcomeAnimation, RcNavLink [rc-webapp stories only], SelectiveImportExample, SvgImage,
+useSelectiveDynamicImport, VideoTrimmerTransformer). Ordering: direct/indirect by call sites first, WordPress-only with
+the WordPress smoke, the 16 unreachable last (still migrated, user decision). Limits are listed in the map.
+
+## 33. Queue 2.3: Popover on the own Tooltip (2026-11-19)
+
+1. MUI Tooltip is used only by Popover, always controlled (`open` from Vanguard's own mouseenter/leave, focus/blur
+   with `openOnFocus`). MUI's delay/hysteresis timers only drive onOpen/onClose, which Popover never passes: no
+   visible effect, not modelled. Ported: trigger clone (aria-label/-labelledby or describedby, handler order
+   consumer-first), touch user-select window + `MuiTooltip-touch`, OwnPopper + arrow modifier (padding 4), 200 ms Grow,
+   MuiTooltip DOM, emotion styles in mui-compat.scss for MUI's default theme and VanguardThemeProvider (both rendered:
+   rc-webapp with the provider, WordPress without).
+2. Popper fidelity fixes found on the way, each its own SHA: popper.js `hide` modifier (70a5065), getLayoutRect size
+   rule (98a144b, fractional widths moved arrows by 1px).
+3. Evidence: jsdom DOM differential (15 cases), Chromium computed styles (24 cases × 2 themes; positions judged
+   against MUI's live instance or a fresh popper.js run), Popover's MUI contract specs/stories unchanged and green,
+   cleanup spec, WordPress package smoke (Popover hover → own-core tooltip, both bundles; counts 9/9/8/8 = 34).
+4. Trigger slot: the wrapper span is `data-slot="popover-trigger"` (wrapChildren); with wrapChildren={false} the
+   consumer's element is the trigger. rc-webapp Tier A screens: schedulecard `[class*="runTime"]`, InfoIcon story
+   (`buildingblocks-infoicon--info-icon-story`, hover the popover-trigger span).
