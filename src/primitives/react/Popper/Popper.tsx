@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import type { Placement } from '../../core/anchored-placement';
+import { Portal } from '../Portal/Portal';
 import { AnchorLike, computeAnchored } from './compute-anchored';
 import { layoutSize, listScrollParents } from './dom-geometry';
 import { PopperModifierLike, resolvePopperOptions } from './popper-options';
@@ -212,6 +212,11 @@ export const OwnPopper = (props: OwnPopperProps) => {
       style={{ position: 'fixed', top: 0, left: 0, display, ...style }}
     />
   );
-  // MUI Portal: no container (no anchorEl, no container prop) renders into document.body.
-  return disablePortal ? tooltip : createPortal(tooltip, container ?? document.body);
+  // MUI Popper renders PopperTooltip through Portal: portaled content mounts one commit later (nested overlays register
+  // outer first); no container (no anchorEl, no container prop) renders into document.body.
+  return (
+    <Portal disablePortal={disablePortal} container={container ?? document.body}>
+      {tooltip}
+    </Portal>
+  );
 };

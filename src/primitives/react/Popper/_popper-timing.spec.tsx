@@ -119,4 +119,38 @@ describe('OwnPopper update timing equals MUI Popper', () => {
     };
     expect(await go(OwnPopper)).toBe(await go(MuiPopper));
   });
+
+  // Codex review (PopoverModal): MUI Popper portals through Portal, whose content mounts one commit later, so nested
+  // overlays register in outer-then-inner order (OverlayStackingService).
+  it('portaled content mounts after its siblings, like MUI Portal', () => {
+    const go = (Comp: React.ElementType, disablePortal: boolean) => {
+      const order: string[] = [];
+      const Content = () => {
+        useLayoutEffect(() => {
+          order.push('content');
+        }, []);
+        return <div>{'floating'}</div>;
+      };
+      const Sibling = () => {
+        useLayoutEffect(() => {
+          order.push('sibling');
+        }, []);
+        return null;
+      };
+      const anchor = makeAnchor();
+      const view = render(
+        <>
+          <Comp open anchorEl={anchor} placement="bottom" disablePortal={disablePortal}>
+            <Content />
+          </Comp>
+          <Sibling />
+        </>,
+      );
+      view.unmount();
+      anchor.remove();
+      return order;
+    };
+    expect(go(OwnPopper, false)).toEqual(go(MuiPopper, false));
+    expect(go(OwnPopper, true)).toEqual(go(MuiPopper, true));
+  });
 });
