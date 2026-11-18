@@ -657,3 +657,9 @@ Track 1 status: every (a) component in src/core and src/common now has its DOM c
 4. Next (d): leak-hygiene specs for B-slotted non-MUI components that register listeners/timers/rAF/observers/portals/body mutations: mount → unmount → nothing left. Inventory table to the watchdog before fixing anything non-trivial; real leaks fixed with a reproducing spec, minimal diff, listed for verifier 2's Tier P.
 5. Handoffs combine small batches while verifier 2 is busy (one paired run base = last PASS vs tip).
 Tools copied to `agentic-plans/uisdk-tools-b/` (collision-check.sh, attr-only-check.py).
+
+### (b) Enable never-run tests: Table group
+1. Specs enabled (renamed `_*.spec.tsx`), 10: TableBody, TableBodyRenderer, TableCell, TableFooter, FooterPagination, FooterShowLess, FooterShowMore, TableHeader, CtaWithIcon, TablePlaceholder. Setup-only edit in each: `import { describe, test } from 'vitest';` (they relied on globals; failed with `describe is not defined`). Assertions untouched. Table specs 14 files / 33 green.
+2. NOT enabled, stale test: `Table/Table.spec.tsx` — imports `TableData` from `Table.mock.tsx`, which is entirely commented out (`TypeError: Cannot read properties of undefined (reading 'columns')`). Stale fixture, not a component bug.
+3. Stories enabled, 9: TableBody, TableBodyRenderer, TableCell, TableFooter, FooterPagination, FooterShowLess, FooterShowMore, CtaWithIcon, TablePlaceholder. Setup-only: object-literal default export. Table stories 12 files / 27 green.
+4. NOT enabled: `Table/Table.stories.tsx` (would collide with the existing `_Table.stories.tsx`, and uses the commented-out `TableData`), `TableHeader/TableHeader.stories.tsx` (uses `TableData`).

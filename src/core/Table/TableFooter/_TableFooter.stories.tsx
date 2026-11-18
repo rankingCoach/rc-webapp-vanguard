@@ -1,27 +1,29 @@
 
-import { CtaWithIcon, CtaWithIconProps } from "./CtaWithIcon";
+import { TableFooter, TableFooterProps } from "./TableFooter";
 import React from "react";
 import {disableControls, SbDecorator} from "@test-utils/get-storybook-decorator";
 import {mapStorybookActionToProps} from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
-  title: "Vanguard/Table/common/CtaWithIcon",
-  component: CtaWithIcon,
+export default {
+  ...SbDecorator({
+  title: "Vanguard/Table/TableFooter",
+  component: TableFooter,
     extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories 
  * If the storybook user did not add anything this will be chosen 
  * */
-const defaultProps: CtaWithIconProps = {
+const defaultProps: TableFooterProps = {
  
 };
 
 
-export const CtaWithIconStory = (props:CtaWithIconProps) => {
+export const TableFooterStory = (props:TableFooterProps) => {
   
   /**
   * Here we can add story specific props
@@ -31,9 +33,9 @@ export const CtaWithIconStory = (props:CtaWithIconProps) => {
   });
 
   return (
-    <div >
-        <CtaWithIcon {...propsMock}>ImplementME</CtaWithIcon>
-    </div>
+    <table >
+        <TableFooter {...propsMock}>ImplementME</TableFooter>
+    </table>
   );
 };
 

@@ -1,27 +1,29 @@
 
-import { TablePlaceholder, TablePlaceholderProps } from "./TablePlaceholder";
+import { FooterShowMore, FooterShowMoreProps } from "./FooterShowMore";
 import React from "react";
 import {disableControls, SbDecorator} from "@test-utils/get-storybook-decorator";
 import {mapStorybookActionToProps} from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
-  title: "Vanguard/Table/common/TablePlaceholder",
-  component: TablePlaceholder,
+export default {
+  ...SbDecorator({
+  title: "Vanguard/Table/TableFooter/FooterShowMore",
+  component: FooterShowMore,
     extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories 
  * If the storybook user did not add anything this will be chosen 
  * */
-const defaultProps: TablePlaceholderProps = {
+const defaultProps: FooterShowMoreProps = {
  
 };
 
 
-export const TablePlaceholderStory = (props:TablePlaceholderProps) => {
+export const FooterShowMoreStory = (props:FooterShowMoreProps) => {
   
   /**
   * Here we can add story specific props
@@ -32,7 +34,7 @@ export const TablePlaceholderStory = (props:TablePlaceholderProps) => {
 
   return (
     <div >
-        <TablePlaceholder {...propsMock}>ImplementME</TablePlaceholder>
+        <FooterShowMore {...propsMock}>ImplementME</FooterShowMore>
     </div>
   );
 };

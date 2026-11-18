@@ -1,27 +1,29 @@
 
-import { FooterShowMore, FooterShowMoreProps } from "./FooterShowMore";
+import { CtaWithIcon, CtaWithIconProps } from "./CtaWithIcon";
 import React from "react";
 import {disableControls, SbDecorator} from "@test-utils/get-storybook-decorator";
 import {mapStorybookActionToProps} from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
-  title: "Vanguard/Table/TableFooter/FooterShowMore",
-  component: FooterShowMore,
+export default {
+  ...SbDecorator({
+  title: "Vanguard/Table/common/CtaWithIcon",
+  component: CtaWithIcon,
     extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories 
  * If the storybook user did not add anything this will be chosen 
  * */
-const defaultProps: FooterShowMoreProps = {
+const defaultProps: CtaWithIconProps = {
  
 };
 
 
-export const FooterShowMoreStory = (props:FooterShowMoreProps) => {
+export const CtaWithIconStory = (props:CtaWithIconProps) => {
   
   /**
   * Here we can add story specific props
@@ -32,7 +34,7 @@ export const FooterShowMoreStory = (props:FooterShowMoreProps) => {
 
   return (
     <div >
-        <FooterShowMore {...propsMock}>ImplementME</FooterShowMore>
+        <CtaWithIcon {...propsMock}>ImplementME</CtaWithIcon>
     </div>
   );
 };

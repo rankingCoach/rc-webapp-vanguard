@@ -1,27 +1,29 @@
 
-import { TableBody, TableBodyProps } from "./TableBody";
+import { TablePlaceholder, TablePlaceholderProps } from "./TablePlaceholder";
 import React from "react";
 import {disableControls, SbDecorator} from "@test-utils/get-storybook-decorator";
 import {mapStorybookActionToProps} from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
-  title: "Vanguard/Table/TableBody",
-  component: TableBody,
+export default {
+  ...SbDecorator({
+  title: "Vanguard/Table/common/TablePlaceholder",
+  component: TablePlaceholder,
     extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories 
  * If the storybook user did not add anything this will be chosen 
  * */
-const defaultProps: TableBodyProps = {
+const defaultProps: TablePlaceholderProps = {
  
 };
 
 
-export const TableBodyStory = (props:TableBodyProps) => {
+export const TablePlaceholderStory = (props:TablePlaceholderProps) => {
   
   /**
   * Here we can add story specific props
@@ -31,9 +33,9 @@ export const TableBodyStory = (props:TableBodyProps) => {
   });
 
   return (
-    <table >
-        <TableBody {...propsMock}>ImplementME</TableBody>
-    </table>
+    <div >
+        <TablePlaceholder {...propsMock}>ImplementME</TablePlaceholder>
+    </div>
   );
 };
 

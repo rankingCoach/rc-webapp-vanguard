@@ -1,27 +1,29 @@
 
-import { TableCell, TableCellProps } from "./TableCell";
+import { FooterPagination, FooterPaginationProps } from "./FooterPagination";
 import React from "react";
 import {disableControls, SbDecorator} from "@test-utils/get-storybook-decorator";
 import {mapStorybookActionToProps} from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
-  title: "Vanguard/Table/TableCell",
-  component: TableCell,
+export default {
+  ...SbDecorator({
+  title: "Vanguard/Table/TableFooter/FooterPagination",
+  component: FooterPagination,
     extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories 
  * If the storybook user did not add anything this will be chosen 
  * */
-const defaultProps: TableCellProps = {
+const defaultProps: FooterPaginationProps = {
  
 };
 
 
-export const TableCellStory = (props:TableCellProps) => {
+export const FooterPaginationStory = (props:FooterPaginationProps) => {
   
   /**
   * Here we can add story specific props
@@ -32,7 +34,7 @@ export const TableCellStory = (props:TableCellProps) => {
 
   return (
     <div >
-        <TableCell {...propsMock}>ImplementME</TableCell>
+        <FooterPagination {...propsMock}>ImplementME</FooterPagination>
     </div>
   );
 };

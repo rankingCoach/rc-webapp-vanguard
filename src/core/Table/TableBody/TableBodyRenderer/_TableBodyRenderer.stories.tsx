@@ -3,13 +3,15 @@ import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 import { mapStorybookActionToProps } from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/Table/TableBody/TableBodyRenderer",
   component: TableBodyRenderer,
   extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories
