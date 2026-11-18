@@ -28,6 +28,12 @@ const setup = () => {
   return { store, emit: (r: unknown) => act(() => sink.emit(r)) };
 };
 
+const looseSink: { emit: (r: unknown) => void } = { emit: () => undefined };
+const Loose = () => {
+  looseSink.emit = useLegacyDispatch();
+  return null;
+};
+
 describe('useLegacyDispatch (D9 single dispatch shim)', () => {
   it('dispatches an action object returned by a consumer action creator', () => {
     const { store, emit } = setup();
@@ -46,5 +52,13 @@ describe('useLegacyDispatch (D9 single dispatch shim)', () => {
     const spy = vi.spyOn(store, 'dispatch');
     emit(undefined);
     expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('without a react-redux Provider: renders (no throw) and drops results with a dev warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    expect(() => render(<Loose />)).not.toThrow();
+    act(() => looseSink.emit({ type: 'x' }));
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
