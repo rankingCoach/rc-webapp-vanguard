@@ -2,7 +2,7 @@ import styles from './Menu.module.scss';
 import { uuidv4 } from '@helpers/generate-uid';
 import { Menu as MuiMenu, MenuProps as MuiMenuProps } from '@mui/material';
 import { useThemeProps } from '@mui/material/styles';
-import { useRtl } from '@mui/system/RtlProvider';
+import { useRtl } from '@mui/system';
 import type { VanguardLegacyMenuProps } from '@vanguard/_internal/mui-legacy-props';
 import { mapLegacyModalAliases, mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';

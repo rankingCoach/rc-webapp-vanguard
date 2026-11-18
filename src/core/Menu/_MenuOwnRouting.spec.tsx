@@ -1,5 +1,5 @@
 import { Menu as MuiMenu, MenuItem as MuiMenuItem } from '@mui/material';
-import RtlProvider from '@mui/system/RtlProvider';
+import { RtlProvider } from '@mui/system';
 import { act, render } from '@testing-library/react';
 import { MenuItem } from '@vanguard/MenuItem/MenuItem';
 import React from 'react';
