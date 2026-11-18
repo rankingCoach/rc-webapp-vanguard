@@ -1088,3 +1088,49 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    5. "MUI MenuItem inside Select" (Vanguard MenuItem): MenuItem renders the own MenuOption inside every own popup
       (OptionHostContext: MenuList now provides it, so also inside DropdownMenu); MUI MenuItem remains only inside
       MUI-rendered Menus until Menu is rebuilt (queue item 2.2).
+
+## 31. Duplication audit (implementer B, watchdog decisions) → rebuild entries
+
+Source: agentic-plans/ui-sdk-thread-b-log.md "3B duplication audit" (usage ledger there). Each merge lands with the
+rebuild of the named family, public API unchanged.
+
+1. ListPageCheckboxGroup / ListPageSwitchGroup (common/ListPage): TSX 54 %, SCSS 91 %, copied Redux filter dispatch.
+   With the ListPage rebuild: Checkbox owns a boolean-filter renderer with a control adapter, Switch is a thin
+   wrapper; module classes kept. Owner: A.
+2. AcceptModal / ConfirmModal (74 % TSX, 78 % SCSS; ModalService call sites Confirm 67, Accept 5): with the Modal
+   rebuild, ConfirmModal owns the decision dialog, AcceptModal becomes a wrapper (no negative action, centred buttons).
+3. EditModal / BigAssEditModal: identical positive/negative fns, diverged async/loading/close-result handling. One
+   shared core with the Modal rebuild; EditModal is a WordPress export (smoke test required).
+4. TextEditDrawer / MultiSelectDrawer: shared drawer chrome (title/actions/width) with the Drawer rebuild.
+5. DropdownMenu / Popover: arrow-placement SCSS copied (31 %) → one mixin with the Popover rebuild (queue 2.3).
+6. PhoneNumberIMask / VerificationPinInputIMask: one internal mask adapter (forwardRef + IMask + synthetic change) in
+   the imask/Input work.
+7. B (approved, no merge): BarChart/HSBChart getCategories + repeated Apex options → pure helper with spec, output
+   identical.
+
+### DropdownMenu opened during load (verifier, handoff 10) → fixed in pack-11 (10b)
+
+Cause (verifier repro): the trigger's Icon loads lazily (useDynamicImport) and re-renders only itself; the anchor SPAN
+grows 0×0 → 16×16 after the popper positioned, and nothing re-ran it. Fix: OwnPopper observes the anchor with a
+ResizeObserver (beyond popper.js; MUI's result was the settled position). Red→green story: Popper Parity ›
+FollowsAnchorResizeAfterOpen; jsdom timing differential `_popper-timing.spec.tsx` stays equal to MUI.
+
+## 32. Usage map (watchdog prep item 1) and how the queue uses it
+
+Source (read-only, rc-webapp `html/react/src`, swagger and model mocks excluded):
+`rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/component-usage.md`. 297 value exports, 171 rendered as JSX,
+55 PascalCase exports never imported from the root.
+
+1. Ordering weight, not a usage verdict. User decision stands: nothing counts as unused until the reachability map
+   arrives. Known undercounts in this map:
+   1. Service-rendered components: ConfirmModal (67) and AcceptModal (5) via ModalService (B's audit), listed as zero
+      here.
+   2. Deep `dist/` imports: OverlayStackingService, OVERLAY_BASE_Z_INDEX.
+   3. WordPress exports: EditableCard, SlideTransition (WordPress smoke test still required).
+   4. Components passed as values (`component={X}`) are not counted.
+2. Queue items it confirms as high-traffic own-core surfaces: Input 320 sites (formconfig ×115, textFieldProps ×64),
+   Select 168 (valueAsDefaultValue ×58, translateOptions ×55), Popover 67 (message, position, wrapChildren; interactive
+   ×5, arrow ×3, fixedPosition ×2) → 2.3 Popover/Tooltip covers those prop paths first, the rest stay on the MUI path
+   until modelled (§23 rule).
+3. Props-actually-passed lists drive the "modelled props" routing (Menu-style hybrid router) and the Tier A story set
+   per component: every prop with ≥1 rc-webapp site gets a parity story before the component's MUI path is removed.
