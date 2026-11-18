@@ -2,11 +2,23 @@
 // Package gate (Track 2): the packed tarball must ship docs/llms.txt, skills/vanguard/SKILL.md and one
 // docs/components/<Name>.md per value export of src/index.ts. Usage: node scripts/check-package-contents.mjs <tgz>
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseEntryExports } from './generate-agent-docs.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/**
+ * Value exports that get a docs page: every name the entry exports (generator's parseEntryExports) except constants
+ * defined inline in the entry itself (backward-compat dummies such as `lottieAnimation`, no source to document).
+ */
+export const documentedExports = (entryFile) => {
+  const names = parseEntryExports(entryFile);
+  const src = fs.readFileSync(entryFile, 'utf8');
+  for (const m of src.matchAll(/export\s+(?:const|function|class)\s+([A-Za-z0-9_$]+)/g)) names.delete(m[1]);
+  return names;
+};
 
 /** Required tarball entries that are absent, in a stable order (llms.txt, skill, then pages by export order). */
 export const missingPackageEntries = (entries, exportNames) => {
@@ -28,7 +40,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const entries = execFileSync('tar', ['-tzf', tgz], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
     .split('\n')
     .filter(Boolean);
-  const names = parseEntryExports(path.join(ROOT, 'src/index.ts'));
+  const names = documentedExports(path.join(ROOT, 'src/index.ts'));
   const missing = missingPackageEntries(entries, names);
   if (missing.length > 0) {
     console.error(`package contents: ${missing.length} missing\n${missing.join('\n')}`);

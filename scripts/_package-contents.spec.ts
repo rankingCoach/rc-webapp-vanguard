@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseEntryExports } from './generate-agent-docs.mjs';
-import { missingPackageEntries } from './check-package-contents.mjs';
+import { documentedExports, missingPackageEntries } from './check-package-contents.mjs';
 
 const complete = (names: string[]) => [
   'package/package.json',
@@ -24,6 +24,13 @@ describe('package contents gate (agent docs, Track 2)', () => {
   });
 
   it('checks every value export of src/index.ts (298 when Track 2 landed)', () => {
-    expect(parseEntryExports('src/index.ts').size).toBeGreaterThanOrEqual(298);
+    expect(documentedExports('src/index.ts').size).toBeGreaterThanOrEqual(298);
+  });
+
+  it('exempts constants defined inline in the entry (no source to document, e.g. the lottieAnimation dummy)', () => {
+    const names = documentedExports('src/index.ts');
+    expect(parseEntryExports('src/index.ts').has('lottieAnimation')).toBe(true);
+    expect(names.has('lottieAnimation')).toBe(false);
+    expect(names.has('Button')).toBe(true);
   });
 });
