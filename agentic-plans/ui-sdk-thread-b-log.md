@@ -675,3 +675,14 @@ Tools copied to `agentic-plans/uisdk-tools-b/` (collision-check.sh, attr-only-ch
    5. `FadeCarouselAuto/FadeCarouselAuto.stories.tsx`: its play query fails (TestingLibraryElementError on the scroll container) → stale/timing, needs a look by whoever owns the story.
    6. `GlobalStateComponent/GlobalStateComponent.stories.tsx`, `InfoBox/InfoBox.stories.tsx`: an `_`-prefixed story with the same name exists; renaming would collide.
 No real-bug candidates in this group.
+
+## (d) Leak hygiene of B-slotted non-MUI components (watchdog APPROVED: spec per row, red first, minimal fixes)
+| # | component | finding | commit | spec (red → green) |
+|---|---|---|---|---|
+| 1 | ListItems | scroll listener added on every `items` change, never removed (stale `sticky` closures pile up) | c2d9e07 | `_ListItems.hygiene.spec.tsx`: 3 listeners after 2 updates → 1; 1 left after unmount → 0; updated+scroll innerHTML == fresh mount+scroll (also true on the old code in jsdom, so no visible-state change) |
+| 2 | FadedCarousel (center mode) | rAF loop never cancelled on unmount / [mode, items] change | ca27407 | `_FadedCarousel.hygiene.spec.tsx`: 2 pending frames after an items change → 1; unmount → 0 |
+| 3 | StarRating | 2 s hover re-enable timer outlives unmount; one more per click | 311dbca | `_StarRating.hygiene.spec.tsx`: timer left after unmount → 0; 3 clicks → 1 pending timer |
+| 4–10 | ActionBar resize, AnimatedNumber timeout+rAF, FadeCarouselAuto interval, FadedCarousel scroll listener, Tabs observers/resize/rAF, Tabs setTimeout(0) ref reset, saveCsvFile link | already clean | 66c42e1 | spec-only, all green (FadedCarousel's count excludes React's own root listener on the RTL container) |
+
+### Behaviour deltas for the user
+1. StarRating (311dbca): after a rating change hover is disabled for 2 s. Before: each click armed its own timer, so hover came back 2 s after the FIRST of several quick clicks (and timers fired after unmount). After: 2 s after the LAST click; nothing fires after unmount. Accepted by the watchdog as a bug fix.
