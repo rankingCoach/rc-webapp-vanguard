@@ -25,7 +25,7 @@ export const ContentPlaceholder = (props: Props) => {
   };
 
   return (
-    <div onClick={openModal} className={'notif-content-placeholder'}>
+    <div data-slot={'content-placeholder'} onClick={openModal} className={'notif-content-placeholder'}>
       <Render if={item}>
         <Icon type={IconSize.small}>{IconNames.refresh}</Icon>
       </Render>

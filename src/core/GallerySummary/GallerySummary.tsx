@@ -38,14 +38,15 @@ export const GallerySummary = (props: GallerySummaryProps) => {
   ];
 
   return (
-    <div className={classNames(styles.gallerySummaryContainer, dFlex, gap1)}>
+    <div data-slot={'gallery-summary'} className={classNames(styles.gallerySummaryContainer, dFlex, gap1)}>
       {visibleItems.map((item, index) => (
         <div
+          data-slot={'gallery-summary-item'}
           key={index}
           className={classNames(styles.gallerySummaryItem, index > 0 ? styles.stacked : '')}
           style={{ zIndex: MAX_VISIBLE_ITEMS - index }}
         >
-          <div className={classNames(styles.gallerySummaryImage)}>
+          <div data-slot={'gallery-summary-image'} className={classNames(styles.gallerySummaryImage)}>
             <GalleryMediaItem
               mediaItem={item}
               width={144}
@@ -57,7 +58,7 @@ export const GallerySummary = (props: GallerySummaryProps) => {
       ))}
 
       <Render if={remainingCount > 0}>
-        <div className={classNames(styles.gallerySummaryMore)}>
+        <div data-slot={'gallery-summary-more'} className={classNames(styles.gallerySummaryMore)}>
           <Text color={'--fn-fg-lightest'}>+{remainingCount}</Text>
         </div>
       </Render>

@@ -15,7 +15,7 @@ export const InvoiceAddress = (props: InvoiceAddressProps) => {
   const { invoiceCompanyName, formattedAddress, className } = props;
 
   return (
-    <ComponentContainer className={classNames(className, styles.invoiceAddress)}>
+    <ComponentContainer data-slot={'invoice-address'} className={classNames(className, styles.invoiceAddress)}>
       <Text
         className={styles.name}
         testId={'name'}

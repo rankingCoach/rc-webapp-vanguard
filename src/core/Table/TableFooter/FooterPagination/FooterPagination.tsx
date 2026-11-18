@@ -1,10 +1,9 @@
 import { classNames } from '@helpers/classNames';
 import { IconNames } from '@vanguard/Icon/IconNames';
-import { CtaWithIcon } from '@vanguard/Table/common/CtaWithIcon/CtaWithIcon';
 import { TableContextType, TableProvider } from '@vanguard/Table/Table';
-import { FontWeights, Text } from '@vanguard/Text/Text';
 import React, { useContext, useEffect, useState } from 'react';
 
+import { FooterAction } from '../FooterAction/FooterAction';
 import styles from './FooterPagination.module.scss';
 
 export type TablePaginationProps = {
@@ -56,32 +55,22 @@ export const FooterPagination = (props: FooterPaginationProps) => {
 
   return (
     <>
-      <CtaWithIcon
+      <FooterAction
+        label={'Back'}
         disabled={disabledBack}
-        onClick={(evt) => {
-          onPrevPage && onPrevPage(offset);
-        }}
+        onClick={() => onPrevPage && onPrevPage(offset)}
         className={classNames(styles.spacer, styles.linkColor, styles.disabled)}
         icon={IconNames.caretRight}
         position={'left'}
-      >
-        <Text fontWeight={FontWeights.medium} color={disabledBack ? 'var(--n300)' : 'var(--brand-color)'}>
-          Back
-        </Text>
-      </CtaWithIcon>
-      <CtaWithIcon
+      />
+      <FooterAction
+        label={'Next'}
         disabled={disabledNext}
-        onClick={(evt) => {
-          onNextPage && onNextPage(offset);
-        }}
+        onClick={() => onNextPage && onNextPage(offset)}
         className={classNames(styles.linkColor)}
         icon={IconNames.caretLeft}
         position={'right'}
-      >
-        <Text fontWeight={FontWeights.medium} color={disabledNext ? 'var(--n300)' : 'var(--brand-color)'}>
-          Next
-        </Text>
-      </CtaWithIcon>
+      />
     </>
   );
 };

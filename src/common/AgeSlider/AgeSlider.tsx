@@ -38,7 +38,7 @@ export const AgeSlider = (props: AgeSliderProps) => {
     }
   };
   return (
-    <ComponentContainer className={classNames(dFlex, dFlexRow, alignItemsCenter, justifyContentCenter, gap3)}>
+    <ComponentContainer data-slot={'age-slider'} className={classNames(dFlex, dFlexRow, alignItemsCenter, justifyContentCenter, gap3)}>
       <Input className={styles.input} type={'text'} value={range[0]} onChange={handleMinAgeChange} required={true} />
       <Slider onChange={handleChange} type={'primary'} value={range} min={minAge} max={maxAge} />
       <Input

@@ -22,7 +22,7 @@ export const ExpandableItem = (props: ExpandableItemProps) => {
     : { marginLeft: '0px', marginBottom: '0px' };
 
   return (
-    <ComponentContainer>
+    <ComponentContainer data-slot={'expandable-item'}>
       <Accordion
         variant={'outlined'}
         summaryCustomStyle={summaryCustomStyle}

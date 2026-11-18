@@ -23,11 +23,12 @@ export const AvatarStack = (props: AvatarStackProps) => {
   // @todo Use Avatar Component instead of the IMG here (After solving Avatar issues)
 
   return (
-    <ComponentContainer className={classNames(className, styles.container)} style={{ width: stackWidth }}>
+    <ComponentContainer data-slot={'avatar-stack'} className={classNames(className, styles.container)} style={{ width: stackWidth }}>
       {items.map((item, index) => {
         return (
-          <div key={index} className={classNames(styles.dot)} style={{ height: avatarSize }}>
+          <div data-slot={'avatar-stack-item'} key={index} className={classNames(styles.dot)} style={{ height: avatarSize }}>
             <div
+              data-slot={'avatar-stack-avatar'}
               className={classNames(styles.avatar)}
               style={{
                 width: avatarSize,
@@ -36,7 +37,7 @@ export const AvatarStack = (props: AvatarStackProps) => {
                 border: `2px solid ${item.borderColor ?? defaultBorderColor}`,
               }}
             >
-              <img src={item.image} className={classNames(styles.img)} alt={''} />
+              <img data-slot={'avatar-stack-image'} src={item.image} className={classNames(styles.img)} alt={''} />
             </div>
           </div>
         );

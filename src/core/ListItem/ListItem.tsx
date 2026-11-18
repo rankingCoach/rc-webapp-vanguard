@@ -74,15 +74,15 @@ export const ListItem = (props: ListItemProps) => {
   };
 
   return (
-    <ComponentContainer>
+    <ComponentContainer data-slot={'list-item-container'}>
       {isComingSoon && (
-        <div className={classNames(styles.listItemCommingSoon)}>
+        <div data-slot={'list-item-coming-soon'} className={classNames(styles.listItemCommingSoon)}>
           <Text fontWeight={FontWeights.bold} color={'#FFFFFF'}>
             Comming soon
           </Text>
         </div>
       )}
-      <div key={index} className={classNames(dFlex, alignItemsCenter, mb1, classNameListItem && classNameListItem)}>
+      <div data-slot={'list-item'} key={index} className={classNames(dFlex, alignItemsCenter, mb1, classNameListItem && classNameListItem)}>
         <AnimatedConditional condition={type !== 'none'}>
           <div
             data-testid={'iconList'}
@@ -97,7 +97,7 @@ export const ListItem = (props: ListItemProps) => {
             {getElementIndex()}
           </div>
         </AnimatedConditional>
-        <div className={classNames(dFlex, alignItemsCenter)}>
+        <div data-slot={'list-item-content'} className={classNames(dFlex, alignItemsCenter)}>
           {isText ? (
             <Text type={textType} replacements={replacements}>
               {children}

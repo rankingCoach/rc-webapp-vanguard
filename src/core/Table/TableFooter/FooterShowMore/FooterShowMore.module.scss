@@ -1,11 +1,6 @@
-@import "./src/styles/spacings";
+@import "../FooterAction/footer-action";
 
-.spacer {
-  margin-right: $x4;
-}
-.link-color {
-  color: var(--brand-color);
-}
+@include footer-action-base;
 
 .disabled {
   &.link-color {

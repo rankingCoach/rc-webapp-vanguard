@@ -65,9 +65,10 @@ export const ListItems = <ObjectType,>(props: ListItemsProps<ObjectType>) => {
   }, [ulRef, items]);
 
   return (
-    <ComponentContainer style={{ height: '100%' }} testId={testId} className={classNames(styles.container, className)}>
+    <ComponentContainer data-slot={'list-items'} style={{ height: '100%' }} testId={testId} className={classNames(styles.container, className)}>
       {typeof topNote === 'string' ? <Text>{topNote}</Text> : topNote}
       <ul
+        data-slot={'list-items-list'}
         ref={ulRef}
         style={{
           height: '99%',

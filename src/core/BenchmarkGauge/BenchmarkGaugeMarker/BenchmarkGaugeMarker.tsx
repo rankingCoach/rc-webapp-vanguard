@@ -60,6 +60,8 @@ export const BenchmarkGaugeMarker = (props: BenchmarkGaugeMarkerProps) => {
    */
   return (
     <div
+      data-slot={'benchmark-gauge-marker'}
+      data-orientation={orientation}
       className={classNames(styles.marker, isVertical && styles.vertical, isDimmed && styles.dimmed)}
       style={positionStyle}
     >
@@ -73,6 +75,7 @@ export const BenchmarkGaugeMarker = (props: BenchmarkGaugeMarkerProps) => {
 
       <Render if={!!marker.renderContent}>
         <div
+          data-slot={'benchmark-gauge-marker-content'}
           className={classNames(
             styles.contentAnchor,
             resolvedSide(marker.contentSide) === 'start' ? styles.contentAnchorStart : styles.contentAnchorEnd,

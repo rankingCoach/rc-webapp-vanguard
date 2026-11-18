@@ -144,6 +144,7 @@ export const MediaItemSelectInput = (props: Props) => {
    */
   return (
     <input
+      data-slot={'media-item-select-input'}
       ref={fileSelectRef}
       type={'file'}
       accept={accept.join(',')}

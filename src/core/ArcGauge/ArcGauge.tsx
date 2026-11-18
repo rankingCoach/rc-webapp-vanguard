@@ -58,8 +58,9 @@ export const ArcGauge = (props: ArcGaugeProps) => {
   };
 
   return (
-    <div className={classNames(styles.container)}>
+    <div data-slot={'arc-gauge'} className={classNames(styles.container)}>
       <svg
+        data-slot={'arc-gauge-track'}
         className={styles.arcGauge}
         viewBox="0 0 240 120"
         xmlns="http://www.w3.org/2000/svg"
@@ -70,6 +71,7 @@ export const ArcGauge = (props: ArcGaugeProps) => {
       </svg>
 
       <div
+        data-slot={'arc-gauge-fill'}
         className={classNames(styles.arcGauge)}
         style={{
           background: `conic-gradient(from 270deg at 50% 100%, ${parsedColor1} 0deg, ${parsedColor2} ${
@@ -79,10 +81,10 @@ export const ArcGauge = (props: ArcGaugeProps) => {
         }}
       />
 
-      <img src={SvgIcon} className={classNames(styles.overlayMask)} alt={''} />
+      <img data-slot={'arc-gauge-mask'} src={SvgIcon} className={classNames(styles.overlayMask)} alt={''} />
 
       <Render if={!!text}>
-        <div className={classNames(styles.textContainer)}>
+        <div data-slot={'arc-gauge-text'} className={classNames(styles.textContainer)}>
           <Text
             type={TextTypes.textIntro}
             fontWeight={FontWeights.bold}

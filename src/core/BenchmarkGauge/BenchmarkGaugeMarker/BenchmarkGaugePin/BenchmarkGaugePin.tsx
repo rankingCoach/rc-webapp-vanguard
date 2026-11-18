@@ -17,15 +17,16 @@ export const BenchmarkGaugePin = (props: BenchmarkGaugePinProps) => {
   const { marker, ctx, resolvedColor, isHighlighted, growHighlightedMarker } = props;
 
   return (
-    <div className={classNames(styles.pinWrapper)}>
+    <div data-slot={'benchmark-gauge-pin'} className={classNames(styles.pinWrapper)}>
       <Render if={!!marker.renderPin}>{marker.renderPin?.(ctx)}</Render>
       <Render if={!marker.renderPin}>
         <div
+          data-slot={'benchmark-gauge-pin-default'}
           className={classNames(styles.defaultPin, growHighlightedMarker && isHighlighted && styles.defaultPinGrown)}
           style={{ background: resolvedColor }}
         >
           <Render if={!!marker.renderHighlightedContent}>
-            <div className={classNames(styles.highlightedContent, isHighlighted && styles.highlightedContentVisible)}>
+            <div data-slot={'benchmark-gauge-pin-highlighted-content'} className={classNames(styles.highlightedContent, isHighlighted && styles.highlightedContentVisible)}>
               {marker.renderHighlightedContent?.(ctx)}
             </div>
           </Render>

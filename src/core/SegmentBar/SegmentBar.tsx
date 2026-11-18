@@ -33,9 +33,10 @@ export const SegmentBar = (props: SegmentBarProps) => {
   const placeholderColor = parseCssVariable('--n200');
 
   return (
-    <div className={[styles.bar, className].filter(Boolean).join(' ')} style={{ height }}>
+    <div data-slot={'segment-bar'} className={[styles.bar, className].filter(Boolean).join(' ')} style={{ height }}>
       {segments.map((segment, index) => (
         <div
+          data-slot={'segment-bar-segment'}
           key={index}
           className={styles.segment}
           style={{

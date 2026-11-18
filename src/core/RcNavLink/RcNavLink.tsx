@@ -19,7 +19,7 @@ export const RcNavLink = (props: LinkComponentProps) => {
     to = to.replace('$locationId', params.locationId);
   }
   return (
-    <a href={to} {...props}>
+    <a data-slot={'rc-nav-link'} href={to} {...props}>
       {children}
     </a>
   );

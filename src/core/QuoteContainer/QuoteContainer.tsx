@@ -20,10 +20,10 @@ export const QuoteContainer: React.FC<QuoteContainerProps> = ({ children, classN
   const { SvgIcon, loading, error } = useDynamicImport('QuoteMarks.svg');
 
   return (
-    <div className={classNames(styles.quoteContainer, className)}>
-      <div className={styles.body}>{children}</div>
+    <div data-slot={'quote-container'} className={classNames(styles.quoteContainer, className)}>
+      <div data-slot={'quote-container-body'} className={styles.body}>{children}</div>
       {!loading && !error && (
-        <div className={styles.quoteMarks}>
+        <div data-slot={'quote-container-marks'} className={styles.quoteMarks}>
           <StyledSVG src={SvgIcon} />
         </div>
       )}

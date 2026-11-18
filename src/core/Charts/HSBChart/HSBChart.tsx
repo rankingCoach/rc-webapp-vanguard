@@ -1,6 +1,7 @@
 import './HSBChart.scss';
 
 import { abbreviateNumber } from '@helpers/round-number';
+import { translateLabels } from '@helpers/charts/translate-labels';
 import { translationService } from '@services/translation.service';
 import { BigLegend } from '@vanguard/Charts/BigLegend/BigLegend';
 import { BigLegendItemProps } from '@vanguard/Charts/BigLegend/BigLegendItem/BigLegendItem';
@@ -74,12 +75,7 @@ export const HSBChart = (props: HSBChartProps) => {
     });
   };
 
-  const getCategories = (categories: string[]): string[] => {
-    return categories.map((item) => {
-      item = translationService.get(item).value;
-      return item;
-    });
-  };
+  const getCategories = translateLabels;
 
   const makeRoundedCorner = (series: HSBChartSeries[]) => {
     let borderRadius: number[] = [];

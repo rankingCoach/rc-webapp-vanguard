@@ -1,11 +1,10 @@
 import { classNames } from '@helpers/classNames';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { IconNames } from '@vanguard/Icon/IconNames';
-import { CtaWithIcon } from '@vanguard/Table/common/CtaWithIcon/CtaWithIcon';
 import { TableContextType, TableProvider } from '@vanguard/Table/Table';
-import { FontWeights, Text } from '@vanguard/Text/Text';
-import React, { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
+import { FooterAction } from '../FooterAction/FooterAction';
 import styles from './FooterShowMore.module.scss';
 
 export interface FooterShowMoreProps {
@@ -37,19 +36,14 @@ export const FooterShowMore = (props: FooterShowMoreProps) => {
   }
   return (
     <ComponentContainer data-slot={'footer-show-more-container'}>
-      <CtaWithIcon
-        onClick={(evt: SyntheticEvent) => {
-          onShowMore && onShowMore(limit);
-        }}
+      <FooterAction
+        label={'Show more'}
+        onClick={() => onShowMore && onShowMore(limit)}
         disabled={disabled}
         className={classNames(styles.linkColor)}
         icon={IconNames.caretDown}
         position={'right'}
-      >
-        <Text fontWeight={FontWeights.medium} color={disabled ? 'var(--n300)' : 'var(--brand-color)'}>
-          Show more
-        </Text>
-      </CtaWithIcon>
+      />
     </ComponentContainer>
   );
 };

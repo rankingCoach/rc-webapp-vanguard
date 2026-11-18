@@ -24,6 +24,7 @@ export const NotificationAction = (props: Props) => {
   };
   return (
     <div
+      data-slot={'notification-action'}
       style={{ width: `${width}%` }}
       onClick={() => {
         if (cb && typeof cb === 'function') {

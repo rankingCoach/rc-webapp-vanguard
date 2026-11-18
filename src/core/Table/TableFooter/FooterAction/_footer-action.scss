@@ -1,0 +1,11 @@
+@import "./src/styles/spacings";
+
+// Shared by FooterPagination and FooterShowMore: emits the same .spacer and .link-color rules each module had.
+@mixin footer-action-base {
+  .spacer {
+    margin-right: $x4;
+  }
+  .link-color {
+    color: var(--brand-color);
+  }
+}

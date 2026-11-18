@@ -25,8 +25,8 @@ export type ActionBarMessageProps = {
 export const ActionBarMessage = (props: ActionBarMessageProps) => {
   const { type, title, description, button } = props;
   return (
-    <ComponentContainer testId={'ActionBarMessage_Container'} className={styles.container}>
-      <div className={styles.infoBox}>
+    <ComponentContainer data-slot={'action-bar-message'} testId={'ActionBarMessage_Container'} className={styles.container}>
+      <div data-slot={'action-bar-message-info'} className={styles.infoBox}>
         <div>
           <ActionBarMessageIcon type={type} />
         </div>
@@ -39,7 +39,7 @@ export const ActionBarMessage = (props: ActionBarMessageProps) => {
           </Render>
 
           <Render if={!!description}>
-            <div className={styles.description}>
+            <div data-slot={'action-bar-message-description'} className={styles.description}>
               <Text type={TextTypes.textHelp}>{description}</Text>
             </div>
           </Render>

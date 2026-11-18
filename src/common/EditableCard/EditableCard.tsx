@@ -71,6 +71,7 @@ export const EditableCard = (props: EditableCardProps) => {
 
   return (
     <ComponentContainer
+      data-slot={'editable-card'}
       testId={testId}
       className={classNames(
         styles.container,
@@ -81,7 +82,7 @@ export const EditableCard = (props: EditableCardProps) => {
       )}
       onClick={shouldHaveOnClickEventOnContainer && !!editCallback && !hideEditButton ? editCallback : undefined}
     >
-      <div className={classNames(styles.header, editButtonFloatRight ? styles.editButtonFloatRight : undefined)}>
+      <div data-slot={'editable-card-header'} className={classNames(styles.header, editButtonFloatRight ? styles.editButtonFloatRight : undefined)}>
         <div>
           <Text testId={'title'} type={TextTypes.textIntro} fontWeight={titleWeight} translate={translate}>
             {title}
@@ -103,7 +104,7 @@ export const EditableCard = (props: EditableCardProps) => {
           )}
         </div>
 
-        <div className={styles.actionBtns}>
+        <div data-slot={'editable-card-actions'} className={styles.actionBtns}>
           {actionBtns}
           {WrapButton(
             <Button
@@ -120,7 +121,7 @@ export const EditableCard = (props: EditableCardProps) => {
         </div>
       </div>
 
-      <div className={styles.content}>{children}</div>
+      <div data-slot={'editable-card-content'} className={styles.content}>{children}</div>
     </ComponentContainer>
   );
 };

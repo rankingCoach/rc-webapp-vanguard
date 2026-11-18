@@ -16,7 +16,7 @@ export const NotificationSource = (props: Props) => {
   const { source = 'own' } = props;
 
   return (
-    <div className={classNames(dFlex, 'notif-source', source)}>
+    <div data-slot={'notification-source'} className={classNames(dFlex, 'notif-source', source)}>
       <Text type={TextTypes.textCaption} textWrap={'no-wrap'} fontWeight={FontWeights.regular}>
         {source === 'own' ? 'Own notification' : 'Competitor notification'}
       </Text>

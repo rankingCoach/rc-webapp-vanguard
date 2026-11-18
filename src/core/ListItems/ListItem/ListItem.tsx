@@ -80,6 +80,7 @@ export const ListItem = <ObjectType,>(props: ListItemProps<ObjectType>) => {
    */
   return (
     <li
+      data-slot={'list-items-item'}
       ref={ref}
       onClick={() => {
         onClick && item?.element && onClick(item.element, idx ?? -1);
@@ -99,25 +100,26 @@ export const ListItem = <ObjectType,>(props: ListItemProps<ObjectType>) => {
       onMouseLeave={() => onHover && item.element && onHover(item.element, idx ?? -1, false)}
     >
       <Render if={!hideLeft && !!item?.left}>
-        <div className={classNames(styles.left)}>
+        <div data-slot={'list-items-item-left'} className={classNames(styles.left)}>
           <div className={styles.left_content}>{item.left}</div>
         </div>
       </Render>
 
       <div
+        data-slot={'list-items-item-middle'}
         className={classNames(
           styles.middle,
           !item.left || hideLeft ? styles.hiddenLeft : undefined,
           !item.right || hideRight ? styles.hiddenRight : undefined,
         )}
       >
-        <div className={classNames(styles.titleLine)}>{item?.title ?? null}</div>
-        <div className={classNames(styles.contentLine)}>{item?.content ?? null}</div>
-        <div className={classNames(styles.lastLine)}>{item?.last ?? null}</div>
+        <div data-slot={'list-items-item-title'} className={classNames(styles.titleLine)}>{item?.title ?? null}</div>
+        <div data-slot={'list-items-item-content'} className={classNames(styles.contentLine)}>{item?.content ?? null}</div>
+        <div data-slot={'list-items-item-last'} className={classNames(styles.lastLine)}>{item?.last ?? null}</div>
       </div>
 
       <Render if={!hideRight && !!item?.right}>
-        <div className={classNames(styles.right)}>
+        <div data-slot={'list-items-item-right'} className={classNames(styles.right)}>
           <div className={styles.right_content}>{item.right}</div>
         </div>
       </Render>

@@ -47,9 +47,9 @@ export const BenchmarkGauge = (props: BenchmarkGaugeProps) => {
    * Return View
    */
   return (
-    <div data-testid={testId} className={classNames(styles.root, isVertical && styles.rootVertical, className)}>
+    <div data-slot={'benchmark-gauge'} data-orientation={orientation} data-testid={testId} className={classNames(styles.root, isVertical && styles.rootVertical, className)}>
       <Render if={hasLegend}>
-        <div className={styles.legend}>
+        <div data-slot={'benchmark-gauge-legend'} className={styles.legend}>
           {legendMarkers.map((marker) => {
             const isHighlighted = highlightedId === marker.id;
             const isDimmed = highlightedId !== undefined && highlightedId !== marker.id;
@@ -58,6 +58,7 @@ export const BenchmarkGauge = (props: BenchmarkGaugeProps) => {
 
             return (
               <div
+                data-slot={'benchmark-gauge-legend-item'}
                 key={marker.id}
                 className={classNames(
                   styles.legendItem,
@@ -75,15 +76,16 @@ export const BenchmarkGauge = (props: BenchmarkGaugeProps) => {
         </div>
       </Render>
 
-      <div className={styles.trackWrapper}>
-        <div className={classNames(isProgressMode && styles.trackBarProgress, styles.trackBar)} style={trackBarStyle}>
+      <div data-slot={'benchmark-gauge-track-wrapper'} className={styles.trackWrapper}>
+        <div data-slot={'benchmark-gauge-track'} className={classNames(isProgressMode && styles.trackBarProgress, styles.trackBar)} style={trackBarStyle}>
           {/* Ghost: full-track gradient at reduced opacity. Visible only in progress mode. */}
-          <div className={styles.trackGhost} style={ghostStyle} />
+          <div data-slot={'benchmark-gauge-ghost'} className={styles.trackGhost} style={ghostStyle} />
 
           {/* Fill: vivid gradient, clipped to the progress endpoint via clip-path.
               Suppressed when progressPercent is 0 — only the ghost layer shows.
               In normal mode: fill has no background, trackBar CSS gradient shows through. */}
           <div
+            data-slot={'benchmark-gauge-fill'}
             className={classNames(styles.trackFill, shouldUseTrackGradient && styles.trackGradient)}
             style={fillStyle}
           />

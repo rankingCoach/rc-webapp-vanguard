@@ -546,3 +546,106 @@ Usage ledger (direct JSX / service / internal / WordPress):
 ### Story renames so verifier 2 can check slotted components (watchdog)
 1. `Rating.stories.tsx`, `RatingDistribution.stories.tsx`, `SmallLoader.stories.tsx` → `_*.stories.tsx` (never collected before; also added to the never-run list above).
 2. Setup-only edits after the rename, listed: (a) all three: `export default SbDecorator({...})` → `export default { ...SbDecorator({...}) }` (the Storybook indexer rejects a call expression as default export; this is the shape every collected story uses); (b) RatingDistribution: the meta `argTypes.*.defaultValue` values (ignored since Storybook 7, so `ratingDistributionData` was undefined and the render threw) repeated as meta `args` with the same values. No story body, render or assertion changed. Result: 3/3 stories green.
+
+### Audit item 1: NotificationAction standalone copy → re-export (watchdog APPROVED)
+1. `src/core/NotificationAction/NotificationAction.tsx` now re-exports `NotificationAction` + `NotificationActionProps` from `src/core/Notification/NotificationAction/` (the root export). Same names importable from the old path; no public export added or removed.
+2. Spec `_NotificationAction.reexport.spec.tsx`: identity (red before: two different functions; green after) + markup equality over 4 prop combinations (label, width, iconLeft, iconRight).
+3. `NotificationAction.scss` in the old folder is now imported by nobody; kept because `_showcase/CssUpdatesShowcase/data.ts:580` lists its path. Its `NotificationAction.stories.tsx` has no underscore, so it was never collected (on the never-run list); it imports from the old path and so now renders the single implementation.
+
+### Audit item 3: Table footer controls on one renderer (watchdog APPROVED)
+1. New internal `TableFooter/FooterAction/FooterAction.tsx` (not exported): CtaWithIcon + Text label, colour by `disabled`. FooterPagination (Back/Next), FooterShowMore and FooterShowLess render it; their hooks, callbacks, containers, slots and module classes are unchanged; every file and export stays.
+2. SCSS: `FooterAction/_footer-action.scss` mixin emits the shared `.spacer` + `.link-color` rules; FooterPagination/FooterShowMore modules `@include` it and keep their own `.disabled` rule (descendant vs compound selector preserved). Compiled CSS (sass, both modules) byte-identical before/after; class names unchanged (same files, same class names).
+3. Characterization spec `_TableFooterControls.characterization.spec.tsx`: 3 controls × 5 pagination states × hidden → 30 markup snapshots captured from the pre-refactor code (8f3b328) into `__fixtures__/footer-controls.json` (stable across 2 re-runs, icons awaited); identical after the refactor.
+4. Table specs 23/23, stories 18/18, tsc 0, biome same diagnostics before/after.
+
+### Audit item 7: BarChart / HSBChart shared helper (watchdog APPROVED, helper only; A informed)
+1. `src/helpers/charts/translate-labels.ts` `translateLabels(labels)` replaces three identical copies (BarChart `getCategories` + `getCustomLegendItems`, HSBChart `getCategories`); the local names stay as aliases so the options code is untouched. BarChart's now-unused `translationService` import removed.
+2. Options builder NOT extracted: diffing the two option objects shows ~25 differing values (orientation, column width, radius, fonts Roboto vs theme typeface, legend position/size/markers, grid colour/position, axis visibility, formatters); a shared builder would be only parameters. Recorded as not worth it.
+3. Spec `_translate-labels.spec.ts` (red: module missing → green 3/3): order, call keys, new array, input untouched, empty. Chart stories 7/7, tsc 0, biome same before/after.
+
+### Audit item 10: TextHighlighted props derived from Text's (watchdog APPROVED, type-only)
+1. `Props` = `Pick<TextProps, 24 keys>` + `caseInsensitive`; `textWrap` stays written out because Text's is wider (`'pre-wrap' | 'pre'`), so a plain Pick would have widened TextHighlighted. `TextHighlightedProps extends Props` unchanged; no runtime change.
+2. Type spec `_TextHighlighted.types.spec.ts` (checked by `tsc -p tsconfig.spec.json`): `Props` and `TextHighlightedProps` `toEqualTypeOf` the hand-written legacy shape. Sensitivity shown: a plain Pick including `textWrap` fails it (TS2344 on textWrap); final version passes. TextHighlighted spec 1/1 + stories 3/3, tsc 0, biome: only the pre-existing `noChildrenProp` in the old spec.
+3. Left as logged (watchdog): ActionCardBody (returns children only), RcNavLink (raw prop spread). QuoteContainer pair: known divergence, left. Masked inputs: A's.
+
+## Candidates for removal (user decides; waiting for verifier 2's reachability map)
+1. `src/core/GoogleMaps/GoogleMapsMarker/Marker.tsx` (≈880 lines; 75% copy of AdvancedMarker.tsx): imported by no file in src (grep for `GoogleMapsMarker/Marker`, `./Marker`), not re-exported by `src/core/GoogleMaps/index.ts`, `src/index.ts` or `src/index-wordpress.ts`; the public `MarkerF` is `export { MarkerF } from '@react-google-maps/api'`. rc-webapp: 0 direct, 0 service.
+2. Correction to the Codex audit row: `GoogleMapsMarker/AdvancedMarker.tsx` is NOT dead — `src/core/GoogleMaps/index.ts` exports `MarkerF as AdvancedMarkerF, Marker as AdvancedMarker` and its props type publicly. Keep.
+
+### Audit item 4: CircularGauge / ProgressCircle — STOPPED, both kept (watchdog's stop rule)
+Byte-identical SVG for ProgressCircle would need its own complete render branch inside CircularGauge, i.e. the duplication moved, not removed. Differences that all reach the markup: geometry (ProgressCircle clamps size 1..100, stroke = 10% of size, `normalizedRadius = radius - stroke/2`, diameter = size - stroke; CircularGauge `radius = (size - strokeWidth)/2` on the full size), `strokeDasharray` as the string "c c" vs a number, `strokeDashoffset` as inline style vs attribute, `viewBox` + `rotate(-90)` transform + `strokeLinecap="round"` only on CircularGauge, track stroke `var(--n200)` literal vs parsed variable, attribute order, different CSS-module classes, and ProgressCircle's built-in "NN %" Text block vs CircularGauge's children slot. Recorded as known divergence; time spent ≈15 min reading.
+
+### Batch 4: ActionBar, gauges, Notification family, lists and small own components
+Drafted by Codex (medium), read by me; renames by me: ListItems' nested row `list-items-item*` (the standalone ListItem keeps `list-item*`; two different components must not share a slot), Notification's local QuoteContainer `notification-quote*` (the public QuoteContainer gets `quote-container` later).
+| Component | Attributes |
+|---|---|
+| AIOrb | `ai-orb` |
+| ActionBar / ActionBarFooter / ActionBarMessage | `action-bar`; `action-bar-footer`; `action-bar-message`, `-info`, `-description` |
+| ActionButton | nothing (renders Button, A's) |
+| ArcGauge | `arc-gauge`, `-track`, `-fill`, `-mask`, `-text` |
+| AvatarStack | `avatar-stack`, `-item`, `-avatar`, `-image` |
+| BenchmarkGauge / Marker / Pin | `benchmark-gauge` + `data-orientation`, `-legend`, `-legend-item`, `-track-wrapper`, `-track`, `-ghost`, `-fill`; `benchmark-gauge-marker` + `data-orientation`, `-marker-content`; `benchmark-gauge-pin`, `-pin-default`, `-pin-highlighted-content` |
+| DragAndDropFile | `drag-and-drop-file`, `-label`, `-input` |
+| FadeCarouselAuto | `fade-carousel-auto`, `-scroll`, `-item` |
+| MediaItemSelectInput | `media-item-select-input` |
+| GallerySummary | `gallery-summary`, `-item`, `-image`, `-more` |
+| ListItem | `list-item-container`, `list-item`, `-coming-soon`, `-content` |
+| ListItems | `list-items`, `list-items-list`; row `list-items-item`, `-left`, `-middle`, `-title`, `-content`, `-last`, `-right` |
+| Notification | `notification`, `-header`, `-header-title`, `-header-meta`, `-content`, `-actions`; ContentPlaceholder `content-placeholder`; NotificationAction `notification-action`; NotificationReview `notification-review`, `-text`, `-stars`, `-author`; NotificationSocialPost `notification-social-post`; local QuoteContainer `notification-quote`, `-content`, `-marks`; NotificationSource `notification-source` |
+Evidence: red 15/16 (ActionButton "no own slot" passes by design), green 16/16; touched-folder specs 16 files / 24, stories 15 / 91; tsc 0; biome 19 = 19, 0 on new specs; attribute-only 50 = 50; collision check: no hit. Codex's wider scan found `[data-slot=avatar|switch|badge|card…]` selectors only in rc-webapp `nexus/` (a separate shadcn app that does not import Vanguard) and `editor-bridge/__fixture__/studio-*.html` (test fixtures) — neither can match Vanguard DOM; noted as a risk if nexus ever embeds Vanguard.
+
+### Batch 5: ModalHeader / ModalBody / ModalFooter (watchdog Q2; A confirmed the files were free)
+| Component | Attributes |
+|---|---|
+| ModalHeader | root `modal-header` + `data-type` (danger/warn/success/info/default); `modal-header-title`; `modal-header-icon`. Close Button (A's) untouched |
+| ModalBody | `modal-body` + `data-mode` (`fill` or absent) |
+| ModalFooter | ComponentContainer root `modal-footer` (consumer className); `modal-footer-buttons` + `data-position` (start/end/between/center; default end, matching the default class). Render group and Buttons untouched |
+Evidence: red 3/3 → green 3/3; Modal/StandardModals/CustomModals specs 12 files / 243, stories 12 / 112; tsc 0; biome 1 = 1; attribute-only stream check OK (the line check now also reports reflow; the stream check compares the concatenated text per file); collision: `[data-mode="basic"|"advanced"]` in legacy html/{integrum,jump}/jira.css only, values never emitted.
+3. Verifier 2's reachability map (rc-webapp `tmp/research/vanguard-ui-sdk-visual-baseline/v2/reachability-map.md`, Vanguard ef2ee15, 300 value exports: direct 230 / indirect 50 / WordPress-only 4 / unreachable 16): confirms TextHighlighted = WordPress-only. AdvancedMarker / AdvancedMarkerF are public exports but unreachable from rc-webapp and not in the WordPress closure; the local `Marker.tsx` is not even an export. All 16 unreachable rows are public exports, so removing any is a breaking change: user decides at the next major (list + evidence in the map). Batch order: the unreachable components I still slot (AIBudgetEnd, OnboardingWelcomeAnimation, RcNavLink, SvgImage, DragAndDropFile done) go last, per the user's "zero-usage still migrated, last".
+
+### Batch 6: core leftovers + first src/common group
+Drafted by Codex (medium), read by me; spec fixes by me (SvgImage's runtime `require(path)` needs a resolvable module in jsdom; SegmentBar spec forEach lint).
+| Component | Attributes |
+|---|---|
+| ProgressCircle | `progress-circle`, `-svg`, `-track`, `-value`, `-label` |
+| QuoteContainer (public) | `quote-container`, `-body`, `-marks` |
+| RcNavLink | `<a>` `rc-nav-link` (before the raw props spread) |
+| SegmentBar | `segment-bar`, `segment-bar-segment` (loading only changes inline styles: no state attr) |
+| SocialMediaLink | `social-media-link` (both branches) |
+| SvgImage | `<img>` `svg-image` |
+| AssetPreloader | `asset-preloader` (its own hidden wrapper) |
+| TextIcon / GeneratedWithAIPill | `text-icon` / `generated-with-ai-pill` |
+| InfoText | `info-text-container`, `info-text` |
+| PageSectionLoading | `page-section-loading-content`, `page-section-loading-image` + `data-size` (small/medium/large, default large); root is PageSection (already `page-section`) |
+| DiscountBadge | `discount-badge`, `-border` |
+| FeatureBox | `feature-box`, `-content`, `-title`, `-features`, `-media`, `-animation` |
+| ErrorText | nothing (Text + AnimatedConditional only) |
+Evidence: red 13/14 → green 14/14; touched-folder specs 16 files / 19 (incl. existing); collected stories 3 files / 19 (src/common stories are not collected; the new specs render each component); tsc 0; biome 6 = 6, 0 on new specs; attribute-only stream OK; collision: `[data-size=default|sm|lg]` + shadcn slots only in rc-webapp editor-bridge `__fixture__/lumen-*.html` / `studio-*.html` test fixtures; none in Vanguard-rendering code.
+
+### Track 2 follow-up: example coverage (watchdog, lowest priority)
+1. The generator resolves plain identifiers and `helper.key` lookups in story args through top-level consts of the story file and its relative imports (e.g. `testMessages.danger` from `stories/_Alert.default.ts`), unwrapping `as const`; `children` may be such a lookup too.
+2. Examples with no attribute and no children (`<AIOrb />`) and JSX longer than 320 characters (chart series, big data) are skipped.
+3. Pages with examples: 27 → 49 of 298. Spec 8/8 (the one red run was the determinism test while Codex was editing src between the spec's two generations; green once src was stable).
+
+### Batch 7: remaining src/common components
+Drafted by Codex (medium), read by me; spec fix by me (PageSectionRecommended renders LottieAnimationLoader → jsdom canvas error after the test; added the lottie-web mock used by `_error-logging.spec.tsx`).
+| Component | Attributes |
+|---|---|
+| AIBudgetEnd | `ai-budget-end-first-paragraph`, `-second-paragraph` (root is Modal/ModalBody, which take no data-*) |
+| AgeSlider / ExpandableItem / InvoiceAddress / OpeningTimes / SectionMissing / StatisticsBoard | root slot each (`age-slider`, `expandable-item`, `invoice-address`, `opening-times`, `section-missing`, `statistics-board`) |
+| BusinessListItemWithConnections | `business-list-item-with-connections-container`, `business-list-item-with-connections`, `-details` |
+| DashboardCard | `dashboard-card`, `-title`, `-info`, `-content` |
+| EditableCard | `editable-card`, `-header`, `-actions`, `-content` |
+| GooglePartnerBadge | `google-partner-badge`, `-link`, `-image` |
+| HoverableCard | `hoverable-card` + `data-disabled`, `-header`, `-subtitles`, `-subtitles-separator`, `-content` |
+| IncentiveBox | `incentive-box-container`, `incentive-box`, `-content` |
+| ListingServiceConnectionStatus | `listing-service-connection-status-container`, `listing-service-connection-status`, `-account`, `-avatar`, `-details` |
+| OnboardingWelcomeAnimation | `onboarding-welcome-animation` |
+| OpportunityCard | `opportunity-card`, `-image`, `-content`, `-header`, `-subtitle` |
+| PageContainer | `page-container` (before the props spread: caller wins) |
+| PageSectionRecommended | `page-section-recommended` (styled inner root), `-image`, `-content`, `-title`, `-children` |
+| RecommendationCard | `recommendation-card`, `-content`, `-badge`, `-image`, `-toggle` |
+| UpsellingTrigger | `upselling-trigger-container`, `upselling-trigger`, `-content`, `-illustration` |
+| Tutorial | nothing (root is Modal) |
+Evidence: red 21/23 (2 "no own slot" passes) → green 24/24 (21 files); spec + SectionMissing story green; tsc 0; biome 10 = 10, 0 on new specs; attribute-only stream OK; collision: none.
+Track 1 status: every (a) component in src/core and src/common now has its DOM contract or a recorded reason for none.

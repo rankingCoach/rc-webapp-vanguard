@@ -59,15 +59,16 @@ export const FadeCarouselAuto = <T extends {}>(props: FadeCarouselAutoProps<T>):
   }, [scrollRef.current, isTriggerHovered]);
 
   return (
-    <div className={styles.carousel}>
+    <div data-slot={'fade-carousel-auto'} className={styles.carousel}>
       {/*<div style={beforeStyle} />*/}
       <div
+        data-slot={'fade-carousel-auto-scroll'}
         className={classNames(styles.scrollContainer)}
         style={{ display: 'flex', gap, ...beforeStyle }}
         ref={scrollRef}
       >
         {[...items, ...items].map((item, index) => (
-          <div key={index} className={styles.carouselItem}>
+          <div data-slot={'fade-carousel-auto-item'} key={index} className={styles.carouselItem}>
             <ItemType {...item} />
           </div>
         ))}

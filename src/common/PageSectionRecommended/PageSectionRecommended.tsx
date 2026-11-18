@@ -43,16 +43,16 @@ export const PageSectionRecommended = (props: RecommendationCardProps) => {
     <PageSection testId={testId} background={PageSectionBackground.frostedGlass} {...pageSectionProps}>
       {hasBadge && <RecommendationBadge testId={`${testId}_Badge`} title={badgeText} />}
 
-      <div className={classNames(styles.container, hasBadge ? mt4 : undefined)}>
+      <div data-slot={'page-section-recommended'} className={classNames(styles.container, hasBadge ? mt4 : undefined)}>
         {imageUrl !== undefined && (
-          <div className={classNames(justifyContentCenter, mr4)} style={{ maxWidth: 204, minWidth: 204 }}>
+          <div data-slot={'page-section-recommended-image'} className={classNames(justifyContentCenter, mr4)} style={{ maxWidth: 204, minWidth: 204 }}>
             {typeof imageUrl === 'string' ? <StyledSVG src={imageUrl} /> : <LottieAnimationLoader src={imageUrl} />}
           </div>
         )}
 
-        <div>
+        <div data-slot={'page-section-recommended-content'}>
           {title && (
-            <div className={classNames(mb2)}>
+            <div data-slot={'page-section-recommended-title'} className={classNames(mb2)}>
               {Array.isArray(title) ? (
                 title?.map((textElement: string, index: number) => {
                   return (
@@ -106,7 +106,7 @@ export const PageSectionRecommended = (props: RecommendationCardProps) => {
             </Button>
           )}
 
-          {children && <div className={mt3}>{children}</div>}
+          {children && <div data-slot={'page-section-recommended-children'} className={mt3}>{children}</div>}
         </div>
       </div>
     </PageSection>
