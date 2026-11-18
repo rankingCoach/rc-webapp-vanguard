@@ -23,7 +23,7 @@ import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
 
-import { useLegacyDispatch } from '../../../primitives/react/form/use-legacy-dispatch';
+import { useFieldBinding } from '../../../primitives/react/form/use-field-binding';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { MuiTextField as TextField } from './MuiTextField';
 import { useNumberInputGuard } from './use-number-input-guard';
@@ -837,52 +837,28 @@ export const InputBase = (props: rcInputBaseProps) => {
     onClick && onClick(e);
   };
 
-  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
-  const dispatch = useLegacyDispatch();
-  // const dispatchChange = (formConfig: FormConfigElement, value:any) => {
-  //
-  // }
+  // F1: the form-binding seam is the one place this input writes into its formconfig.
+  const binding = useFieldBinding(formconfig);
   const onChangeFn = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onChange && onChange(e);
 
     let valueInChangeFn: any;
 
     if (formconfig) {
-      // Dispatch value (no dispatch needed for Autocomplete)
-      // console.log(formconfig.setStateValue);
-
-      if (formconfig.setStateValue) {
+      if (binding.canWrite) {
         if (
           formFieldType == 'InputBase' ||
           formFieldType == 'Input' ||
           formFieldType == 'InputNumber' ||
           formFieldType == 'ColorPicker'
         ) {
-          valueInChangeFn = e.currentTarget.value;
-          if (formconfig.valueMappers?.toObject) {
-            valueInChangeFn = formconfig.valueMappers.toObject(valueInChangeFn);
-          }
-
-          // // For ColorPicker, only update state if it's a valid hex color
-          // if (formFieldType == "ColorPicker" && !isValidHexColor(valueInChangeFn)) {
-          //   return; // Don't update state for invalid hex colors
-          // }
-
-          if (formconfig.arrayPosition !== undefined && formconfig.setStateValueArray) {
-            dispatch(formconfig.setStateValueArray({ el: valueInChangeFn, idx: formconfig.arrayPosition }));
-          } else {
-            let value = valueInChangeFn;
-            if (formFieldType == 'InputNumber') {
-              value = parseInt(value);
-            }
-            if (formFieldType == 'ColorPicker') {
-              if (isValidHexColor(value)) {
-                dispatch(formconfig.setStateValue(value));
-              }
-            } else {
-              dispatch(formconfig.setStateValue(value));
-            }
-          }
+          valueInChangeFn = binding.toStored(e.currentTarget.value);
+          // scalar only (array writes store the mapped value as-is): number parsing, hex-only colours
+          binding.write(valueInChangeFn, (value) => {
+            if (formFieldType == 'InputNumber') return { value: parseInt(value as string) };
+            if (formFieldType == 'ColorPicker') return isValidHexColor(value as string) ? { value } : { skip: true };
+            return { value };
+          });
         }
         if (formFieldType == 'Textarea') {
           valueInChangeFn = e.currentTarget.value;
@@ -890,30 +866,14 @@ export const InputBase = (props: rcInputBaseProps) => {
           if (!allowBreakLines) {
             // remove breaklines if text was pasted
             valueInChangeFn = e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, ' ');
-            // dispatch(formconfig.setStateValue(e.currentTarget.value.replace(/(\r\n|\n|\r)/gm, " ")));
           }
 
-          if (formconfig.valueMappers?.toObject) {
-            valueInChangeFn = formconfig.valueMappers.toObject(valueInChangeFn);
-          }
-
-          if (formconfig.arrayPosition !== undefined && formconfig.setStateValueArray) {
-            dispatch(formconfig.setStateValueArray({ el: valueInChangeFn, idx: formconfig.arrayPosition }));
-          } else {
-            dispatch(formconfig.setStateValue(valueInChangeFn));
-          }
+          valueInChangeFn = binding.toStored(valueInChangeFn);
+          binding.write(valueInChangeFn);
         }
         if (formFieldType == 'Select') {
-          valueInChangeFn = e.currentTarget?.value || e.target?.value;
-
-          if (formconfig.valueMappers?.toObject) {
-            valueInChangeFn = formconfig.valueMappers.toObject(valueInChangeFn);
-          }
-          if (formconfig.arrayPosition !== undefined && formconfig.setStateValueArray) {
-            dispatch(formconfig.setStateValueArray({ el: valueInChangeFn, idx: formconfig.arrayPosition }));
-          } else {
-            dispatch(formconfig.setStateValue(valueInChangeFn));
-          }
+          valueInChangeFn = binding.toStored(e.currentTarget?.value || e.target?.value);
+          binding.write(valueInChangeFn);
         }
       }
 
@@ -930,7 +890,7 @@ export const InputBase = (props: rcInputBaseProps) => {
         formconfig._inputRef.current.value = e.target?.value ?? '';
       }
       // Form Callback
-      formconfig?._onChange && formconfig?._onChange();
+      binding.notifyChange();
     } else {
       valueInChangeFn = e.currentTarget?.value ?? '';
     }
