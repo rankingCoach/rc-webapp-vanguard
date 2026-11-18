@@ -280,3 +280,10 @@ Evidence: new specs 13 files; red 22/24 with the implementation removed (the 2 p
 6. Consequence: docs/ must be regenerated in the same commit whenever slots, props, exports or exports-meta change, or the scripts spec fails (also on A's side after a merge).
 7. Needed config change, for A at merge (not applied by B): package.json `files` += `"docs"`, `"skills"`.
 8. Later work, not started: runtime agent bridge (snapshot/act/query, WebMCP).
+
+### Track 2 review round (watchdog) and follow-up commit
+1. DECIDED (watchdog): docs are build output, gitignored (`/docs/`), generated during the library build; SKILL.md stays committed. Spec generates into temp dirs (determinism, links, slot truth via the generator's source manifest, content rules, SKILL.md); the stale-committed check is gone. Wiring (package.json build step, `files`, tarball check) is A's.
+2. Examples now come from story `args`, not story source: `import { X } from '@rankingcoach/vanguard'` + JSX; stories with `render`, spreads or non-literal args are skipped; `on*`/`testId`/`data-*` args dropped; ≤3 distinct per component. 27 pages get examples (most stories use helper constants or custom renders, so they are skipped rather than pasting test code). Spec forbids relative imports, `storybook`, `play:`, `expect(` and `src/` in pages; on the previous output that rule finds 187 violating examples in 100 pages.
+3. `Source: src/...` line dropped. MUI note per component: plan §23 overrides for Input, Textarea, Select, ToggleButton(Group), PopoverPopper, MenuItem; folder `@mui` import for the rest.
+4. SKILL.md: save button is Vanguard `Button htmlType="submit"` (+ `isLoading`), with the useFormStatus child pattern; line added: string labels are already rendered through Text and translated.
+5. generate-exports-props.js CLI (`node scripts/generate-exports-props.js`): base 13dfd71 vs now, 267 = 267 files, 0 differences beyond the two additive prop fields.

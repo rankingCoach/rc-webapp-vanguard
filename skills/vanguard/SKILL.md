@@ -23,8 +23,9 @@ Vanguard's CSS wins or loses equal-specificity ties by position. Keep: app entry
 ## Text and copy
 
 1. All user-facing copy goes through `<Text>`; it translates by default (`translate={false}` for literal text) and takes `type` (`TextTypes`), `fontWeight` (`FontWeights`), `color` (a `--fn-*` token name).
-2. Highlighting search terms: `<Text highlightWords={['seo']} highlightMode="background">`. `TextHighlighted` is a deprecated wrapper of the same thing.
-3. Colours, spacing and radii come from `--fn-*` CSS custom properties; do not hard-code hex values.
+2. `Button` and other components that take a string label (`label`, `title`, `text`, `children` typed as string) already render it through `Text` and translate it: pass the string, do not wrap it in `<Text>`.
+3. Highlighting search terms: `<Text highlightWords={['seo']} highlightMode="background">`. `TextHighlighted` is a deprecated wrapper of the same thing.
+4. Colours, spacing and radii come from `--fn-*` CSS custom properties; do not hard-code hex values.
 
 ## Styling and testing: the DOM contract
 
@@ -38,14 +39,18 @@ Vanguard's CSS wins or loses equal-specificity ties by position. Keep: app entry
 New forms keep their values in a per-form store, no Redux slice or Provider:
 
 ```tsx
-import { Form, Input, Select, useFormStore } from '@rankingcoach/vanguard';
+import { Button, Form, Input, Select, useFormStore } from '@rankingcoach/vanguard';
 import { useFormStatus } from 'react-dom';
 
 type Values = { name: string; plan: string };
 
 const SaveButton = () => {
   const { pending } = useFormStatus(); // must be a child of <Form action>
-  return <button type="submit" disabled={pending}>Save</button>;
+  return (
+    <Button htmlType="submit" disabled={pending} isLoading={pending}>
+      Save
+    </Button>
+  );
 };
 
 export const ProfileForm = () => {

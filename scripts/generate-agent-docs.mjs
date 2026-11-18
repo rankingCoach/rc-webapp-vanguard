@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
  * Generates the agent-readable docs shipped in the package: docs/llms.txt (index) and docs/components/<Name>.md (one
- * page per value export of src/index.ts). Inputs, all in the repo: src/index.ts and src/index-wordpress.ts (export
- * lists), src/exports-meta/*.json (summaries), the TS compiler path of scripts/generate-exports-props.js (props), each
- * component's stories/*.story.tsx (examples) and data-slot literals in its source (DOM contract).
+ * page per value export of src/index.ts). Build output (gitignored), produced during the library build so it ships
+ * in the tarball. Inputs, all in the repo: src/index.ts and src/index-wordpress.ts (export lists),
+ * src/exports-meta/*.json (summaries), the TS compiler path of scripts/generate-exports-props.js (props), the `args`
+ * of each component's stories/*.story.tsx (usage examples) and data-slot literals in its source (DOM contract).
  *
- * Deterministic: sorted, no timestamps, no absolute paths. scripts/_agent-docs.spec.ts regenerates and diffs.
+ * Deterministic: sorted, no timestamps, no absolute paths. Checked by scripts/_agent-docs.spec.ts.
  *
  * Usage: node scripts/generate-agent-docs.mjs [outDir]   (default: docs)
  */
@@ -17,8 +18,6 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PKG = '@rankingcoach/vanguard';
-const MAX_EXAMPLE_LINES = 40;
-const MAX_EXAMPLES = 2;
 const MAX_TYPE_LENGTH = 90;
 
 const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
@@ -93,21 +92,119 @@ const usesMui = (file) => {
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 const INTERNAL_HOST_RE = /\b[a-z0-9.-]*rankingcoach\.(?:com|de|net|io|local)\b/i;
 const ABS_PATH_RE = /(?:\/Users\/|\/home\/|[A-Z]:\\)/;
+const MAX_ARGS_EXAMPLES = 3;
 
-/** Story examples for the component whose folder name equals its export name. */
-const examplesFor = (name, file) => {
+/** JSX attribute for one story arg, or null when the value is not a plain literal (then the story is skipped). */
+const attrFor = (ts, key, node, exported, uses) => {
+  const lit = (n) => {
+    if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) return JSON.stringify(n.text);
+    if (ts.isNumericLiteral(n)) return n.text;
+    if (n.kind === ts.SyntaxKind.TrueKeyword) return 'true';
+    if (n.kind === ts.SyntaxKind.FalseKeyword) return 'false';
+    if (n.kind === ts.SyntaxKind.NullKeyword) return 'null';
+    if (ts.isPrefixUnaryExpression(n) && ts.isNumericLiteral(n.operand)) return `-${n.operand.text}`;
+    if (ts.isPropertyAccessExpression(n) && ts.isIdentifier(n.expression) && exported.has(n.expression.text)) {
+      uses.add(n.expression.text);
+      return `${n.expression.text}.${n.name.text}`;
+    }
+    if (ts.isArrayLiteralExpression(n)) {
+      const items = n.elements.map(lit);
+      return items.includes(null) ? null : `[${items.join(', ')}]`;
+    }
+    if (ts.isObjectLiteralExpression(n)) {
+      const items = n.properties.map((pr) => {
+        if (!ts.isPropertyAssignment(pr)) return null;
+        const v = lit(pr.initializer);
+        const k = ts.isIdentifier(pr.name) ? pr.name.text : ts.isStringLiteral(pr.name) ? JSON.stringify(pr.name.text) : null;
+        return v === null || k === null ? null : `${k}: ${v}`;
+      });
+      return items.includes(null) ? null : `{ ${items.join(', ')} }`;
+    }
+    return null;
+  };
+  const v = lit(node);
+  if (v === null) return null;
+  if (v === 'true') return key;
+  if ((ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) && !node.text.includes('"')) return `${key}=${v}`;
+  return `${key}={${v}}`;
+};
+
+/**
+ * Usage examples generated from story `args` (not story source): `import { X } from '<pkg>'` plus the JSX the args
+ * describe. Stories with a custom `render`, spread args or non-literal values are skipped; event-handler and test-id
+ * args (`on*`, `testId`) are dropped. At most three examples with distinct args.
+ */
+const examplesFor = (name, file, exported) => {
   const dir = path.dirname(file);
   if (path.basename(dir) !== name) return [];
   const storyDir = path.join(dir, 'stories');
   if (!fs.existsSync(storyDir)) return [];
-  return fs
-    .readdirSync(storyDir)
-    .filter((f) => f.endsWith('.story.tsx'))
-    .sort()
-    .map((f) => ({ file: rel(path.join(storyDir, f)), code: read(path.join(storyDir, f)).trim() }))
-    .filter(({ code }) => code.split('\n').length <= MAX_EXAMPLE_LINES)
-    .filter(({ code }) => !EMAIL_RE.test(code) && !INTERNAL_HOST_RE.test(code) && !ABS_PATH_RE.test(code))
-    .slice(0, MAX_EXAMPLES);
+  const ts = require('typescript5');
+  const seen = new Set();
+  const out = [];
+  for (const f of fs.readdirSync(storyDir).filter((x) => x.endsWith('.story.tsx')).sort()) {
+    const src = read(path.join(storyDir, f));
+    const sf = ts.createSourceFile(f, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    for (const stmt of sf.statements) {
+      if (!ts.isVariableStatement(stmt) || !stmt.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
+      for (const decl of stmt.declarationList.declarations) {
+        const init = decl.initializer;
+        if (!init || !ts.isObjectLiteralExpression(init)) continue;
+        const keys = init.properties.map((p) => (p.name && ts.isIdentifier(p.name) ? p.name.text : '?'));
+        if (keys.includes('render') || init.properties.some((p) => ts.isSpreadAssignment(p))) continue;
+        const argsProp = init.properties.find((p) => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === 'args');
+        if (!argsProp || !ts.isObjectLiteralExpression(argsProp.initializer)) continue;
+        const uses = new Set([name]);
+        const attrs = [];
+        let children = null;
+        let ok = true;
+        for (const p of argsProp.initializer.properties) {
+          if (!ts.isPropertyAssignment(p)) {
+            ok = false;
+            break;
+          }
+          const key = ts.isIdentifier(p.name) ? p.name.text : ts.isStringLiteral(p.name) ? p.name.text : null;
+          if (!key || /^on[A-Z]/.test(key) || key === 'testId' || key.startsWith('data-')) continue;
+          if (key === 'children' && (ts.isStringLiteral(p.initializer) || ts.isNoSubstitutionTemplateLiteral(p.initializer))) {
+            children = p.initializer.text;
+            continue;
+          }
+          if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)) {
+            ok = false;
+            break;
+          }
+          const a = attrFor(ts, key, p.initializer, exported, uses);
+          if (a === null) {
+            ok = false;
+            break;
+          }
+          attrs.push(a);
+        }
+        if (!ok) continue;
+        const open = [name, ...attrs].join(' ');
+        const jsx = children !== null ? `<${open}>${children}</${name}>` : `<${open} />`;
+        if (seen.has(jsx) || EMAIL_RE.test(jsx) || INTERNAL_HOST_RE.test(jsx) || ABS_PATH_RE.test(jsx)) continue;
+        seen.add(jsx);
+        out.push(`import { ${[...uses].sort().join(', ')} } from '${PKG}';\n\n${jsx}`);
+        if (out.length >= MAX_ARGS_EXAMPLES) return out;
+      }
+    }
+  }
+  return out;
+};
+
+/**
+ * Plan §23 ("Paths still on MUI") is more precise than a folder-level `@mui` import for components that are partly on
+ * the own core. `null` = fully on the own core (no note even if the folder still imports MUI for a type or a fallback).
+ */
+const MUI_NOTES = {
+  Input: 'Outlined text field: own core. Filled/standard variants (`textFieldProps.variant`) and a custom `inputComponent`: pending rebuild (MUI).',
+  Textarea: 'Outlined multiline field: own core. Filled/standard variants: pending rebuild (MUI).',
+  Select: 'Outlined select and its menu: own core. Native select (`SelectProps.native`) and filled/standard variants: pending rebuild (MUI).',
+  ToggleButton: null,
+  ToggleButtonGroup: null,
+  PopoverPopper: 'Positioning: own core (own Popper). The surrounding popper shell: pending rebuild (MUI).',
+  MenuItem: 'Inside Select and Menu it renders the own-core menu option; standalone rendering: pending rebuild (MUI).',
 };
 
 const kindOf = (r) => {
@@ -146,6 +243,7 @@ const propsSection = (r) => {
 
 export const buildPages = (records, wordpress) => {
   const pages = new Map();
+  const exported = new Set(records.map((r) => r.name));
   for (const r of records) {
     const file = path.join(ROOT, r.from);
     const meta = loadMeta(r.name);
@@ -153,11 +251,16 @@ export const buildPages = (records, wordpress) => {
     const lines = [`# ${r.name}`, ''];
     if (meta?.summary) lines.push(meta.summary, '');
     lines.push(`- Kind: ${kind}`, `- Import: \`import { ${r.name} } from '${PKG}';\``);
-    lines.push(`- WordPress bundle: ${wordpress.has(r.name) ? 'yes' : 'no'}`, `- Source: \`${r.from}\``);
+    lines.push(`- WordPress bundle: ${wordpress.has(r.name) ? 'yes' : 'no'}`);
     if (meta?.keywords?.length) lines.push(`- Keywords: ${meta.keywords.join(', ')}`);
     lines.push('');
     if (kind === 'component') {
-      if (usesMui(file)) lines.push('> Internals pending rebuild: this component still renders MUI internally. Its DOM contract (data-slot parts) is not final yet; style it through the props and classes it documents.', '');
+      const note = Object.hasOwn(MUI_NOTES, r.name)
+        ? MUI_NOTES[r.name]
+        : usesMui(file)
+          ? 'Internals pending rebuild: this component still renders MUI internally. Its DOM contract (data-slot parts) is not final yet; style it through the props and classes it documents.'
+          : null;
+      if (note) lines.push(`> ${note}`, '');
       const { slots, states } = scrapeSlots(file);
       lines.push('## DOM contract', '');
       if (slots.length) {
@@ -175,10 +278,10 @@ export const buildPages = (records, wordpress) => {
       for (const x of related) lines.push(`- ${x.id ? `\`${x.id}\`: ` : ''}${esc(x.reason)}`);
       lines.push('');
     }
-    const ex = kind === 'component' ? examplesFor(r.name, file) : [];
+    const ex = kind === 'component' ? examplesFor(r.name, file, exported) : [];
     if (ex.length) {
       lines.push('## Examples', '');
-      for (const e of ex) lines.push(`From \`${e.file}\`:`, '', '```tsx', e.code, '```', '');
+      for (const e of ex) lines.push('```tsx', e, '```', '');
     }
     pages.set(r.name, `${lines.join('\n').trimEnd()}\n`);
   }
@@ -237,7 +340,7 @@ export const generate = (outDir) => {
   fs.mkdirSync(path.join(outDir, 'components'), { recursive: true });
   fs.writeFileSync(path.join(outDir, 'llms.txt'), buildLlms(records, wordpress));
   for (const [name, md] of pages) fs.writeFileSync(path.join(outDir, 'components', `${name}.md`), md);
-  return { count: pages.size };
+  return { count: pages.size, sources: Object.fromEntries(records.map((r) => [r.name, r.from])) };
 };
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
