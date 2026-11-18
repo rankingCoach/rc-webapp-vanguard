@@ -1,5 +1,6 @@
 import { muiCompatLast } from './config/mui-compat-last';
 import { withBundledUseClientFilter } from './config/rollup-onwarn';
+import { thirdPartyNotices } from './config/third-party-notices';
 import { defineConfig, build, Connect, Plugin, UserConfig, mergeConfig } from "vite";
 import fs from "fs";
 import react from "@vitejs/plugin-react";
@@ -48,6 +49,8 @@ export const BaseViteConfig: UserConfig = {
     vitePluginAssetAnalyzer(),
     // D15: MUI-ported CSS appended last to vanguard.css (default and WordPress builds).
     muiCompatLast(),
+    // Licence notices of every bundled npm package (the minifier drops legal comments).
+    thirdPartyNotices(),
     // react(),
     viteTsconfigPaths(),
     // customConfigPlugin(),

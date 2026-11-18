@@ -14,7 +14,7 @@ try {
 }
 
 // Clean dist-wordpress to keep only essential files for WordPress build
-const keepPatterns = ['index.js'];
+const keepPatterns = ['index.js', 'THIRD_PARTY_NOTICES.txt']; // licence notices of the bundled packages (MIT)
 const keepDirPatterns = ['types'];
 
 function shouldKeep(filePath) {
