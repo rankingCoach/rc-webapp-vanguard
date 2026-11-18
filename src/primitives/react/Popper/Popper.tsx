@@ -69,6 +69,15 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
         ...options.computeStyles,
       }),
     );
+    // popper applyStyles, in its attribute order (hide's main-phase attributes, then computeStyles' placement):
+    // true → present (""), false / disabled → absent.
+    for (const [name, on] of [
+      ['data-popper-reference-hidden', result.hide?.isReferenceHidden],
+      ['data-popper-escaped', result.hide?.hasPopperEscaped],
+    ] as const) {
+      if (on) node.setAttribute(name, '');
+      else node.removeAttribute(name);
+    }
     node.setAttribute('data-popper-placement', result.placement);
     const arrowEl = options.input.arrow?.element as HTMLElement | undefined;
     if (arrowEl && result.arrow) {

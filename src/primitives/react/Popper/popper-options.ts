@@ -92,6 +92,7 @@ export const resolvePopperOptions = (props: {
               tetherOffset: prevent.tetherOffset,
             },
       arrow: arrow && arrow.element ? { element: arrow.element as Element, padding: arrow.padding } : undefined,
+      hide: opts('hide') !== false,
     },
     computeStyles: {
       gpuAcceleration: cs.gpuAcceleration ?? true,

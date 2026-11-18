@@ -244,12 +244,14 @@ export const MatchesPopperJsInTheDom: Story = {
     const { resolvePopperOptions } = await import('../../../primitives/react/Popper/popper-options');
     const mismatches: string[] = [];
     let count = 0;
+    const hideSeen = { referenceHidden: 0, escaped: 0 };
     const containers: Container[] = ['none', 'scroll', 'hidden', 'transform', 'scroll-in-transform'];
     const anchors = [
       { x: 260, y: 200 },
       { x: 150, y: 95 },
       { x: 470, y: 330 },
       { x: 140, y: 380 },
+      { x: 640, y: 20 },
     ];
     for (const container of containers)
       for (const portal of [true, false])
@@ -282,6 +284,12 @@ export const MatchesPopperJsInTheDom: Story = {
                 await instance.update();
                 const expected = instance.state.modifiersData.popperOffsets as { x: number; y: number };
                 const expectedPlacement = instance.state.placement;
+                const expectedHide = instance.state.modifiersData.hide as {
+                  isReferenceHidden: boolean;
+                  hasPopperEscaped: boolean;
+                };
+                if (expectedHide.isReferenceHidden) hideSeen.referenceHidden++;
+                if (expectedHide.hasPopperEscaped) hideSeen.escaped++;
                 instance.destroy();
                 dom.floating.removeAttribute('style');
                 Object.assign(dom.floating.style, {
@@ -295,12 +303,14 @@ export const MatchesPopperJsInTheDom: Story = {
                 });
                 const actual = computeAnchored(dom.anchor, dom.floating, { ...resolved, altBoundary: !portal });
                 const ok =
+                  actual.hide?.isReferenceHidden === expectedHide.isReferenceHidden &&
+                  actual.hide?.hasPopperEscaped === expectedHide.hasPopperEscaped &&
                   actual.placement === expectedPlacement &&
                   Math.abs(actual.offsetX - expected.x) < 1e-6 &&
                   Math.abs(actual.offsetY - expected.y) < 1e-6;
                 if (!ok)
                   mismatches.push(
-                    `${container}/${portal ? 'portal' : 'inline'}/${strategy}/${anchorPos.x},${anchorPos.y}/${placement}/${mods[0]?.name ?? '-'}: popper ${JSON.stringify({ ...expected, p: expectedPlacement })} own ${JSON.stringify({ x: actual.offsetX, y: actual.offsetY, p: actual.placement })}`,
+                    `${container}/${portal ? 'portal' : 'inline'}/${strategy}/${anchorPos.x},${anchorPos.y}/${placement}/${mods[0]?.name ?? '-'}: popper ${JSON.stringify({ ...expected, p: expectedPlacement })} own ${JSON.stringify({ x: actual.offsetX, y: actual.offsetY, p: actual.placement })} hide ${JSON.stringify(expectedHide)} vs ${JSON.stringify(actual.hide)}`,
                   );
                 dom.cleanup();
               }
@@ -309,5 +319,7 @@ export const MatchesPopperJsInTheDom: Story = {
       mismatches: [],
       n: 0,
     });
+    // The grid exercises both hide flags (popper.js's own verdicts), not only the all-visible case.
+    await expect(hideSeen.referenceHidden > 0 && hideSeen.escaped > 0).toBe(true);
   },
 };

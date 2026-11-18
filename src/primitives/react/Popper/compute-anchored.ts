@@ -43,6 +43,16 @@ export const computeAnchored = (
         : floating;
   const boundary = getClippingRect(clipElement, options.strategy);
   const autoBoundary = clipElement === floating ? boundary : getClippingRect(floating, options.strategy);
+  // popper `hide`: detectOverflow against the reference's own clipping parents (a virtual anchor uses its
+  // contextElement, else the floating element's document element).
+  const referenceElement =
+    'nodeType' in anchor
+      ? (anchor as Element)
+      : 'contextElement' in anchor && anchor.contextElement
+        ? anchor.contextElement
+        : floating.ownerDocument.documentElement;
+  const referenceBoundary =
+    referenceElement === clipElement ? boundary : getClippingRect(referenceElement, options.strategy);
   const arrowEl = options.input.arrow?.element as HTMLElement | null | undefined;
   const arrowParent = arrowEl?.offsetParent as HTMLElement | null | undefined;
   const composite = getCompositeRect(anchor, getOffsetParent(floating), fixed);
@@ -57,6 +67,8 @@ export const computeAnchored = (
     offset: options.input.offset,
     flip: options.input.flip,
     preventOverflow: options.input.preventOverflow,
+    hide: options.input.hide,
+    referenceBoundary,
     arrow: arrowEl
       ? {
           width: arrowEl.offsetWidth,
