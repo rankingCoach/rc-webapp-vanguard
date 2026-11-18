@@ -1,5 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Button, Form, Input, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
+import { Button, Form, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { render } from '@testing-library/react';
@@ -108,6 +108,23 @@ describe('installed Vanguard bundle', () => {
     expect(change.mock.calls[0][1]).toMatchObject({ value: 'banana' });
     expect(screen.queryByRole('listbox')).toBeNull();
     expect(screen.getByRole('combobox').textContent).toBe('Banana');
+  });
+  // Popover runs on Vanguard's own Tooltip in both bundles (WordPress exports it): hover opens, leave closes.
+  it('opens the installed Popover on hover with an own-core tooltip', async () => {
+    renderWithProviders(
+      <Popover message="Fixture tip">
+        <button type="button">Fixture trigger</button>
+      </Popover>,
+    );
+    const wrapper = document.querySelector('[data-slot="popover-trigger"]') as HTMLElement;
+    expect(wrapper).not.toBeNull();
+    fireEvent.mouseEnter(wrapper);
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip.hasAttribute('data-vg-core')).toBe(true);
+    expect(tooltip.textContent).toContain('Fixture tip');
+    expect(wrapper.getAttribute('aria-labelledby')).toBe(tooltip.id);
+    fireEvent.mouseLeave(wrapper);
+    expect(wrapper.getAttribute('aria-labelledby')).toBeNull();
   });
 });
 
