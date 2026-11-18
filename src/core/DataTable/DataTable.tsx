@@ -1,4 +1,5 @@
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import React, { createContext, useContext } from 'react';
 
 import styles from './DataTable.module.scss';
@@ -50,6 +51,7 @@ export const DataTable = (props: DataTableProps) => {
       className={classNames(styles.container, 'vanguard-data-table-container', containerClassName)}
       style={maxHeight ? { maxHeight } : undefined}
       data-testid={`${testId}-container`}
+      data-slot={'data-table-container'}
     >
       <table
         className={classNames(
@@ -62,6 +64,8 @@ export const DataTable = (props: DataTableProps) => {
         )}
         style={minWidth ? { minWidth } : undefined}
         data-testid={testId}
+        data-slot={'data-table'}
+        data-size={size}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
       >
@@ -78,19 +82,25 @@ export interface DataTableSectionProps {
 
 export const DataTableHead = ({ children, className }: DataTableSectionProps) => (
   <SectionContext.Provider value={'head'}>
-    <thead className={classNames(styles.head, className)}>{children}</thead>
+    <thead data-slot={'data-table-head'} className={classNames(styles.head, className)}>
+      {children}
+    </thead>
   </SectionContext.Provider>
 );
 
 export const DataTableBody = ({ children, className }: DataTableSectionProps) => (
   <SectionContext.Provider value={'body'}>
-    <tbody className={className}>{children}</tbody>
+    <tbody data-slot={'data-table-body'} className={className}>
+      {children}
+    </tbody>
   </SectionContext.Provider>
 );
 
 export const DataTableFoot = ({ children, className }: DataTableSectionProps) => (
   <SectionContext.Provider value={'foot'}>
-    <tfoot className={classNames(styles.foot, className)}>{children}</tfoot>
+    <tfoot data-slot={'data-table-foot'} className={classNames(styles.foot, className)}>
+      {children}
+    </tfoot>
   </SectionContext.Provider>
 );
 
@@ -117,6 +127,8 @@ export const DataTableRow = (props: DataTableRowProps) => {
       aria-selected={selected || undefined}
       onClick={onClick}
       data-testid={testId}
+      data-slot={'data-table-row'}
+      data-selected={dataFlag(selected)}
     >
       {children}
     </tr>
@@ -156,6 +168,7 @@ export const DataTableCell = (props: DataTableCellProps) => {
       rowSpan={rowSpan}
       title={title}
       data-testid={testId}
+      data-slot={'data-table-cell'}
       className={classNames(
         styles.cell,
         isHeader ? styles.headerCell : undefined,

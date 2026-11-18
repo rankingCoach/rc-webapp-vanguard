@@ -19,6 +19,8 @@ export const TagList = (props: Props) => {
 
   return (
     <ComponentContainer
+      data-slot={'tag-list'}
+      data-variant={variant}
       className={classNames(`TagList-container ${className ?? ''} ${variant === 'tag' ? gap1 : gap0_5}`)}
     >
       {tags &&

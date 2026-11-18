@@ -1,4 +1,5 @@
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { Text, TextProps } from '@vanguard/Text/Text';
@@ -43,6 +44,8 @@ export const Link = (props: LinkProps) => {
       href={href}
       target={target}
       className={classNames(styles.link, disabled ? styles.disabled : '')}
+      data-slot={'link'}
+      data-disabled={dataFlag(disabled)}
       rel="noreferrer"
       role={'link'}
       onClick={(e) => {

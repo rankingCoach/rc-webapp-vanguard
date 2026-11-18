@@ -62,10 +62,10 @@ export const Rating = (props: RatingProps) => {
   };
 
   return (
-    <ComponentContainer className={classNames(className)}>
-      <div className={classNames(styles.container, valueAlign == 'top' ? styles.ratingAlignTop : '')}>
+    <ComponentContainer data-slot={'rating-container'} className={classNames(className)}>
+      <div data-slot={'rating'} className={classNames(styles.container, valueAlign == 'top' ? styles.ratingAlignTop : '')}>
         {valueAlign && valueAlign == 'left' ? (
-          <span className={classNames()} style={getStyles()}>
+          <span data-slot={'rating-value'} className={classNames()} style={getStyles()}>
             {floatValue}
           </span>
         ) : null}
@@ -84,7 +84,7 @@ export const Rating = (props: RatingProps) => {
           size={props.size ?? 24}
         />
         {valueAlign && valueAlign == 'right' ? (
-          <span className={styles.ratingValue} style={getStyles()}>
+          <span data-slot={'rating-value'} className={styles.ratingValue} style={getStyles()}>
             {floatValue}
           </span>
         ) : null}

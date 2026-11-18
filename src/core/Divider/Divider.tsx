@@ -8,5 +8,5 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Divider = (props: Props) => {
   const { className = '', ...rest } = props;
-  return <div className={`rc-divider ${className}`} {...rest} />;
+  return <div data-slot={'divider'} className={`rc-divider ${className}`} {...rest} />;
 };

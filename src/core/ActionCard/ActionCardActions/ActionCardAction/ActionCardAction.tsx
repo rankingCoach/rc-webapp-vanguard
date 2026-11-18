@@ -1,3 +1,4 @@
+import { dataFlag } from '@helpers/data-attributes';
 import { classNames } from '@helpers/classNames';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -66,6 +67,9 @@ export const ActionCardAction = (props: ActionCardActionProps) => {
   // };
   return (
     <div
+      data-slot={'action-card-action'}
+      data-disabled={dataFlag(disabled)}
+      data-loading={dataFlag(loading)}
       data-testid={testId}
       style={{ width: `${width}%` }}
       onClick={() => {
@@ -82,6 +86,7 @@ export const ActionCardAction = (props: ActionCardActionProps) => {
       <RenderIcon shouldRender={!loading} name={iconRight} opts={{ testId: 'iconRight', parentTestId: testId }} />
       {loading && (
         <div
+          data-slot={'action-card-action-loader'}
           role={'spinbutton'}
           data-testid={parseTestId('loadingSpinner')}
           className={classNames(loading ? styles.loaderSpinner : '')}

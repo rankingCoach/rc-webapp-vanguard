@@ -1,6 +1,7 @@
+import { DataAttributes, pickDataAttributes } from '@helpers/data-attributes';
 import React, { MouseEventHandler, MutableRefObject } from 'react';
 
-export interface ComponentContainerProps {
+export interface ComponentContainerProps extends DataAttributes {
   children: React.ReactNode;
   className?: string;
   innerRef?: MutableRefObject<HTMLDivElement | null> | ((node?: Element | null | undefined) => void);
@@ -23,6 +24,7 @@ export const ComponentContainer = (props: ComponentContainerProps) => {
       style={style}
       onClick={onClick}
       className={className}
+      {...pickDataAttributes(props)}
     >
       {children}
     </div>

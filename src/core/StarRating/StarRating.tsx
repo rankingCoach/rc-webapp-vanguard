@@ -1,3 +1,4 @@
+import { dataFlag } from '@helpers/data-attributes';
 import { useHover } from '@custom-hooks/use-hover';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -71,7 +72,7 @@ export const StarRating = (props: StarRatingProps) => {
   }, [readonly]);
 
   return (
-    <div className={starRatingClassName} ref={container} data-testid="star-rating" data-rating={value}>
+    <div data-slot={'star-rating'} data-readonly={dataFlag(readonly)} className={starRatingClassName} ref={container} data-testid="star-rating" data-rating={value}>
       {[...Array(maxNumberOfStars)].map((item, index) => {
         return (
           <Star

@@ -25,7 +25,7 @@ export const AiGlow = (props: AiGlowProps) => {
   } as React.CSSProperties;
 
   return (
-    <div className={classNames(styles.grad, className)} style={style}>
+    <div data-slot={'ai-glow'} className={classNames(styles.grad, className)} style={style}>
       {children}
     </div>
   );

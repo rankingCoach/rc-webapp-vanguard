@@ -37,8 +37,8 @@ export const TableHeader = (props: TableHeaderProps) => {
   const columnsCount = columns?.length;
 
   return (
-    <thead className={classNames('vanguard-table-head', 'table-head', className, styles.tableHead)}>
-      <tr>
+    <thead data-slot={'table-header'} className={classNames('vanguard-table-head', 'table-head', className, styles.tableHead)}>
+      <tr data-slot={'table-row'}>
         {columns?.length
           ? columns.map((item: any, i: number) => {
               const orderClass = ''; //order && order === item.alias ? styles.columnSortDesc : styles.columnSortAsc;
@@ -53,6 +53,7 @@ export const TableHeader = (props: TableHeaderProps) => {
               const ariaSort = isSortable ? (sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : 'none') : undefined;
               return (
                 <th
+                  data-slot={'table-header-cell'}
                   key={i}
                   scope={'col'}
                   aria-sort={ariaSort}
@@ -70,6 +71,7 @@ export const TableHeader = (props: TableHeaderProps) => {
                   <div className={classNames(centerClass, endClass)}>
                     {isSortable ? (
                       <button
+                        data-slot={'table-sort-button'}
                         type={'button'}
                         className={classNames('vanguard-table-sort-button', styles.sortButton)}
                         data-testid={`table-sort-${item.alias}`}

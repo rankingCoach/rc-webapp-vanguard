@@ -1,3 +1,4 @@
+import { dataFlag } from '@helpers/data-attributes';
 import { alignItemsCenter, dFlex, ml0_5, mr0_5 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { Icon } from '@vanguard/Icon/Icon';
@@ -48,6 +49,8 @@ export const CtaWithIcon = (props: CtaWithIconProps) => {
 
   return (
     <div
+      data-slot={'cta-with-icon'}
+      data-disabled={dataFlag(disabled)}
       onClick={onClickHandler}
       className={classNames(dFlex, alignItemsCenter, className, styles.container, disabled ? styles.disabled : '')}
     >

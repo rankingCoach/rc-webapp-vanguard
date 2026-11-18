@@ -350,8 +350,8 @@ export const Table = (props: TableProps) => {
   return (
     <TableProvider.Provider value={{ ...context }}>
       {toolbarView}
-      <ComponentContainer className={classNames(styles.container, containerClassName)} testId={testId}>
-        <table className={classNames(styles.table, className)}>
+      <ComponentContainer data-slot={'table-container'} className={classNames(styles.container, containerClassName)} testId={testId}>
+        <table data-slot={'table'} className={classNames(styles.table, className)}>
           <Render if={columnsData.length > 0}>
             <TableHeader
               order={columnsData[0]?.alias}

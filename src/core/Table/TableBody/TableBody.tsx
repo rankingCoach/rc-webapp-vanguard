@@ -59,11 +59,11 @@ export const TableBody = (props: TableBodyProps) => {
         hasGreyBody={hasGreyBody}
       />
       <Render if={hasBlurredRows}>
-        <tbody className={classNames(styles.tableBody, styles.blurredTable)}>
+        <tbody data-slot={'table-body-blurred'} className={classNames(styles.tableBody, styles.blurredTable)}>
           <Render if={!!blurredMessage && !UPSELLING_LINKS_DISABLED && !hideBlurredMessage}>
-            <tr className={styles.blurredMessageContainer}>
-              <td className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter)} colSpan={columnsCount}>
-                <div className={styles.blurredMessage}>
+            <tr data-slot={'table-blurred-message-row'} className={styles.blurredMessageContainer}>
+              <td data-slot={'table-blurred-message-cell'} className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter)} colSpan={columnsCount}>
+                <div data-slot={'table-blurred-message'} className={styles.blurredMessage}>
                   <Text replacements={replacements} type={TextTypes.textIntro} fontWeight={FontWeights.medium}>
                     {blurredMessage}
                   </Text>

@@ -27,12 +27,12 @@ export const RatingStarsAndProgressBar = (props: RatingStarsAndProgressBarProps)
   };
 
   return (
-    <ComponentContainer className={classNames(styles.starRatingRow)} testId={testId}>
-      <div className={classNames(styles.starRating)}>
+    <ComponentContainer data-slot={'rating-stars-and-progress-bar'} className={classNames(styles.starRatingRow)} testId={testId}>
+      <div data-slot={'rating-stars-and-progress-bar-stars'} className={classNames(styles.starRating)}>
         <StarRating size={11} value={5} maxNumberOfStars={maxNumberOfStars} color={'--n300'} bgColor={'--n300'} />
       </div>
 
-      <div className={classNames(styles.ratingDistributionProgressBar)}>
+      <div data-slot={'rating-stars-and-progress-bar-progress'} className={classNames(styles.ratingDistributionProgressBar)}>
         <ProgressBar
           color={progressValueColor}
           progressValue={calculateProgressValue(ratingsNumber)}

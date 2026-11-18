@@ -103,7 +103,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
 
   if (variant === 'glass') {
     return (
-      <div className={classNames(className, styles.glass)}>
+      <div className={classNames(className, styles.glass)} data-slot={'status-badge'} data-variant={variant}>
         <Text
           type={TextTypes.textCaption}
           color={'--fn-fg-on-dark'}
@@ -122,7 +122,12 @@ export const StatusBadge = (props: StatusBadgeProps) => {
   const color = glowColor ? `var(${glowColor})` : `var(${iconColor}-rgb)`;
   if (variant === 'big') {
     return (
-      <div className={classNames(className, styles.statusIcon)}>
+      <div
+        className={classNames(className, styles.statusIcon)}
+        data-slot={'status-badge'}
+        data-variant={variant}
+        data-status={status}
+      >
         <div
           className={styles.gradient}
           style={{
@@ -165,6 +170,10 @@ export const StatusBadge = (props: StatusBadgeProps) => {
         iconVariant === 'none' ? styles.statusBadgeNoneIcon : undefined,
         isCompact ? styles.compact : undefined,
       )}
+      data-slot={'status-badge'}
+      data-variant={variant}
+      data-size={size}
+      data-status={status}
       style={{
         backgroundColor: `var(${bgColor})`,
         border: borderColor ? `1px solid var(${borderColor})` : '',
@@ -196,7 +205,7 @@ export const StatusBadge = (props: StatusBadgeProps) => {
         {text}
       </Text>
       <AnimatedConditional condition={hasNumberValue}>
-        <div className={classNames(hasNumberValue ? styles.ml1 : '')}>
+        <div className={classNames(hasNumberValue ? styles.ml1 : '')} data-slot={'status-badge-value'}>
           <Text
             isBlurred={isBlurred}
             fontWeight={FontWeights.bold}

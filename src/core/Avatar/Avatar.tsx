@@ -93,6 +93,8 @@ export const Avatar = (props: AvatarProps) => {
     return (
       <div
         data-testid={'avatar-image-test-id'}
+        data-slot={'avatar'}
+        data-size={size}
         className={classNames(
           style.rcAvatar,
           style.rcAvatarImage,
@@ -107,7 +109,11 @@ export const Avatar = (props: AvatarProps) => {
         }}
       >
         {showNotifications && (
-          <div data-testid={'avatar-notifications-test-id'} className={classNames(style.rcAvatarNotification)} />
+          <div
+            data-testid={'avatar-notifications-test-id'}
+            data-slot={'avatar-notification'}
+            className={classNames(style.rcAvatarNotification)}
+          />
         )}
       </div>
     );
@@ -118,10 +124,16 @@ export const Avatar = (props: AvatarProps) => {
       return (
         <div
           data-testid={'avatar-icon-test-id'}
+          data-slot={'avatar'}
+          data-size={size}
           className={classNames(style.rcAvatar, greyScale ? style.greyScale : undefined)}
         >
           {showNotifications && (
-            <div data-testid={'avatar-notifications-test-id'} className={classNames(style.rcAvatarNotification)} />
+            <div
+              data-testid={'avatar-notifications-test-id'}
+              data-slot={'avatar-notification'}
+              className={classNames(style.rcAvatarNotification)}
+            />
           )}
           <StyledSVG width={sizePixels} height={sizePixels} src={SvgIcon} className={style.avatarSvg} />
         </div>
@@ -138,6 +150,8 @@ export const Avatar = (props: AvatarProps) => {
   return (
     <div
       data-testid={'avatar-name-test-id'}
+      data-slot={'avatar'}
+      data-size={size}
       className={classNames(
         style.rcAvatar,
         style.rcAvatarName,
@@ -152,7 +166,11 @@ export const Avatar = (props: AvatarProps) => {
       }}
     >
       {showNotifications && (
-        <div data-testid={'avatar-notifications-test-id'} className={classNames(style.rcAvatarNotification)} />
+        <div
+          data-testid={'avatar-notifications-test-id'}
+          data-slot={'avatar-notification'}
+          className={classNames(style.rcAvatarNotification)}
+        />
       )}
       <Text
         type={TextTypes.textHelp}

@@ -34,9 +34,9 @@ export const ActionCardHeader = (props: ActionCardHeaderProps) => {
   const visible = !!dropdownItems.length;
 
   return (
-    <div className={classNames(dFlex, alignItemsCenter, mb1, gap1)}>
+    <div data-slot={'action-card-header'} className={classNames(dFlex, alignItemsCenter, mb1, gap1)}>
       {children}
-      <div>
+      <div data-slot={'action-card-header-menu'}>
         <Button
           targetRef={menuAnchorEl}
           disabled={disabled}

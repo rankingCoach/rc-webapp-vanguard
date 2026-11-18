@@ -29,8 +29,8 @@ export const Alert = (props: AlertProps) => {
   };
 
   return (
-    <ComponentContainer className={'Alert-container'}>
-      <div className={`rc-alert rc-alert-${type}`}>
+    <ComponentContainer className={'Alert-container'} data-slot={'alert-container'}>
+      <div className={`rc-alert rc-alert-${type}`} data-slot={'alert'} data-type={type}>
         <Text color={colorBasedOnType(type)} fontWeight={FontWeights.bold}>
           {children}
         </Text>

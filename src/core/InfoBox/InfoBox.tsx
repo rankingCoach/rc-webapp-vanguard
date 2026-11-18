@@ -137,9 +137,12 @@ export const InfoBox = (props: InfoBoxProps) => {
       <ComponentContainer
         testId={testId}
         className={classNames(styles.InfoBoxContainer, getInfoBoxPositionStyle(position), className)}
+        data-slot={'info-box'}
+        data-type={type ?? 'info'}
       >
         <div
           data-testid={'info-box-content'}
+          data-slot={'info-box-content'}
           className={styles.InfoBoxComponent}
           style={{ maxWidth: maxWidth, width: width, borderRadius: borderRadius }}
         >
@@ -156,7 +159,7 @@ export const InfoBox = (props: InfoBoxProps) => {
               {infoBoxData.icon}
             </Icon>
           </div>
-          <div data-testid={'info-box-body'} className={styles.body}>
+          <div data-testid={'info-box-body'} data-slot={'info-box-body'} className={styles.body}>
             <AnimatedConditional condition={!!title}>
               <Text
                 testId={'info-box-title'}

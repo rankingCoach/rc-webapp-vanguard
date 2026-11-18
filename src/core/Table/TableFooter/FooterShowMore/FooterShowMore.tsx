@@ -36,7 +36,7 @@ export const FooterShowMore = (props: FooterShowMoreProps) => {
     return null;
   }
   return (
-    <ComponentContainer>
+    <ComponentContainer data-slot={'footer-show-more-container'}>
       <CtaWithIcon
         onClick={(evt: SyntheticEvent) => {
           onShowMore && onShowMore(limit);

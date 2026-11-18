@@ -30,7 +30,7 @@ export const AnimatedNumber = (props: AnimatedNumberProps) => {
     formatter && atTarget ? formatter(value) : decimals ? animated.toFixed(decimals) : String(Math.round(animated));
 
   return (
-    <span className={className} style={style}>
+    <span data-slot={'animated-number'} className={className} style={style}>
       {display}
     </span>
   );

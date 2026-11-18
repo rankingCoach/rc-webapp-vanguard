@@ -78,8 +78,8 @@ export const TableToolbar = (props: TableToolbarProps) => {
   const visibleCount = columns.length - hiddenColumns.length;
 
   return (
-    <div className={styles.toolbar} data-testid={`${testId}-toolbar`}>
-      <div className={styles.title}>
+    <div data-slot={'table-toolbar'} className={styles.toolbar} data-testid={`${testId}-toolbar`}>
+      <div data-slot={'table-toolbar-title'} className={styles.title}>
         {typeof options.title === 'string' ? (
           <Text type={TextTypes.heading4} fontWeight={FontWeights.bold}>
             {options.title}
@@ -89,7 +89,7 @@ export const TableToolbar = (props: TableToolbarProps) => {
         )}
       </div>
 
-      <div className={styles.controls}>
+      <div data-slot={'table-toolbar-controls'} className={styles.controls}>
         {options.actions}
 
         {options.search ? (

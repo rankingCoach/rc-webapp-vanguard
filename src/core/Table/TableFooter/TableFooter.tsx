@@ -25,17 +25,17 @@ export const TableFooter = (props: TableFooterProps) => {
   const total = context.pagination?.total ?? 1;
 
   return (
-    <tfoot>
-      <tr className={styles.tableFooter}>
-        <td colSpan={columnsCount}>
-          <div className={classNames(dFlex, alignItemsCenter)}>
+    <tfoot data-slot={'table-footer'}>
+      <tr data-slot={'table-footer-row'} className={styles.tableFooter}>
+        <td data-slot={'table-footer-cell'} colSpan={columnsCount}>
+          <div data-slot={'table-footer-controls'} className={classNames(dFlex, alignItemsCenter)}>
             <AnimatedConditional condition={limit <= total && total > 6}>
-              <div className={styles.sideLeft}>
+              <div data-slot={'table-footer-more-controls'} className={styles.sideLeft}>
                 <FooterShowLess isHidden={limit < total} />
                 <FooterShowMore isHidden={limit === total} />
               </div>
             </AnimatedConditional>
-            <div className={classNames(dFlex, alignItemsCenter, styles.sideRight)}>
+            <div data-slot={'table-footer-pagination'} className={classNames(dFlex, alignItemsCenter, styles.sideRight)}>
               <FooterPagination />
             </div>
           </div>

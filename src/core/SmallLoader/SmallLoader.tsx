@@ -22,8 +22,8 @@ export const SmallLoader = (props: SmallLoaderProps) => {
   const { SvgIcon, loading, error } = useDynamicImport(`gifs/${colorBasedOnVariant(variant)}.gif`);
 
   return (
-    <ComponentContainer style={{ padding: 5 }}>
-      <img style={{ width: 25, height: 15 }} src={SvgIcon} alt={''} />
+    <ComponentContainer data-slot={'small-loader'} style={{ padding: 5 }}>
+      <img data-slot={'small-loader-image'} style={{ width: 25, height: 15 }} src={SvgIcon} alt={''} />
     </ComponentContainer>
   );
 };

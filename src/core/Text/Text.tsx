@@ -466,6 +466,8 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
       <TextWrapBalancer balanced={balanced}>
         <HeadingName
           data-testid={testId}
+          data-slot={'text'}
+          data-type={type}
           className={getClasses()}
           style={getStyles()}
           {...getContentProp()}
@@ -481,7 +483,15 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
   if (type.indexOf('display') >= 0) {
     return (
       <TextWrapBalancer balanced={balanced}>
-        <h1 data-testid={testId} className={getClasses()} style={getStyles()} {...getContentProp()} {...rest} />
+        <h1
+          data-testid={testId}
+          data-slot={'text'}
+          data-type={type}
+          className={getClasses()}
+          style={getStyles()}
+          {...getContentProp()}
+          {...rest}
+        />
       </TextWrapBalancer>
     );
   }
@@ -493,6 +503,8 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
     <TextWrapBalancer balanced={balanced}>
       <span
         data-testid={testId}
+        data-slot={'text'}
+        data-type={type}
         className={classNames('paragraph', getClasses())}
         style={getStyles()}
         {...getContentProp()}

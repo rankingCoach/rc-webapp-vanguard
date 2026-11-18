@@ -60,7 +60,7 @@ export const TableCellContent = (props: TableCellContentProps) => {
   }
 
   return cellOption && cellOption.value && cellOption.columnAlias == column?.alias ? (
-    <div style={cellOption.style ?? undefined} className={`optional-${type}`}>
+    <div data-slot={'table-cell-content'} data-type={type} style={cellOption.style ?? undefined} className={`optional-${type}`}>
       {typeof cellOption.value === 'function' && cellOption.valueParam && row[cellOption.valueParam] ? (
         cellOption.value(row[cellOption.valueParam], row)
       ) : ObjectCmp ? (
@@ -74,6 +74,7 @@ export const TableCell = (props: TableCellProps) => {
   const { row, column, options, rowIndex, colIndex, isBlurred, hasGreyBody } = props;
   return (
     <td
+      data-slot={'table-cell'}
       key={`${rowIndex}-${colIndex}`}
       className={classNames(
         styles.tableCell,
@@ -84,6 +85,7 @@ export const TableCell = (props: TableCellProps) => {
       style={column?.styles ? { ...column.styles } : undefined}
     >
       <div
+        data-slot={'table-cell-inner'}
         className={classNames(
           dFlex,
           alignItemsCenter,
