@@ -207,4 +207,115 @@ describe('own Tooltip equals MUI Tooltip (controlled)', () => {
     };
     expect(await go(Tooltip)).toEqual(await go(MuiTooltip));
   });
+
+  // Codex review (Popover handoff): MUI behaviours reachable through Popover or a direct controlled Tooltip.
+  it('child callback ref: attached once, React 19 cleanup called once on unmount', async () => {
+    const go = async (Impl: Impl) => {
+      const calls: string[] = [];
+      const ref = (node: HTMLElement | null) => {
+        calls.push(node ? 'attach' : 'null');
+        return () => calls.push('cleanup');
+      };
+      const tree = (open: boolean) => (
+        <Impl open={open} title={<Title />}>
+          <span ref={ref}>{'trigger'}</span>
+        </Impl>
+      );
+      const view = render(tree(false));
+      await flush();
+      view.rerender(tree(true));
+      await flush();
+      view.rerender(tree(false));
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      view.unmount();
+      view.container.remove();
+      return calls;
+    };
+    expect(await go(Tooltip)).toEqual(await go(MuiTooltip));
+  });
+
+  it('touch then a synthetic mouseover: the touch flag still resets (class on the next render)', async () => {
+    const go = async (Impl: Impl) => {
+      const c = CASES[1];
+      const view = mount(Impl, c);
+      await flush();
+      const trigger = view.getByText('trigger');
+      fireEvent.touchStart(trigger);
+      fireEvent.touchEnd(trigger);
+      fireEvent.mouseOver(trigger);
+      act(() => {
+        vi.advanceTimersByTime(1800);
+      });
+      view.rerender(
+        <Impl {...(c.props as object)} title={<b>{'again'}</b>}>
+          <span>{'trigger'}</span>
+        </Impl>,
+      );
+      const snap = snapshot();
+      view.unmount();
+      view.container.remove();
+      return snap;
+    };
+    expect(await go(Tooltip)).toEqual(await go(MuiTooltip));
+  });
+
+  it('Escape while open resets the touch flag', async () => {
+    const go = async (Impl: Impl) => {
+      const c = CASES[1];
+      const view = mount(Impl, c);
+      await flush();
+      fireEvent.touchStart(view.getByText('trigger'));
+      fireEvent.keyDown(document, { key: 'Escape' });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+      view.rerender(
+        <Impl {...(c.props as object)} title={<b>{'again'}</b>}>
+          <span>{'trigger'}</span>
+        </Impl>,
+      );
+      const snap = snapshot();
+      view.unmount();
+      view.container.remove();
+      return snap;
+    };
+    expect(await go(Tooltip)).toEqual(await go(MuiTooltip));
+  });
+
+  it('a long press removes a native title from the trigger', async () => {
+    const go = async (Impl: Impl) => {
+      const view = render(
+        <Impl open={false} title="Tip" describeChild>
+          <span title="native">{'trigger'}</span>
+        </Impl>,
+      );
+      await flush();
+      fireEvent.touchStart(view.getByText('trigger'));
+      act(() => {
+        vi.advanceTimersByTime(750);
+      });
+      const title = view.getByText('trigger').getAttribute('title');
+      view.unmount();
+      view.container.remove();
+      return title;
+    };
+    expect(await go(Tooltip)).toEqual(await go(MuiTooltip));
+  });
+
+  it('className on the Tooltip merges onto the trigger', async () => {
+    const go = async (Impl: Impl) => {
+      const view = render(
+        <Impl open={false} title="Tip" className="consumer-trigger">
+          <span className="own">{'trigger'}</span>
+        </Impl>,
+      );
+      const cls = view.getByText('trigger').className;
+      view.unmount();
+      view.container.remove();
+      return cls;
+    };
+    expect(await go(Tooltip)).toEqual(await go(MuiTooltip));
+  });
 });

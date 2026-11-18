@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { OwnPopper } from '../Popper/Popper';
 import { Grow } from '../Transitions/Grow';
 import { useVanguardTypography } from '../typography-context';
@@ -136,7 +136,6 @@ export const Tooltip = (props: TooltipProps) => {
     disableInteractive = false,
     describeChild = false,
     id: idProp,
-    className,
     slotProps = {},
     ...other
   } = props;
@@ -179,14 +178,26 @@ export const Tooltip = (props: TooltipProps) => {
       handleMouseLeave();
     }
   };
-  const handleFocus = (event: React.FocusEvent) => {
-    if (!childNode) setChildNode(event.currentTarget as HTMLElement);
-    if (isFocusVisible(event.target as Element)) setChildIsFocusVisible(true);
-    leaveTimer.clear();
-  };
-  const handleMouseOver = () => {
+  // MUI handleMouseOver (controlled: the enter timer only drives onOpen): ignored after a touch until the flag
+  // resets, removes the native title, cancels a pending leave.
+  const handleMouseOver = (event: { type: string }) => {
+    if (ignoreNonTouchEvents.current && event.type !== 'touchstart') return;
     if (childNode) childNode.removeAttribute('title');
     leaveTimer.clear();
+  };
+  const handleFocus = (event: React.FocusEvent) => {
+    if (!childNode) setChildNode(event.currentTarget as HTMLElement);
+    const target = event.target as HTMLElement;
+    if (isFocusVisible(target)) {
+      // React does not fire blur when a focused element becomes disabled (MUI's native blur workaround).
+      const handleNativeBlur = (blurEvent: FocusEvent) => {
+        if ((blurEvent.target as HTMLButtonElement).disabled) handleBlur(blurEvent as never);
+        blurEvent.target?.removeEventListener('blur', handleNativeBlur as EventListener);
+      };
+      target.addEventListener('blur', handleNativeBlur);
+      setChildIsFocusVisible(true);
+      handleMouseOver(event);
+    }
   };
 
   const childProps = children.props;
@@ -203,6 +214,8 @@ export const Tooltip = (props: TooltipProps) => {
     bodyStyle().WebkitUserSelect = 'none';
     touchTimer.start(ENTER_TOUCH_DELAY, () => {
       bodyStyle().WebkitUserSelect = prevUserSelect.current;
+      // MUI handleTriggerMouseOver (controlled) → handleMouseOver with the touchstart event.
+      handleMouseOver({ type: 'touchstart' });
     });
   };
   const handleTouchEnd = (event: React.TouchEvent) => {
@@ -210,6 +223,18 @@ export const Tooltip = (props: TooltipProps) => {
     stopTouchInteraction();
     leaveTimer.start(LEAVE_TOUCH_DELAY, handleClose);
   };
+
+  // MUI: Escape while open closes (controlled: re-arms the touch flag reset).
+  const handleCloseRef = useRef(handleClose);
+  handleCloseRef.current = handleClose;
+  useEffect(() => {
+    if (!openProp) return undefined;
+    const onKeyDown = (nativeEvent: KeyboardEvent) => {
+      if (nativeEvent.key === 'Escape') handleCloseRef.current();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [openProp]);
 
   // There is no point in displaying an empty tooltip (MUI: all falsy titles except 0).
   const open = !title && title !== 0 ? false : openProp;
@@ -220,16 +245,33 @@ export const Tooltip = (props: TooltipProps) => {
     : { 'aria-label': titleIsString ? title : null, 'aria-labelledby': open && !titleIsString ? id : null };
 
   const childRef = (childProps as { ref?: unknown }).ref ?? (children as { ref?: unknown }).ref;
+  const forkRef = useCallback(
+    (node: HTMLElement | null) => {
+      setChildNode(node);
+      let cleanup: (() => void) | undefined;
+      if (typeof childRef === 'function') {
+        const returned = childRef(node);
+        cleanup =
+          typeof returned === 'function' ? (returned as () => void) : () => (childRef as (v: null) => void)(null);
+      } else if (childRef && typeof childRef === 'object') {
+        (childRef as React.MutableRefObject<unknown>).current = node;
+        cleanup = () => {
+          (childRef as React.MutableRefObject<unknown>).current = null;
+        };
+      }
+      return () => {
+        setChildNode(null);
+        cleanup?.();
+      };
+    },
+    [childRef],
+  );
   const triggerProps: AnyProps = {
     ...nameOrDesc,
     ...other,
     ...childProps,
     className: cx(other.className, childProps.className),
-    ref: (node: HTMLElement | null) => {
-      setChildNode(node);
-      if (typeof childRef === 'function') childRef(node);
-      else if (childRef && typeof childRef === 'object') (childRef as React.MutableRefObject<unknown>).current = node;
-    },
+    ref: forkRef,
     onTouchStart: handleTouchStart,
     onTouchEnd: handleTouchEnd,
   };
