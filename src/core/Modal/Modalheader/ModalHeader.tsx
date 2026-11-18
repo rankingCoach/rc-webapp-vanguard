@@ -108,10 +108,16 @@ export const ModalHeader = (props: ModalHeaderProps) => {
   );
 
   return (
-    <div key={type} className={classNames('modal-header', className)} style={getHeaderData(type).containerStyle}>
-      <div className={'modal-header-title-container'}>
+    <div
+      key={type}
+      data-slot={'modal-header'}
+      data-type={type}
+      className={classNames('modal-header', className)}
+      style={getHeaderData(type).containerStyle}
+    >
+      <div data-slot={'modal-header-title'} className={'modal-header-title-container'}>
         <AnimatedConditional condition={type !== 'default' && !hideTypeIcon}>
-          <div className={'modal-header-icon-container'}>{getHeaderData(type).icon}</div>
+          <div data-slot={'modal-header-icon'} className={'modal-header-icon-container'}>{getHeaderData(type).icon}</div>
         </AnimatedConditional>
         <Text type={titleTextType} fontWeight={FontWeights.bold} replacements={replacements}>
           {title}

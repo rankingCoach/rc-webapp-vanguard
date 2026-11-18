@@ -28,6 +28,8 @@ export const ModalBody = (props: Props) => {
   return (
     <div
       ref={innerRef}
+      data-slot={'modal-body'}
+      data-mode={mode}
       className={classNames('modal-body', className)}
       style={{
         padding: padding !== undefined ? padding : '',

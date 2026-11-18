@@ -593,3 +593,11 @@ Drafted by Codex (medium), read by me; renames by me: ListItems' nested row `lis
 | ListItems | `list-items`, `list-items-list`; row `list-items-item`, `-left`, `-middle`, `-title`, `-content`, `-last`, `-right` |
 | Notification | `notification`, `-header`, `-header-title`, `-header-meta`, `-content`, `-actions`; ContentPlaceholder `content-placeholder`; NotificationAction `notification-action`; NotificationReview `notification-review`, `-text`, `-stars`, `-author`; NotificationSocialPost `notification-social-post`; local QuoteContainer `notification-quote`, `-content`, `-marks`; NotificationSource `notification-source` |
 Evidence: red 15/16 (ActionButton "no own slot" passes by design), green 16/16; touched-folder specs 16 files / 24, stories 15 / 91; tsc 0; biome 19 = 19, 0 on new specs; attribute-only 50 = 50; collision check: no hit. Codex's wider scan found `[data-slot=avatar|switch|badge|card…]` selectors only in rc-webapp `nexus/` (a separate shadcn app that does not import Vanguard) and `editor-bridge/__fixture__/studio-*.html` (test fixtures) — neither can match Vanguard DOM; noted as a risk if nexus ever embeds Vanguard.
+
+### Batch 5: ModalHeader / ModalBody / ModalFooter (watchdog Q2; A confirmed the files were free)
+| Component | Attributes |
+|---|---|
+| ModalHeader | root `modal-header` + `data-type` (danger/warn/success/info/default); `modal-header-title`; `modal-header-icon`. Close Button (A's) untouched |
+| ModalBody | `modal-body` + `data-mode` (`fill` or absent) |
+| ModalFooter | ComponentContainer root `modal-footer` (consumer className); `modal-footer-buttons` + `data-position` (start/end/between/center; default end, matching the default class). Render group and Buttons untouched |
+Evidence: red 3/3 → green 3/3; Modal/StandardModals/CustomModals specs 12 files / 243, stories 12 / 112; tsc 0; biome 1 = 1; attribute-only stream check OK (the line check now also reports reflow; the stream check compares the concatenated text per file); collision: `[data-mode="basic"|"advanced"]` in legacy html/{integrum,jump}/jira.css only, values never emitted.

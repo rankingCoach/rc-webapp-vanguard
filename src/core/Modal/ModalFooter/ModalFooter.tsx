@@ -88,13 +88,14 @@ export const ModalFooter = (props: ModalFooterProps) => {
   const hasNeutral = !!neutral && !neutral?.hidden;
   return (
     <ComponentContainer
+      data-slot={'modal-footer'}
       style={{ padding: padding ?? '16px 32px 32px 32px' }}
       className={classNames('modal-footer', showTopBorder ? 'modal-footer-border' : '', className)}
     >
       {children ? (
         children
       ) : (
-        <div className={classNames('modal-footer-buttons', position)}>
+        <div data-slot={'modal-footer-buttons'} data-position={buttonsPosition ?? 'end'} className={classNames('modal-footer-buttons', position)}>
           <AnimatedConditional animation={'none'} condition={hasNegative}>
             <Button
               {...getRowButtonTypeAndSize(negative?.type ?? ButtonTypes.default)}
