@@ -4,13 +4,15 @@ import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorato
 import { mapStorybookActionToProps } from "@test-utils/map-storybook-action-to-props";
 import { Text } from "@vanguard/Text/Text";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/FadedCarousel/ElementsBeforeAfter",
   component: ElementsBeforeAfter,
   extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories

@@ -3,7 +3,8 @@ import React from "react";
 import { Render, RenderProps } from "@vanguard/Render/Render";
 import { Text } from "@vanguard/Text/Text";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/Render",
   component: Render,
   extra: {
@@ -13,7 +14,8 @@ export default SbDecorator({
       },
     },
   },
-});
+}),
+};
 
 export const RenderStory = (props: RenderProps) => {
   return (

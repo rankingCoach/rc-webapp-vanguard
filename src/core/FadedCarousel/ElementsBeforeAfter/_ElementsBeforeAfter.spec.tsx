@@ -4,6 +4,7 @@ import React from 'react';
 
 import { ElementsBeforeAfter } from './ElementsBeforeAfter';
 
+import { describe, test } from 'vitest';
 describe('ElementsBeforeAfter component tests', () => {
   test('should render', async () => {
     render(

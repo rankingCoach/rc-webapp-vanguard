@@ -4,6 +4,7 @@ import React from 'react';
 
 import { render } from '../../../test-utils/test-utils';
 
+import { describe, test } from 'vitest';
 describe('Avatar tests', () => {
   test('should render icon', async () => {
     render(<Avatar icon={'gmb'} />);

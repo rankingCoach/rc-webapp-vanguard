@@ -3,10 +3,12 @@ import React from "react";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 import { Text, TextTypes } from "@vanguard/Text/Text";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "@vanguard/ListItem",
   component: ListItem,
-});
+}),
+};
 
 export const ListItemStory = (props: ListItemProps) => {
   const {

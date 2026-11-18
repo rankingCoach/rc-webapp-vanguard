@@ -3,6 +3,7 @@ import React from 'react';
 
 import { ImgLoader } from './ImgLoader';
 
+import { describe, test, expect } from 'vitest';
 describe('ImgLoader component tests', () => {
   test('should render title and descrption', async () => {
     render(<ImgLoader description={'This is description'} title={'This is title'} />);

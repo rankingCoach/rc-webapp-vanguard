@@ -1,7 +1,9 @@
+import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@test-utils/test-utils';
 import { Render } from '@vanguard/Render/Render';
 import React from 'react';
 
+import { describe, test, expect } from 'vitest';
 describe('Render component tests', () => {
   test('should be empty', async () => {
     render(

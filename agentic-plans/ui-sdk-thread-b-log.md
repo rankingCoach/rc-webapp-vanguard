@@ -663,3 +663,15 @@ Tools copied to `agentic-plans/uisdk-tools-b/` (collision-check.sh, attr-only-ch
 2. NOT enabled, stale test: `Table/Table.spec.tsx` — imports `TableData` from `Table.mock.tsx`, which is entirely commented out (`TypeError: Cannot read properties of undefined (reading 'columns')`). Stale fixture, not a component bug.
 3. Stories enabled, 9: TableBody, TableBodyRenderer, TableCell, TableFooter, FooterPagination, FooterShowLess, FooterShowMore, CtaWithIcon, TablePlaceholder. Setup-only: object-literal default export. Table stories 12 files / 27 green.
 4. NOT enabled: `Table/Table.stories.tsx` (would collide with the existing `_Table.stories.tsx`, and uses the commented-out `TableData`), `TableHeader/TableHeader.stories.tsx` (uses `TableData`).
+
+### (b) Enable never-run tests: B-slotted folders, second group
+1. Specs enabled (18): ActionCardBody, ActionCardHeader, Avatar, StatusBadge (as `_StatusBadge.legacy.spec.tsx`, the `_StatusBadge.spec.tsx` name was taken), ClipboardText, FrostedGlass, ImgLoader, ImgWithLoader, SmallLoader, ProgressCircle, Rating, RatingDistribution, TogglerWithText, DragAndDropFile, Render, SocialMediaLink `utils`, ElementsBeforeAfter, TextWrapBalancer. Setup-only: `vitest` import (globals) and, where jest-dom matchers are used, `import '@testing-library/jest-dom/vitest'`. 18 files / 35 tests green.
+2. Stories enabled (11): ActionCardActions, ActionCardBody, ActionCardHeader, ElementsBeforeAfter, ListItem, Notification, NotificationAction, ProgressCircle, Render, TogglerWithText, TextWrapBalancer. Setup-only: object-literal default export. 11 files / 12 green.
+3. Kept off (assertion fails against current behaviour; not edited, component not changed):
+   1. `LineAlert/LineAlert.spec.tsx`: `getByTestId('line-alert-icon-svg')` right after the icon span appears; StyledSVG injects the inline SVG and its testid asynchronously → stale/timing test (sync query), not a bug.
+   2. `ListItem/ListItem.spec.tsx`: `expect(iconList.innerHTML).toBe('1')` but the number renders inside a Text `<span>` (also on 2e33fd7, before the Text slot) → stale test.
+   3. `ListItems/ListItems.spec.tsx`, `ListItems/ListItem/ListItem.spec.tsx`: `TypeError: ListItemsMock is not a function` → stale mock.
+   4. `ListItems/ListItems.stories.tsx`, `ListItems/ListItem/ListItem.stories.tsx`: fail to import (named import missing from the module) → stale.
+   5. `FadeCarouselAuto/FadeCarouselAuto.stories.tsx`: its play query fails (TestingLibraryElementError on the scroll container) → stale/timing, needs a look by whoever owns the story.
+   6. `GlobalStateComponent/GlobalStateComponent.stories.tsx`, `InfoBox/InfoBox.stories.tsx`: an `_`-prefixed story with the same name exists; renaming would collide.
+No real-bug candidates in this group.

@@ -3,6 +3,7 @@ import React from 'react';
 
 import { RatingDistribution } from './RatingDistribution';
 
+import { describe, test } from 'vitest';
 describe('RatingDistribution component tests', () => {
   test('should render RatingDistribution component', async () => {
     const TestId = 'RatingDistribution_test1';
