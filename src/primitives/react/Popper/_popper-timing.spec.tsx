@@ -87,4 +87,36 @@ describe('OwnPopper update timing equals MUI Popper', () => {
     const own = await run(OwnPopper, props);
     expect(own).toEqual(mui);
   });
+
+  // Codex review (PopoverModal): popper.js debounces scroll/resize updates into a microtask, so a handler registered
+  // later in the same event can still move the anchor first.
+  it('a scroll handler registered after the popper moves the anchor in the same event', async () => {
+    const go = async (Comp: React.ElementType) => {
+      anchorTop = 100;
+      const anchor = makeAnchor();
+      const view = render(
+        <Comp open anchorEl={anchor} placement="bottom" data-testid="floating">
+          <div>{'floating'}</div>
+        </Comp>,
+      );
+      await act(async () => {
+        await Promise.resolve();
+      });
+      const late = () => {
+        anchorTop = 400;
+      };
+      window.addEventListener('scroll', late);
+      await act(async () => {
+        window.dispatchEvent(new Event('scroll'));
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      window.removeEventListener('scroll', late);
+      const out = transformOf(view.container);
+      view.unmount();
+      anchor.remove();
+      return out;
+    };
+    expect(await go(OwnPopper)).toBe(await go(MuiPopper));
+  });
 });

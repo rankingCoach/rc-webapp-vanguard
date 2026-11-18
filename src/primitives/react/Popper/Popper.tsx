@@ -117,7 +117,18 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     updateRef.current();
     // popper's eventListeners modifier: scroll on every scroll parent of anchor and popper, resize on window.
     const targets = [...('nodeType' in anchor ? listScrollParents(anchor as Element) : []), ...listScrollParents(node)];
-    const onEvent = () => updateRef.current();
+    // popper.js `update` is debounced into a microtask: handlers later in the same event (or other listeners that
+    // move the anchor) run first, and several events in one task cost one measurement.
+    let pending = false;
+    let cancelled = false;
+    const onEvent = () => {
+      if (pending) return;
+      pending = true;
+      queueMicrotask(() => {
+        pending = false;
+        if (!cancelled) updateRef.current();
+      });
+    };
     for (const t of targets) t.addEventListener('scroll', onEvent, { passive: true });
     const win = node.ownerDocument.defaultView ?? window;
     win.addEventListener('resize', onEvent, { passive: true });
@@ -127,6 +138,7 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     const observer = RO && 'nodeType' in anchor ? new RO(onEvent) : null;
     observer?.observe(anchor as Element);
     return () => {
+      cancelled = true;
       for (const t of targets) t.removeEventListener('scroll', onEvent);
       win.removeEventListener('resize', onEvent);
       observer?.disconnect();
