@@ -963,3 +963,43 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
 4. Each component keeps its public props (PopperProps-derived types stay vendored, §26) and its DOM classes
    (`MuiPopper-root`, `MuiTooltip-*`, `MuiMenuList-root`) as aliases, plus data-slot hooks; fixtures per inventory
    rule (root-components.scss Menu/Autocomplete paper/listbox are entry-chunk rules).
+
+## 28. Group B review round (watchdog §26/§27) and positioning facts
+
+1. §26 APPROVED with conditions: licence notices (vendored file header + a build-generated
+   `THIRD_PARTY_NOTICES.txt` for every bundled npm package; today the package ships only Vanguard's own LICENSE and
+   `legalComments: "none"` strips the bundled MUI notices; LOGGED FOR THE USER), generated-file determinism spec,
+   rc-webapp typecheck against the candidate pack without MUI (verifier) = `.472` baseline, then MUI →
+   devDependencies with package.sh 30/30, before continuing group B components.
+2. MAJOR 1 (clipping parents) done in the core path: `react/Popper/dom-geometry.ts` ports popper's clipping
+   parents, offset parent/containing block (transforms, contain:paint, will-change), composite rects and scroll
+   parents; `react/Popper/compute-anchored.ts` = measure + clip + core + shift into offset-parent coordinates.
+   Finding while porting: popper's computeAutoPlacement does not forward `altBoundary`, so `auto` is scored against
+   the floating element's clipping parents while flip/preventOverflow use the anchor's (core `autoBoundary`).
+   Differential in Chromium against real popper.js: 2520 rect scenarios + 2880 DOM scenarios (none / nested scroll
+   container scrolled 140×90 / overflow:hidden / transformed ancestor / scroll inside transform × portal vs
+   disablePortal(altBoundary) × absolute vs fixed × 4 anchor positions incl. partly scrolled out × 6 placements incl.
+   auto × offset/preventOverflow variants): all exact.
+3. MINOR 2 positioning strategies actually used: absolute in a body portal (MUI default: Popover/Tooltip,
+   DropdownMenu, Autocomplete, AutocompleteWithAnchor, SearchableSelect, DatePicker, DateRangePicker, Menu);
+   `strategy: fixed` (Popover `fixedPosition`, used by rc-webapp ExportAccountsChip and AiUsageKpisInfoIcon);
+   `disablePortal` (PopoverModal default `renderInPortal=false`, used by Vanguard stories; rc-webapp passes `renderInPortal` in all 3 of its
+   uses). All three are used, all three are in the grid. Popper `modifiers` in use are only built-ins (arrow,
+   offset, flip padding/altBoundary/rootBoundary viewport, preventOverflow altAxis/tether, computeStyles
+   adaptive/gpu); anything else (custom modifier, function options, other boundaries) is routed to MUI Popper by
+   `popper-options.ts` and goes on the "Paths still on MUI" list if it ever appears.
+4. MINOR 3/4 recorded for the tooltip and click-away work: keyboard path + aria semantics in the tooltip spec,
+   global hysteresis in a browser story; click-away ignores events starting in a layer stacked above (ModalHost
+   stack), mixed Select-inside-DropdownMenu/PopoverModal story.
+5. §26 acceptance (package.sh, HEAD 40b71c5 + vendoring, MUI in devDependencies, scratch): runtime 30/30 in all four
+   consumers; the consumers WITHOUT MUI give exactly the same type error set as those with MUI (default gated 6 =
+   6, measured 6 = 6, identical line for line; WordPress 0 = 0), down from 33 measured before vendoring.
+   Committed: 7d1c8ae (THIRD_PARTY_NOTICES), 0eebfc9 (vendored types + determinism spec).
+6. FOR THE USER (licences of bundled code, from THIRD_PARTY_NOTICES.txt): default bundle 116 packages, WordPress 55.
+   143 MIT, 10 Apache-2.0, 11 BSD-2/3, 2 0BSD entries (both bundles). Two to look at: `jszip` is
+   "MIT OR GPL-3.0-or-later" (the MIT option applies); 5 packages ship no licence file (inline-style-parser,
+   react-property, react-twitter-widgets, styled-components, videojs-youtube; all declare MIT, the notices file
+   carries the declared id). Apache-2.0 packages (9: @googlemaps/js-api-loader, m3u8-parser, mpd-parser, mux.js,
+   rxjs, url-toolkit, video.js, videojs-vtt.js, xlsx): none ships a NOTICE file, so the licence text suffices.
+7. Pending: the verifier runs rc-webapp's own typecheck in the shadow copy against the candidate pack without MUI
+   resolvable through Vanguard (error set must equal `.472`); then commit MUI → devDependencies.
