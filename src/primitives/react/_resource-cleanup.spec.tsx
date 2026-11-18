@@ -3,11 +3,13 @@ import React, { useRef, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultLayerStack } from '../core/layer-stack';
 import { defaultModalManager } from '../core/modal-manager';
+import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
 import { ClickAway } from './ClickAway/ClickAway';
 import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
+import { Portal } from './Portal/Portal';
 import { InputTextField } from './TextField/InputTextField';
 import { Tooltip } from './Tooltip/Tooltip';
 import { Fade } from './Transitions/Fade';
@@ -262,6 +264,24 @@ describe('own-core resources are released', () => {
     settle();
     expect(leftovers(before)).toEqual(CLEAN);
     expect(vendor()).toBe(userSelectBefore);
+  });
+
+  it('Backdrop in a Portal (Fade timers, portal node), closed mid-exit then unmounted', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Portal>
+        <Backdrop open={open} zIndex={1031} onMouseDown={() => undefined} />
+      </Portal>
+    );
+    const view = render(tree(true));
+    settle();
+    view.rerender(tree(false));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
   });
 
   it('ClickAway (document listeners, activation timer, layer)', () => {
