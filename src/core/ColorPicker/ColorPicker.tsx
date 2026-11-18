@@ -105,12 +105,13 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     [onColorChange],
   );
 
-  const debouncedFormConfigDispatch = useCallback(
-    debounce((color: string) => {
-      if (isValidHexColor(color)) {
-        binding.writeScalar(color);
-      }
-    }, DEBOUNCE_VALUE_DEFAULT),
+  const debouncedFormConfigDispatch = useMemo(
+    () =>
+      debounce((color: string) => {
+        if (isValidHexColor(color)) {
+          binding.writeScalar(color);
+        }
+      }, DEBOUNCE_VALUE_DEFAULT),
     [binding],
   );
 

@@ -47,7 +47,7 @@ export const useFormElementBinding = (props: FormElementBindingOptions): FormCon
   useEffect(() => {
     if (!active) return;
     activateErrors(childConfig);
-  }, [childConfig]);
+  }, [childConfig, active]);
 
   useEffect(() => {
     if (!active) return;
@@ -63,19 +63,19 @@ export const useFormElementBinding = (props: FormElementBindingOptions): FormCon
       onChange && onChange(changedStatus);
       // validInput(childConfig);
     }
-  }, [errorsByDev]);
+  }, [errorsByDev, active]);
 
   useEffect(() => {
     if (!active) return undefined;
     return () => {
       childRemoved && childRemoved(childConfig);
     };
-  }, []);
+  }, [active]);
 
   useEffect(() => {
     if (!active) return;
     childAdded && childAdded(childConfig);
-  }, [childConfig]);
+  }, [childConfig, active]);
 
   const bindStateVars = (childFormConfig: FormConfigElement) => {
     const stringKey = childFormConfig.stateFieldName;
