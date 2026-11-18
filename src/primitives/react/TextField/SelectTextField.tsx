@@ -57,6 +57,7 @@ const ArrowDropDown = (props: { className?: string }) => (
     viewBox="0 0 24 24"
     data-testid="ArrowDropDownIcon"
     data-slot="select-icon"
+    data-vg-core=""
   >
     <path d="M7 10l5 5 5-5z" />
   </svg>
@@ -590,6 +591,7 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         onBlur={handleDisplayBlur}
         onFocus={handleDisplayFocus}
         data-slot="select-trigger"
+        data-vg-core=""
         data-open={open ? '' : undefined}
         data-disabled={disabled ? '' : undefined}
         {...SelectDisplayProps}
@@ -634,6 +636,7 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         autoFocus={autoFocus}
         required={required}
         data-slot="select-native-input"
+        data-vg-core=""
         {...htmlInput}
         id={htmlInput.id ?? nativeInputId}
       />

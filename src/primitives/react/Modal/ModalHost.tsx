@@ -53,16 +53,22 @@ export const ModalHost = (props: ModalHostProps) => {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const modal = useRef<ManagedModal>({ modalRef: null });
   const restoreTo = useRef<HTMLElement | null>(null);
+  // Record the element to restore focus to in the render that opens, before any child layout effect (e.g. a
+  // MenuList auto-focusing its item) moves focus into the popup.
+  const wasOpen = useRef(false);
+  if (open && !wasOpen.current && typeof document !== 'undefined') {
+    restoreTo.current = document.activeElement as HTMLElement | null;
+  }
+  wasOpen.current = open;
   const mounted = open || exiting;
 
   useLayoutEffect(() => {
     if (!open) return undefined;
-    restoreTo.current = document.activeElement as HTMLElement | null;
     modal.current.modalRef = rootRef.current;
     defaultModalManager.add(modal.current, document.body);
     defaultModalManager.mount(modal.current, { disableScrollLock });
     // Layer order for click-away hosts below this modal (core/layer-stack.ts).
-    const layer = defaultLayerStack.push(() => rootRef.current);
+    const layer = defaultLayerStack.push(() => rootRef.current, restoreTo.current);
     return () => {
       defaultModalManager.remove(modal.current, false);
       defaultLayerStack.remove(layer);
@@ -114,6 +120,7 @@ export const ModalHost = (props: ModalHostProps) => {
       <div
         aria-hidden="true"
         data-slot="modal-backdrop"
+        data-vg-core=""
         className={classNames(
           'MuiBackdrop-root',
           'MuiBackdrop-invisible',

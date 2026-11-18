@@ -8,19 +8,20 @@ export interface LayerToken {
 }
 
 export interface LayerStack {
-  push: (element: () => Element | null) => LayerToken;
+  /** `origin`: the element the layer was opened from (focused when it opened); decides which host it belongs to. */
+  push: (element: () => Element | null, origin?: Element | null) => LayerToken;
   remove: (token: LayerToken) => void;
-  /** Elements of the layers opened after `token` that are still open, nearest first. */
-  above: (token: LayerToken) => Element[];
+  /** Layers opened after `token` that are still open, nearest first. */
+  above: (token: LayerToken) => { element: Element; origin: Element | null }[];
 }
 
 export const createLayerStack = (): LayerStack => {
   let next = 0;
-  const layers: { token: LayerToken; element: () => Element | null }[] = [];
+  const layers: { token: LayerToken; element: () => Element | null; origin: Element | null }[] = [];
   return {
-    push: (element) => {
+    push: (element, origin = null) => {
       const token = { id: next++ };
-      layers.push({ token, element });
+      layers.push({ token, element, origin });
       return token;
     },
     remove: (token) => {
@@ -32,8 +33,8 @@ export const createLayerStack = (): LayerStack => {
       if (i === -1) return [];
       return layers
         .slice(i + 1)
-        .map((l) => l.element())
-        .filter((e): e is Element => e !== null);
+        .map((l) => ({ element: l.element(), origin: l.origin }))
+        .filter((l): l is { element: Element; origin: Element | null } => l.element !== null);
     },
   };
 };
@@ -53,7 +54,11 @@ export interface ClickAwayDecisionInput {
   /** The host's React subtree saw the event (React portals bubble through the React tree). */
   insideReactTree: boolean;
   disableReactTree: boolean;
-  /** The event started inside a layer stacked above the host. */
+  /**
+   * The event started inside a layer stacked above the host AND opened from inside the host (e.g. a Select menu
+   * opened from a field in a PopoverModal). A layer opened from elsewhere (another independent dropdown) does not
+   * shield the host: MUI calls the older host's onClickAway there too.
+   */
   insideHigherLayer: boolean;
 }
 

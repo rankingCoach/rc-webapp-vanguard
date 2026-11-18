@@ -40,6 +40,7 @@ export const MenuOption = (props: MenuOptionProps) => {
       tabIndex={-1}
       disabled={disabled}
       data-slot="menu-option"
+      data-vg-core=""
       data-selected={selected ? '' : undefined}
       data-disabled={disabled ? '' : undefined}
       {...(rest as Record<string, unknown>)}

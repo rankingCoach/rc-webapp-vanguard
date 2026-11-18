@@ -146,6 +146,7 @@ export const TextareaAutosize = (props: TextareaAutosizeProps) => {
         aria-hidden
         className={className}
         data-slot="text-field-control-shadow"
+        data-vg-core=""
         readOnly
         ref={shadowRef}
         tabIndex={-1}

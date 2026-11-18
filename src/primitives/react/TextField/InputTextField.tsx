@@ -253,6 +253,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
     type: ibMultiline ? undefined : ibType,
     ...htmlRest,
     'data-slot': 'text-field-control',
+    'data-vg-core': '',
     className: classNames(
       'MuiInputBase-input',
       'MuiOutlinedInput-input',
