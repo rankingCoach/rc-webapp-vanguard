@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "vite --config vite.config.app.ts",
     "build": "node scripts/analyze-dynamic-imports.js && pnpm run build-lib && pnpm run build-wordpress",
-    "build-lib": "vite build --config vite.config.lib.ts && node scripts/vendor-mui-types.mjs dist/types && node scripts/fix-dynamic-imports.js && echo 'default' > dist/.version",
+    "build-lib": "vite build --config vite.config.lib.ts && node scripts/vendor-mui-types.mjs dist/types && node scripts/fix-dynamic-imports.js && echo 'default' > dist/.version && node scripts/generate-agent-docs.mjs",
     "build-wordpress": "vite build --config vite.config.wordpress.ts && node scripts/vendor-mui-types.mjs dist-wordpress/types dist/types && node scripts/fix-dynamic-imports.js ; echo 'wp' > dist-wordpress/.version && node scripts/cleanup-wordpress-assets.js",
     "build-wordpress-no-clean": "vite build --config vite.config.wordpress.ts",
     "postinstall": "node scripts/clean-assets-based-on-vanguardrc.js",
@@ -83,7 +83,9 @@
     "LICENSE",
     "dist-wordpress",
     "dist",
-    "scripts"
+    "scripts",
+    "docs",
+    "skills"
   ],
   "peerDependencies": {
     "@reduxjs/toolkit": ">=1.7.1",
