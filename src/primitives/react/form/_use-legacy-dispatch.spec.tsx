@@ -3,6 +3,7 @@ import { act, render } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { describe, expect, it, vi } from 'vitest';
+import { localFormAction } from './local-form-action';
 import { useLegacyDispatch } from './use-legacy-dispatch';
 
 const slice = createSlice({
@@ -60,5 +61,30 @@ describe('useLegacyDispatch (D9 single dispatch shim)', () => {
     act(() => looseSink.emit({ type: 'x' }));
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
+  });
+});
+
+const localSink: { fire: (r: unknown) => void } = { fire: () => undefined };
+const LocalProbe = () => {
+  localSink.fire = useLegacyDispatch();
+  return null;
+};
+
+describe('useLegacyDispatch with F4 local form actions', () => {
+  it('applies a local form action itself, with or without a Provider, and never dispatches it', () => {
+    const applied = vi.fn();
+    const store = configureStore({ reducer: (s: number = 0) => s });
+    const spy = vi.spyOn(store, 'dispatch');
+    render(
+      <Provider store={store}>
+        <LocalProbe />
+      </Provider>,
+    );
+    localSink.fire(localFormAction(applied));
+    expect(applied).toHaveBeenCalledTimes(1);
+    expect(spy).not.toHaveBeenCalled();
+    render(<LocalProbe />);
+    localSink.fire(localFormAction(applied));
+    expect(applied).toHaveBeenCalledTimes(2);
   });
 });

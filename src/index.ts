@@ -780,6 +780,8 @@ export type {
 export { useSelectiveDynamicImport } from './custom-hooks/use-dynamic-import/use-selective-dynamic-import.ts';
 export type { FormConfig, FormConfigElement, FormFieldType } from './custom-hooks/useFormConfig.ts';
 export { useFormConfig } from './custom-hooks/useFormConfig.ts';
+export type { UseFormStoreOptions, UseFormStoreResult } from './custom-hooks/use-form-store.ts';
+export { useFormStore } from './custom-hooks/use-form-store.ts';
 export type { UseMediaQueryOptions } from './custom-hooks/use-media-query';
 export { useMediaQuery } from './custom-hooks/use-media-query';
 export { classNames } from './helpers/classNames';

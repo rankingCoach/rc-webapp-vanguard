@@ -1,5 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Button, Form, Input, Select, Textarea, useFormConfig } from '@rankingcoach/vanguard';
+import { Button, Form, Input, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { render } from '@testing-library/react';
@@ -66,6 +66,29 @@ describe('installed Vanguard bundle', () => {
     );
     await user.type(screen.getByRole('textbox', { name: 'Fixture name' }), 'Ann');
     expect(store.getState().fixtureForm.name).toBe('Ann');
+  });
+  // F4 (both bundles): a Redux-free form. Plain render: no react-redux Provider and no store anywhere.
+  it('runs a Form on useFormStore without react-redux or a Provider', async () => {
+    const user = userEvent.setup();
+    let data: () => { city?: string } = () => ({});
+    const StoreForm = () => {
+      const form = useFormStore({ initialValues: { city: 'Rome' }, inputs: { city: { fieldType: 'Input' } } });
+      data = form.getData;
+      return (
+        <Form config={form.formConfig as never}>
+          <div>
+            <Input field="city" textFieldProps={{ inputProps: { 'aria-label': 'City' } }} />
+          </div>
+          <output data-testid="city">{form.values.city}</output>
+        </Form>
+      );
+    };
+    render(<StoreForm />);
+    const input = screen.getByRole('textbox', { name: 'City' }) as HTMLInputElement;
+    expect(input.value).toBe('Rome');
+    await user.type(input, 'x');
+    expect(screen.getByTestId('city').textContent).toBe('Romex');
+    expect(data().city).toBe('Romex');
   });
   // Select runs on Vanguard's own core in both bundles (WordPress exports it): open, pick an option, read it back.
   it('opens the installed Select and picks an option', async () => {

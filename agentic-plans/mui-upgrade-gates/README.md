@@ -54,7 +54,7 @@ legacy watchdog and isolated diagnostic reruns. It stops immediately on a failin
 
 scripts specs moved to node project: not UI code, no UI setup; still mandatory in pnpm test/gates; excluded from component coverage gate by project, not by file filter.
 
-Canonical package gate: `bash agentic-plans/mui-upgrade-gates/package.sh` (mandatory wrapper around the unchanged frozen fixture). Mandatory validator selftest: `python3 -m unittest discover -s agentic-plans/mui-upgrade-gates -p test_package_counts.py`. Expected runtime tests: default-declared 7, default-mui 7, wp-declared 6, wp-mui 6; aggregate 26. The default-only DatePicker test exercises the packed DatePicker; the Select test (both bundles, added with the own-core Select) opens it and picks an option; the F3 test binds an Input to the nearest Form by `field`. Missing, duplicate, malformed, failed, skipped or off-by-one summaries fail closed. Fixture nonzero exits are preserved. `runtime-counts.json` records each consumer and aggregate.
+Canonical package gate: `bash agentic-plans/mui-upgrade-gates/package.sh` (mandatory wrapper around the unchanged frozen fixture). Mandatory validator selftest: `python3 -m unittest discover -s agentic-plans/mui-upgrade-gates -p test_package_counts.py`. Expected runtime tests: default-declared 8, default-mui 8, wp-declared 7, wp-mui 7; aggregate 30. The default-only DatePicker test exercises the packed DatePicker; the Select test (both bundles, added with the own-core Select) opens it and picks an option; the F3 test binds an Input to the nearest Form by `field`; the F4 test runs a Form on `useFormStore` with no react-redux Provider. Missing, duplicate, malformed, failed, skipped or off-by-one summaries fail closed. Fixture nonzero exits are preserved. `runtime-counts.json` records each consumer and aggregate.
 
 Sleep validity: bounded_runner records mach_continuous_time plus mach_absolute_time elapsed values on
 Darwin and pmset Sleep/Wake/DarkWake lines in the run window. A continuous-minus-absolute gap greater
@@ -109,7 +109,7 @@ info are recorded separately and are not input changes.
 
 The package gate runs when src, package/lock or build config differs from the
 last package-GREEN (or none exists). Otherwise the build still runs. Smoke counts
-remain default-mui 7, default-declared 7, wp-declared 6, wp-mui 6: aggregate 26.
+remain default-mui 8, default-declared 8, wp-declared 7, wp-mui 7: aggregate 30.
 The stage audit command is mandatory: it must check the stage's exact build-warning
 inventory, TS/WP diagnostics, bytes/pins and frozen proofs. Tier 3 alone does not
 waive any of those checks. The runner exposes MUI_GATE_OUT and PACKAGE_FIXTURE_OUT.

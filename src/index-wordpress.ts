@@ -166,6 +166,8 @@ export { SlideTransition } from './core/SlideTransition/SlideTransition.tsx';
 export type { EditModalProps } from './core/CustomModals/EditModal/EditModal.tsx';
 export { EditModal } from './core/CustomModals/EditModal/EditModal.tsx';
 export { useFormConfig } from './custom-hooks/useFormConfig.ts';
+export type { UseFormStoreOptions, UseFormStoreResult } from './custom-hooks/use-form-store.ts';
+export { useFormStore } from './custom-hooks/use-form-store.ts';
 export { classNames } from './helpers/classNames';
 
 

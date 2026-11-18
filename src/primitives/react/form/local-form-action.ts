@@ -1,0 +1,14 @@
+/**
+ * F4: a form setter result that applies itself (writes the Redux-free form store) instead of being dispatched.
+ * Legacy slice setters are pure action creators (FormElement even calls `setStateValue` during render without
+ * dispatching), so the F4 setters must be pure too: they return one of these and the seam runs it.
+ */
+const LOCAL_FORM_ACTION = Symbol.for('vanguard.localFormAction');
+
+export type LocalFormAction = (() => void) & { [LOCAL_FORM_ACTION]: true };
+
+export const localFormAction = (apply: () => void): LocalFormAction =>
+  Object.assign(() => apply(), { [LOCAL_FORM_ACTION]: true as const });
+
+export const isLocalFormAction = (value: unknown): value is LocalFormAction =>
+  typeof value === 'function' && (value as Partial<LocalFormAction>)[LOCAL_FORM_ACTION] === true;

@@ -1,5 +1,6 @@
 import { useCallback, useContext } from 'react';
 import { ReactReduxContext } from 'react-redux';
+import { isLocalFormAction } from './local-form-action';
 
 const isDev = () => {
   try {
@@ -23,6 +24,11 @@ export const useLegacyDispatch = () => {
   return useCallback(
     (result: unknown) => {
       if (result === undefined) return;
+      // F4 (useFormStore): the setter's result writes the form's own store; no Redux involved.
+      if (isLocalFormAction(result)) {
+        result();
+        return;
+      }
       if (dispatch) {
         dispatch(result as Parameters<typeof dispatch>[0]);
       } else if (isDev()) {
