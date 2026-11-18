@@ -68,3 +68,11 @@ export const ProfileForm = () => {
    container.
 4. The package still needs `react-redux` installed (Vanguard's legacy form path imports it), but this path needs no
    Provider and no store.
+
+## MUI is no longer installed through Vanguard (a68ad3d)
+
+`@mui/*` moved to Vanguard's devDependencies. The runtime was always bundled; the MUI prop types Vanguard's public
+types extend (TextField/Select/Menu/Popover/Autocomplete/... legacy props) are vendored into
+`types/_vendor/mui.d.ts`. rc-webapp declares no `@mui/*` itself and imports none; its `tsc --noEmit` is clean with
+`@mui` unresolvable (verifier, handoff 8). If rc-webapp ever imports `@mui/*` directly it must declare it in its own
+package.json. Licences of everything bundled: `THIRD_PARTY_NOTICES.txt` in `dist` and `dist-wordpress`.
