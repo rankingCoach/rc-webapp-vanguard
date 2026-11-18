@@ -1,6 +1,7 @@
 import { classNames } from '@helpers/classNames';
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { defaultLayerStack } from '../../core/layer-stack';
 import { defaultModalManager, ManagedModal } from '../../core/modal-manager';
 
 export type ModalCloseReason = 'escapeKeyDown' | 'backdropClick' | 'tabKeyDown';
@@ -60,8 +61,11 @@ export const ModalHost = (props: ModalHostProps) => {
     modal.current.modalRef = rootRef.current;
     defaultModalManager.add(modal.current, document.body);
     defaultModalManager.mount(modal.current, { disableScrollLock });
+    // Layer order for click-away hosts below this modal (core/layer-stack.ts).
+    const layer = defaultLayerStack.push(() => rootRef.current);
     return () => {
       defaultModalManager.remove(modal.current, false);
+      defaultLayerStack.remove(layer);
     };
   }, [open, disableScrollLock]);
 
