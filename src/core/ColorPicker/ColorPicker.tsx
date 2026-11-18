@@ -8,7 +8,7 @@ import { Form, useFormConfigContext } from '@vanguard/Form/Form.tsx';
 import { Label } from '@vanguard/Label/Label';
 import { TextReplacements } from '@vanguard/Text/Text';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
+import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
 
 const DEBOUNCE_VALUE_DEFAULT = 50;
 export interface ColorPickerProps {
@@ -45,8 +45,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     maxWidth,
     testId,
   } = props;
-  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
-  const dispatch = useLegacyDispatch();
+  // F1: form writes go through the binding seam (plain setStateValue, as before).
+  const binding = useFieldBinding(formconfig);
   // Use color prop if provided, fallback to initialColor for backward compatibility
   const effectiveColor = externalColor ?? initialColor ?? '';
 
@@ -98,11 +98,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
 
   const debouncedFormConfigDispatch = useCallback(
     debounce((color: string) => {
-      if (isValidHexColor(color) && formconfig && formconfig.setStateValue) {
-        dispatch(formconfig.setStateValue(color));
+      if (isValidHexColor(color)) {
+        binding.writeScalar(color);
       }
     }, DEBOUNCE_VALUE_DEFAULT),
-    [dispatch, formconfig],
+    [binding],
   );
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
