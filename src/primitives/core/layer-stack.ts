@@ -13,6 +13,8 @@ export interface LayerStack {
   remove: (token: LayerToken) => void;
   /** Layers opened after `token` that are still open, nearest first. */
   above: (token: LayerToken) => { element: Element; origin: Element | null }[];
+  /** Open layers (leak checks: 0 once everything is closed and unmounted). */
+  size: () => number;
 }
 
 export const createLayerStack = (): LayerStack => {
@@ -28,6 +30,7 @@ export const createLayerStack = (): LayerStack => {
       const i = layers.findIndex((l) => l.token === token);
       if (i !== -1) layers.splice(i, 1);
     },
+    size: () => layers.length,
     above: (token) => {
       const i = layers.findIndex((l) => l.token === token);
       if (i === -1) return [];

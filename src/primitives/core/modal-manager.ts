@@ -169,6 +169,11 @@ export class ModalManager {
     return index;
   }
 
+  /** Registered modals (leak checks: 0 once everything is closed). */
+  modalCount(): number {
+    return this.modals.length;
+  }
+
   isTopModal(modal: ManagedModal): boolean {
     return this.modals.length > 0 && this.modals[this.modals.length - 1] === modal;
   }
