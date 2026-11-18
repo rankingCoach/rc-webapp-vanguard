@@ -4,6 +4,7 @@ import { isMouseEventInsideElement as inside } from '../../core/hit-test';
 import { areEqualValues, createTypeahead, TYPEAHEAD_RESET_MS, TypeaheadOption } from '../../core/typeahead';
 import { FocusSource, MenuPopup } from '../Menu/MenuPopup';
 import { useVanguardTypography } from '../typography-context';
+import { TextFieldFrame } from './TextFieldFrame';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyProps = Record<string, any>;
@@ -501,232 +502,149 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
   const { slots: _rootSlots, slotProps: _rootSlotProps, onClose: rootOnClose, ...rootSlotRest } = rootSlot;
   const paperSlot = typeof menuSlotProps.paper === 'function' ? menuSlotProps.paper({}) : (menuSlotProps.paper ?? {});
   const listSlot = typeof menuSlotProps.list === 'function' ? menuSlotProps.list({}) : (menuSlotProps.list ?? {});
-  const LabelComponent: React.ElementType = slots?.inputLabel ?? 'label';
-  const {
-    component: labelComponent,
-    vanguardComponent,
-    shrink: _s,
-    className: labelClassName,
-    ...labelRest
-  } = labelSlot;
-  const LabelHost: React.ElementType = slots?.inputLabel
-    ? LabelComponent
-    : (labelComponent ?? vanguardComponent ?? 'label');
-
-  const stateClasses = (base: string) =>
-    classNames(focused ? 'Mui-focused' : '', disabled ? 'Mui-disabled' : '', error ? 'Mui-error' : '', base);
-
   return (
-    <div
-      className={classNames(
-        'MuiFormControl-root',
-        fullWidth ? 'MuiFormControl-fullWidth' : '',
-        'MuiTextField-root',
-        className ?? '',
-      )}
-      data-slot="text-field"
-      style={{ ...(sx && typeof sx === 'object' && !Array.isArray(sx) ? sx : {}), ...style }}
-      {...rootRest}
+    <TextFieldFrame
+      id={id}
+      className={className}
+      sx={sx}
+      style={style}
+      rootProps={rootRest}
+      fullWidth={fullWidth}
+      label={label}
+      labelId={labelId}
+      labelSlotComponent={slots?.inputLabel}
+      labelSlot={labelSlot}
+      shrink={shrink}
+      size={size}
+      color={color}
+      required={required}
+      error={error}
+      disabled={disabled}
+      focused={focused}
+      filled={filled}
+      vgType={vgType}
+      inputRootRest={inputRest}
+      inputRootClassName={inputClassName}
+      inputRootExtraClasses="MuiSelect-root"
+      startAdornment={startAdornment}
+      endAdornment={endAdornment}
+      helperText={helperText}
+      helperId={helperId}
+      helperSlot={helperSlot}
+      after={
+        <MenuPopup
+          id={`menu-${name || ''}`}
+          anchorEl={anchorElement}
+          open={open}
+          onClose={rootOnClose ?? menuOnClose ?? closeMenu}
+          marginThreshold={marginThreshold}
+          disableScrollLock={disableScrollLock}
+          autoFocusItem={(menuAutoFocus ?? true) && !disableAutoFocusItem}
+          anchorOrigin={anchorOrigin ?? { vertical: 'bottom', horizontal: 'center' }}
+          transformOrigin={transformOrigin ?? { vertical: 'top', horizontal: 'center' }}
+          focusSource={focusSource}
+          disableListWrap
+          rootProps={{
+            ...menuRest,
+            ...rootSlotRest,
+            style: {
+              ...(menuSx && typeof menuSx === 'object' ? menuSx : {}),
+              ...menuRest.style,
+              ...rootSlotRest.style,
+            },
+          }}
+          paperProps={{
+            ...paperSlot,
+            ref: (node: HTMLDivElement | null) => {
+              paperRef.current = node;
+            },
+            style: { minWidth, ...paperSlot.style },
+          }}
+          listProps={{
+            'aria-labelledby': labelId,
+            role: 'listbox',
+            'aria-multiselectable': multiple ? 'true' : undefined,
+            id: listboxId,
+            ...listSlot,
+          }}
+        >
+          {items}
+        </MenuPopup>
+      }
     >
-      {hasLabel ? (
-        <LabelHost
-          data-shrink={shrink ? 'true' : 'false'}
-          data-slot="text-field-label"
-          htmlFor={id}
-          id={labelId}
-          {...labelRest}
-          className={classNames(
-            'MuiFormLabel-root',
-            'MuiInputLabel-root',
-            'MuiInputLabel-formControl',
-            'MuiInputLabel-animated',
-            shrink ? 'MuiInputLabel-shrink' : '',
-            size === 'small' ? 'MuiInputLabel-sizeSmall' : '',
-            'MuiInputLabel-outlined',
-            `MuiFormLabel-color${color.charAt(0).toUpperCase()}${color.slice(1)}`,
-            stateClasses(filled ? 'MuiFormLabel-filled' : ''),
-            required ? 'Mui-required' : '',
-            vgType,
-            labelClassName ?? '',
-          )}
-        >
-          {label}
-          {required ? (
-            <span
-              aria-hidden
-              className={classNames('MuiFormLabel-asterisk', 'MuiInputLabel-asterisk', error ? 'Mui-error' : '')}
-            >
-              {' *'}
-            </span>
-          ) : null}
-        </LabelHost>
-      ) : null}
       <div
-        data-slot="text-field-input"
-        {...inputRest}
-        onFocus={undefined}
-        onBlur={undefined}
+        tabIndex={tabIndex}
+        role="combobox"
+        aria-controls={open ? listboxId : undefined}
+        aria-disabled={disabled ? 'true' : undefined}
+        aria-expanded={open ? 'true' : 'false'}
+        aria-haspopup="listbox"
+        aria-readonly={readOnly ? 'true' : undefined}
+        aria-label={htmlInput['aria-label']}
+        aria-labelledby={[labelId, SelectDisplayProps.id ?? id].filter(Boolean).join(' ')}
+        aria-describedby={helperId}
+        aria-required={required ? 'true' : undefined}
+        aria-invalid={error ? 'true' : undefined}
+        onKeyDown={handleKeyDown}
+        onMouseDown={disabled || readOnly ? undefined : handleMouseDown}
+        onBlur={handleDisplayBlur}
+        onFocus={handleDisplayFocus}
+        data-slot="select-trigger"
+        data-open={open ? '' : undefined}
+        data-disabled={disabled ? '' : undefined}
+        {...SelectDisplayProps}
+        ref={(node: HTMLDivElement | null) => {
+          displayRef.current = node;
+          if (node) setDisplayNode(node);
+        }}
         className={classNames(
-          'MuiInputBase-root',
-          'MuiOutlinedInput-root',
-          `MuiInputBase-color${color.charAt(0).toUpperCase()}${color.slice(1)}`,
-          fullWidth ? 'MuiInputBase-fullWidth' : '',
-          adornedStart ? 'MuiInputBase-adornedStart' : '',
-          endAdornment ? 'MuiInputBase-adornedEnd' : '',
-          'MuiInputBase-formControl',
-          size === 'small' ? 'MuiInputBase-sizeSmall' : '',
-          'MuiSelect-root',
-          stateClasses(''),
-          vgType,
-          inputClassName ?? '',
+          'MuiSelect-select',
+          'MuiSelect-outlined',
+          'MuiInputBase-input',
+          'MuiOutlinedInput-input',
+          disabled ? 'Mui-disabled' : '',
+          SelectDisplayProps.className ?? '',
         )}
+        id={SelectDisplayProps.id ?? id}
       >
-        {startAdornment}
-        <div
-          tabIndex={tabIndex}
-          role="combobox"
-          aria-controls={open ? listboxId : undefined}
-          aria-disabled={disabled ? 'true' : undefined}
-          aria-expanded={open ? 'true' : 'false'}
-          aria-haspopup="listbox"
-          aria-readonly={readOnly ? 'true' : undefined}
-          aria-label={htmlInput['aria-label']}
-          aria-labelledby={[labelId, SelectDisplayProps.id ?? id].filter(Boolean).join(' ')}
-          aria-describedby={helperId}
-          aria-required={required ? 'true' : undefined}
-          aria-invalid={error ? 'true' : undefined}
-          onKeyDown={handleKeyDown}
-          onMouseDown={disabled || readOnly ? undefined : handleMouseDown}
-          onBlur={handleDisplayBlur}
-          onFocus={handleDisplayFocus}
-          data-slot="select-trigger"
-          data-open={open ? '' : undefined}
-          data-disabled={disabled ? '' : undefined}
-          {...SelectDisplayProps}
-          ref={(node: HTMLDivElement | null) => {
-            displayRef.current = node;
-            if (node) setDisplayNode(node);
-          }}
-          className={classNames(
-            'MuiSelect-select',
-            'MuiSelect-outlined',
-            'MuiInputBase-input',
-            'MuiOutlinedInput-input',
-            disabled ? 'Mui-disabled' : '',
-            SelectDisplayProps.className ?? '',
-          )}
-          id={SelectDisplayProps.id ?? id}
-        >
-          {isEmptyDisplay(display) ? (
-            <span className="notranslate" aria-hidden="true">
-              {'​'}
-            </span>
-          ) : (
-            display
-          )}
-        </div>
-        <input
-          aria-invalid={error}
-          value={Array.isArray(value) ? value.join(',') : (value as string | number)}
-          name={name}
-          ref={nativeRef}
-          aria-hidden
-          onChange={(event) => {
-            const child = childrenArray.find((c) => c.props.value === event.target.value);
-            if (child === undefined) return;
-            if (!isControlled) setValueState(child.props.value);
-            onChange?.(event, child);
-          }}
-          tabIndex={-1}
-          disabled={disabled}
-          readOnly={readOnly}
-          className={classNames('MuiSelect-nativeInput')}
-          autoFocus={autoFocus}
-          required={required}
-          data-slot="select-native-input"
-          {...htmlInput}
-          id={htmlInput.id ?? nativeInputId}
-        />
-        <IconComponent
-          className={classNames(
-            IconComponent === ArrowDropDown ? 'MuiSvgIcon-root MuiSvgIcon-fontSizeMedium' : '',
-            'MuiSelect-icon',
-            open ? 'MuiSelect-iconOpen' : '',
-            disabled ? 'Mui-disabled' : '',
-          )}
-        />
-        {endAdornment}
-        <fieldset aria-hidden="true" className="MuiOutlinedInput-notchedOutline" data-slot="text-field-outline">
-          <legend
-            className="vg-notched-legend"
-            data-with-label={hasLabel ? '' : undefined}
-            data-notched={hasLabel && shrink ? '' : undefined}
-          >
-            {hasLabel ? (
-              <span>
-                {label}
-                {required ? ' *' : null}
-              </span>
-            ) : (
-              <span className="notranslate" aria-hidden="true">
-                {'​'}
-              </span>
-            )}
-          </legend>
-        </fieldset>
+        {isEmptyDisplay(display) ? (
+          <span className="notranslate" aria-hidden="true">
+            {'​'}
+          </span>
+        ) : (
+          display
+        )}
       </div>
-      {helperText != null ? (
-        <p
-          id={helperId}
-          data-slot="text-field-helper"
-          {...helperSlot}
-          className={classNames(
-            'MuiFormHelperText-root',
-            size === 'small' ? 'MuiFormHelperText-sizeSmall' : 'MuiFormHelperText-sizeMedium',
-            'MuiFormHelperText-contained',
-            stateClasses(filled ? 'MuiFormHelperText-filled' : ''),
-            required ? 'Mui-required' : '',
-            vgType,
-            helperSlot.className ?? '',
-          )}
-        >
-          {helperText}
-        </p>
-      ) : null}
-      <MenuPopup
-        id={`menu-${name || ''}`}
-        anchorEl={anchorElement}
-        open={open}
-        onClose={rootOnClose ?? menuOnClose ?? closeMenu}
-        marginThreshold={marginThreshold}
-        disableScrollLock={disableScrollLock}
-        autoFocusItem={(menuAutoFocus ?? true) && !disableAutoFocusItem}
-        anchorOrigin={anchorOrigin ?? { vertical: 'bottom', horizontal: 'center' }}
-        transformOrigin={transformOrigin ?? { vertical: 'top', horizontal: 'center' }}
-        focusSource={focusSource}
-        disableListWrap
-        rootProps={{
-          ...menuRest,
-          ...rootSlotRest,
-          style: { ...(menuSx && typeof menuSx === 'object' ? menuSx : {}), ...menuRest.style, ...rootSlotRest.style },
+      <input
+        aria-invalid={error}
+        value={Array.isArray(value) ? value.join(',') : (value as string | number)}
+        name={name}
+        ref={nativeRef}
+        aria-hidden
+        onChange={(event) => {
+          const child = childrenArray.find((c) => c.props.value === event.target.value);
+          if (child === undefined) return;
+          if (!isControlled) setValueState(child.props.value);
+          onChange?.(event, child);
         }}
-        paperProps={{
-          ...paperSlot,
-          ref: (node: HTMLDivElement | null) => {
-            paperRef.current = node;
-          },
-          style: { minWidth, ...paperSlot.style },
-        }}
-        listProps={{
-          'aria-labelledby': labelId,
-          role: 'listbox',
-          'aria-multiselectable': multiple ? 'true' : undefined,
-          id: listboxId,
-          ...listSlot,
-        }}
-      >
-        {items}
-      </MenuPopup>
-    </div>
+        tabIndex={-1}
+        disabled={disabled}
+        readOnly={readOnly}
+        className={classNames('MuiSelect-nativeInput')}
+        autoFocus={autoFocus}
+        required={required}
+        data-slot="select-native-input"
+        {...htmlInput}
+        id={htmlInput.id ?? nativeInputId}
+      />
+      <IconComponent
+        className={classNames(
+          IconComponent === ArrowDropDown ? 'MuiSvgIcon-root MuiSvgIcon-fontSizeMedium' : '',
+          'MuiSelect-icon',
+          open ? 'MuiSelect-iconOpen' : '',
+          disabled ? 'Mui-disabled' : '',
+        )}
+      />
+    </TextFieldFrame>
   );
 };
