@@ -95,19 +95,70 @@ describe('ClickAway parity with MUI ClickAwayListener', () => {
 });
 
 describe('ClickAway layer rule (not in MUI)', () => {
-  it('a click inside a layer opened above the host is not a click away', async () => {
+  it('a click inside a layer opened from inside the host is not a click away', async () => {
     const onAway = vi.fn();
     const { defaultLayerStack } = await import('../../core/layer-stack');
     const view = render(<Harness Impl={ClickAway} onAway={onAway} opts={{}} />);
     await act(async () => new Promise((r) => setTimeout(r, 1)));
     const layer = document.createElement('div');
     document.body.appendChild(layer);
-    const token = defaultLayerStack.push(() => layer);
+    const token = defaultLayerStack.push(() => layer, view.getAllByTestId('inner')[0]);
     fireEvent.click(layer);
     expect(onAway).not.toHaveBeenCalled();
     defaultLayerStack.remove(token);
     fireEvent.click(layer);
     expect(onAway).toHaveBeenCalledTimes(1);
+    layer.remove();
+    view.unmount();
+  });
+});
+
+describe('two independent hosts (review finding: layer rule too broad)', () => {
+  it('a click inside the newer host is a click away for the older one, like MUI', async () => {
+    const go = async (Impl: Impl) => {
+      const older = vi.fn();
+      const newer = vi.fn();
+      const view = render(
+        <div>
+          <Impl onClickAway={older}>
+            <div data-testid="older">{'older'}</div>
+          </Impl>
+        </div>,
+      );
+      await act(async () => new Promise((r) => setTimeout(r, 1)));
+      view.rerender(
+        <div>
+          <Impl onClickAway={older}>
+            <div data-testid="older">{'older'}</div>
+          </Impl>
+          <Impl onClickAway={newer}>
+            <div data-testid="newer">{'newer'}</div>
+          </Impl>
+        </div>,
+      );
+      await act(async () => new Promise((r) => setTimeout(r, 1)));
+      fireEvent.click(view.getByTestId('newer'));
+      view.unmount();
+      return { older: older.mock.calls.length, newer: newer.mock.calls.length };
+    };
+    const mui = await go(ClickAwayListener);
+    expect(mui).toEqual({ older: 1, newer: 0 });
+    expect(await go(ClickAway)).toEqual(mui);
+  });
+});
+
+describe('ClickAway layer rule: origin outside the host', () => {
+  it('a layer opened from outside the host does not shield it', async () => {
+    const onAway = vi.fn();
+    const { defaultLayerStack } = await import('../../core/layer-stack');
+    const view = render(<Harness Impl={ClickAway} onAway={onAway} opts={{}} />);
+    await act(async () => new Promise((r) => setTimeout(r, 1)));
+    const layer = document.createElement('div');
+    document.body.appendChild(layer);
+    const token = defaultLayerStack.push(() => layer, view.getAllByTestId('outside')[0]);
+    fireEvent.click(layer);
+    expect(onAway).toHaveBeenCalledTimes(1);
+    defaultLayerStack.remove(token);
     layer.remove();
     view.unmount();
   });

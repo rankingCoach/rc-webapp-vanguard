@@ -124,6 +124,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
         className ?? '',
       )}
       data-slot="text-field"
+      data-vg-core=""
       style={{ ...(sx && typeof sx === 'object' && !Array.isArray(sx) ? sx : {}), ...style }}
       {...rootProps}
     >
@@ -131,6 +132,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
         <LabelHost
           data-shrink={shrink ? 'true' : 'false'}
           data-slot="text-field-label"
+          data-vg-core=""
           htmlFor={id}
           id={labelId}
           {...labelRest}
@@ -152,6 +154,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
           {label}
           {required ? (
             <span
+              data-vg-core=""
               aria-hidden
               className={classNames('MuiFormLabel-asterisk', 'MuiInputLabel-asterisk', error ? 'Mui-error' : '')}
             >
@@ -162,6 +165,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
       ) : null}
       <div
         data-slot="text-field-input"
+        data-vg-core=""
         {...inputRootRest}
         onFocus={undefined}
         onBlur={undefined}
@@ -187,7 +191,12 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
         {startAdornment}
         {children}
         {endAdornment}
-        <fieldset aria-hidden="true" className="MuiOutlinedInput-notchedOutline" data-slot="text-field-outline">
+        <fieldset
+          aria-hidden="true"
+          className="MuiOutlinedInput-notchedOutline"
+          data-slot="text-field-outline"
+          data-vg-core=""
+        >
           <legend
             className="vg-notched-legend"
             data-with-label={hasLabel ? '' : undefined}
@@ -210,6 +219,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
         <p
           id={helperId}
           data-slot="text-field-helper"
+          data-vg-core=""
           {...helperSlot}
           className={classNames(
             'MuiFormHelperText-root',

@@ -2,7 +2,7 @@
 // extracted per element with agentic-plans/uisdk-tools/extract-emotion-rules.mjs and from MUI source for variants no
 // story triggered. Specificity rule (D15): each emotion `.css-hash` becomes ONE stable class at emotion's own
 // specificity (no type bump); prop variants sit in `:where(...)`, and every block is scoped to own-core elements with
-// `:where([data-slot])` (zero specificity) so components still rendered by MUI are untouched. Tie order comes from
+// `:where([data-vg-core])` (zero specificity) so components still rendered by MUI are untouched. Tie order comes from
 // position instead: this file is part of src/styles/mui-compat.scss, which the build appends LAST to vanguard.css
 // (vite plugin `vanguard-mui-compat-last`), so it wins ties against the Vanguard skin and against consumer CSS loaded
 // before vanguard.css, and loses ties against consumer CSS loaded after it, exactly as emotion did in production.
@@ -17,7 +17,7 @@ $primary: rgb(25, 118, 210);
 $error: rgb(211, 47, 47);
 
 // ---------------------------------------------------------------- FormControl (TextField root)
-.MuiFormControl-root:where([data-slot]) {
+.MuiFormControl-root:where([data-vg-core]) {
   display: inline-flex;
   flex-direction: column;
   position: relative;
@@ -33,7 +33,7 @@ $error: rgb(211, 47, 47);
 }
 
 // ---------------------------------------------------------------- InputLabel (outlined, form control, animated)
-.MuiInputLabel-root:where([data-slot]) {
+.MuiInputLabel-root:where([data-vg-core]) {
   color: rgba(0, 0, 0, 0.6);
   font-family: $font;
   font-weight: 400;
@@ -93,14 +93,14 @@ $error: rgb(211, 47, 47);
   }
 }
 
-.MuiFormLabel-asterisk:where([data-slot]) {
+.MuiFormLabel-asterisk:where([data-vg-core]) {
   &.Mui-error {
     color: $error;
   }
 }
 
 // ---------------------------------------------------------------- InputBase + OutlinedInput root
-.MuiInputBase-root:where([data-slot]) {
+.MuiInputBase-root:where([data-vg-core]) {
   font-family: $font;
   font-weight: 400;
   font-size: 1rem;
@@ -175,7 +175,7 @@ $error: rgb(211, 47, 47);
 }
 
 // ---------------------------------------------------------------- Notched outline
-.MuiOutlinedInput-notchedOutline:where([data-slot]) {
+.MuiOutlinedInput-notchedOutline:where([data-vg-core]) {
   text-align: left;
   position: absolute;
   inset: -5px 0 0;
@@ -244,7 +244,7 @@ $error: rgb(211, 47, 47);
   }
 }
 
-$control: '[data-slot^="text-field-control"]';
+$control: '[data-vg-core][data-slot^="text-field-control"]';
 
 .MuiInputBase-input:where(#{$control}) {
   font: inherit;
@@ -358,7 +358,7 @@ label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where
 }
 
 // ---------------------------------------------------------------- Select display (InputBase input + Select select)
-.MuiSelect-select:where([data-slot]) {
+.MuiSelect-select:where([data-vg-core]) {
   font: inherit;
   letter-spacing: inherit;
   color: currentcolor;
@@ -431,12 +431,12 @@ label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where
   }
 }
 
-.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select) {
+.MuiInputBase-root:where([data-vg-core]):has(> .MuiSelect-select) {
   --_caret: 32px;
   --_endAdornment: 0px;
 }
 
-.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select ~ .MuiInputAdornment-root) {
+.MuiInputBase-root:where([data-vg-core]):has(> .MuiSelect-select ~ .MuiInputAdornment-root) {
   --_endAdornment: 28px;
 }
 
@@ -452,7 +452,7 @@ label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where
   }
 }
 
-.MuiSelect-nativeInput:where([data-slot]) {
+.MuiSelect-nativeInput:where([data-vg-core]) {
   bottom: 0;
   left: 0;
   position: absolute;
@@ -462,7 +462,7 @@ label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where
   box-sizing: border-box;
 }
 
-.MuiSelect-icon:where(.MuiInputBase-root[data-slot] > *) {
+.MuiSelect-icon:where(.MuiInputBase-root[data-vg-core] > *) {
   position: absolute;
   top: calc(50% - 0.5em);
   pointer-events: none;
@@ -479,7 +479,7 @@ label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where
 }
 
 // SvgIcon (default ArrowDropDown); merged into the icon's emotion class in MUI, kept single-class here.
-svg.MuiSvgIcon-root:where([data-slot]) {
+svg.MuiSvgIcon-root:where([data-vg-core]) {
   user-select: none;
   width: 1em;
   height: 1em;
@@ -494,7 +494,7 @@ svg.MuiSvgIcon-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- Helper text
-.MuiFormHelperText-root:where([data-slot]) {
+.MuiFormHelperText-root:where([data-vg-core]) {
   color: rgba(0, 0, 0, 0.6);
   font-family: $font;
   font-weight: 400;
@@ -518,7 +518,7 @@ svg.MuiSvgIcon-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- Menu popup (Modal + Popover + Paper + List)
-.MuiModal-root:where([data-slot]) {
+.MuiModal-root:where([data-vg-core]) {
   position: fixed;
   z-index: 1300;
   inset: 0;
@@ -528,7 +528,7 @@ svg.MuiSvgIcon-root:where([data-slot]) {
   }
 }
 
-.MuiBackdrop-root:where([data-slot]) {
+.MuiBackdrop-root:where([data-vg-core]) {
   position: fixed;
   display: flex;
   align-items: center;
@@ -546,7 +546,7 @@ svg.MuiSvgIcon-root:where([data-slot]) {
   }
 }
 
-.MuiPopover-paper:where([data-slot]) {
+.MuiPopover-paper:where([data-vg-core]) {
   // Light: MUI's white paper, unchanged. Dark: the --fn-bg-surface token instead of MUI's white (approved delta, fixes
   // the white-menu bug where root-components.scss is not loaded). rc-webapp already paints this paper with the same
   // token via `.MuiMenu-root > .MuiPaper-root` (higher specificity), so the app is unchanged. `color` stays MUI's so
@@ -569,7 +569,21 @@ svg.MuiSvgIcon-root:where([data-slot]) {
   }
 }
 
-.MuiMenu-list:where([data-slot]) {
+// MUI List (any own-core MenuList, e.g. DropdownMenu's): emotion's one class, padding variant included. Same
+// specificity as the module skin's `.menu` it used to beat by order (D15: this block is last).
+.MuiList-root:where([data-vg-core]) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  &:where(.MuiList-padding) {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+.MuiMenu-list:where([data-vg-core]) {
   list-style: none;
   margin: 0;
   padding: 8px 0;
@@ -578,7 +592,7 @@ svg.MuiSvgIcon-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- MenuItem (option)
-.MuiMenuItem-root:where([data-slot]) {
+.MuiMenuItem-root:where([data-vg-core]) {
   // ButtonBase reset in the same rule (D3), then the MenuItem paint.
   @include button-base-reset;
 
@@ -666,12 +680,12 @@ svg.MuiSvgIcon-root:where([data-slot]) {
 // ---------------------------------------------------------------- Inside VanguardThemeProvider
 // The bundled MUI theme it set (fontSize 16, htmlFontSize 16) scales body1/caption by 16/14. Same specificity as the
 // base rules above and later in this file, so they win deterministically.
-.MuiInputBase-root:where([data-slot]):where(.vg-typography-vanguard),
-.MuiInputLabel-root:where([data-slot]):where(.vg-typography-vanguard),
-.MuiMenuItem-root:where([data-slot]):where(.vg-typography-vanguard) {
+.MuiInputBase-root:where([data-vg-core]):where(.vg-typography-vanguard),
+.MuiInputLabel-root:where([data-vg-core]):where(.vg-typography-vanguard),
+.MuiMenuItem-root:where([data-vg-core]):where(.vg-typography-vanguard) {
   font-size: unquote("1.1428571428571428rem");
 }
 
-.MuiFormHelperText-root:where([data-slot]):where(.vg-typography-vanguard) {
+.MuiFormHelperText-root:where([data-vg-core]):where(.vg-typography-vanguard) {
   font-size: unquote("0.8571428571428571rem");
 }

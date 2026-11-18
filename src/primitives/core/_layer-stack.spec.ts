@@ -42,10 +42,11 @@ describe('layer stack', () => {
     const ta = stack.push(() => a);
     const tb = stack.push(() => b);
     stack.push(() => c);
-    expect(stack.above(ta)).toEqual([b, c]);
-    expect(stack.above(tb)).toEqual([c]);
+    const els = (t: typeof ta) => stack.above(t).map((l) => l.element);
+    expect(els(ta)).toEqual([b, c]);
+    expect(els(tb)).toEqual([c]);
     stack.remove(tb);
-    expect(stack.above(ta)).toEqual([c]);
+    expect(els(ta)).toEqual([c]);
     expect(stack.above(tb)).toEqual([]);
   });
 });

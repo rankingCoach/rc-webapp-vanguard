@@ -149,6 +149,13 @@ Status keys: **PROPOSED** = waiting for watchdog sign-off · **APPROVED** · **U
 2. State as present/absent boolean attributes: `data-pressed`, `data-disabled`, `data-open`, `data-highlighted`, `data-selected`. Enums as values: `data-orientation`, `data-side`. Plus `data-value` where useful. No `data-state`.
 3. Legacy `Mui*` classes (`MuiButtonBase-root`, `MuiToggleButton-root`, `Mui-selected`, `Mui-disabled`, `Mui-focusVisible`, `MuiToggleButtonGroup-grouped|firstButton|middleButton|lastButton`, `MuiTouchRipple-*`) are a **compatibility alias**. rc-webapp styles them in 6 modules today (ColorSchemeToggle, AdminColorSchemeToggle, ScreenSizeSelector, ExportScopeSwitch, AgentChatAdminSettingsModal, LogsPage).
 4. New Vanguard SCSS should target the data attributes. Removal of the aliases is a later, separate breaking step (USER), after rc-webapp moves its 6 modules to data attributes.
+5. Naming convention (watchdog, fixed for the whole library, 2026-11-18): the bare `<component>` slot goes on the
+   element that carries the component's own styling and state (it receives the consumer `className` and the state
+   classes), with the state attributes on that same element. When the ComponentContainer wrapper is a distinct
+   element it gets `<component>-container`. Parts are `<component>-<part>`. Existing own-core slots already follow it
+   (`toggle-button` on ButtonBase, `select-trigger`, `text-field-*`, `menu-list`, `popper`). Implementer B adds the
+   `-container` slots to rebuilt components' wrappers and announces it before touching those files; ComponentContainer
+   gets an optional typed data-* pass-through in B's batch 1.
 
 ### D3. CSS: order-independent at MUI's exact specificity, no `@layer` (PROPOSED)
 1. Each skin includes the ButtonBase reset **inside its own root rule** (`@include button-base-reset` from `_button-base.scss`). Reset and skin then share one selector, so stylesheet order can't flip them. Ripple classes are unique, so their order doesn't matter either.
@@ -1003,3 +1010,81 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    rxjs, url-toolkit, video.js, videojs-vtt.js, xlsx): none ships a NOTICE file, so the licence text suffices.
 7. Pending: the verifier runs rc-webapp's own typecheck in the shadow copy against the candidate pack without MUI
    resolvable through Vanguard (error set must equal `.472`); then commit MUI → devDependencies.
+
+## 29. Process log
+
+1. TDD exception (b423180): the click-away decision spec (`_layer-stack.spec.ts`) was written together with the
+   code, not red first. The parity spec against MUI was added after, with MUI's counts pinned. Rule from now on:
+   behaviour ports start with a red spec against MUI's pinned values.
+2. Watchdog standing rule (2026-11-18 evening): a status report is not a stopping point; a turn ends only when every
+   queued item waits on a verdict/gate and nothing else can start, or on a blocker. Queue: DropdownMenu → Menu/
+   MenuItem → Tooltip timing + Popover → focus trap + PopoverModal → Autocomplete/SearchableSelect; filler while
+   waiting: the Trivial group (data-slot only, 10–15 per commit) and the agent surface (llms.txt, per-component docs,
+   skill file; design entry first).
+3. Codex review of handoff 10 (gpt-6.1-sol, high, read-only; 13 findings, all checked):
+   1. Fixed, each with a red spec against MUI first: SSR `document` access in OwnPopper (1); MenuList items arriving
+      after mount (2), focus by pointer/code moving the tab stop (4), consumer onKeyDown after navigation (9),
+      Shift+Arrow (10), first focusable selected item (11); Fade child-ref churn/cleanup (5), `enter`/`exit` and extra
+      props reaching Transition/the child (6); ClickAway layer rule narrowed to layers opened from inside the host
+      (8: two independent dropdowns now behave like MUI).
+   2. Not reproduced, defensive change kept: reopen during exit (3), MUI-pinned spec added; MenuPopup now gates
+      `autoFocusItem` with `open` like MUI Menu.
+   3. Accepted deltas (zero usage): RTL theme direction flipping popper placements (7: no RTL theme in rc-webapp or
+      Vanguard); theme `motion.reducedMotion` (12: MUI default 'never', nothing sets it); TransitionGroup context for
+      Transition (13: no Fade inside a TransitionGroup).
+4. Own-core CSS marker (watchdog MAJOR from B's review): compat selectors scoped `:where([data-slot])` treated any
+   data-slot on a Mui-classed element as own core; B is adding slots library-wide. The own core now emits an explicit
+   `data-vg-core` on every element a compat rule targets (TextField frame parts, select trigger/native input/icon,
+   text control and autosize shadow, ModalHost backdrop, menu popup/paper/list/option) and the selectors require it
+   (text-control rules keep the slot filter too). Spec `_own-core-marker.spec.tsx`: no compat selector uses data-slot
+   as the marker; an MUI-rendered TextField whose parts carry data-slot matches none of them (jsdom treats `:where()`
+   as always true, so the spec unwraps it before matching). Side effect, toward parity: the required asterisk span
+   never carried a slot, so its error colour rule never applied; it now does (MUI colours it red on error).
+   Tell B when it lands so the defensive "never slot a Mui-classed element" rule can go.
+
+## 30. Verification additions (user, 2026-11-18 night)
+
+1. Unit tests count as verification too (the limit is no live backend calls, no live app session, no real user
+   data). The verifier also runs rc-webapp's own Vitest specs for the files that import a handed-off component,
+   paired against `.472` in the shadow copies; catch-up run on Select, Input/Textarea, ToggleButtonGroup, Form/field
+   binding and the dispatch shim. A spec that passes on `.472` and fails on a candidate pack is a FAIL.
+2. Tier P (final phase, after Tier C): performance and leak sweep per component (mount/unmount and open/close cycles,
+   forced GC, heap / DOM node / listener counts, leftover timers and observers, body state after close, commit counts),
+   paired against `.472`; the verifier builds the harness now and runs it early on rebuilt components. A NEW leak or a
+   clear render-cost regression is a FAIL; a leak that also exists on `.472` is reported as pre-existing.
+3. For the own code: every primitive/component that adds a document/window listener, timer, rAF loop, observer,
+   portal node, body class/style, sibling aria-hidden or scroll lock gets a spec proving it is gone after unmount and
+   after close. Backfill for what is committed (ButtonBase/ripple, ModalHost, MenuPopup, Popper, click-away, autosize,
+   keep-last helper, layer stack) in one commit.
+4. User decisions (2026-11-18 night):
+   1. Every WordPress export is in use (curated list). "Used" = rc-webapp usage OR WordPress export. When rebuilt,
+      Autocomplete, Popover, Accordion, Button, CheckBox, Skeleton, SlideTransition, Modal (ModalRoot/ModalService/
+      ModalProvider), EditModal, Form, Input, Textarea and Select each get a WordPress smoke test in the package
+      fixture.
+   2. Components with no rc-webapp usage and no WordPress export are still migrated, last in order.
+   3. The full rc-webapp unit suite runs once at the end, paired in the shadows.
+   4. ONE BRANCH: B's `feature/ui-sdk-b-data-slots` is merged into `feature/ui-sdk-architecture-investigation` after
+      every verifier PASS on a B batch (plain merge, no rebase/squash; conflicts go to the watchdog), and checked at
+      least hourly for passed, unmerged commits.
+   5. Pre-existing leaks/performance problems found by Tier P on `.472` are FIXED (own commit + reproducing spec).
+   6. Duplicate-component families (B's audit) merge through B, approved per family by the watchdog.
+   7. The old component-usage "zero usage" list counted only direct imports and is being rebuilt; nothing is treated
+      as unused until the reachability map arrives (ModalService/DrawerService/snackbarService/actionBarService/
+      videoPlayerService and rendering by other Vanguard components count). rc-webapp calls: ModalService.open 328,
+      snackbarService.openErrorSnackbar 169, ModalService.openConfirmModal 71, DrawerService.open 56, ...
+5. Zero-usage claims in this plan, re-verified against direct AND indirect use (2026-11-18 night):
+   1. Native select / filled-standard variants (§22.5): no Vanguard component passes `native`/`variant` to
+      InputBase/Select/TextField (grep of non-story src), rc-webapp's 65 `textFieldProps` never do. NOT verifiable for
+      WordPress consumers (Input/Select are WordPress exports and take `textFieldProps`). The decision is unaffected:
+      those props keep working through the MUI fallback until the MUI-removal step.
+   2. PopoverPopper / AutocompleteWithAnchor: no rc-webapp import, not WordPress-exported, and no Vanguard component
+      renders them (Autocomplete only mentions AutocompleteWithAnchor in a comment; Popover imports PopoverPopper.scss,
+      not the component). Holds; migrated anyway (91e27ce).
+   3. Slider with formconfig: rc-webapp renders Slider in 7 files, none binds formconfig/field; Vanguard renders it in
+      Cropper and AgeSlider, neither binds. Holds.
+   4. RTL theme direction (handoff 10 review, finding 7): Vanguard's theme (`createTheme` in VanguardThemeProvider)
+      sets no direction (ltr); MUI is bundled into Vanguard, so a consumer's own MUI ThemeProvider is a different
+      context the bundled MUI never reads; rc-webapp has no RTL theme. Holds for rc-webapp and WordPress.
+   5. "MUI MenuItem inside Select" (Vanguard MenuItem): MenuItem renders the own MenuOption inside every own popup
+      (OptionHostContext: MenuList now provides it, so also inside DropdownMenu); MUI MenuItem remains only inside
+      MUI-rendered Menus until Menu is rebuilt (queue item 2.2).

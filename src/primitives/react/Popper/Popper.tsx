@@ -160,6 +160,8 @@ export const OwnPopper = (props: OwnPopperProps) => {
   } = props;
   const [exited, setExited] = useState(true);
   if (!keepMounted && !open && (!transition || exited)) return null;
+  // Server render: MUI's Portal renders nothing until mounted; there is no document to portal into.
+  if (typeof document === 'undefined') return null;
   let container: Element | null | undefined;
   if (containerProp) container = resolve(containerProp);
   else if (anchorEl) {

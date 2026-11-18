@@ -38,7 +38,10 @@ export const ClickAway = (props: ClickAwayProps) => {
     const timer = setTimeout(() => {
       activated.current = true;
     }, 0);
-    layer.current = defaultLayerStack.push(() => nodeRef.current);
+    layer.current = defaultLayerStack.push(
+      () => nodeRef.current,
+      typeof document === 'undefined' ? null : document.activeElement,
+    );
     return () => {
       clearTimeout(timer);
       activated.current = false;
@@ -60,7 +63,13 @@ export const ClickAway = (props: ClickAwayProps) => {
           : !doc.documentElement.contains(target) || node.contains(target)
         : false;
       const above = layer.current ? defaultLayerStack.above(layer.current) : [];
-      const insideHigherLayer = above.some((el) => (path ? path.includes(el) : el.contains(target)));
+      const insideHigherLayer = above.some(
+        (l) =>
+          l.origin !== null &&
+          node !== null &&
+          node.contains(l.origin) &&
+          (path ? path.includes(l.element) : l.element.contains(target)),
+      );
       const wasMoved = moved.current;
       moved.current = false;
       if (

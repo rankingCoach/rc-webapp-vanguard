@@ -1,12 +1,11 @@
 import { classNames } from '@helpers/classNames';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createListTypeahead, nextListIndex } from '../../core/listbox';
 import { OriginH, OriginV, popoverPosition } from '../../core/position';
 import { GROW_HIDDEN_TRANSFORM, growTransition } from '../../core/transition';
 import { ModalCloseReason, ModalHost } from '../Modal/ModalHost';
-import { OptionHostContext } from './option-host-context';
+import { FocusSource, MenuList } from './MenuList';
 
-export type FocusSource = 'keyboard' | 'pointer' | null;
+export type { FocusSource };
 
 export const PAPER_SHADOW_8 =
   '0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)';
@@ -33,15 +32,6 @@ export interface MenuPopupProps {
   disableScrollLock?: boolean;
   children: React.ReactNode;
 }
-
-const items = (list: HTMLElement | null) =>
-  list ? Array.from(list.querySelectorAll<HTMLElement>(':scope > [role="option"], :scope > [role="menuitem"]')) : [];
-
-const itemInfo = (el: HTMLElement) => ({
-  // biome-ignore lint/performance/useDomNodeTextContent: MUI MenuList typeahead matches the rendered text (innerText, textContent fallback)
-  text: (el.innerText ?? el.textContent ?? '') as string,
-  disabled: el.getAttribute('aria-disabled') === 'true',
-});
 
 /**
  * Menu popup = MUI Menu/Popover parity: ModalHost + Paper (elevation 8, Grow "auto" transition, positioned by the
@@ -70,7 +60,6 @@ export const MenuPopup = (props: MenuPopupProps) => {
   const listRef = useRef<HTMLUListElement | null>(null);
   const [exiting, setExiting] = useState(false);
   const wasOpen = useRef(open);
-  const typeahead = useRef(createListTypeahead());
 
   if (wasOpen.current && !open && !exiting) setExiting(true);
   wasOpen.current = open;
@@ -123,57 +112,12 @@ export const MenuPopup = (props: MenuPopupProps) => {
     return () => window.removeEventListener('resize', onResize);
   }, [open, position]);
 
-  // Roving tab index + initial focus.
-  useLayoutEffect(() => {
-    if (!open) return;
-    const list = items(listRef.current);
-    const selected = list.findIndex((el) => el.getAttribute('aria-selected') === 'true' && !itemInfo(el).disabled);
-    const first = list.findIndex((el) => !itemInfo(el).disabled);
-    const active = selected !== -1 ? selected : first;
-    list.forEach((el, i) => {
-      el.setAttribute('tabindex', i === active && !itemInfo(el).disabled ? '0' : '-1');
-    });
-    if (autoFocusItem && active !== -1) {
-      try {
-        list[active].focus(
-          focusSource == null ? undefined : ({ focusVisible: focusSource === 'keyboard' } as FocusOptions),
-        );
-      } catch {
-        list[active].focus();
-      }
-    }
-  }, [open, autoFocusItem, focusSource]);
-
-  const moveTo = (list: HTMLElement[], index: number | null) => {
-    if (index === null || !list[index]) return;
-    for (const el of list) el.setAttribute('tabindex', '-1');
-    list[index].setAttribute('tabindex', '0');
-    list[index].focus();
-  };
-
+  // Tab closes the menu (MUI Menu's handleListKeyDown); everything else is MenuList's.
   const handleListKeyDown = (event: React.KeyboardEvent<HTMLUListElement>) => {
     (listProps?.onKeyDown as React.KeyboardEventHandler<HTMLUListElement> | undefined)?.(event);
-    if (event.ctrlKey || event.metaKey || event.altKey) return;
-    if (event.key === 'Tab') {
+    if (event.key === 'Tab' && !(event.ctrlKey || event.metaKey || event.altKey)) {
       event.preventDefault();
       onClose(event, 'tabKeyDown');
-      return;
-    }
-    const list = items(listRef.current);
-    const current = list.indexOf(document.activeElement as HTMLElement);
-    const infos = list.map(itemInfo);
-    const nav = nextListIndex(infos, current === -1 ? -1 : current, event.key, { wrap: !disableListWrap });
-    if (nav !== null) {
-      event.preventDefault();
-      moveTo(list, nav);
-      return;
-    }
-    if (event.key.length === 1) {
-      const hit = typeahead.current.type(event.key, infos, current, performance.now());
-      if (hit !== null) {
-        event.preventDefault();
-        moveTo(list, hit);
-      }
     }
   };
 
@@ -198,6 +142,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
       style={rootStyle}
       backdropStyle={{ opacity: open ? 1 : 0, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1)' }}
       data-slot="menu-popup"
+      data-vg-core=""
       data-open={open ? '' : undefined}
       {...rootRest}
     >
@@ -213,6 +158,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
         )}
         tabIndex={-1}
         data-slot="menu-paper"
+        data-vg-core=""
         ref={setPaperRef}
         style={{
           ['--Paper-shadow' as string]: PAPER_SHADOW_8,
@@ -222,17 +168,18 @@ export const MenuPopup = (props: MenuPopupProps) => {
         }}
         {...paperRest}
       >
-        <ul
-          className={classNames('MuiList-root', 'MuiList-padding', 'MuiMenu-list', listClass ?? '')}
-          tabIndex={-1}
-          data-slot="menu-list"
+        <MenuList
+          className={classNames('MuiMenu-list', listClass ?? '')}
           ref={listRef}
           style={listStyle}
+          autoFocusItem={open && autoFocusItem}
+          focusSource={focusSource}
+          disableListWrap={disableListWrap}
           onKeyDown={handleListKeyDown}
           {...listRest}
         >
-          <OptionHostContext.Provider value={true}>{children}</OptionHostContext.Provider>
-        </ul>
+          {children}
+        </MenuList>
       </div>
     </ModalHost>
   );
