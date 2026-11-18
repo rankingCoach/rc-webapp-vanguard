@@ -48,7 +48,7 @@ export const OpeningTimes = (props: OpeningTimesProps) => {
   } = props;
 
   return (
-    <ComponentContainer className={classNames(className, styles.flex)} testId={testId}>
+    <ComponentContainer data-slot={'opening-times'} className={classNames(className, styles.flex)} testId={testId}>
       {openingHoursDays.map((item) => {
         return (
           <OpeningTimesItem

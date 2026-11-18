@@ -31,13 +31,13 @@ export const RecommendationCard = (props: RecommendationCardProps) => {
   };
 
   return (
-    <div className={classNames(styles.recommendationCard)}>
+    <div data-slot={'recommendation-card'} className={classNames(styles.recommendationCard)}>
       {showDetails ? (
         details
       ) : (
-        <div className={classNames(dFlex, gap8)}>
+        <div data-slot={'recommendation-card-content'} className={classNames(dFlex, gap8)}>
           <div>
-            <div className={classNames(styles.recommendationBadge, mb2)}>
+            <div data-slot={'recommendation-card-badge'} className={classNames(styles.recommendationBadge, mb2)}>
               <TextIcon
                 iconSize={IconSize.small}
                 icon={IconNames.rec}
@@ -65,12 +65,12 @@ export const RecommendationCard = (props: RecommendationCardProps) => {
             </AnimatedConditional>
           </div>
 
-          <img src={svgIcon} className={classNames(styles.cardIllustration)} />
+          <img data-slot={'recommendation-card-image'} src={svgIcon} className={classNames(styles.cardIllustration)} />
         </div>
       )}
 
       <Render if={!!details}>
-        <div className={styles.learnMoreButton} onClick={toggleDetails}>
+        <div data-slot={'recommendation-card-toggle'} className={styles.learnMoreButton} onClick={toggleDetails}>
           <TextIcon
             icon={showDetails ? IconNames.visibilityOff : IconNames.visibility}
             textColor="--n000"

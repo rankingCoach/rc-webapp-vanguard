@@ -22,18 +22,18 @@ export const OpportunityCard = (props: OpportunityCardProps) => {
   const { SvgIcon } = useDynamicImport(`seo/domainFlow/${svg}.svg`);
 
   return (
-    <ComponentContainer className={styles.container} onClick={onClick}>
-      <img src={SvgIcon} height={175} width={300} alt={''} />
+    <ComponentContainer data-slot={'opportunity-card'} className={styles.container} onClick={onClick}>
+      <img data-slot={'opportunity-card-image'} src={SvgIcon} height={175} width={300} alt={''} />
 
-      <div className={styles.textBox}>
-        <div className={classNames(dFlex, alignItemsCenter, justifyContentBetween)}>
+      <div data-slot={'opportunity-card-content'} className={styles.textBox}>
+        <div data-slot={'opportunity-card-header'} className={classNames(dFlex, alignItemsCenter, justifyContentBetween)}>
           <Text>{title}</Text>
           <Icon className={styles.arrow}>{IconNames.arrowRight}</Icon>
         </div>
         <Render if={!!subtitle}>
           {Array.isArray(subtitle) ? (
             subtitle.map((text, index) => (
-              <div key={index} className={classNames(dFlex, alignItemsStart, justifyContentBetween)}>
+              <div data-slot={'opportunity-card-subtitle'} key={index} className={classNames(dFlex, alignItemsStart, justifyContentBetween)}>
                 <Text type={TextTypes.textHelp}>{text}</Text>
                 <Icon>{IconNames.arrowRight}</Icon>
               </div>

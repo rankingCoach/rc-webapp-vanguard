@@ -1,6 +1,7 @@
 import { InfoIcon } from '@common/InfoIcon/InfoIcon';
 import { dFlex, h100, ml2, pb2, pl3, pr3, pt2 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { AnimatedConditional } from '@vanguard/AnimatedConditional/AnimatedConditional';
 import { Button, ButtonProps, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
@@ -24,11 +25,11 @@ export const HoverableCardSubtitles = (props: HoverableCardSubtitlesProps) => {
   if (!subtitles || !subtitles.length) return null;
 
   return (
-    <div className={classNames(dFlex, styles.subtitlesContainer)}>
+    <div data-slot={'hoverable-card-subtitles'} className={classNames(dFlex, styles.subtitlesContainer)}>
       {subtitles.map((subtitle: string, index: number) => {
         return (
           <React.Fragment key={index}>
-            {!!index && <div className={classNames(styles.separator)} />}
+            {!!index && <div data-slot={'hoverable-card-subtitles-separator'} className={classNames(styles.separator)} />}
             <Text
               testId={'subtitle'}
               type={TextTypes.textHelp}
@@ -92,6 +93,8 @@ export const HoverableCard = (props: HoverableCardProps) => {
 
   return popoverWrap(
     <ComponentContainer
+      data-slot={'hoverable-card'}
+      data-disabled={dataFlag(disabled)}
       testId={testId}
       className={classNames(
         className,
@@ -108,7 +111,7 @@ export const HoverableCard = (props: HoverableCardProps) => {
         !disableHover && onClick();
       }}
     >
-      <div className={styles.header}>
+      <div data-slot={'hoverable-card-header'} className={styles.header}>
         <div>
           <Text className={styles.title} testId={'title'} fontWeight={FontWeights.regular} replacements={replacements}>
             {title}
@@ -136,7 +139,7 @@ export const HoverableCard = (props: HoverableCardProps) => {
           )}
         </AnimatedConditional>
       </div>
-      <div className={styles.content}>{children}</div>
+      <div data-slot={'hoverable-card-content'} className={styles.content}>{children}</div>
     </ComponentContainer>,
   );
 };

@@ -22,9 +22,9 @@ export const BusinessListItemWithConnections = (props: BusinessListWithConnectio
   const { title, category, isButtonLoading, connectCallbackClick, address, website, btnType } = props;
 
   return (
-    <ComponentContainer>
-      <div className={classNames(dFlex, justifyContentBetween, py3)}>
-        <div className={classNames(dFlexColumn, gap1)}>
+    <ComponentContainer data-slot={'business-list-item-with-connections-container'}>
+      <div data-slot={'business-list-item-with-connections'} className={classNames(dFlex, justifyContentBetween, py3)}>
+        <div data-slot={'business-list-item-with-connections-details'} className={classNames(dFlexColumn, gap1)}>
           <Text type={TextTypes.textIntro} fontWeight={FontWeights.bold} className={pb1}>
             {title}
           </Text>

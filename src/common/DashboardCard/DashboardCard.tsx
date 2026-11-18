@@ -21,6 +21,7 @@ export const DashboardCard = (props: DashboardCardProps) => {
 
   return (
     <ComponentContainer
+      data-slot={'dashboard-card'}
       className={classNames(
         styles.container,
         disablePadding ? styles.noPadding : undefined,
@@ -29,7 +30,7 @@ export const DashboardCard = (props: DashboardCardProps) => {
       )}
     >
       {title && (
-        <div className={styles.title}>
+        <div data-slot={'dashboard-card-title'} className={styles.title}>
           <Text color={titleColor ?? '--fn-fg-light'} fontWeight={FontWeights.medium}>
             {title}
           </Text>
@@ -37,12 +38,12 @@ export const DashboardCard = (props: DashboardCardProps) => {
       )}
 
       {infoIconProps && (
-        <div className={styles.infobox}>
+        <div data-slot={'dashboard-card-info'} className={styles.infobox}>
           <InfoIcon size={IconSize.small} {...infoIconProps} />
         </div>
       )}
 
-      <div className={styles.childrenContainer}>{children}</div>
+      <div data-slot={'dashboard-card-content'} className={styles.childrenContainer}>{children}</div>
     </ComponentContainer>
   );
 };

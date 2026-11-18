@@ -19,9 +19,9 @@ export const UpsellingTrigger = (props: UpsellingTriggerProps) => {
   const { productName, onclick } = props;
 
   return (
-    <ComponentContainer>
-      <div className={classNames(dFlex, alignItemsCenter, styles.upsellingContainer)}>
-        <div>
+    <ComponentContainer data-slot={'upselling-trigger-container'}>
+      <div data-slot={'upselling-trigger'} className={classNames(dFlex, alignItemsCenter, styles.upsellingContainer)}>
+        <div data-slot={'upselling-trigger-content'}>
           <div className={classNames(pl1_5, pb1)}>
             <Text testId="title" type={TextTypes.text} fontWeight={FontWeights.bold}>
               Get more engagement and increase your budget
@@ -41,7 +41,7 @@ export const UpsellingTrigger = (props: UpsellingTriggerProps) => {
             Learn more
           </Button>
         </div>
-        <div>
+        <div data-slot={'upselling-trigger-illustration'}>
           <StyledSVG width="128" height="128" src={Trigger} />
         </div>
       </div>

@@ -21,15 +21,15 @@ export interface IncentiveBoxProps {
 export const IncentiveBox = (props: IncentiveBoxProps) => {
   const { icon, text, buttonText, hasButton, onClickBtn, replacements, linkReplacements } = props;
   return (
-    <ComponentContainer>
-      <div className={styles.incentiveContainer}>
+    <ComponentContainer data-slot={'incentive-box-container'}>
+      <div data-slot={'incentive-box'} className={styles.incentiveContainer}>
         <div>
           <Icon className={styles.icon} hasCircle={true} fillColor={'--p100'} color={'--p500'} type={IconSize.small}>
             {icon}
           </Icon>
         </div>
 
-        <div className={styles.textAndCta}>
+        <div data-slot={'incentive-box-content'} className={styles.textAndCta}>
           <Text
             replacements={replacements}
             testId="text"

@@ -14,7 +14,7 @@ export interface OnboardingWelcomeAnimationProps {
 export const OnboardingWelcomeAnimation: React.FC<OnboardingWelcomeAnimationProps> = (props) => {
   const { textsSlideAnimationDuration, textsFadeAnimationDuration = 150, waitBetweenTexts, texts } = props;
   return (
-    <div className={classNames(dFlex, alignItemsCenter, justifyContentCenter)}>
+    <div data-slot={'onboarding-welcome-animation'} className={classNames(dFlex, alignItemsCenter, justifyContentCenter)}>
       <SlideTransition waitBetweenComponents={waitBetweenTexts} duration={textsSlideAnimationDuration}>
         {texts.map((txt) => {
           return (

@@ -8,9 +8,9 @@ export const GooglePartnerBadge = (props: Props) => {
   const anchorLink = 'https://www.google.com/partners/agency?id=2194615496';
 
   return (
-    <ComponentContainer testId={'googlePartnerComponentContainer'}>
-      <a data-testid={'googlePartnerAnchor'} href={anchorLink} target={'_blank'} rel="noreferrer">
-        <img data-testid={'googlePartnerImage'} src={imageSrc} />
+    <ComponentContainer data-slot={'google-partner-badge'} testId={'googlePartnerComponentContainer'}>
+      <a data-slot={'google-partner-badge-link'} data-testid={'googlePartnerAnchor'} href={anchorLink} target={'_blank'} rel="noreferrer">
+        <img data-slot={'google-partner-badge-image'} data-testid={'googlePartnerImage'} src={imageSrc} />
       </a>
     </ComponentContainer>
   );

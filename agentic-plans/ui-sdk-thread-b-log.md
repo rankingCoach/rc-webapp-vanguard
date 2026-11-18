@@ -626,3 +626,26 @@ Evidence: red 13/14 → green 14/14; touched-folder specs 16 files / 19 (incl. e
 1. The generator resolves plain identifiers and `helper.key` lookups in story args through top-level consts of the story file and its relative imports (e.g. `testMessages.danger` from `stories/_Alert.default.ts`), unwrapping `as const`; `children` may be such a lookup too.
 2. Examples with no attribute and no children (`<AIOrb />`) and JSX longer than 320 characters (chart series, big data) are skipped.
 3. Pages with examples: 27 → 49 of 298. Spec 8/8 (the one red run was the determinism test while Codex was editing src between the spec's two generations; green once src was stable).
+
+### Batch 7: remaining src/common components
+Drafted by Codex (medium), read by me; spec fix by me (PageSectionRecommended renders LottieAnimationLoader → jsdom canvas error after the test; added the lottie-web mock used by `_error-logging.spec.tsx`).
+| Component | Attributes |
+|---|---|
+| AIBudgetEnd | `ai-budget-end-first-paragraph`, `-second-paragraph` (root is Modal/ModalBody, which take no data-*) |
+| AgeSlider / ExpandableItem / InvoiceAddress / OpeningTimes / SectionMissing / StatisticsBoard | root slot each (`age-slider`, `expandable-item`, `invoice-address`, `opening-times`, `section-missing`, `statistics-board`) |
+| BusinessListItemWithConnections | `business-list-item-with-connections-container`, `business-list-item-with-connections`, `-details` |
+| DashboardCard | `dashboard-card`, `-title`, `-info`, `-content` |
+| EditableCard | `editable-card`, `-header`, `-actions`, `-content` |
+| GooglePartnerBadge | `google-partner-badge`, `-link`, `-image` |
+| HoverableCard | `hoverable-card` + `data-disabled`, `-header`, `-subtitles`, `-subtitles-separator`, `-content` |
+| IncentiveBox | `incentive-box-container`, `incentive-box`, `-content` |
+| ListingServiceConnectionStatus | `listing-service-connection-status-container`, `listing-service-connection-status`, `-account`, `-avatar`, `-details` |
+| OnboardingWelcomeAnimation | `onboarding-welcome-animation` |
+| OpportunityCard | `opportunity-card`, `-image`, `-content`, `-header`, `-subtitle` |
+| PageContainer | `page-container` (before the props spread: caller wins) |
+| PageSectionRecommended | `page-section-recommended` (styled inner root), `-image`, `-content`, `-title`, `-children` |
+| RecommendationCard | `recommendation-card`, `-content`, `-badge`, `-image`, `-toggle` |
+| UpsellingTrigger | `upselling-trigger-container`, `upselling-trigger`, `-content`, `-illustration` |
+| Tutorial | nothing (root is Modal) |
+Evidence: red 21/23 (2 "no own slot" passes) → green 24/24 (21 files); spec + SectionMissing story green; tsc 0; biome 10 = 10, 0 on new specs; attribute-only stream OK; collision: none.
+Track 1 status: every (a) component in src/core and src/common now has its DOM contract or a recorded reason for none.

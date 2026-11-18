@@ -20,19 +20,20 @@ export interface ListingServiceConnectionStatusProps {
 export const ListingServiceConnectionStatus = (props: ListingServiceConnectionStatusProps) => {
   const { picture, disconnectCallbackClick, fullName, text, replacements, hasBorderBottom = true } = props;
   return (
-    <ComponentContainer>
+    <ComponentContainer data-slot={'listing-service-connection-status-container'}>
       <div
+        data-slot={'listing-service-connection-status'}
         className={classNames(dFlex, alignItemsCenter, justifyContentBetween)}
         style={hasBorderBottom ? { borderBottom: '1px solid var(--n100)' } : {}}
       >
-        <div className={classNames(dFlex, alignItemsCenter, pb2)}>
+        <div data-slot={'listing-service-connection-status-account'} className={classNames(dFlex, alignItemsCenter, pb2)}>
           {picture ? (
-            <img src={picture} alt={fullName} className={styles.avatar} />
+            <img data-slot={'listing-service-connection-status-avatar'} src={picture} alt={fullName} className={styles.avatar} />
           ) : (
             <Avatar name={fullName} size={'medium-large'} noHover={true} />
           )}
 
-          <div className={pl2}>
+          <div data-slot={'listing-service-connection-status-details'} className={pl2}>
             <Text fontWeight={FontWeights.bold}>{fullName}</Text>
             <Link type={TextTypes.text} onClick={disconnectCallbackClick}>
               {'Disconnect and connect another account'}

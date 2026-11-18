@@ -19,7 +19,7 @@ export const StatisticsBoard = (props: StatisticsBoardProps) => {
   const { testId = 'StatisticsBoard', items, className, isLoading = false, isLoadingItemsNr = 4 } = props;
 
   return (
-    <ComponentContainer className={classNames(styles.items, className)} testId={testId}>
+    <ComponentContainer data-slot={'statistics-board'} className={classNames(styles.items, className)} testId={testId}>
       <Render if={isLoading}>
         {Array.from(Array(isLoadingItemsNr).keys()).map((index) => {
           return <StatisticsBoardItemPlaceholder key={index} />;

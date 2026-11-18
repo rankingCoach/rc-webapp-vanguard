@@ -33,10 +33,10 @@ export const AIBudgetEnd = (props: AIBudgetEndProps) => {
       </ModalHeader>
 
       <ModalBody className={style.modalBody}>
-        <div>
+        <div data-slot={'ai-budget-end-first-paragraph'}>
           <Text textAlign={'center'}>{firstParagraph}</Text>
         </div>
-        <div>
+        <div data-slot={'ai-budget-end-second-paragraph'}>
           <Text textAlign={'center'}>{secondParagraph}</Text>
         </div>
       </ModalBody>
