@@ -649,3 +649,11 @@ Drafted by Codex (medium), read by me; spec fix by me (PageSectionRecommended re
 | Tutorial | nothing (root is Modal) |
 Evidence: red 21/23 (2 "no own slot" passes) → green 24/24 (21 files); spec + SectionMissing story green; tsc 0; biome 10 = 10, 0 on new specs; attribute-only stream OK; collision: none.
 Track 1 status: every (a) component in src/core and src/common now has its DOM contract or a recorded reason for none.
+
+## Decided by the watchdog (after Track 1 completion)
+1. (b) Enable never-run specs/stories, B's slotted folders first: `_` rename + setup/import-only fixes. A spec failing against current behaviour is NOT edited and the component NOT changed: it stays un-prefixed and is listed with the failing assertion and "stale test" vs "real bug?" (real-bug candidates to the watchdog). Stories enabled only if they render without errors; verifier 2 gets the new story ids per commit (same-build render check, no .472 baseline). One commit per folder group, small packs, targeted runs only (host load 80–125).
+2. (a) `-container` slots on A's components: NO for now; they land with A's rebuild. A gets the collision tool + convention note once.
+3. (c) runtime agent bridge: not started.
+4. Next (d): leak-hygiene specs for B-slotted non-MUI components that register listeners/timers/rAF/observers/portals/body mutations: mount → unmount → nothing left. Inventory table to the watchdog before fixing anything non-trivial; real leaks fixed with a reproducing spec, minimal diff, listed for verifier 2's Tier P.
+5. Handoffs combine small batches while verifier 2 is busy (one paired run base = last PASS vs tip).
+Tools copied to `agentic-plans/uisdk-tools-b/` (collision-check.sh, attr-only-check.py).
