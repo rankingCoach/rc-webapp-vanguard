@@ -557,3 +557,8 @@ Usage ledger (direct JSX / service / internal / WordPress):
 2. SCSS: `FooterAction/_footer-action.scss` mixin emits the shared `.spacer` + `.link-color` rules; FooterPagination/FooterShowMore modules `@include` it and keep their own `.disabled` rule (descendant vs compound selector preserved). Compiled CSS (sass, both modules) byte-identical before/after; class names unchanged (same files, same class names).
 3. Characterization spec `_TableFooterControls.characterization.spec.tsx`: 3 controls × 5 pagination states × hidden → 30 markup snapshots captured from the pre-refactor code (8f3b328) into `__fixtures__/footer-controls.json` (stable across 2 re-runs, icons awaited); identical after the refactor.
 4. Table specs 23/23, stories 18/18, tsc 0, biome same diagnostics before/after.
+
+### Audit item 7: BarChart / HSBChart shared helper (watchdog APPROVED, helper only; A informed)
+1. `src/helpers/charts/translate-labels.ts` `translateLabels(labels)` replaces three identical copies (BarChart `getCategories` + `getCustomLegendItems`, HSBChart `getCategories`); the local names stay as aliases so the options code is untouched. BarChart's now-unused `translationService` import removed.
+2. Options builder NOT extracted: diffing the two option objects shows ~25 differing values (orientation, column width, radius, fonts Roboto vs theme typeface, legend position/size/markers, grid colour/position, axis visibility, formatters); a shared builder would be only parameters. Recorded as not worth it.
+3. Spec `_translate-labels.spec.ts` (red: module missing → green 3/3): order, call keys, new array, input untouched, empty. Chart stories 7/7, tsc 0, biome same before/after.

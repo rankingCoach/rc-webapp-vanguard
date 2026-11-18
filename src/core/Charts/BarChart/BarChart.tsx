@@ -2,7 +2,7 @@ import './BarChart.scss';
 
 import { CHART_COLORS } from '@helpers/charts/colors';
 import { resolveCssVariables } from '@helpers/resolve-css-variables';
-import { translationService } from '@services/translation.service';
+import { translateLabels } from '@helpers/charts/translate-labels';
 import { BigLegendItem } from '@vanguard/Charts/BigLegend/BigLegendItem/BigLegendItem';
 import { ChartsPlaceholder } from '@vanguard/Charts/ChartsPlaceholder/ChartsPlaceholder';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
@@ -89,19 +89,8 @@ export const BarChart = (props: BarChartProps) => {
    * Format data
    * -------------------------------------------------------------------------------------------------------------------
    */
-  const getCategories = (categories: string[]): string[] => {
-    return categories.map((item) => {
-      item = translationService.get(item).value;
-      return item;
-    });
-  };
-
-  const getCustomLegendItems = (customLegendItems: string[]): string[] => {
-    return customLegendItems.map((item) => {
-      item = translationService.get(item).value;
-      return item;
-    });
-  };
+  const getCategories = translateLabels;
+  const getCustomLegendItems = translateLabels;
 
   /**
    * Function | Calculate Total Series
