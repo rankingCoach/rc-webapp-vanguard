@@ -1,17 +1,19 @@
-import { FeatureBox, FeatureBoxProps } from "./FeatureBox";
+import { FeatureBox, type FeatureBoxProps } from "./FeatureBox";
 import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 import { IconNames } from "@vanguard/Icon/IconNames";
 // @ts-ignore
 import animation from "../../../vanguard/LottieAnimationLoader/LottieBase/mock/mock-anim.json";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/FeatureBox",
   component: FeatureBox,
   extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 const items = [
   {

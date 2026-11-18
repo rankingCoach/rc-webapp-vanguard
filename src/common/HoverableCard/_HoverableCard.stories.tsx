@@ -1,13 +1,15 @@
-import { HoverableCard, HoverableCardProps } from "./HoverableCard";
+import { HoverableCard, type HoverableCardProps } from "./HoverableCard";
 import React from "react";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 import { Text } from "@vanguard/Text/Text";
 
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/HoverableCard",
   component: HoverableCard,
-});
+}),
+};
 
 export const HoverableCardStory = (props: HoverableCardProps) => {
   const {

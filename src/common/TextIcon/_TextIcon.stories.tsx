@@ -3,10 +3,12 @@ import { IconNames } from "@vanguard/Icon/IconNames";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 import React from "react";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/TextIcon",
   component: TextIcon,
-});
+}),
+};
 export const Primary = () => {
   return (
     <div>

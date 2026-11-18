@@ -1,10 +1,11 @@
-import { StatisticsBoard, StatisticsBoardProps } from "./StatisticsBoard";
+import { StatisticsBoard, type StatisticsBoardProps } from "./StatisticsBoard";
 import React from "react";
 import { disableControls, SbDecorator, SbJumpPageBackground } from "@test-utils/get-storybook-decorator";
 import { IconNames } from "@vanguard/Icon/IconNames";
 import { FrostedGlass } from "@vanguard/FrostedGlass/FrostedGlass";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/StatisticsBoard",
   component: StatisticsBoard,
   extra: {
@@ -51,7 +52,8 @@ export default SbDecorator({
       },
     },
   },
-});
+}),
+};
 
 export const StatisticsBoardStory = (props: StatisticsBoardProps) => {
   return (

@@ -1,8 +1,9 @@
-import { PageSectionRecommended, RecommendationCardProps } from "./PageSectionRecommended";
+import { PageSectionRecommended, type RecommendationCardProps } from "./PageSectionRecommended";
 import React from "react";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/PageSectionRecommended",
   component: PageSectionRecommended,
 
@@ -26,7 +27,8 @@ export default SbDecorator({
       },
     },
   },
-});
+}),
+};
 
 export const RecommendationCardStory = (props: RecommendationCardProps) => {
   return (

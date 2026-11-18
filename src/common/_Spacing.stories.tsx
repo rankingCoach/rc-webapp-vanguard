@@ -4,10 +4,12 @@ import { SbDecorator } from "@test-utils/get-storybook-decorator";
 import { classNames } from "@helpers/classNames";
 import { alignItemsCenter, dFlexColumn, justifyContentCenter, px9, vw100 } from "@globalStyles";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/Spacing",
   component: null,
-});
+}),
+};
 
 export const Primary = () => {
   const keys = Object.keys(globals);

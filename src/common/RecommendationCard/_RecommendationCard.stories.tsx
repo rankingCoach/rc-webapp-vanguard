@@ -2,13 +2,15 @@ import { RecommendationCard, RecommendationCardProps } from "./RecommendationCar
 import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/RecommendationCard",
   component: RecommendationCard,
   extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories

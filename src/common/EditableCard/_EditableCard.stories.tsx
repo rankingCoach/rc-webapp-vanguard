@@ -3,10 +3,12 @@ import { EditableCard, EditableCardProps } from "./EditableCard";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 import { Text } from "@vanguard/Text/Text";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/EditableCard",
   component: EditableCard,
-});
+}),
+};
 
 export const EditableCardStory = (props: EditableCardProps) => {
   const {

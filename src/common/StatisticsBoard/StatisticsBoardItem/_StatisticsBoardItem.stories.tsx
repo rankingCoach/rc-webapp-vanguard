@@ -3,7 +3,8 @@ import React from "react";
 import { disableControls, SbDecorator, SbJumpPageBackground } from "@test-utils/get-storybook-decorator";
 import { IconNames } from "@vanguard/Icon/IconNames";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/StatisticsBoard/StatisticsBoardItem",
   component: StatisticsBoardItem,
   extra: {
@@ -11,7 +12,8 @@ export default SbDecorator({
       ...disableControls,
     },
   },
-});
+}),
+};
 
 export const StatisticsBoardItemStory = (props: StatisticsBoardItemProps) => {
   return (

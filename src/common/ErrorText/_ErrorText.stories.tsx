@@ -2,10 +2,12 @@ import { ErrorText, ErrorTextProps } from "./ErrorText";
 import React from "react";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/ErrorText",
   component: ErrorText,
-});
+}),
+};
 
 export const ErrorTextStory = (props: ErrorTextProps) => {
   return (

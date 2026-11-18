@@ -1,9 +1,10 @@
 import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
-import { IncentiveBox, IncentiveBoxProps } from "@common/IncentiveBox/IncentiveBox";
+import { IncentiveBox, type IncentiveBoxProps } from "@common/IncentiveBox/IncentiveBox";
 import { IconNames } from "@vanguard/Icon/IconNames";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/IncentiveBox",
   component: IncentiveBox,
   extra: {
@@ -24,7 +25,8 @@ export default SbDecorator({
       },
     },
   },
-});
+}),
+};
 
 export const IncentiveBoxStory = (props: IncentiveBoxProps) => {
   return (

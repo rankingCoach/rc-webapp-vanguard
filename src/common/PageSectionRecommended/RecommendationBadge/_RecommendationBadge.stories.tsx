@@ -1,11 +1,13 @@
-import { RecommendationBadge, RecommendationBadgeProps } from "./RecommendationBadge";
+import { RecommendationBadge, type RecommendationBadgeProps } from "./RecommendationBadge";
 import React from "react";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/PageSectionRecommended/RecommendationBadge",
   component: RecommendationBadge,
-});
+}),
+};
 
 export const RecommendationBadgeStory = (props: RecommendationBadgeProps) => {
   return (

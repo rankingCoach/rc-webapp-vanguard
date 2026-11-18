@@ -2,7 +2,8 @@ import { PageSectionLoading, PageSectionLoadingProps } from "./PageSectionLoadin
 import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/PageSectionLoading",
   component: PageSectionLoading,
   extra: {
@@ -17,7 +18,8 @@ export default SbDecorator({
       },
     },
   },
-});
+}),
+};
 
 export const PageSectionLoadingStory = (props: PageSectionLoadingProps) => {
   return <PageSectionLoading {...props} />;
