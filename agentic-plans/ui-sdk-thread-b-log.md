@@ -567,3 +567,7 @@ Usage ledger (direct JSX / service / internal / WordPress):
 1. `Props` = `Pick<TextProps, 24 keys>` + `caseInsensitive`; `textWrap` stays written out because Text's is wider (`'pre-wrap' | 'pre'`), so a plain Pick would have widened TextHighlighted. `TextHighlightedProps extends Props` unchanged; no runtime change.
 2. Type spec `_TextHighlighted.types.spec.ts` (checked by `tsc -p tsconfig.spec.json`): `Props` and `TextHighlightedProps` `toEqualTypeOf` the hand-written legacy shape. Sensitivity shown: a plain Pick including `textWrap` fails it (TS2344 on textWrap); final version passes. TextHighlighted spec 1/1 + stories 3/3, tsc 0, biome: only the pre-existing `noChildrenProp` in the old spec.
 3. Left as logged (watchdog): ActionCardBody (returns children only), RcNavLink (raw prop spread). QuoteContainer pair: known divergence, left. Masked inputs: A's.
+
+## Candidates for removal (user decides; waiting for verifier 2's reachability map)
+1. `src/core/GoogleMaps/GoogleMapsMarker/Marker.tsx` (≈880 lines; 75% copy of AdvancedMarker.tsx): imported by no file in src (grep for `GoogleMapsMarker/Marker`, `./Marker`), not re-exported by `src/core/GoogleMaps/index.ts`, `src/index.ts` or `src/index-wordpress.ts`; the public `MarkerF` is `export { MarkerF } from '@react-google-maps/api'`. rc-webapp: 0 direct, 0 service.
+2. Correction to the Codex audit row: `GoogleMapsMarker/AdvancedMarker.tsx` is NOT dead — `src/core/GoogleMaps/index.ts` exports `MarkerF as AdvancedMarkerF, Marker as AdvancedMarker` and its props type publicly. Keep.
