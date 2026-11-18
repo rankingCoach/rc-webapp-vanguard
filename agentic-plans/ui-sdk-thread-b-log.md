@@ -621,3 +621,8 @@ Drafted by Codex (medium), read by me; spec fixes by me (SvgImage's runtime `req
 | FeatureBox | `feature-box`, `-content`, `-title`, `-features`, `-media`, `-animation` |
 | ErrorText | nothing (Text + AnimatedConditional only) |
 Evidence: red 13/14 → green 14/14; touched-folder specs 16 files / 19 (incl. existing); collected stories 3 files / 19 (src/common stories are not collected; the new specs render each component); tsc 0; biome 6 = 6, 0 on new specs; attribute-only stream OK; collision: `[data-size=default|sm|lg]` + shadcn slots only in rc-webapp editor-bridge `__fixture__/lumen-*.html` / `studio-*.html` test fixtures; none in Vanguard-rendering code.
+
+### Track 2 follow-up: example coverage (watchdog, lowest priority)
+1. The generator resolves plain identifiers and `helper.key` lookups in story args through top-level consts of the story file and its relative imports (e.g. `testMessages.danger` from `stories/_Alert.default.ts`), unwrapping `as const`; `children` may be such a lookup too.
+2. Examples with no attribute and no children (`<AIOrb />`) and JSX longer than 320 characters (chart series, big data) are skipped.
+3. Pages with examples: 27 → 49 of 298. Spec 8/8 (the one red run was the determinism test while Codex was editing src between the spec's two generations; green once src was stable).

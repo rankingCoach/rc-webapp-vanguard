@@ -93,10 +93,22 @@ const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 const INTERNAL_HOST_RE = /\b[a-z0-9.-]*rankingcoach\.(?:com|de|net|io|local)\b/i;
 const ABS_PATH_RE = /(?:\/Users\/|\/home\/|[A-Z]:\\)/;
 const MAX_ARGS_EXAMPLES = 3;
+const MAX_EXAMPLE_JSX = 320;
 
 /** JSX attribute for one story arg, or null when the value is not a plain literal (then the story is skipped). */
-const attrFor = (ts, key, node, exported, uses) => {
+const attrFor = (ts, key, node, exported, uses, consts = new Map()) => {
   const lit = (n) => {
+    while (n && (ts.isAsExpression(n) || ts.isSatisfiesExpression?.(n) || ts.isParenthesizedExpression(n))) n = n.expression;
+    if (ts.isIdentifier(n) && consts.has(n.text)) return lit(consts.get(n.text));
+    if (ts.isPropertyAccessExpression(n) && ts.isIdentifier(n.expression) && consts.has(n.expression.text)) {
+      let obj = consts.get(n.expression.text);
+      while (obj && (ts.isAsExpression(obj) || ts.isSatisfiesExpression?.(obj))) obj = obj.expression;
+      if (obj && ts.isObjectLiteralExpression(obj)) {
+        const prop = obj.properties.find((pr) => ts.isPropertyAssignment(pr) && pr.name && pr.name.getText() === n.name.text);
+        return prop ? lit(prop.initializer) : null;
+      }
+      return null;
+    }
     if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) return JSON.stringify(n.text);
     if (ts.isNumericLiteral(n)) return n.text;
     if (n.kind === ts.SyntaxKind.TrueKeyword) return 'true';
@@ -129,9 +141,35 @@ const attrFor = (ts, key, node, exported, uses) => {
   return `${key}={${v}}`;
 };
 
+
+/** Top-level `const` initialisers of a story file and of the relative modules it imports (helpers like testMessages). */
+const collectConsts = (ts, sf, file) => {
+  const consts = new Map();
+  const addFrom = (source, onlyNames) => {
+    for (const st of source.statements) {
+      if (!ts.isVariableStatement(st)) continue;
+      for (const d of st.declarationList.declarations) {
+        if (ts.isIdentifier(d.name) && d.initializer && (!onlyNames || onlyNames.has(d.name.text))) consts.set(d.name.text, d.initializer);
+      }
+    }
+  };
+  addFrom(sf);
+  for (const st of sf.statements) {
+    if (!ts.isImportDeclaration(st) || !ts.isStringLiteral(st.moduleSpecifier) || !st.moduleSpecifier.text.startsWith('.')) continue;
+    const names = new Set((st.importClause?.namedBindings && ts.isNamedImports(st.importClause.namedBindings) ? st.importClause.namedBindings.elements : []).map((e) => e.name.text));
+    if (!names.size) continue;
+    const base = path.resolve(path.dirname(file), st.moduleSpecifier.text);
+    const target = ['.ts', '.tsx', '/index.ts'].map((e) => base + e).find((f) => fs.existsSync(f));
+    if (!target) continue;
+    addFrom(ts.createSourceFile(target, read(target), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX), names);
+  }
+  return consts;
+};
+
 /**
  * Usage examples generated from story `args` (not story source): `import { X } from '<pkg>'` plus the JSX the args
- * describe. Stories with a custom `render`, spread args or non-literal values are skipped; event-handler and test-id
+ * describe. Plain identifiers and `helper.key` lookups resolve through top-level consts of the story file and its
+ * relative imports (e.g. `testMessages.danger`). Stories with a custom `render`, spread args or other non-literal values are skipped; event-handler and test-id
  * args (`on*`, `testId`) are dropped. At most three examples with distinct args.
  */
 const examplesFor = (name, file, exported) => {
@@ -145,6 +183,7 @@ const examplesFor = (name, file, exported) => {
   for (const f of fs.readdirSync(storyDir).filter((x) => x.endsWith('.story.tsx')).sort()) {
     const src = read(path.join(storyDir, f));
     const sf = ts.createSourceFile(f, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    const consts = collectConsts(ts, sf, path.join(storyDir, f));
     for (const stmt of sf.statements) {
       if (!ts.isVariableStatement(stmt) || !stmt.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
       for (const decl of stmt.declarationList.declarations) {
@@ -165,25 +204,31 @@ const examplesFor = (name, file, exported) => {
           }
           const key = ts.isIdentifier(p.name) ? p.name.text : ts.isStringLiteral(p.name) ? p.name.text : null;
           if (!key || /^on[A-Z]/.test(key) || key === 'testId' || key.startsWith('data-')) continue;
-          if (key === 'children' && (ts.isStringLiteral(p.initializer) || ts.isNoSubstitutionTemplateLiteral(p.initializer))) {
-            children = p.initializer.text;
+          if (key === 'children') {
+            const v = attrFor(ts, 'children', p.initializer, exported, uses, consts);
+            if (v === null || !/^children=".*"$|^children=\{".*"\}$/.test(v)) {
+              ok = false;
+              break;
+            }
+            children = JSON.parse(v.replace(/^children=\{?/, '').replace(/\}?$/, ''));
             continue;
           }
           if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)) {
             ok = false;
             break;
           }
-          const a = attrFor(ts, key, p.initializer, exported, uses);
+          const a = attrFor(ts, key, p.initializer, exported, uses, consts);
           if (a === null) {
             ok = false;
             break;
           }
           attrs.push(a);
         }
-        if (!ok) continue;
+        if (!ok || (!attrs.length && children === null)) continue;
         const open = [name, ...attrs].join(' ');
         const jsx = children !== null ? `<${open}>${children}</${name}>` : `<${open} />`;
-        if (seen.has(jsx) || EMAIL_RE.test(jsx) || INTERNAL_HOST_RE.test(jsx) || ABS_PATH_RE.test(jsx)) continue;
+        // Long literal data (chart series, big option lists) makes a poor usage example; skip it.
+        if (jsx.length > MAX_EXAMPLE_JSX || seen.has(jsx) || EMAIL_RE.test(jsx) || INTERNAL_HOST_RE.test(jsx) || ABS_PATH_RE.test(jsx)) continue;
         seen.add(jsx);
         out.push(`import { ${[...uses].sort().join(', ')} } from '${PKG}';\n\n${jsx}`);
         if (out.length >= MAX_ARGS_EXAMPLES) return out;
