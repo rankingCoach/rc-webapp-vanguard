@@ -55,12 +55,13 @@ export const ListLoader = (props: Props) => {
     <>
       {[...Array(loadersCount)].map((item, index) => {
         return (
-          <div key={index} className="list-loader">
-            <div className="animationLoading">
-              <div className="avatar" />
+          <div data-slot="list-loader" key={index} className="list-loader">
+            <div data-slot="list-loader-animation" className="animationLoading">
+              <div data-slot="list-loader-avatar" className="avatar" />
               {loaderConfig.items.map((item, innerIndex) => {
                 return (
                   <div
+                    data-slot="list-loader-line"
                     key={innerIndex}
                     style={{
                       left: item.left,

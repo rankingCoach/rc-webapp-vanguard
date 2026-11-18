@@ -29,6 +29,7 @@ export const BlobAnimation = (props: BlobAnimationProps) => {
 
   return (
     <div
+      data-slot="blob-animation"
       className={styles.container}
       style={{ width: width, height: height, ...(baseColor && ({ '--baseC': baseColor } as React.CSSProperties)) }}
     >

@@ -1,5 +1,6 @@
 import { useLazyImage } from '@custom-hooks/useLazyImage';
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { secondsToTimeDuration } from '@helpers/data-formatters';
 import { updateImageUrlWithBaseRequest } from '@helpers/update-image-url-with-base-request';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
@@ -61,7 +62,7 @@ export const GalleryMediaItem = (props: Props) => {
    */
   if (isLazyLoading) {
     return (
-      <ComponentContainer className={styles.mediaItemContainer} style={{ width, height }}>
+      <ComponentContainer data-slot="gallery-media-item-container" className={styles.mediaItemContainer} style={{ width, height }}>
         <Skeleton type={SkeletonTypes.rectangle} height={height} width={width} />
       </ComponentContainer>
     );
@@ -72,6 +73,7 @@ export const GalleryMediaItem = (props: Props) => {
    */
   return (
     <ComponentContainer
+      data-slot="gallery-media-item-container"
       className={styles.mediaItemContainer}
       style={{ width, height }}
       onClick={() => {
@@ -79,11 +81,14 @@ export const GalleryMediaItem = (props: Props) => {
       }}
     >
       <div
+        data-slot="gallery-media-item"
         className={classNames(styles.mediaItem, toBeDeleted ? styles.toBeDeleted : '')}
         style={{ backgroundImage: `url(${updateImageUrlWithBaseRequest(mediaItemSrc)})`, width, height }}
       >
         <Render if={selectable || !!actions.length}>
           <div
+            data-slot="gallery-media-item-options"
+            data-selected={dataFlag(isSelected)}
             className={classNames(
               styles.overlayOptions,
               isSelected ? styles.isSelected : undefined,
@@ -93,6 +98,8 @@ export const GalleryMediaItem = (props: Props) => {
             {actions.map((action, index) => (
               <div key={index} className={styles.actionContainer}>
                 <div
+                  data-slot="gallery-media-item-action"
+                  data-disabled={dataFlag(action.disabled)}
                   onClick={() => {
                     if (action.disabled) {
                       return;
@@ -124,7 +131,7 @@ export const GalleryMediaItem = (props: Props) => {
         </Render>
 
         <Render if={mediaItem.fileType?.includes('video') || mediaItem.type === GalleryMediaItemType.video}>
-          <div className={classNames(styles.videoMetadataContainer)}>
+          <div data-slot="gallery-media-item-video-metadata" className={classNames(styles.videoMetadataContainer)}>
             <Text type={TextTypes.textCaption} color={'--fn-bg'} className={classNames(styles.videoDuration)}>
               {mediaItem.settings?.videoDuration ?? secondsToTimeDuration(mediaItem.metadata?.videoMetadata?.duration)}
             </Text>

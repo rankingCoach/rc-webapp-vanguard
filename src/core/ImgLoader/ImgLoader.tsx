@@ -15,9 +15,9 @@ export const ImgLoader = (props: ImgLoaderProps) => {
   const { title, description, replacements } = props;
   const { SvgIcon, loading, error } = useDynamicImport('gifs/loading.gif');
   return (
-    <ComponentContainer>
-      <div className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter)}>
-        <img style={{ width: 200, height: 200 }} src={SvgIcon} />
+    <ComponentContainer data-slot="img-loader-container">
+      <div data-slot="img-loader" className={classNames(dFlexColumn, alignItemsCenter, justifyContentCenter)}>
+        <img data-slot="img-loader-image" style={{ width: 200, height: 200 }} src={SvgIcon} />
 
         <Text
           testId={'title'}

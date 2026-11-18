@@ -48,7 +48,7 @@ export const ImgWithLoader = (props: ImgWithLoaderProps) => {
 
   return (
     <>
-      <div style={{ display: !isLoading && !loading ? 'none' : 'block' }}>
+      <div data-slot="img-with-loader-placeholder" style={{ display: !isLoading && !loading ? 'none' : 'block' }}>
         <Skeleton
           type={SkeletonTypes.fill}
           style={{ height: height ?? '192px', width: width ?? '100%', minWidth: 'calc(33.33% - 16px)' }}
@@ -57,11 +57,12 @@ export const ImgWithLoader = (props: ImgWithLoaderProps) => {
       </div>
 
       <div
+        data-slot="img-with-loader"
         style={{ display: isLoading || loading ? 'none' : 'block' }}
         className={classNames(styles.imageContainer, useBorderRadius && styles.borderRadius)}
       >
         <Render if={showMediaType}>
-          <div className={classNames(styles.mediaTypeInfo)}>
+          <div data-slot="img-with-loader-media-type" className={classNames(styles.mediaTypeInfo)}>
             <Text color={'--fn-bg'} type={TextTypes.textCaption}>
               {additionalText}
             </Text>
@@ -71,7 +72,7 @@ export const ImgWithLoader = (props: ImgWithLoaderProps) => {
           </div>
         </Render>
 
-        <img {...rest} onLoad={imageLoaded} ref={imgRef} decoding="async" />
+        <img data-slot="img-with-loader-image" {...rest} onLoad={imageLoaded} ref={imgRef} decoding="async" />
       </div>
     </>
   );

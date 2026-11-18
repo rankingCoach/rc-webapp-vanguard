@@ -219,13 +219,14 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
    */
   return (
     <ComponentContainer
+      data-slot="faded-carousel-container"
       className={styles.carouselContainer}
       data-testId={'fadedCarousel'}
       style={mode !== 'centerWithElementsBeforeAfter' ? { overflow: 'hidden' } : {}}
     >
       {/* Left Fade Overlay */}
       <Render if={showFade(isAtLeftExtreme, canScrollLeft)}>
-        <div className={styles.before} />
+        <div data-slot="faded-carousel-fade-before" className={styles.before} />
       </Render>
 
       {/* Left Arrow */}
@@ -246,7 +247,7 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
 
       {/* MODE: centerWithElementsBeforeAfter */}
       <Render if={mode === 'centerWithElementsBeforeAfter'}>
-        <div className={classNames(styles.carouselItemsContainer, className)}>
+        <div data-slot="faded-carousel" className={classNames(styles.carouselItemsContainer, className)}>
           <ElementsBeforeAfter
             widthElement={widthPerItem}
             margin={marginLeft}
@@ -257,7 +258,7 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
           </ElementsBeforeAfter>
 
           {centerItems.map((element, i) => (
-            <div key={i} style={{ width: `${widthPerItem}%` }} className={classNames(styles.carouselItem)}>
+            <div data-slot="faded-carousel-item" key={i} style={{ width: `${widthPerItem}%` }} className={classNames(styles.carouselItem)}>
               {element}
             </div>
           ))}
@@ -271,11 +272,12 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
       {/* MODE: start or center => all items in a normal scroll container */}
       <Render if={mode === 'start' || mode === 'center'}>
         <div
+          data-slot="faded-carousel"
           className={classNames(styles.carouselItemsContainer, styles.carouselScroll, className)}
           ref={scrollContainerRef}
         >
           {items.map((item, idx) => (
-            <div className={styles.carouselItem} key={idx}>
+            <div data-slot="faded-carousel-item" className={styles.carouselItem} key={idx}>
               {item}
             </div>
           ))}
@@ -300,7 +302,7 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
 
       {/* Right Fade Overlay */}
       <Render if={showFade(isAtRightExtreme, canScrollRight)}>
-        <div className={styles.after} />
+        <div data-slot="faded-carousel-fade-after" className={styles.after} />
       </Render>
     </ComponentContainer>
   );

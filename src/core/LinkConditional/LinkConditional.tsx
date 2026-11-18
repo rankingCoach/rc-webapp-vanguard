@@ -23,7 +23,7 @@ export const LinkConditional = (props: LinkConditionalProps) => {
   }
 
   return (
-    <span className={classNames(styles.container, childFullWidth ? styles.childFullWidth : '')}>
+    <span data-slot="link-conditional" className={classNames(styles.container, childFullWidth ? styles.childFullWidth : '')}>
       {children}
       <Icon style={{ cursor: 'pointer' }} onClick={onDeleteClick}>
         {IconNames.trash}

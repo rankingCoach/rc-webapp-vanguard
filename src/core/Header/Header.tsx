@@ -78,7 +78,7 @@ export const Header = (props: HeaderProps) => {
   };
 
   return (
-    <ComponentContainer className={classNames(styles.header, getClassName())} testId={testId + "_Header"}>
+    <ComponentContainer data-slot="header" data-type={type} className={classNames(styles.header, getClassName())} testId={testId + "_Header"}>
       <Text type={getTitleTextType()} fontWeight={FontWeights.bold} replacements={replacements}>
         {title}
       </Text>

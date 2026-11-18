@@ -1,5 +1,6 @@
 import { dFlex, dFlexRow, w100 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Text } from '@vanguard/Text/Text';
 import React, { Dispatch, SetStateAction, useState } from 'react';
@@ -75,6 +76,8 @@ export const TogglerWithText = (props: TogglerWithTextProps) => {
 
   return (
     <ComponentContainer
+      data-slot="toggler-with-text"
+      data-variant={theme}
       className={classNames(
         theme == 'default' ? styles.vanguardToggler : styles.vanguardTogglerSquare,
         className ? className : '',
@@ -82,8 +85,10 @@ export const TogglerWithText = (props: TogglerWithTextProps) => {
       style={{ backgroundColor: `var(${bgColor})` }}
       testId={testId}
     >
-      <div className={classNames(styles.slider, dFlex, dFlexRow, w100)}>
+      <div data-slot="toggler-with-text-slider" className={classNames(styles.slider, dFlex, dFlexRow, w100)}>
         <div
+          data-slot="toggler-with-text-left"
+          data-active={dataFlag(state === 'left')}
           data-testid={'left'}
           className={classNames(state == 'left' ? styles.active : null, styles.sliderOptionLeft)}
           style={state == 'left' ? { backgroundColor: `var(${activeBgColor})` } : {}}
@@ -92,6 +97,8 @@ export const TogglerWithText = (props: TogglerWithTextProps) => {
           {TogglerOption(left, state === 'left', activeTextColor, textColor)}
         </div>
         <div
+          data-slot="toggler-with-text-right"
+          data-active={dataFlag(state === 'right')}
           data-testid={'right'}
           className={classNames(state == 'right' ? styles.active : null, styles.sliderOptionRight)}
           style={state == 'right' ? { backgroundColor: `var(${activeBgColor})` } : {}}

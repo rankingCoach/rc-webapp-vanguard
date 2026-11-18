@@ -287,3 +287,29 @@ Evidence: new specs 13 files; red 22/24 with the implementation removed (the 2 p
 3. `Source: src/...` line dropped. MUI note per component: plan §23 overrides for Input, Textarea, Select, ToggleButton(Group), PopoverPopper, MenuItem; folder `@mui` import for the rest.
 4. SKILL.md: save button is Vanguard `Button htmlType="submit"` (+ `isLoading`), with the useFormStatus child pattern; line added: string labels are already rendered through Text and translated.
 5. generate-exports-props.js CLI (`node scripts/generate-exports-props.js`): base 13dfd71 vs now, 267 = 267 files, 0 differences beyond the two additive prop fields.
+
+### Batch 3: Gallery, Header, TreeView, gauges, loaders and small own components
+Drafted by Codex (medium), read line by line; fixes by me: CircularGauge bare slot moved to the styled ComponentContainer (`circular-gauge` + `data-loading`; arc = `circular-gauge-value`), dropped a non-ComponentContainer `gallery-media-item-action-container` slot, spec key fix.
+| Component | Attributes |
+|---|---|
+| Label | nothing (renders only Text) |
+| ImgLoader | `img-loader-container`, `img-loader`, `img-loader-image` |
+| ImgWithLoader | `img-with-loader` (before rest spread), `-placeholder`, `-media-type`, `-image` |
+| Gallery | `gallery-container` (wrapper div `.gallery-container`), `gallery` (consumer className), `gallery-item` |
+| GalleryMediaItem | `gallery-media-item-container`, `gallery-media-item`, `-options` + `data-selected`, `-action` + `data-disabled`, `-video-metadata` |
+| PhotoPlaceholder | `photo-placeholder` + `data-variant` (format), `photo-placeholder-icons` |
+| GalleryFeedbackModal / ErrorImagesList | `gallery-feedback-modal-body`, `-success`; `error-images-list`, `-summary`, `-error` |
+| IllustrationBlob / BlobAnimation | `illustration-blob`, `-layer`, `-image`, `-decoration`, `-icon`; `blob-animation` |
+| CircularGauge | `circular-gauge` + `data-loading`, `-ring`, `-track`, `-value`, `-center` |
+| FadedCarousel / ElementsBeforeAfter | `faded-carousel-container`, `faded-carousel`, `-item`, `-fade-before`, `-fade-after`; `elements-before-after` |
+| TogglerWithText | `toggler-with-text` + `data-variant`, `-slider`, `-left`/`-right` + `data-active` |
+| TreeView / TreeItem | `tree-view`; `tree-item` + `data-selected`, `data-disabled`, `-content`, `-icon`, `-label`, `-group` |
+| LineAlert / Header | `line-alert` + `data-type`; `header` + `data-type` |
+| LinkConditional | `link-conditional` |
+| ListLoader | `list-loader`, `-animation`, `-avatar`, `-line` |
+| ClipboardText | `clipboard-text`, `-copy`, `-content` |
+
+Evidence: red 20/21 with the implementation removed (Label's "no own slot" passes by design), green 21/21; specs of touched folders 16 files / 32 tests; stories 15 files / 70 tests; tsc spec + lib 0; biome 27 = 27 on changed files, 0 on new specs; attribute-only 44 = 44; collision check (new standing step, `collision-check.sh`: attribute selectors and DOM queries on every added name in Vanguard src and rc-webapp html/**): no hit except A's Mui-scoped `[data-slot]` (now `data-vg-core` on A's branch).
+
+### Standing batch checklist (from the watchdog, after verifier-2 deltas)
+1. Red specs first, green after. 2. Attribute-only mechanical check. 3. Collision check: every existing selector or DOM query in Vanguard and rc-webapp matching an added attribute name, listed in the handoff. 4. No added/removed/reordered element (structural selectors). 5. No `"false"`/`"undefined"` attribute strings. 6. Existing specs + stories of the touched folders, tsc, biome before = after. 7. Codex review prompt includes items 3–5.
