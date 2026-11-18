@@ -1,12 +1,11 @@
 import './DateRangeInput.scss';
 
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { InputAdornment } from '@mui/material';
 import { InputBase, rcInputBaseProps } from '@vanguard/_internal/InputBase/InputBase';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-
+import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
 import { Button, ButtonSizes, ButtonTypes } from '../Button/Button';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { DateRangeInitialProps, DateRangePickerResp, RcDateRangePickerProps } from '../DateRange/DateRange';
@@ -29,7 +28,8 @@ export const DateRangeInput = (props: Props) => {
   const { formatFn, reverseFormatFn } = inputFormatter || {};
   let inputRef = formconfig?._inputRef;
   const [s, updateState] = useState({});
-  const dispatch = useAppDispatch();
+  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
+  const dispatch = useLegacyDispatch();
   if (!inputRef) {
     inputRef = useRef(null);
   }

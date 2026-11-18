@@ -1,7 +1,6 @@
 import './InputBase.scss';
 
 import { REGEX } from '@config/regex';
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { FormConfigElement, FormFieldType } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
@@ -24,6 +23,7 @@ import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
 
+import { useLegacyDispatch } from '../../../primitives/react/form/use-legacy-dispatch';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { MuiTextField as TextField } from './MuiTextField';
 import { useNumberInputGuard } from './use-number-input-guard';
@@ -837,7 +837,8 @@ export const InputBase = (props: rcInputBaseProps) => {
     onClick && onClick(e);
   };
 
-  const dispatch = useAppDispatch();
+  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
+  const dispatch = useLegacyDispatch();
   // const dispatchChange = (formConfig: FormConfigElement, value:any) => {
   //
   // }

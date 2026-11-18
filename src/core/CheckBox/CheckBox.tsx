@@ -1,6 +1,5 @@
 import './CheckBox.scss';
 
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { useHover } from '@custom-hooks/use-hover';
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
 import { classNames } from '@helpers/classNames';
@@ -8,7 +7,7 @@ import { parseCssVariable } from '@helpers/css-variables-parser';
 import { CheckBoxIcon } from '@vanguard/CheckBox/CheckBoxIcon/CheckBoxIcon';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { ChangeEvent, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
-
+import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
 import { Text, TextReplacements } from '../Text/Text';
 
 /**
@@ -77,7 +76,8 @@ export const CheckBox = (props: CheckBoxProps) => {
 
   let { backgroundColor } = props;
 
-  const dispatch = useAppDispatch();
+  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
+  const dispatch = useLegacyDispatch();
   const ref = useRef(null);
   const [isChecked, setIsChecked] = useState<boolean>(checked);
   const [isHovered, setIsHovered] = useState<boolean | undefined>(hovered);

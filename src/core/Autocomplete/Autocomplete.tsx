@@ -1,6 +1,5 @@
 import './Autocomplete.scss';
 
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch';
 import { classNames } from '@helpers/classNames';
 import { uuidv4 } from '@helpers/generate-uid';
 import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason } from '@mui/material';
@@ -30,6 +29,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Text } from '../Text/Text';
+import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
 
 /** State handed to a custom `renderOption`. */
 export interface AutocompleteOptionState {
@@ -181,7 +181,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
   delete slotMapped.renderTags;
   const listboxProps = slotMapped.slotProps?.listbox;
 
-  const dispatch = useAppDispatch();
+  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
+  const dispatch = useLegacyDispatch();
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
   const [adornmentIndex, setAdornmentIndex] = useState<number | undefined>(undefined);

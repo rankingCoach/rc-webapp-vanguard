@@ -1,15 +1,14 @@
-import { useAppDispatch } from '@custom-hooks/use-app-dispatch.ts';
+import styles from './ColorPicker.module.scss';
 import { FormConfigElement, useFormConfig } from '@custom-hooks/useFormConfig';
 import { debounce } from '@helpers/debounce';
 import { isValidHexColor, normalizeHexColor } from '@helpers/validators/hex-color/hex-color';
+import { FormConfigHexValidation } from '@helpers/validators/valid-input/validate-input-types';
 import { InputBase } from '@vanguard/_internal/InputBase/InputBase.tsx';
 import { Form, useFormConfigContext } from '@vanguard/Form/Form.tsx';
 import { Label } from '@vanguard/Label/Label';
 import { TextReplacements } from '@vanguard/Text/Text';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
-import styles from './ColorPicker.module.scss';
-import { FormConfigHexValidation } from '@helpers/validators/valid-input/validate-input-types';
+import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
 
 const DEBOUNCE_VALUE_DEFAULT = 50;
 export interface ColorPickerProps {
@@ -46,7 +45,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     maxWidth,
     testId,
   } = props;
-  const dispatch = useAppDispatch();
+  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
+  const dispatch = useLegacyDispatch();
   // Use color prop if provided, fallback to initialColor for backward compatibility
   const effectiveColor = externalColor ?? initialColor ?? '';
 
