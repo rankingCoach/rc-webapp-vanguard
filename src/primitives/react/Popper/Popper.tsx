@@ -55,7 +55,7 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
   const update = useCallback(() => {
     const node = nodeRef.current;
     if (!node || !anchor || !open) return;
-    const result = computeAnchored(anchor, node, { ...options, altBoundary: Boolean(disablePortal) });
+    const result = computeAnchored(anchor, node, options);
     const size = layoutSize(node);
     Object.assign(
       node.style,
@@ -97,7 +97,7 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
       );
     }
     setPlacement((prev) => (prev === result.placement ? prev : result.placement));
-  }, [anchor, open, options, disablePortal]);
+  }, [anchor, open, options]);
 
   const updateRef = useRef(update);
   updateRef.current = update;
