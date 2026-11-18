@@ -27,16 +27,16 @@ const NotificationHeader = (props: NotificationProps) => {
   const source = isCompetitor ? 'competitor' : 'own';
 
   return (
-    <div className={'notif-header'}>
+    <div data-slot={'notification-header'} className={'notif-header'}>
       <div className={'notif-header-left'}>
         <div className={'notif-top-container'}>
           <div className={'notif-left-container'}>
             <Avatar icon={icon} />
-            <div className={'notif-title-container'}>
+            <div data-slot={'notification-header-title'} className={'notif-title-container'}>
               <Text className={'notif-title notif-text'} type={TextTypes.textIntro}>
                 {title || 'Notification title'}
               </Text>
-              <div className={'notif-bottom-texts'}>
+              <div data-slot={'notification-header-meta'} className={'notif-bottom-texts'}>
                 <Text
                   textWrap={'no-wrap'}
                   color={'--n400'}
@@ -81,13 +81,13 @@ export const Notification = (props: NotificationProps) => {
   const { children, isCompetitor, actions = [] } = props;
 
   return (
-    <div className={`notif-body ${getSourceFromCompetitor(isCompetitor)}`}>
+    <div data-slot={'notification'} className={`notif-body ${getSourceFromCompetitor(isCompetitor)}`}>
       <NotificationHeader {...props} />
-      <div className={'notif-content-container'}>
+      <div data-slot={'notification-content'} className={'notif-content-container'}>
         {children && typeof children !== 'string' ? children : <ContentPlaceholder />}
         AICI
       </div>
-      <div className={'notif-actions-container'}>
+      <div data-slot={'notification-actions'} className={'notif-actions-container'}>
         {actions.map((action, index) => {
           return <NotificationAction key={index} {...action} width={100 / actions.length} />;
         })}

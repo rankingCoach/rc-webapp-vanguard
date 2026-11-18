@@ -574,3 +574,22 @@ Usage ledger (direct JSX / service / internal / WordPress):
 
 ### Audit item 4: CircularGauge / ProgressCircle — STOPPED, both kept (watchdog's stop rule)
 Byte-identical SVG for ProgressCircle would need its own complete render branch inside CircularGauge, i.e. the duplication moved, not removed. Differences that all reach the markup: geometry (ProgressCircle clamps size 1..100, stroke = 10% of size, `normalizedRadius = radius - stroke/2`, diameter = size - stroke; CircularGauge `radius = (size - strokeWidth)/2` on the full size), `strokeDasharray` as the string "c c" vs a number, `strokeDashoffset` as inline style vs attribute, `viewBox` + `rotate(-90)` transform + `strokeLinecap="round"` only on CircularGauge, track stroke `var(--n200)` literal vs parsed variable, attribute order, different CSS-module classes, and ProgressCircle's built-in "NN %" Text block vs CircularGauge's children slot. Recorded as known divergence; time spent ≈15 min reading.
+
+### Batch 4: ActionBar, gauges, Notification family, lists and small own components
+Drafted by Codex (medium), read by me; renames by me: ListItems' nested row `list-items-item*` (the standalone ListItem keeps `list-item*`; two different components must not share a slot), Notification's local QuoteContainer `notification-quote*` (the public QuoteContainer gets `quote-container` later).
+| Component | Attributes |
+|---|---|
+| AIOrb | `ai-orb` |
+| ActionBar / ActionBarFooter / ActionBarMessage | `action-bar`; `action-bar-footer`; `action-bar-message`, `-info`, `-description` |
+| ActionButton | nothing (renders Button, A's) |
+| ArcGauge | `arc-gauge`, `-track`, `-fill`, `-mask`, `-text` |
+| AvatarStack | `avatar-stack`, `-item`, `-avatar`, `-image` |
+| BenchmarkGauge / Marker / Pin | `benchmark-gauge` + `data-orientation`, `-legend`, `-legend-item`, `-track-wrapper`, `-track`, `-ghost`, `-fill`; `benchmark-gauge-marker` + `data-orientation`, `-marker-content`; `benchmark-gauge-pin`, `-pin-default`, `-pin-highlighted-content` |
+| DragAndDropFile | `drag-and-drop-file`, `-label`, `-input` |
+| FadeCarouselAuto | `fade-carousel-auto`, `-scroll`, `-item` |
+| MediaItemSelectInput | `media-item-select-input` |
+| GallerySummary | `gallery-summary`, `-item`, `-image`, `-more` |
+| ListItem | `list-item-container`, `list-item`, `-coming-soon`, `-content` |
+| ListItems | `list-items`, `list-items-list`; row `list-items-item`, `-left`, `-middle`, `-title`, `-content`, `-last`, `-right` |
+| Notification | `notification`, `-header`, `-header-title`, `-header-meta`, `-content`, `-actions`; ContentPlaceholder `content-placeholder`; NotificationAction `notification-action`; NotificationReview `notification-review`, `-text`, `-stars`, `-author`; NotificationSocialPost `notification-social-post`; local QuoteContainer `notification-quote`, `-content`, `-marks`; NotificationSource `notification-source` |
+Evidence: red 15/16 (ActionButton "no own slot" passes by design), green 16/16; touched-folder specs 16 files / 24, stories 15 / 91; tsc 0; biome 19 = 19, 0 on new specs; attribute-only 50 = 50; collision check: no hit. Codex's wider scan found `[data-slot=avatar|switch|badge|card…]` selectors only in rc-webapp `nexus/` (a separate shadcn app that does not import Vanguard) and `editor-bridge/__fixture__/studio-*.html` (test fixtures) — neither can match Vanguard DOM; noted as a risk if nexus ever embeds Vanguard.

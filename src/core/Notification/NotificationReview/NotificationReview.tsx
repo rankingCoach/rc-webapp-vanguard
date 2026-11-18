@@ -12,17 +12,17 @@ interface Props {}
 
 export const NotificationReview = (props: Props) => {
   return (
-    <div className={'notification-review-body'}>
+    <div data-slot={'notification-review'} className={'notification-review-body'}>
       <QuoteContainer>
-        <div className={'review-text'}>
+        <div data-slot={'notification-review-text'} className={'review-text'}>
           <Text type={TextTypes.text}>
             <i>The burger was good, not the best I’ve had but for Timisoara is on top I think!!!!</i>
           </Text>
         </div>
-        <div className={'review-stars'}>
+        <div data-slot={'notification-review-stars'} className={'review-stars'}>
           <StarRating value={3.5} size={24} />
         </div>
-        <div className={classNames('review-subtext', dFlex)}>
+        <div data-slot={'notification-review-author'} className={classNames('review-subtext', dFlex)}>
           <Text type={TextTypes.textCaption}>By</Text>
           &nbsp;
           <Text type={TextTypes.textCaption} fontWeight={FontWeights.medium}>

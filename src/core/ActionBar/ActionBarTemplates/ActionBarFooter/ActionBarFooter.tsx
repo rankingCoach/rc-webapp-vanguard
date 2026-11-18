@@ -28,6 +28,7 @@ export const ActionBarFooter = (props: ActionBarFooterProps) => {
   const { buttons } = props;
   return (
     <ComponentContainer
+      data-slot={'action-bar-footer'}
       testId={'ActionBarFooter_Container'}
       className={buttons.length === 2 ? styles.container : styles.containerCenter}
     >

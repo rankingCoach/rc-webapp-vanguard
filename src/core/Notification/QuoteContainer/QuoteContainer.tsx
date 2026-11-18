@@ -18,9 +18,9 @@ export const QuoteContainer = (props: Props) => {
 
   return (
     <div>
-      <div className={classNames('quote-container', dFlex, justifyContentBetween)}>
-        <div className={classNames(dFlexColumn, alignItemsCenter)}>{children}</div>
-        <div className="quote-marks">
+      <div data-slot={'notification-quote'} className={classNames('quote-container', dFlex, justifyContentBetween)}>
+        <div data-slot={'notification-quote-content'} className={classNames(dFlexColumn, alignItemsCenter)}>{children}</div>
+        <div data-slot={'notification-quote-marks'} className="quote-marks">
           <SvgIcon />
           <StyledSVG src={SvgIcon} />
         </div>

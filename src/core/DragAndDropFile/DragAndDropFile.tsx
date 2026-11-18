@@ -71,15 +71,16 @@ export const DragAndDropFile: React.FC<DragAndDropFileProps> = ({ onFileDrop }) 
 
   return (
     <div
+      data-slot={'drag-and-drop-file'}
       className={`${styles.dropzone} ${dragging ? styles.dragging : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onClick={handleFilePickerClick}
     >
-      <label>
+      <label data-slot={'drag-and-drop-file-label'}>
         Drag and drop files here
-        <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileInputChange} />
+        <input data-slot={'drag-and-drop-file-input'} type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileInputChange} />
       </label>
     </div>
   );

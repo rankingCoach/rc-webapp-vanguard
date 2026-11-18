@@ -96,7 +96,7 @@ export const AIOrb = (props: AIOrbProps) => {
   };
 
   return (
-    <div className={classNames(styles.aiOrb, className)} style={getOrbStyle()}>
+    <div data-slot={'ai-orb'} className={classNames(styles.aiOrb, className)} style={getOrbStyle()}>
       <div className={classNames(styles.orbsContainer)} />
 
       <div className={classNames(styles.orbsContainer)}>

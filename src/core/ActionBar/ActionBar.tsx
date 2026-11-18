@@ -83,6 +83,7 @@ export const ActionBar = (props: ActionBarProps) => {
    */
   return (
     <ComponentContainer
+      data-slot={'action-bar'}
       innerRef={actionBarRef}
       testId={'ActionBar_Container'}
       className={styles.container}

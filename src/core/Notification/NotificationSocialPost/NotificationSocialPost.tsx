@@ -27,6 +27,7 @@ export const NotificationSocialPost = (props: Props) => {
   if (!isActive) {
     return (
       <img
+        data-slot={'notification-social-post'}
         className="notification-social-placeholder"
         onClick={() => {
           setIsActive(true);
@@ -37,7 +38,7 @@ export const NotificationSocialPost = (props: Props) => {
   }
   const realFacebookLink = `${facebookPostLink}/posts/${realPostId};`;
   return (
-    <div ref={socialRef} className={'notification-social-post-body '}>
+    <div data-slot={'notification-social-post'} ref={socialRef} className={'notification-social-post-body '}>
       {postSource === 'facebook' ? (
         <FacebookProvider appId="212384205474225">
           <div>
