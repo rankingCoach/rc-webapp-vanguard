@@ -54,7 +54,7 @@ legacy watchdog and isolated diagnostic reruns. It stops immediately on a failin
 
 scripts specs moved to node project: not UI code, no UI setup; still mandatory in pnpm test/gates; excluded from component coverage gate by project, not by file filter.
 
-Canonical package gate: `bash agentic-plans/mui-upgrade-gates/package.sh` (mandatory wrapper around the unchanged frozen fixture). Mandatory validator selftest: `python3 -m unittest discover -s agentic-plans/mui-upgrade-gates -p test_package_counts.py`. Expected runtime tests: default-declared 5, default-mui 5, wp-declared 4, wp-mui 4; aggregate 18. The default-only fifth test exercises the packed DatePicker. Missing, duplicate, malformed, failed, skipped or off-by-one summaries fail closed. Fixture nonzero exits are preserved. `runtime-counts.json` records each consumer and aggregate.
+Canonical package gate: `bash agentic-plans/mui-upgrade-gates/package.sh` (mandatory wrapper around the unchanged frozen fixture). Mandatory validator selftest: `python3 -m unittest discover -s agentic-plans/mui-upgrade-gates -p test_package_counts.py`. Expected runtime tests: default-declared 6, default-mui 6, wp-declared 5, wp-mui 5; aggregate 22. The default-only DatePicker test exercises the packed DatePicker; the Select test (both bundles, added with the own-core Select) opens it and picks an option. Missing, duplicate, malformed, failed, skipped or off-by-one summaries fail closed. Fixture nonzero exits are preserved. `runtime-counts.json` records each consumer and aggregate.
 
 Sleep validity: bounded_runner records mach_continuous_time plus mach_absolute_time elapsed values on
 Darwin and pmset Sleep/Wake/DarkWake lines in the run window. A continuous-minus-absolute gap greater
@@ -109,7 +109,7 @@ info are recorded separately and are not input changes.
 
 The package gate runs when src, package/lock or build config differs from the
 last package-GREEN (or none exists). Otherwise the build still runs. Smoke counts
-remain default-mui 5, default-declared 5, wp-declared 4, wp-mui 4: aggregate 18.
+remain default-mui 6, default-declared 6, wp-declared 5, wp-mui 5: aggregate 22.
 The stage audit command is mandatory: it must check the stage's exact build-warning
 inventory, TS/WP diagnostics, bytes/pins and frozen proofs. Tier 3 alone does not
 waive any of those checks. The runner exposes MUI_GATE_OUT and PACKAGE_FIXTURE_OUT.

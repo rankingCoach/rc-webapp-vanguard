@@ -1,5 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Button, Input, Textarea } from '@rankingcoach/vanguard';
+import { Button, Input, Select, Textarea } from '@rankingcoach/vanguard';
 import { describe, expect, it, vi } from 'vitest';
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
@@ -29,6 +29,25 @@ describe('installed Vanguard bundle', () => {
   it('renders Textarea from the installed bundle', () => {
     renderWithProviders(<Textarea value="Fixture biography" rows={3} />);
     expect(screen.getByDisplayValue('Fixture biography').tagName).toBe('TEXTAREA');
+  });
+  // Select runs on Vanguard's own core in both bundles (WordPress exports it): open, pick an option, read it back.
+  it('opens the installed Select and picks an option', async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    const options = [
+      { key: 'a', value: 'apple', title: 'Apple' },
+      { key: 'b', value: 'banana', title: 'Banana' },
+    ];
+    renderWithProviders(<Select options={options} value="apple" translateOptions={false} onChange={change} />);
+    const combo = screen.getByRole('combobox');
+    expect(combo.getAttribute('data-slot')).toBe('select-trigger');
+    await user.click(combo);
+    const listbox = await screen.findByRole('listbox');
+    await user.click(within(listbox).getByRole('option', { name: 'Banana' }));
+    expect(change).toHaveBeenCalledTimes(1);
+    expect(change.mock.calls[0][1]).toMatchObject({ value: 'banana' });
+    expect(screen.queryByRole('listbox')).toBeNull();
+    expect(screen.getByRole('combobox').textContent).toBe('Banana');
   });
 });
 
