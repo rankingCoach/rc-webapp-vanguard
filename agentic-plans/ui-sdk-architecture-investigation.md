@@ -593,3 +593,61 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
     7. Next per D14: F1 (the `useFieldBinding` seam in inputs, no Form change), then F2 (registration replaces child-walking; Tier B on form screens after it).
 11. **Storybook for handoffs:** my :6009 dies at the 2-hour background limit. If it's down, the handoff says so and names the SHA. The verifier then serves a detached worktree of that SHA (read-only use, they remove it afterwards).
 12. **Select Tier A PASS (3c, tree 8cafbcd):** 0 computed-style deltas; rc-webapp 8/8; the dark paper delta is approved. Commit after the final package.sh (WordPress Select smoke, expected 22). The Tier B milestone sweep was requested from the verifier now, before F1/F2.
+
+## 19. Milestone 1 accepted (watchdog), queue and open risks
+1. Milestone 1 = 8 commits `9d900aa`…`eecd392`.
+2. Tier B (corrected): about 40 form-heavy and Select/ToggleButtonGroup stories in `tierB-inputs.json` (~20 min), reused after each Form stage. It runs from the verifier's shadow rc-webapp copy on :6010. A Tier B delta preempts F1.
+3. **Now: F1** (`useFieldBinding` seam in the inputs, Form untouched, F0 36 tests as the guard). One input per commit, in this order:
+   1. InputBase (Input / Textarea / Select).
+   2. CheckBox.
+   3. RadioButton (+ Group).
+   4. Slider.
+   5. Autocomplete.
+   6. ColorPicker.
+   7. DateRangeInput.
+   8. DatePicker / TimePicker.
+   9. PhoneNumber.
+   10. AvatarCheckbox.
+   11. Verification*Input.
+
+   After each: its own specs + F0, then a commit. F1 goes to the verifier as ONE Tier A item at the end (two form screens + `tierB-inputs.json`); no DOM/CSS change expected.
+4. **Queued next group A, the rest of the text-field stack on the Select frame:**
+   1. Order:
+      1. Outlined TextField frame for Input (text / number / email / password, adornments, highlight backdrop).
+      2. Textarea (multiline, autosize rows / minRows / maxRows).
+      3. Native select (`SelectProps.native`).
+      4. Non-outlined variants (filled / standard via the `textFieldProps` escape hatch).
+   2. Each is a separate Tier A.
+   3. Tier A screens to request:
+      1. Vanguard Input / Textarea / InputBase stories (light / dark, empty / filled / error / disabled / focused).
+      2. rc-webapp `editassistantgeneralsettings--default` (Textarea + Select) and `eventssetupformmain--empty` (Input / Textarea / date-time).
+      3. One search-heavy screen with an Input adornment (verifier to pick).
+5. **Queued group B, Menu family on ModalHost + MenuPopup:**
+   1. Order:
+      1. Menu + MenuItem (MenuItem's MUI branch removed).
+      2. DropdownMenu.
+      3. Popover / PopoverModal.
+      4. Then the Drawer and Modal surfaces move onto `defaultModalManager`, giving the single manager.
+   2. Tier A screens to request:
+      1. Vanguard Menu / MenuItem / DropdownMenu / Popover / PopoverModal stories (open / closed, keyboard, light / dark).
+      2. The OverlayStacking showcase stories.
+      3. rc-webapp MediaBrowser `default-grid` (MediaItemActionsMenu) and one table toolbar with a DropdownMenu (verifier to pick).
+6. **Open risk: the WordPress-without-MUI path is untested.**
+   1. The `declared` package consumers stop at the pre-existing isolation probe, because MUI is a regular dependency. No test installs the WordPress bundle without MUI.
+   2. It becomes testable when `@mui/material`, `@mui/system` and `@mui/x-date-pickers` leave `dependencies`.
+   3. Earliest point, measured by the dependency graph:
+      1. `@mui/x-date-pickers` after DatePicker and the range pickers.
+      2. `@mui/material` / `@mui/system` after the last `@mui` import goes.
+   4. Pull-forward option: when the WordPress entry's own import graph has no `@mui` left (it exports Select / Form / Input / Textarea / Button / … but no DatePicker), add a WordPress-only declared consumer that installs with MUI excluded via npm `overrides`. That tests the WordPress-without-MUI path before the full package is MUI-free.
+   5. The check that tells when we get there is a grep of `dist-wordpress/index.js` for `@mui`, added to every handoff's WordPress evidence from now on.
+7. **F1 done (seam in inputs, Form untouched):**
+   1. `useFieldBinding` provides `bound`, `canWrite`, `toStored`, `write` (array-aware, scalar transform), `writeScalar` (plain setStateValue) and `notifyChange`.
+   2. Commits:
+      1. `a8ebd9e` InputBase (Input / InputNumber / ColorPicker-in-input / Textarea / Select branches).
+      2. `9f60c48` CheckBox (writeScalar; still no Form notification, as F0 pins).
+      3. `1416944` Autocomplete.
+      4. `b0a345a` ColorPicker.
+      5. `cf988cf` DateRangeInput.
+   3. No own write path, so nothing to move: RadioButton, RadioButtonGroup, DatePicker, TimePicker, PhoneNumber, AvatarCheckbox, Verification*Input. They pass the config to InputBase or an inner Form.
+   4. No input calls `useLegacyDispatch` / `dispatch(formconfig…)` directly any more. ModalStepper keeps the D11 shim.
+   5. **Decision for the watchdog: Slider.** Today it calls `formconfig?.setStateValue?.(value)` without dispatching, so nothing is ever stored (F0 inventory). Putting it on the seam (`writeScalar`) would START storing slider values in consumer slices, a behaviour change. Recommendation: keep it as-is (not on the seam) and decide when Slider is rebuilt; rc-webapp usage to be checked by the verifier.
