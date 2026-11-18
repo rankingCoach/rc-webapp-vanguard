@@ -313,3 +313,232 @@ Evidence: red 20/21 with the implementation removed (Label's "no own slot" passe
 
 ### Standing batch checklist (from the watchdog, after verifier-2 deltas)
 1. Red specs first, green after. 2. Attribute-only mechanical check. 3. Collision check: every existing selector or DOM query in Vanguard and rc-webapp matching an added attribute name, listed in the handoff. 4. No added/removed/reordered element (structural selectors). 5. No `"false"`/`"undefined"` attribute strings. 6. Existing specs + stories of the touched folders, tsc, biome before = after. 7. Codex review prompt includes items 3–5.
+
+### 3B duplication audit (Codex gpt-6.1-sol high, read-only; top claims re-verified by B)
+Method: 5-token-shingle Jaccard over 311 JSX TSX + 265 SCSS files (comments/imports stripped), then code reading. Usage = direct JSX | service calls | internal importers | WordPress export. Verified by B: NotificationAction copies byte-identical (TSX body after imports + SCSS); standalone `src/core/NotificationAction/` exported from neither entry; Accept/Confirm diff; WordPress column (EditModal, Popover, Link, InfoBox, TextHighlighted, TextWrapBalancer = yes).
+
+| family | similarity evidence (score + what is shared) | what differs | rc-webapp usage of each, JSX/service | real duplication or only looks similar | proposed umbrella: owner, wrappers, additive props | risk | effort |
+|---|---|---|---|---|---|---|---|
+| **NotificationAction / Notification / NotificationSource** | Action copies: **100% TSX, 100% SCSS**. Identical props, `renderIcon`, click guard and markup: `core/NotificationAction/NotificationAction.tsx:9`; nested equivalent `core/Notification/NotificationAction/NotificationAction.tsx:9`. | Action copies differ only in import paths. Notification is the containing view; Source is its label. | Both actions **0/0**; Notification **1/0**; Source **1/0**. | **Exact action duplication.** Notification already composes nested Action and Source at `Notification.tsx:48,92`. | Keep nested Action as owner—it is the root-exported implementation (`core/Notification/index.ts:5`). Deprecate standalone Action as a thin wrapper; one SCSS source. No new props. | Low | S |
+| **Google Maps Marker / AdvancedMarker adapters** | **75.42%** across **887/900 lines**. Copied event maps, listener effects, class lifecycle and child-anchor cloning: `core/GoogleMaps/GoogleMapsMarker/Marker.tsx:27,801`; `AdvancedMarker.tsx:29,810`. | Legacy setters versus AdvancedMarker property assignments; constructor guards; advanced clustering and several updater bodies are disabled. | Local Marker/MarkerF and public AdvancedMarker/AdvancedMarkerF: **0/0 each**. | **Substantial implementation duplication.** Different SDK objects prevent direct aliasing. Public `MarkerF` actually comes from the external package, not the copied local file: `core/GoogleMaps/index.ts:11`. | Extract one internal marker lifecycle/event engine, parameterized by legacy/advanced constructor and updater adapters. Keep class/function APIs and refs; deprecated wrappers delegate. Preserve existing disabled operations and lifecycle timing. | High: imperative SDK behavior, clustering, refs | L |
+| **AcceptModal / ConfirmModal** — Modal foundation **A’s** | **74.50% TSX; 77.78% SCSS**. Identical prop alias, header, message branch, positive callback and 672px shell: `core/StandardModals/AcceptModal/AcceptModal.tsx:15`; `ConfirmModal/ConfirmModal.tsx:15`. | Confirm adds negative action/custom callback; Accept centers its positive button. Different container/modal classes and footer selectors. | Accept **0/5**; Confirm **0/67**. | **Real duplication.** Service usage is material despite zero direct JSX. | Confirm owns one decision-dialog renderer. Add action mode and internal legacy class/footer profile; Accept becomes deprecated wrapper. Retain both prop aliases and service methods. | Medium: close results, CSS selectors, footer layout | M |
+| **EditModal / BigAssEditModal; other custom/standard modals** — Modal foundation **A’s** | Edit pair **37.93%**; identical `positiveFn` and `negativeFn`: `core/CustomModals/EditModal/EditModal.tsx:88`; `BigAssEditModal/BigAssEditModal.tsx:62`. Test/ImplementDetails **45.91%** shell duplication. | Edit has request-error handling, title replacements, configurable width/button; BigAss is fullscreen, uses local loading and a different response payload/effect. Error logs errors; Loading has animation modes; DateRange and PhotoCarousel contain actual workflows. | Edit **21/0**; BigAss **3/0**; Error **22/63**; Success **5/0**; Loading **5/40**; DateRange **0/0**; PhotoCarousel **0/7**; Test and ImplementDetails **0/0**. | **Edit flow is copied and diverged.** Remaining modal shell repetition mostly already composes Modal/Header/Body/Footer. | Edit owns shared edit controller/renderer. Add fullscreen, description, body class and explicit legacy loading/close-result profiles; deprecated BigAss wrapper. Do not fold logging, gallery or date workflows into a universal modal. | High: observable async differences | M–L |
+| **ListPageCheckboxGroup / SwitchGroup / RadioGroup** | Checkbox/Switch **53.95% TSX; 90.53% SCSS**. Their declaration blocks are identical after removing differing imports. Copied Redux dispatch and label/count markup: `common/ListPage/ListPageCheckboxGroup/ListPageCheckboxGroup.tsx:25,33,85`; Switch equivalent `:21,25,64`. | Checkbox supports option hidden/checked/disabled rules; Switch computes disabled differently. Radio stores a scalar and initializes selection. | **0/0 each**. | **Real Checkbox/Switch duplication.** Radio shares a contract, not the full implementation. | Checkbox owns a shared boolean-filter controller/option renderer. Add control adapter, label slot and explicit disabled-policy profile; keep deprecated Checkbox/Switch wrappers. Share Radio’s contract separately. Retain original module classes. | Medium: filter semantics already diverged | M |
+| **PhoneNumberIMask / VerificationPinInputIMask; phone input wrappers** — Input foundation **A’s** | Mask pair **48.16%**: same `forwardRef`, IMask wiring and synthetic change event, `core/PhoneNumber/PhoneNumberIMask/PhoneNumberIMask.tsx:13`; `common/VerificationPinInput/VerificationPinInputIMask/VerificationPinInputIMask.tsx:16`. Prefix/Base **33.52%** and 80% prop-name overlap. | Placeholder `#`/`N`, lazy mode, capitalization, classes; Prefix calculates country code while Base installs a mask. | All four **0/0**. | **Real mask-adapter duplication.** Prefix/Base already compose InputBase. | Phone mask owns a generic internal IMask adapter with placeholder character, lazy, capitalization and class options. Deprecated wrappers map existing names. Share phone prop types; retain Prefix/Base behavior. | Medium: refs and input events | M |
+| **Table / DataTable / footer controls** | Table/DataTable only **1.43%**. Actual duplication: Pagination/ShowMore **36.83% TSX, 81.25% SCSS**; ShowLess/ShowMore **34.39%**. See `core/Table/TableFooter/FooterPagination/FooterPagination.tsx:35,46`; ShowMore `:23,27`. | Table owns data, sorting, paging and toolbar; DataTable is semantic composition. Footer controls differ in callbacks, wrappers, slots and disabled selectors. | Table **29/0**; DataTable **15/0**; footer controls **0/0 each**. | **Table/DataTable are distinct.** Footer state/button/style fragments are copied. | Keep both tables. FooterShowMore owns shared footer-action rendering; parameterize action, icon, label, wrapper/slot and original classes. Deprecated footer wrappers preserve signatures. Shared SCSS mixins must retain descendant versus compound selector differences. | Medium: selectors, callbacks, hooks | M |
+| **CircularGauge / ProgressCircle / ArcGauge / BenchmarkGauge** | Circular/Progress **7.77%**, but both implement circumference/dash-offset rings: `core/CircularGauge/CircularGauge.tsx:46`; `core/ProgressCircle/ProgressCircle.tsx:19`. Other gauge pair scores **2.50–5.57%**. | Progress clamps size, uses a smaller effective diameter/radius, string dash arrays, style-based offset and percentage text. Circular supports max/track/loading/children. Arc is masked semicircle/conic gradient; Benchmark is a linear marker track. | Circular **4/0**; Progress **1/0**; Arc **2/0**; Benchmark **2/0**. | **Partial ring duplication; other gauges are distinct.** | Circular owns an internal ring renderer with explicit legacy geometry/SVG-attribute/class profile; deprecated Progress wrapper keeps its percentage layout. Keep Arc and Benchmark independent. | Medium: geometry and serialized SVG differences | M |
+| **BarChart / HSBChart** | **23.60% TSX; 46.90% SCSS**. `getCategories` is identical: `core/Charts/BarChart/BarChart.tsx:92`; `HSBChart/HSBChart.tsx:77`. Repeated Apex options and tooltip styling. | Vertical/distributed versus horizontal/stacked; different tooltip, legend, fonts and percentage formatting. | Bar **7/0**; HSB **4/0**. | **Real helpers/options duplication; distinct chart configurations.** | Shared internal bar-chart engine owns common options and translation helper. Public components remain deprecated profile wrappers; add orientation, stack and tooltip/legend profile inputs internally. Preserve option ordering and original selectors. | High: chart-generated DOM and tooltip HTML | L |
+| **Toolbar / FormControl; DropdownMenu / Popover** — **A’s** | Toolbar/FormControl **100%** after own-name normalization: `core/Toolbar/Toolbar.tsx:11`; `core/FormControl/FormControl.tsx:10`. Menu/Popover SCSS **30.54%**, principally arrow placement. | Different MUI components and prop contracts. Menu/tooltip shadows, padding, offsets and selector ancestry differ. | Toolbar **1/0**; FormControl **0/0**; DropdownMenu **6/0**; Popover **67/0**. | Toolbar/FormControl are **boilerplate similarity**, not interchangeable implementations. Popper arrow declarations are partially copied. | Keep distinct MUI adapters. Optionally share a shell helper and arrow SCSS mixin under original selectors; no component merge. | Medium: MUI defaults and CSS specificity | S–M |
+| **Loader / SmallLoader / ListLoader; ImgLoader / ImgWithLoader** | Loader pairs **2.51–5.90%**; image pair **4.41%**. See `core/Loader/Loader.tsx:19`, `SmallLoader/SmallLoader.tsx:22`, `ListLoader/ListLoader.tsx:54`, `ImgLoader/ImgLoader.tsx:16`, `ImgWithLoader/ImgWithLoader.tsx:32`. | CSS spinner; dot GIF; list-shaped placeholder; large GIF/message; image load state plus Skeleton/media overlay. | Loader **75/0**; Small **9/0**; List **3/0**; ImgLoader **6/0**; ImgWithLoader **6/0**. | **Distinct renderers.** ImgWithLoader already composes Skeleton (**A’s**). | Keep implementations. A shared loading facade would only dispatch to different renderers and would not remove meaningful duplication. | High visual risk for little gain | — |
+| **FadedCarousel / FadeCarouselAuto** | **3.26%**: refs/effects/item wrappers. `core/FadedCarousel/FadedCarousel.tsx:83`; `core/FadeCarouselAuto/FadeCarouselAuto.tsx:35`. | Manual arrows/centering/edge overlays versus timed scrolling, hover pause and duplicated items for looping. | **4/0; 2/0**. | **Distinct behavior and DOM.** | Keep both; no umbrella justified under byte-identical-output constraint. | High if forced | — |
+| **ListItem / ListItems / nested ListItem** | Standalone/nested rows **1.94%**; standalone/container **2.08%**. `core/ListItem/ListItem.tsx:47`; `core/ListItems/ListItem/ListItem.tsx:66`; `ListItems.tsx:83`. | Numbered/icon content row versus sticky, clickable multi-slot `<li>`. | Standalone **0/0**; nested **0/0**; ListItems **1/0**. | **Names collide; implementations differ.** ListItems already composes its nested row. | Keep both rows and current composition. No consolidation. | High if forced | — |
+| **Rating / StarRating** | **4.01%**. Rating explicitly renders StarRating: `core/Rating/Rating.tsx:77`. | Rating adds numeric label/layout/clamping; StarRating owns interaction and star iteration. | **11/0; 13/0**. | **Already composed.** | Keep StarRating as owner. Resolve the misleading inherited prop surface separately; blindly forwarding more props changes existing behavior. | Medium API risk | S |
+| **Link / LinkConditional / RcNavLink** | **3.58–4.83%**. LinkConditional directly composes Link: `core/LinkConditional/LinkConditional.tsx:22`. | Styled text/icon anchor versus conditional delete UI versus location-token substitution and raw prop spreading, `core/RcNavLink/RcNavLink.tsx:18`. | **64/0; 3/0; 0/0**. | **Already composed / distinct adapter.** | Keep Link owner and LinkConditional composition. Do not route RcNavLink through Link: it adds Text/classes and changes DOM attributes. | Medium | — |
+| **Alert / LineAlert / InfoBox / common InfoText** | Highest **13.54%** Alert/LineAlert; others **4.08–8.94%**. `core/Alert/Alert.tsx:16`; `LineAlert/LineAlert.tsx:23`; `InfoBox/InfoBox.tsx:83`; `common/InfoText/InfoText.tsx:20`. | Different severity colors/icons, `warn`/`warning`, typography, dismissal/actions and wrappers. | Alert **367/0**; Line **3/291**; InfoBox **135/0**; InfoText **0/0**. | **Related semantics, little copied rendering.** | Keep renderers. Share severity types/data only where values actually agree; preserve legacy mappings. InfoBox’s Collapse/Button dependencies are **A’s**. | Medium–high visual/service exposure | S for types; no full merge |
+| **TextHighlighted / Text; fragment/preset wrappers** | TextHighlighted/Text props have **75% field-name overlap**; it already delegates: `core/TextHighlighted/TextHighlighted.tsx:40`. TextWrapBalancer/ActionCardBody **35.14%**, mostly fragment return. | Highlighted renames one prop; Balancer conditionally uses a library; ActionCardBody only returns children. | See four-column usage below. | **Existing deprecated composition; copied types and trivial wrappers.** | Keep Text owner and existing deprecated Highlighted wrapper. Derive compatible props from Text with `Pick`/`Omit`; keep legacy accepted types. Retain ActionCardBody as a deprecated compatibility wrapper. | Low–medium type compatibility | S |
+| **TextEditDrawer / MultiSelectDrawer; ActionBar templates** — Drawer foundation **A’s** | Drawer styles **68.33%**, TSX **20.21%**; identical title/actions declarations: `core/CustomDrawers/TextEditDrawer/TextEditDrawer.module.scss:22`; MultiSelect equivalent `:22`. ActionBar template styles **50.51%**. | Scalar validation/restoration versus async multi-selection. ActionBar message/footer have different gaps and content. | Text drawer **0/2**; MultiSelect **0/0**; ActionBarFooter **0/2**; Message **0/1**. | **Copied shells/styles; distinct workflows.** | Shared internal drawer chrome owns title/body/actions slots; deprecated wrappers retain workflow controllers and original module classes. ActionBar needs only a layout mixin. | Medium | M |
+| **Notification QuoteContainers** | **25.68%**, same asset hook/content/SVG purpose: `core/QuoteContainer/QuoteContainer.tsx:20`; `core/Notification/QuoteContainer/QuoteContainer.tsx:17`. | Different wrappers/layout/classes; modern guards loading/error; legacy renders both `<SvgIcon/>` and StyledSVG. | Public **1/0**; notification-local **0/0**. | **Diverged copy**, not safe aliasing. | Public QuoteContainer may own a profile-based renderer with legacy structure/asset rendering retained; deprecated local wrapper. Low return relative to compatibility complexity. | High | M |
+
+| family | similarity evidence (score + what is shared) | what differs | rc-webapp usage of each, JSX/service | real duplication or only looks similar | proposed umbrella: owner, wrappers, additive props | risk | effort |
+|---|---|---|---|---|---|---|---|
+| **NotificationAction / Notification / NotificationSource** | Action copies: **100% TSX, 100% SCSS**. Identical props, `renderIcon`, click guard and markup: `core/NotificationAction/NotificationAction.tsx:9`; nested equivalent `core/Notification/NotificationAction/NotificationAction.tsx:9`. | Action copies differ only in import paths. Notification is the containing view; Source is its label. | Both actions **0/0**; Notification **1/0**; Source **1/0**. | **Exact action duplication.** Notification already composes nested Action and Source at `Notification.tsx:48,92`. | Keep nested Action as owner—it is the root-exported implementation (`core/Notification/index.ts:5`). Deprecate standalone Action as a thin wrapper; one SCSS source. No new props. | Low | S |
+| **Google Maps Marker / AdvancedMarker adapters** | **75.42%** across **887/900 lines**. Copied event maps, listener effects, class lifecycle and child-anchor cloning: `core/GoogleMaps/GoogleMapsMarker/Marker.tsx:27,801`; `AdvancedMarker.tsx:29,810`. | Legacy setters versus AdvancedMarker property assignments; constructor guards; advanced clustering and several updater bodies are disabled. | Local Marker/MarkerF and public AdvancedMarker/AdvancedMarkerF: **0/0 each**. | **Substantial implementation duplication.** Different SDK objects prevent direct aliasing. Public `MarkerF` actually comes from the external package, not the copied local file: `core/GoogleMaps/index.ts:11`. | Extract one internal marker lifecycle/event engine, parameterized by legacy/advanced constructor and updater adapters. Keep class/function APIs and refs; deprecated wrappers delegate. Preserve existing disabled operations and lifecycle timing. | High: imperative SDK behavior, clustering, refs | L |
+| **AcceptModal / ConfirmModal** — Modal foundation **A’s** | **74.50% TSX; 77.78% SCSS**. Identical prop alias, header, message branch, positive callback and 672px shell: `core/StandardModals/AcceptModal/AcceptModal.tsx:15`; `ConfirmModal/ConfirmModal.tsx:15`. | Confirm adds negative action/custom callback; Accept centers its positive button. Different container/modal classes and footer selectors. | Accept **0/5**; Confirm **0/67**. | **Real duplication.** Service usage is material despite zero direct JSX. | Confirm owns one decision-dialog renderer. Add action mode and internal legacy class/footer profile; Accept becomes deprecated wrapper. Retain both prop aliases and service methods. | Medium: close results, CSS selectors, footer layout | M |
+| **EditModal / BigAssEditModal; other custom/standard modals** — Modal foundation **A’s** | Edit pair **37.93%**; identical `positiveFn` and `negativeFn`: `core/CustomModals/EditModal/EditModal.tsx:88`; `BigAssEditModal/BigAssEditModal.tsx:62`. Test/ImplementDetails **45.91%** shell duplication. | Edit has request-error handling, title replacements, configurable width/button; BigAss is fullscreen, uses local loading and a different response payload/effect. Error logs errors; Loading has animation modes; DateRange and PhotoCarousel contain actual workflows. | Edit **21/0**; BigAss **3/0**; Error **22/63**; Success **5/0**; Loading **5/40**; DateRange **0/0**; PhotoCarousel **0/7**; Test and ImplementDetails **0/0**. | **Edit flow is copied and diverged.** Remaining modal shell repetition mostly already composes Modal/Header/Body/Footer. | Edit owns shared edit controller/renderer. Add fullscreen, description, body class and explicit legacy loading/close-result profiles; deprecated BigAss wrapper. Do not fold logging, gallery or date workflows into a universal modal. | High: observable async differences | M–L |
+| **ListPageCheckboxGroup / SwitchGroup / RadioGroup** | Checkbox/Switch **53.95% TSX; 90.53% SCSS**. Their declaration blocks are identical after removing differing imports. Copied Redux dispatch and label/count markup: `common/ListPage/ListPageCheckboxGroup/ListPageCheckboxGroup.tsx:25,33,85`; Switch equivalent `:21,25,64`. | Checkbox supports option hidden/checked/disabled rules; Switch computes disabled differently. Radio stores a scalar and initializes selection. | **0/0 each**. | **Real Checkbox/Switch duplication.** Radio shares a contract, not the full implementation. | Checkbox owns a shared boolean-filter controller/option renderer. Add control adapter, label slot and explicit disabled-policy profile; keep deprecated Checkbox/Switch wrappers. Share Radio’s contract separately. Retain original module classes. | Medium: filter semantics already diverged | M |
+| **PhoneNumberIMask / VerificationPinInputIMask; phone input wrappers** — Input foundation **A’s** | Mask pair **48.16%**: same `forwardRef`, IMask wiring and synthetic change event, `core/PhoneNumber/PhoneNumberIMask/PhoneNumberIMask.tsx:13`; `common/VerificationPinInput/VerificationPinInputIMask/VerificationPinInputIMask.tsx:16`. Prefix/Base **33.52%** and 80% prop-name overlap. | Placeholder `#`/`N`, lazy mode, capitalization, classes; Prefix calculates country code while Base installs a mask. | All four **0/0**. | **Real mask-adapter duplication.** Prefix/Base already compose InputBase. | Phone mask owns a generic internal IMask adapter with placeholder character, lazy, capitalization and class options. Deprecated wrappers map existing names. Share phone prop types; retain Prefix/Base behavior. | Medium: refs and input events | M |
+| **Table / DataTable / footer controls** | Table/DataTable only **1.43%**. Actual duplication: Pagination/ShowMore **36.83% TSX, 81.25% SCSS**; ShowLess/ShowMore **34.39%**. See `core/Table/TableFooter/FooterPagination/FooterPagination.tsx:35,46`; ShowMore `:23,27`. | Table owns data, sorting, paging and toolbar; DataTable is semantic composition. Footer controls differ in callbacks, wrappers, slots and disabled selectors. | Table **29/0**; DataTable **15/0**; footer controls **0/0 each**. | **Table/DataTable are distinct.** Footer state/button/style fragments are copied. | Keep both tables. FooterShowMore owns shared footer-action rendering; parameterize action, icon, label, wrapper/slot and original classes. Deprecated footer wrappers preserve signatures. Shared SCSS mixins must retain descendant versus compound selector differences. | Medium: selectors, callbacks, hooks | M |
+| **CircularGauge / ProgressCircle / ArcGauge / BenchmarkGauge** | Circular/Progress **7.77%**, but both implement circumference/dash-offset rings: `core/CircularGauge/CircularGauge.tsx:46`; `core/ProgressCircle/ProgressCircle.tsx:19`. Other gauge pair scores **2.50–5.57%**. | Progress clamps size, uses a smaller effective diameter/radius, string dash arrays, style-based offset and percentage text. Circular supports max/track/loading/children. Arc is masked semicircle/conic gradient; Benchmark is a linear marker track. | Circular **4/0**; Progress **1/0**; Arc **2/0**; Benchmark **2/0**. | **Partial ring duplication; other gauges are distinct.** | Circular owns an internal ring renderer with explicit legacy geometry/SVG-attribute/class profile; deprecated Progress wrapper keeps its percentage layout. Keep Arc and Benchmark independent. | Medium: geometry and serialized SVG differences | M |
+| **BarChart / HSBChart** | **23.60% TSX; 46.90% SCSS**. `getCategories` is identical: `core/Charts/BarChart/BarChart.tsx:92`; `HSBChart/HSBChart.tsx:77`. Repeated Apex options and tooltip styling. | Vertical/distributed versus horizontal/stacked; different tooltip, legend, fonts and percentage formatting. | Bar **7/0**; HSB **4/0**. | **Real helpers/options duplication; distinct chart configurations.** | Shared internal bar-chart engine owns common options and translation helper. Public components remain deprecated profile wrappers; add orientation, stack and tooltip/legend profile inputs internally. Preserve option ordering and original selectors. | High: chart-generated DOM and tooltip HTML | L |
+| **Toolbar / FormControl; DropdownMenu / Popover** — **A’s** | Toolbar/FormControl **100%** after own-name normalization: `core/Toolbar/Toolbar.tsx:11`; `core/FormControl/FormControl.tsx:10`. Menu/Popover SCSS **30.54%**, principally arrow placement. | Different MUI components and prop contracts. Menu/tooltip shadows, padding, offsets and selector ancestry differ. | Toolbar **1/0**; FormControl **0/0**; DropdownMenu **6/0**; Popover **67/0**. | Toolbar/FormControl are **boilerplate similarity**, not interchangeable implementations. Popper arrow declarations are partially copied. | Keep distinct MUI adapters. Optionally share a shell helper and arrow SCSS mixin under original selectors; no component merge. | Medium: MUI defaults and CSS specificity | S–M |
+| **Loader / SmallLoader / ListLoader; ImgLoader / ImgWithLoader** | Loader pairs **2.51–5.90%**; image pair **4.41%**. See `core/Loader/Loader.tsx:19`, `SmallLoader/SmallLoader.tsx:22`, `ListLoader/ListLoader.tsx:54`, `ImgLoader/ImgLoader.tsx:16`, `ImgWithLoader/ImgWithLoader.tsx:32`. | CSS spinner; dot GIF; list-shaped placeholder; large GIF/message; image load state plus Skeleton/media overlay. | Loader **75/0**; Small **9/0**; List **3/0**; ImgLoader **6/0**; ImgWithLoader **6/0**. | **Distinct renderers.** ImgWithLoader already composes Skeleton (**A’s**). | Keep implementations. A shared loading facade would only dispatch to different renderers and would not remove meaningful duplication. | High visual risk for little gain | — |
+| **FadedCarousel / FadeCarouselAuto** | **3.26%**: refs/effects/item wrappers. `core/FadedCarousel/FadedCarousel.tsx:83`; `core/FadeCarouselAuto/FadeCarouselAuto.tsx:35`. | Manual arrows/centering/edge overlays versus timed scrolling, hover pause and duplicated items for looping. | **4/0; 2/0**. | **Distinct behavior and DOM.** | Keep both; no umbrella justified under byte-identical-output constraint. | High if forced | — |
+| **ListItem / ListItems / nested ListItem** | Standalone/nested rows **1.94%**; standalone/container **2.08%**. `core/ListItem/ListItem.tsx:47`; `core/ListItems/ListItem/ListItem.tsx:66`; `ListItems.tsx:83`. | Numbered/icon content row versus sticky, clickable multi-slot `<li>`. | Standalone **0/0**; nested **0/0**; ListItems **1/0**. | **Names collide; implementations differ.** ListItems already composes its nested row. | Keep both rows and current composition. No consolidation. | High if forced | — |
+| **Rating / StarRating** | **4.01%**. Rating explicitly renders StarRating: `core/Rating/Rating.tsx:77`. | Rating adds numeric label/layout/clamping; StarRating owns interaction and star iteration. | **11/0; 13/0**. | **Already composed.** | Keep StarRating as owner. Resolve the misleading inherited prop surface separately; blindly forwarding more props changes existing behavior. | Medium API risk | S |
+| **Link / LinkConditional / RcNavLink** | **3.58–4.83%**. LinkConditional directly composes Link: `core/LinkConditional/LinkConditional.tsx:22`. | Styled text/icon anchor versus conditional delete UI versus location-token substitution and raw prop spreading, `core/RcNavLink/RcNavLink.tsx:18`. | **64/0; 3/0; 0/0**. | **Already composed / distinct adapter.** | Keep Link owner and LinkConditional composition. Do not route RcNavLink through Link: it adds Text/classes and changes DOM attributes. | Medium | — |
+| **Alert / LineAlert / InfoBox / common InfoText** | Highest **13.54%** Alert/LineAlert; others **4.08–8.94%**. `core/Alert/Alert.tsx:16`; `LineAlert/LineAlert.tsx:23`; `InfoBox/InfoBox.tsx:83`; `common/InfoText/InfoText.tsx:20`. | Different severity colors/icons, `warn`/`warning`, typography, dismissal/actions and wrappers. | Alert **367/0**; Line **3/291**; InfoBox **135/0**; InfoText **0/0**. | **Related semantics, little copied rendering.** | Keep renderers. Share severity types/data only where values actually agree; preserve legacy mappings. InfoBox’s Collapse/Button dependencies are **A’s**. | Medium–high visual/service exposure | S for types; no full merge |
+| **TextHighlighted / Text; fragment/preset wrappers** | TextHighlighted/Text props have **75% field-name overlap**; it already delegates: `core/TextHighlighted/TextHighlighted.tsx:40`. TextWrapBalancer/ActionCardBody **35.14%**, mostly fragment return. | Highlighted renames one prop; Balancer conditionally uses a library; ActionCardBody only returns children. | See four-column usage below. | **Existing deprecated composition; copied types and trivial wrappers.** | Keep Text owner and existing deprecated Highlighted wrapper. Derive compatible props from Text with `Pick`/`Omit`; keep legacy accepted types. Retain ActionCardBody as a deprecated compatibility wrapper. | Low–medium type compatibility | S |
+| **TextEditDrawer / MultiSelectDrawer; ActionBar templates** — Drawer foundation **A’s** | Drawer styles **68.33%**, TSX **20.21%**; identical title/actions declarations: `core/CustomDrawers/TextEditDrawer/TextEditDrawer.module.scss:22`; MultiSelect equivalent `:22`. ActionBar template styles **50.51%**. | Scalar validation/restoration versus async multi-selection. ActionBar message/footer have different gaps and content. | Text drawer **0/2**; MultiSelect **0/0**; ActionBarFooter **0/2**; Message **0/1**. | **Copied shells/styles; distinct workflows.** | Shared internal drawer chrome owns title/body/actions slots; deprecated wrappers retain workflow controllers and original module classes. ActionBar needs only a layout mixin. | Medium | M |
+| **Notification QuoteContainers** | **25.68%**, same asset hook/content/SVG purpose: `core/QuoteContainer/QuoteContainer.tsx:20`; `core/Notification/QuoteContainer/QuoteContainer.tsx:17`. | Different wrappers/layout/classes; modern guards loading/error; legacy renders both `<SvgIcon/>` and StyledSVG. | Public **1/0**; notification-local **0/0**. | **Diverged copy**, not safe aliasing. | Public QuoteContainer may own a profile-based renderer with legacy structure/asset rendering retained; deprecated local wrapper. Low return relative to compatibility complexity. | High | M |
+
+
+Usage ledger (direct JSX / service / internal / WordPress):
+
+| component/export | rc-webapp direct JSX sites | rc-webapp service call sites rendering it | internal Vanguard importers | WordPress export |
+|---|---:|---:|---:|---|
+| NotificationAction — standalone | 0 | 0 | 0 | no |
+| NotificationAction — nested/root export | 0 | 0 | 1 | no |
+| Notification | 1 | 0 | 0 | no |
+| NotificationSource | 1 | 0 | 1 | no |
+| QuoteContainer — public | 1 | 0 | 0 | no |
+| QuoteContainer — notification-local | 0 | 0 | 1 | no |
+| Marker — local legacy class | 0 | 0 | 0 | no |
+| MarkerF — local legacy function | 0 | 0 | 0 | no |
+| AdvancedMarker | 0 | 0 | 0 | no |
+| AdvancedMarkerF | 0 | 0 | 0 | no |
+| MarkerF — external package re-export | 0 | 0 | 0 | no |
+| AcceptModal | 0 | 5 | 1 | no |
+| ConfirmModal | 0 | 67 | 1 | no |
+| EditModal | 21 | 0 | 1 | yes |
+| BigAssEditModal | 3 | 0 | 0 | no |
+| ErrorModal | 22 | 63 | 2 | no |
+| SuccessModal | 5 | 0 | 0 | no |
+| LoadingModal | 5 | 40 | 1 | no |
+| DateRangeModal | 0 | 0 | 1 | no |
+| PhotoCarouselModal | 0 | 7 | 1 | no |
+| TestModal | 0 | 0 | 0 | no |
+| ImplementDetailsModal | 0 | 0 | 1 | no |
+| ListPageCheckboxGroup | 0 | 0 | 1 | no |
+| ListPageSwitchGroup | 0 | 0 | 1 | no |
+| ListPageRadioGroup | 0 | 0 | 1 | no |
+| PhoneNumberIMask | 0 | 0 | 1 | no |
+| VerificationPinInputIMask | 0 | 0 | 1 | no |
+| PhoneNumberPrefix | 0 | 0 | 1 | no |
+| PhoneNumberBase | 0 | 0 | 1 | no |
+| Table | 29 | 0 | 0 | no |
+| TableHeader | 10 | 0 | 1 | no |
+| TableCell | 1 | 0 | 1 | no |
+| TableFooter | 0 | 0 | 1 | no |
+| FooterPagination | 0 | 0 | 1 | no |
+| FooterShowMore | 0 | 0 | 1 | no |
+| FooterShowLess | 0 | 0 | 1 | no |
+| DataTable | 15 | 0 | 0 | no |
+| DataTableHead | 13 | 0 | 0 | no |
+| DataTableBody | 16 | 0 | 0 | no |
+| DataTableFoot | 0 | 0 | 0 | no |
+| DataTableRow | 39 | 0 | 0 | no |
+| DataTableCell | 145 | 0 | 0 | no |
+| CircularGauge | 4 | 0 | 0 | no |
+| ProgressCircle | 1 | 0 | 0 | no |
+| ArcGauge | 2 | 0 | 0 | no |
+| BenchmarkGauge | 2 | 0 | 0 | no |
+| BarChart | 7 | 0 | 0 | no |
+| HSBChart | 4 | 0 | 0 | no |
+| Toolbar — **A’s** | 1 | 0 | 0 | no |
+| FormControl — **A’s** | 0 | 0 | 0 | no |
+| DropdownMenu — **A’s** | 6 | 0 | 2 | no |
+| Popover — **A’s** | 67 | 0 | 9 | yes |
+| PopoverPopper — **A’s** | 0 | 0 | 1 | no |
+| Loader | 75 | 0 | 0 | no |
+| SmallLoader | 9 | 0 | 0 | no |
+| ListLoader | 3 | 0 | 1 | no |
+| ImgLoader | 6 | 0 | 0 | no |
+| ImgWithLoader | 6 | 0 | 0 | no |
+| FadedCarousel | 4 | 0 | 0 | no |
+| FadeCarouselAuto | 2 | 0 | 0 | no |
+| ListItem — standalone | 0 | 0 | 2 | no |
+| ListItem — nested | 0 | 0 | 1 | no |
+| ListItems | 1 | 0 | 0 | no |
+| Rating | 11 | 0 | 0 | no |
+| StarRating | 13 | 0 | 3 | no |
+| Link | 64 | 0 | 5 | yes |
+| LinkConditional | 3 | 0 | 0 | no |
+| RcNavLink | 0 | 0 | 0 | no |
+| Alert | 367 | 0 | 0 | no |
+| LineAlert | 3 | 291 | 1 | no |
+| InfoBox | 135 | 0 | 1 | yes |
+| InfoText | 0 | 0 | 0 | no |
+| TextHighlighted | 0 | 0 | 1 | yes |
+| Text | 6895 | 478 known template paths¹ | 126 | yes |
+| TextWrapBalancer | 0 | 0 | 1 | yes |
+| ActionCardBody | 6 | 0 | 0 | no |
+| Label | 6 | 0 | 2 | no |
+| PageContainer | 0 | 0 | 0 | no |
+| TextEditDrawer | 0 | 2 | 1 | no |
+| MultiSelectDrawer | 0 | 0 | 1 | no |
+| ActionBarFooter | 0 | 2 | 1 | no |
+| ActionBarMessage | 0 | 1 | 1 | no |
+| ListPageHeader — current nested implementation | 0 | 0 | 1 | no |
+| ListPageHeaderWithActions | 0 | 0 | 1 | no |
+| RcTransparentShowcase | 0 | 0 | 0 | no |
+| CssUpdatesShowcase | 0 | 0 | 0 | no |
+
+| component/export | rc-webapp direct JSX sites | rc-webapp service call sites rendering it | internal Vanguard importers | WordPress export |
+|---|---:|---:|---:|---|
+| NotificationAction — standalone | 0 | 0 | 0 | no |
+| NotificationAction — nested/root export | 0 | 0 | 1 | no |
+| Notification | 1 | 0 | 0 | no |
+| NotificationSource | 1 | 0 | 1 | no |
+| QuoteContainer — public | 1 | 0 | 0 | no |
+| QuoteContainer — notification-local | 0 | 0 | 1 | no |
+| Marker — local legacy class | 0 | 0 | 0 | no |
+| MarkerF — local legacy function | 0 | 0 | 0 | no |
+| AdvancedMarker | 0 | 0 | 0 | no |
+| AdvancedMarkerF | 0 | 0 | 0 | no |
+| MarkerF — external package re-export | 0 | 0 | 0 | no |
+| AcceptModal | 0 | 5 | 1 | no |
+| ConfirmModal | 0 | 67 | 1 | no |
+| EditModal | 21 | 0 | 1 | yes |
+| BigAssEditModal | 3 | 0 | 0 | no |
+| ErrorModal | 22 | 63 | 2 | no |
+| SuccessModal | 5 | 0 | 0 | no |
+| LoadingModal | 5 | 40 | 1 | no |
+| DateRangeModal | 0 | 0 | 1 | no |
+| PhotoCarouselModal | 0 | 7 | 1 | no |
+| TestModal | 0 | 0 | 0 | no |
+| ImplementDetailsModal | 0 | 0 | 1 | no |
+| ListPageCheckboxGroup | 0 | 0 | 1 | no |
+| ListPageSwitchGroup | 0 | 0 | 1 | no |
+| ListPageRadioGroup | 0 | 0 | 1 | no |
+| PhoneNumberIMask | 0 | 0 | 1 | no |
+| VerificationPinInputIMask | 0 | 0 | 1 | no |
+| PhoneNumberPrefix | 0 | 0 | 1 | no |
+| PhoneNumberBase | 0 | 0 | 1 | no |
+| Table | 29 | 0 | 0 | no |
+| TableHeader | 10 | 0 | 1 | no |
+| TableCell | 1 | 0 | 1 | no |
+| TableFooter | 0 | 0 | 1 | no |
+| FooterPagination | 0 | 0 | 1 | no |
+| FooterShowMore | 0 | 0 | 1 | no |
+| FooterShowLess | 0 | 0 | 1 | no |
+| DataTable | 15 | 0 | 0 | no |
+| DataTableHead | 13 | 0 | 0 | no |
+| DataTableBody | 16 | 0 | 0 | no |
+| DataTableFoot | 0 | 0 | 0 | no |
+| DataTableRow | 39 | 0 | 0 | no |
+| DataTableCell | 145 | 0 | 0 | no |
+| CircularGauge | 4 | 0 | 0 | no |
+| ProgressCircle | 1 | 0 | 0 | no |
+| ArcGauge | 2 | 0 | 0 | no |
+| BenchmarkGauge | 2 | 0 | 0 | no |
+| BarChart | 7 | 0 | 0 | no |
+| HSBChart | 4 | 0 | 0 | no |
+| Toolbar — **A’s** | 1 | 0 | 0 | no |
+| FormControl — **A’s** | 0 | 0 | 0 | no |
+| DropdownMenu — **A’s** | 6 | 0 | 2 | no |
+| Popover — **A’s** | 67 | 0 | 9 | yes |
+| PopoverPopper — **A’s** | 0 | 0 | 1 | no |
+| Loader | 75 | 0 | 0 | no |
+| SmallLoader | 9 | 0 | 0 | no |
+| ListLoader | 3 | 0 | 1 | no |
+| ImgLoader | 6 | 0 | 0 | no |
+| ImgWithLoader | 6 | 0 | 0 | no |
+| FadedCarousel | 4 | 0 | 0 | no |
+| FadeCarouselAuto | 2 | 0 | 0 | no |
+| ListItem — standalone | 0 | 0 | 2 | no |
+| ListItem — nested | 0 | 0 | 1 | no |
+| ListItems | 1 | 0 | 0 | no |
+| Rating | 11 | 0 | 0 | no |
+| StarRating | 13 | 0 | 3 | no |
+| Link | 64 | 0 | 5 | yes |
+| LinkConditional | 3 | 0 | 0 | no |
+| RcNavLink | 0 | 0 | 0 | no |
+| Alert | 367 | 0 | 0 | no |
+| LineAlert | 3 | 291 | 1 | no |
+| InfoBox | 135 | 0 | 1 | yes |
+| InfoText | 0 | 0 | 0 | no |
+| TextHighlighted | 0 | 0 | 1 | yes |
+| Text | 6895 | 478 known template paths¹ | 126 | yes |
+| TextWrapBalancer | 0 | 0 | 1 | yes |
+| ActionCardBody | 6 | 0 | 0 | no |
+| Label | 6 | 0 | 2 | no |
+| PageContainer | 0 | 0 | 0 | no |
+| TextEditDrawer | 0 | 2 | 1 | no |
+| MultiSelectDrawer | 0 | 0 | 1 | no |
+| ActionBarFooter | 0 | 2 | 1 | no |
+| ActionBarMessage | 0 | 1 | 1 | no |
+| ListPageHeader — current nested implementation | 0 | 0 | 1 | no |
+| ListPageHeaderWithActions | 0 | 0 | 1 | no |
+| RcTransparentShowcase | 0 | 0 | 0 | no |
+| CssUpdatesShowcase | 0 | 0 | 0 | no |
+
