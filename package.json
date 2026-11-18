@@ -108,6 +108,9 @@
     "@googlemaps/js-api-loader": "1.16.2",
     "@lexical/react": "0.12.6",
     "@lexical/rich-text": "0.12.6",
+    "@mui/material": "9.5.0",
+    "@mui/system": "9.5.0",
+    "@mui/x-date-pickers": "9.17.0",
     "@nozbe/microfuzz": "1.0.0",
     "@originjs/vite-plugin-commonjs": "1.0.3",
     "@react-google-maps/api": "2.19.3",
@@ -192,9 +195,6 @@
     "storybook": "$storybook"
   },
   "dependencies": {
-    "@mui/material": "9.5.0",
-    "@mui/system": "9.5.0",
-    "@mui/x-date-pickers": "9.17.0",
     "@testing-library/react": "16.3.0",
     "date-fns": "2.30.0",
     "dom-serializer": "2.0.0",
