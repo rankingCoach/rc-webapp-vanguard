@@ -672,8 +672,26 @@ svg.MuiSvgIcon-root:where([data-vg-core]) {
     min-width: 36px;
   }
 
+  // MUI variants, in MUI's order: not dense → auto height from sm up; dense → 32px, 4px, body2.
   @media (min-width: 600px) {
-    min-height: auto;
+    &:where(:not(.MuiMenuItem-dense)) {
+      min-height: auto;
+    }
+  }
+
+  &:where(.MuiMenuItem-dense) {
+    min-height: 32px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-family: $font;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.01071em;
+
+    & .MuiListItemIcon-root svg {
+      font-size: 1.25rem;
+    }
   }
 }
 
@@ -684,6 +702,10 @@ svg.MuiSvgIcon-root:where([data-vg-core]) {
 .MuiInputLabel-root:where([data-vg-core]):where(.vg-typography-vanguard),
 .MuiMenuItem-root:where([data-vg-core]):where(.vg-typography-vanguard) {
   font-size: unquote("1.1428571428571428rem");
+}
+
+.MuiMenuItem-root:where([data-vg-core]):where(.vg-typography-vanguard.MuiMenuItem-dense) {
+  font-size: 1rem;
 }
 
 .MuiFormHelperText-root:where([data-vg-core]):where(.vg-typography-vanguard) {

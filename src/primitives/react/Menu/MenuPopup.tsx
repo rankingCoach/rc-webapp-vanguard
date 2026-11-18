@@ -26,6 +26,11 @@ export interface MenuPopupProps {
   listProps?: { className?: string; style?: React.CSSProperties } & Record<string, unknown>;
   /** Focus the selected item (else the first enabled one) on open, like MUI `variant="selectedMenu"`. */
   autoFocusItem?: boolean;
+  /**
+   * MUI Menu `autoFocus` (default true): the menu manages initial focus (item, else the list) and the modal's own
+   * auto-focus is off; false hands initial focus back to the modal (content root).
+   */
+  autoFocus?: boolean;
   focusSource?: FocusSource;
   disableListWrap?: boolean;
   marginThreshold?: number;
@@ -50,6 +55,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
     paperProps,
     listProps,
     autoFocusItem = true,
+    autoFocus = true,
     focusSource = null,
     disableListWrap = false,
     marginThreshold = 16,
@@ -138,6 +144,8 @@ export const MenuPopup = (props: MenuPopupProps) => {
       onClose={onClose}
       id={id}
       disableScrollLock={disableScrollLock}
+      // MUI Menu: `disableAutoFocus={autoFocus}` on its Popover (the menu list moves focus itself).
+      disableAutoFocus={autoFocus}
       className={classNames('MuiPopover-root', 'MuiMenu-root', rootClass ?? '')}
       style={rootStyle}
       backdropStyle={{ opacity: open ? 1 : 0, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -172,7 +180,8 @@ export const MenuPopup = (props: MenuPopupProps) => {
           className={classNames('MuiMenu-list', listClass ?? '')}
           ref={listRef}
           style={listStyle}
-          autoFocusItem={open && autoFocusItem}
+          autoFocusItem={open && autoFocus && autoFocusItem}
+          autoFocus={open && autoFocus}
           focusSource={focusSource}
           disableListWrap={disableListWrap}
           onKeyDown={handleListKeyDown}

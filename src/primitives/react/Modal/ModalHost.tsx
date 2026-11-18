@@ -18,6 +18,8 @@ export interface ModalHostProps {
   disableRestoreFocus?: boolean;
   disableAutoFocus?: boolean;
   disableEscapeKeyDown?: boolean;
+  /** MUI `disableEnforceFocus`: do not pull focus back into the modal when it leaves. */
+  disableEnforceFocus?: boolean;
   backdropClassName?: string;
   backdropStyle?: React.CSSProperties;
   children: React.ReactNode;
@@ -44,6 +46,7 @@ export const ModalHost = (props: ModalHostProps) => {
     disableRestoreFocus = false,
     disableAutoFocus = false,
     disableEscapeKeyDown = false,
+    disableEnforceFocus = false,
     backdropClassName,
     backdropStyle,
     children,
@@ -80,9 +83,54 @@ export const ModalHost = (props: ModalHostProps) => {
   useEffect(() => {
     if (!open) return undefined;
     return () => {
-      if (!disableRestoreFocus && restoreTo.current?.isConnected) restoreTo.current.focus();
+      if (!disableRestoreFocus && restoreTo.current?.isConnected) {
+        ignoreNextEnforce.current = true;
+        restoreTo.current.focus();
+      }
     };
   }, [open, disableRestoreFocus]);
+
+  // MUI FocusTrap enforcement: focus that leaves the content (focusin elsewhere, or falls to <body>) is pulled back
+  // while this is the top modal; skipped once right after focus is restored on close.
+  const ignoreNextEnforce = useRef(false);
+  // MUI FocusTrap `activated`: on from open unless disableAutoFocus; any focus entering the modal turns it on.
+  const activated = useRef(false);
+  // MUI FocusTrap `reactFocusEventTarget`: the last element focused through the React tree (portaled descendants
+  // count as inside).
+  const reactFocusTarget = useRef<EventTarget | null>(null);
+  // MUI's menu takes its first focus in a later commit (Grow onEntering), after this runs; ours focuses in the opening
+  // commit, so focus already inside counts as entered (same outcome as MUI's order).
+  useEffect(() => {
+    if (open) activated.current = !disableAutoFocus || Boolean(rootRef.current?.contains(document.activeElement));
+  }, [open, disableAutoFocus]);
+  useEffect(() => {
+    if (!open || disableEnforceFocus) return undefined;
+    const doc = document;
+    const contain = () => {
+      const content = contentRef.current?.nextElementSibling as HTMLElement | null;
+      if (!content || !rootRef.current) return;
+      if (!doc.hasFocus() || !defaultModalManager.isTopModal(modal.current) || ignoreNextEnforce.current) {
+        ignoreNextEnforce.current = false;
+        return;
+      }
+      const active = doc.activeElement;
+      if (content.contains(active)) return;
+      // The sentinels move focus themselves (trap()); disableAutoFocus = not activated, like MUI.
+      if (active instanceof HTMLElement && active.dataset.testid?.startsWith('sentinel')) return;
+      if (active !== reactFocusTarget.current) reactFocusTarget.current = null;
+      else if (reactFocusTarget.current !== null) return;
+      if (!activated.current) return;
+      content.focus();
+    };
+    doc.addEventListener('focusin', contain);
+    const interval = setInterval(() => {
+      if (doc.activeElement?.tagName === 'BODY') contain();
+    }, 50);
+    return () => {
+      doc.removeEventListener('focusin', contain);
+      clearInterval(interval);
+    };
+  }, [open, disableEnforceFocus]);
 
   useEffect(() => {
     if (!open || disableAutoFocus) return;
@@ -115,6 +163,11 @@ export const ModalHost = (props: ModalHostProps) => {
       style={style}
       ref={rootRef}
       onKeyDown={handleKeyDown}
+      onFocus={(event) => {
+        activated.current = true;
+        const target = event.target as HTMLElement;
+        if (!target.dataset?.testid?.startsWith('sentinel')) reactFocusTarget.current = target;
+      }}
       {...rest}
     >
       <div
