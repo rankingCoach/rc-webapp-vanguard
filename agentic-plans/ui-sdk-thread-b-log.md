@@ -693,3 +693,12 @@ No real-bug candidates in this group.
 3. Kept off: `OpeningTimes/_OpeningTimes.stories.tsx` (story body commented out, references a missing mock); `OpeningTimes/OpeningTimesItem/_OpeningTimesItem.stories.tsx` (its play assertion fails → stale); 9 stories whose component stylesheet does not compile: DiscountBadge, FeatureBox, HoverableCard, IncentiveBox, InvoiceAddress, PageSectionRecommended, RecommendationBadge, StatisticsBoard, UpsellingTrigger.
 4. REAL-BUG CANDIDATE (latent, to the watchdog): those 9 components' `*.module.scss` import `../../../styles/{spacings,media-mixins}` from `src/common/<X>/`, one directory too high (`sass`: "Can't find stylesheet to import"). They are exported from neither `src/index.ts` nor `src/index-wordpress.ts` and imported by nothing except StatisticsBoard→StatisticsBoardItem and PageSectionRecommended→RecommendationBadge, so no consumer is affected today; any import of them would break the build.
 5. Process note: one retry run went out with an empty file list and ran the whole Storybook project (243 files) under high host load; 13 failures there were in A's areas (Popper styles, Select search, Drawer/Modal) plus the known-unstable Tabs RTL overflow stories — not investigated, load-related unless verifier 2 says otherwise.
+
+## Decided by the watchdog (after (d))
+1. Fix the 9 common SCSS import paths (one commit); proof: dist + dist-wordpress CSS sha256 identical before/after + each of the 9 renders in a spec/story; list them as dead-code candidates for the user.
+2. The accidental whole-project Storybook run: failing ids to A as "seen once under load, unverified"; runner guard: empty file list = abort.
+3. Common stories: explicit list (A applies).
+4. Then (e): D10 efficiency MEASUREMENT only (no code change), table to watchdog + A.
+
+### Agent docs coverage (watchdog item 4 of the (d) round)
+The generator also reads the component folder's own `_*.stories.tsx` story objects (args) after `stories/*.story.tsx`. Pages with examples: 49 → 56 of 298 (most newly enabled stories are render functions, not args, so they add little). Spec 8/8.
