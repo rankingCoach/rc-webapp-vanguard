@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, us
 import { createPortal } from 'react-dom';
 import type { Placement } from '../../core/anchored-placement';
 import { AnchorLike, computeAnchored } from './compute-anchored';
-import { listScrollParents } from './dom-geometry';
+import { layoutSize, listScrollParents } from './dom-geometry';
 import { PopperModifierLike, resolvePopperOptions } from './popper-options';
 import { initialPopperStyles, mapToStyles } from './popper-styles';
 
@@ -56,7 +56,7 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     const node = nodeRef.current;
     if (!node || !anchor || !open) return;
     const result = computeAnchored(anchor, node, { ...options, altBoundary: Boolean(disablePortal) });
-    const size = { width: node.offsetWidth, height: node.offsetHeight };
+    const size = layoutSize(node);
     Object.assign(
       node.style,
       mapToStyles({
