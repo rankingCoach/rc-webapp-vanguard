@@ -651,3 +651,17 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    3. No own write path, so nothing to move: RadioButton, RadioButtonGroup, DatePicker, TimePicker, PhoneNumber, AvatarCheckbox, Verification*Input. They pass the config to InputBase or an inner Form.
    4. No input calls `useLegacyDispatch` / `dispatch(formconfig…)` directly any more. ModalStepper keeps the D11 shim.
    5. **Decision for the watchdog: Slider.** Today it calls `formconfig?.setStateValue?.(value)` without dispatching, so nothing is ever stored (F0 inventory). Putting it on the seam (`writeScalar`) would START storing slider values in consumer slices, a behaviour change. Recommendation: keep it as-is (not on the seam) and decide when Slider is rebuilt; rc-webapp usage to be checked by the verifier.
+
+### D14 / F2 verdict per its own fallback rule: keep child-walking; go to F3 (PROPOSED, watchdog to confirm)
+1. Why F2 (registration replacing `Children.map` + `cloneElement`) can't reach parity, from `Form.tsx`:
+   1. **Wiring scope.** The walker only wires elements it reaches through `props.children`. It recurses through plain wrappers whose element has `children`, but never into what a component renders. With registration, every input that receives a `formconfig` would bind, including inputs rendered inside custom components that are unwired today. That changes `inputsStatus`, `isValid` and `hasChanges` for those screens.
+   2. **Array indices.** `idxMap` follows the walk order of wired elements. Registration order follows render order (every field, including those inside components). Exactly the same cases diverge.
+   3. **Status sequence.** The `onChange` sequence on mount (F0: empty status, then one call per `passError` field) comes from FormElement's effect order around the cloned children. Registration effects reorder it whenever registration and the walk disagree.
+   4. Restricting registration to "what the walker would reach" needs the walker anyway, so nothing would be removed.
+2. **Recommendation (the D14 fallback):** stop at F1 + F3.
+   1. Prop-configured children keep FormElement + child-walking unchanged (all 36 F0 tests stay byte-identical).
+   2. **F3** adds the user's goal additively. Inputs get an explicit `field="name"` prop. The seam (`useFieldBinding`) resolves the field config from the nearest Form's context when no `formconfig` prop is given, so no prop drilling. An explicit `formconfig` wins. Fields bound via `field` register with the Form through the seam (new path only, so no parity constraint).
+   3. Then **F4**: the Redux-free per-form store behind the seam for `field`-bound forms and WordPress.
+   4. Then **F5**: React 19 actions / pending.
+   5. FormElement's child-walking may be retired later, once rc-webapp has migrated its forms to `field`. That's a future, separately decided step.
+3. Collision check for the prop name `field`: none of Input, Textarea, Select, CheckBox, Autocomplete, ColorPicker, DateRangeInput, Slider, RadioButtonGroup, PhoneNumber, DatePicker, TimePicker or InputBase has a `field` prop today, so the name is free.
