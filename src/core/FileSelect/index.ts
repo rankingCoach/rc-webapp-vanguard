@@ -5,7 +5,6 @@ export { MediaItemProcessor } from './MediaItemProcessors/MediaItemProcessor';
 export { VideoMetadataProcessor } from './MediaItemProcessors/VideoMetadataProcessor';
 export { VideoThumbnailProcessor } from './MediaItemProcessors/VideoThumbnailProcessor';
 export { MediaItemSelectInput } from './MediaItemSelectInput';
-export type { ShouldCompressImageFile } from './MediaItemTransformers/ImageCompressorTransformer';
 export { ImageCompressorTransformer } from './MediaItemTransformers/ImageCompressorTransformer';
 export { ImageCropperTransformer } from './MediaItemTransformers/ImageCropperTransformer';
 export { MediaItemTransformer } from './MediaItemTransformers/MediaItemTransformer';

@@ -13,10 +13,7 @@ import { ImageContentProcessor } from '@vanguard/FileSelect/MediaItemProcessors/
 import { ImageMetadataProcessor } from '@vanguard/FileSelect/MediaItemProcessors/ImageMetadataProcessor';
 import { VideoMetadataProcessor } from '@vanguard/FileSelect/MediaItemProcessors/VideoMetadataProcessor';
 import { VideoThumbnailProcessor } from '@vanguard/FileSelect/MediaItemProcessors/VideoThumbnailProcessor';
-import {
-  ImageCompressorTransformer,
-  ShouldCompressImageFile,
-} from '@vanguard/FileSelect/MediaItemTransformers/ImageCompressorTransformer';
+import { ImageCompressorTransformer } from '@vanguard/FileSelect/MediaItemTransformers/ImageCompressorTransformer';
 import { ImageCropperTransformer } from '@vanguard/FileSelect/MediaItemTransformers/ImageCropperTransformer';
 import { FileSizeValidator } from '@vanguard/FileSelect/MediaItemValidators/FileSizeValidator';
 import { FileTypeValidator } from '@vanguard/FileSelect/MediaItemValidators/FileTypeValidator';
@@ -128,11 +125,6 @@ interface Props {
     removeDuplicates?: boolean;
     useCompressor?: boolean;
     compressorOptions?: Compressor.Options | undefined;
-    /**
-     * With `useCompressor`: asked once per image file before it is compressed. Answer `false` to
-     * keep the file as it is (same bytes, metadata included). Not set: every image is compressed.
-     */
-    shouldCompress?: ShouldCompressImageFile;
     useCropper?: boolean;
     cropperOptions?: ExtendedCropperProps | undefined;
     showFeedbackModal?: boolean;
@@ -198,7 +190,6 @@ export const Gallery = (props: Props) => {
     ? new ImageCompressorTransformer({
         compressorOptions,
         showLoadingModalDuringCompression: config.showLoadingModalDuringCompression,
-        shouldCompress: config.shouldCompress,
       })
     : null;
 

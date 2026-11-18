@@ -462,7 +462,6 @@ export { FadedCarousel } from './core/FadedCarousel';
 //FileSelect
 export { MediaItemSelectInput } from './core/FileSelect';
 export { MediaItemTransformer } from './core/FileSelect';
-export type { ShouldCompressImageFile } from './core/FileSelect';
 export { ImageCompressorTransformer } from './core/FileSelect';
 export { ImageCropperTransformer } from './core/FileSelect';
 export { VideoTrimmerTransformer } from './core/FileSelect';
