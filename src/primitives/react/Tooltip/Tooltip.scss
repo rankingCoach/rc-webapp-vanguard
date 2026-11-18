@@ -1,0 +1,153 @@
+// MUI 9.5 Tooltip emotion styles (TooltipPopper / TooltipTooltip / TooltipArrow) for the own-core Tooltip, at
+// emotion's specificity (D15): `.css-x` = (0,1,0) → `.MuiTooltip-*:where([data-vg-core]…)`; nested
+// `&[data-popper-placement*=…] .MuiTooltip-arrow` and `.MuiTooltip-popper[data-popper-placement*=…] &` = (0,3,0).
+// ownerState variants are later rules of the same class, keyed here by MUI's own state classes.
+// Theme: MUI's default and the Vanguard theme (VanguardThemeProvider: fontSize 16, htmlFontSize 16 → pxToRem × 16/14,
+// marked `vg-typography-vanguard`); both are rendered (rc-webapp with the provider, WordPress without).
+
+$font: Roboto, Helvetica, Arial, sans-serif;
+
+// ---------------------------------------------------------------- Popper
+.MuiTooltip-popper:where([data-vg-core]) {
+  z-index: 1500;
+  pointer-events: none;
+}
+
+// open && !disableInteractive
+.MuiTooltip-popper:where([data-vg-core].MuiTooltip-popperInteractive:not(.MuiTooltip-popperClose)) {
+  pointer-events: auto;
+}
+
+// arrow
+.MuiTooltip-popper:where([data-vg-core].MuiTooltip-popperArrow)[data-popper-placement*="bottom"] .MuiTooltip-arrow {
+  top: 0;
+  margin-top: -0.71em;
+
+  &::before {
+    transform-origin: 0 100%;
+  }
+}
+
+.MuiTooltip-popper:where([data-vg-core].MuiTooltip-popperArrow)[data-popper-placement*="top"] .MuiTooltip-arrow {
+  bottom: 0;
+  margin-bottom: -0.71em;
+
+  &::before {
+    transform-origin: 100% 0;
+  }
+}
+
+.MuiTooltip-popper:where([data-vg-core].MuiTooltip-popperArrow)[data-popper-placement*="right"] .MuiTooltip-arrow {
+  height: 1em;
+  width: 0.71em;
+  inset-inline-start: 0;
+  margin-inline-start: -0.71em;
+
+  &::before {
+    transform-origin: 100% 100%;
+  }
+}
+
+.MuiTooltip-popper:where([data-vg-core].MuiTooltip-popperArrow)[data-popper-placement*="left"] .MuiTooltip-arrow {
+  height: 1em;
+  width: 0.71em;
+  inset-inline-end: 0;
+  margin-inline-end: -0.71em;
+
+  &::before {
+    transform-origin: 0 0;
+  }
+}
+
+// ---------------------------------------------------------------- Tooltip surface
+.MuiTooltip-tooltip:where([data-vg-core]) {
+  background-color: rgba(97, 97, 97, 0.92);
+  border-radius: 4px;
+  color: #fff;
+  font-family: $font;
+  padding: 4px 8px;
+  font-size: 0.6875rem;
+  max-width: 300px;
+  margin: 2px;
+  word-wrap: break-word;
+  font-weight: 500;
+}
+
+.MuiTooltip-popper[data-popper-placement*="left"] .MuiTooltip-tooltip:where([data-vg-core]) {
+  transform-origin: right center;
+  margin-inline-end: 14px;
+}
+
+.MuiTooltip-popper[data-popper-placement*="right"] .MuiTooltip-tooltip:where([data-vg-core]) {
+  transform-origin: left center;
+  margin-inline-start: 14px;
+}
+
+.MuiTooltip-popper[data-popper-placement*="top"] .MuiTooltip-tooltip:where([data-vg-core]) {
+  transform-origin: center bottom;
+  margin-bottom: 14px;
+}
+
+.MuiTooltip-popper[data-popper-placement*="bottom"] .MuiTooltip-tooltip:where([data-vg-core]) {
+  transform-origin: center top;
+  margin-top: 14px;
+}
+
+// arrow
+.MuiTooltip-tooltip:where([data-vg-core].MuiTooltip-tooltipArrow) {
+  position: relative;
+  margin-block: 0;
+}
+
+// touch
+.MuiTooltip-tooltip:where([data-vg-core].MuiTooltip-touch) {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  line-height: 1.14286em;
+  font-weight: 400;
+}
+
+.MuiTooltip-popper[data-popper-placement*="left"] .MuiTooltip-tooltip:where([data-vg-core].MuiTooltip-touch) {
+  margin-inline-end: 24px;
+}
+
+.MuiTooltip-popper[data-popper-placement*="right"] .MuiTooltip-tooltip:where([data-vg-core].MuiTooltip-touch) {
+  margin-inline-start: 24px;
+}
+
+.MuiTooltip-popper[data-popper-placement*="top"] .MuiTooltip-tooltip:where([data-vg-core].MuiTooltip-touch) {
+  margin-bottom: 24px;
+}
+
+.MuiTooltip-popper[data-popper-placement*="bottom"] .MuiTooltip-tooltip:where([data-vg-core].MuiTooltip-touch) {
+  margin-top: 24px;
+}
+
+// Vanguard theme (pxToRem × 16/14): 11px → 0.7857rem, touch 14px → 1rem. Same specificity, later.
+.MuiTooltip-tooltip:where([data-vg-core]):where(.vg-typography-vanguard) {
+  font-size: unquote("0.7857142857142857rem");
+}
+
+.MuiTooltip-tooltip:where([data-vg-core]):where(.vg-typography-vanguard.MuiTooltip-touch) {
+  font-size: 1rem;
+}
+
+// ---------------------------------------------------------------- Arrow
+.MuiTooltip-arrow:where([data-vg-core]) {
+  overflow: hidden;
+  position: absolute;
+  width: 1em;
+  height: 0.71em;
+  box-sizing: border-box;
+  color: rgba(97, 97, 97, 0.9);
+
+  &::before {
+    content: "";
+    margin: auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: currentColor;
+    transform: rotate(45deg);
+  }
+}

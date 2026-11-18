@@ -9,6 +9,7 @@ import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
 import { InputTextField } from './TextField/InputTextField';
+import { Tooltip } from './Tooltip/Tooltip';
 import { Fade } from './Transitions/Fade';
 
 /**
@@ -138,6 +139,12 @@ const settle = () =>
     vi.advanceTimersByTime(2000);
   });
 
+const TooltipHarness = ({ open }: { open: boolean }) => (
+  <Tooltip open={open} title={<b>{'tip'}</b>} arrow placement="top">
+    <span>{'trigger'}</span>
+  </Tooltip>
+);
+
 const MenuPopupHarness = ({ open }: { open: boolean }) => {
   const anchor = useRef<HTMLButtonElement>(null);
   return (
@@ -233,6 +240,28 @@ describe('own-core resources are released', () => {
     done(view);
     settle();
     expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Tooltip (popper listeners and observer, Grow exit, touch timers, body user-select)', () => {
+    const before = baseline();
+    const vendor = () => (document.body.style as unknown as { WebkitUserSelect?: string }).WebkitUserSelect;
+    // Browsers report '' for an unset style property; jsdom's vendor-prefixed expando starts undefined (MUI's
+    // restore logic, ported as-is, skips an undefined previous value).
+    (document.body.style as unknown as { WebkitUserSelect?: string }).WebkitUserSelect = '';
+    const userSelectBefore = vendor();
+    const view = render(<TooltipHarness open={false} />);
+    view.rerender(<TooltipHarness open />);
+    settle();
+    const trigger = view.getByText('trigger');
+    // Long press pending (700 ms timer, body user-select none), then unmount mid-press.
+    fireEvent.touchStart(trigger);
+    fireEvent.touchEnd(trigger);
+    fireEvent.touchStart(trigger);
+    view.rerender(<TooltipHarness open={false} />);
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+    expect(vendor()).toBe(userSelectBefore);
   });
 
   it('ClickAway (document listeners, activation timer, layer)', () => {
