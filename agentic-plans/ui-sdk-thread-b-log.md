@@ -546,3 +546,8 @@ Usage ledger (direct JSX / service / internal / WordPress):
 ### Story renames so verifier 2 can check slotted components (watchdog)
 1. `Rating.stories.tsx`, `RatingDistribution.stories.tsx`, `SmallLoader.stories.tsx` → `_*.stories.tsx` (never collected before; also added to the never-run list above).
 2. Setup-only edits after the rename, listed: (a) all three: `export default SbDecorator({...})` → `export default { ...SbDecorator({...}) }` (the Storybook indexer rejects a call expression as default export; this is the shape every collected story uses); (b) RatingDistribution: the meta `argTypes.*.defaultValue` values (ignored since Storybook 7, so `ratingDistributionData` was undefined and the render threw) repeated as meta `args` with the same values. No story body, render or assertion changed. Result: 3/3 stories green.
+
+### Audit item 1: NotificationAction standalone copy → re-export (watchdog APPROVED)
+1. `src/core/NotificationAction/NotificationAction.tsx` now re-exports `NotificationAction` + `NotificationActionProps` from `src/core/Notification/NotificationAction/` (the root export). Same names importable from the old path; no public export added or removed.
+2. Spec `_NotificationAction.reexport.spec.tsx`: identity (red before: two different functions; green after) + markup equality over 4 prop combinations (label, width, iconLeft, iconRight).
+3. `NotificationAction.scss` in the old folder is now imported by nobody; kept because `_showcase/CssUpdatesShowcase/data.ts:580` lists its path. Its `NotificationAction.stories.tsx` has no underscore, so it was never collected (on the never-run list); it imports from the old path and so now renders the single implementation.
