@@ -30,19 +30,19 @@ export const IllustrationBlob = (props: IllustrationBlobProps) => {
   if (SVGObject && (loading || error)) return null;
 
   return (
-    <div className={styles.mainContainer}>
+    <div data-slot="illustration-blob" className={styles.mainContainer}>
       {value.map((item, i) => {
         return (
-          <div className={classNames(styles.container, item === 2 ? styles.orbChild : undefined)} key={item}>
-            <div className={styles.image} style={{ ...imageAlignments }}>
+          <div data-slot="illustration-blob-layer" className={classNames(styles.container, item === 2 ? styles.orbChild : undefined)} key={item}>
+            <div data-slot="illustration-blob-image" className={styles.image} style={{ ...imageAlignments }}>
               <StyledSVG src={SvgImage} uniquifyIDs={true} />
             </div>
             <Render if={!onlyImage}>
-              <div className={styles.blobAndIconContainer}>
+              <div data-slot="illustration-blob-decoration" className={styles.blobAndIconContainer}>
                 <BlobAnimation size={'small'} baseColor={color} />
 
                 <Render if={!!icon}>
-                  <div className={styles.icon}>
+                  <div data-slot="illustration-blob-icon" className={styles.icon}>
                     <Icon type={IconSize.large} forceSize={48} color={'--n000'}>
                       {icon ?? IconNames.card}
                     </Icon>

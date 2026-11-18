@@ -39,9 +39,9 @@ export const GalleryFeedbackModal = (props: Props) => {
     <Modal {...props} className="GalleryFeedbackModal">
       <ModalHeader closeFn={close} hideCloseButtonOnMobile={false} />
       <ModalBody>
-        <div className={classNames(dFlexColumn, alignItemsCenter, 'gallery-feedback-modal-body')}>
+        <div data-slot="gallery-feedback-modal-body" className={classNames(dFlexColumn, alignItemsCenter, 'gallery-feedback-modal-body')}>
           {validMediaItemsCount > 0 ? (
-            <div className={classNames(dFlex, mb3, justifyContentCenter, alignItemsCenter)}>
+            <div data-slot="gallery-feedback-modal-success" className={classNames(dFlex, mb3, justifyContentCenter, alignItemsCenter)}>
               <Icon className={mr2} hasCircle={true} type={IconSize.small} color={'--s500'}>
                 {IconNames.check}
               </Icon>

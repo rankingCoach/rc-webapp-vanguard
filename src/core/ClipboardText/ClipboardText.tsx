@@ -14,8 +14,9 @@ export interface ClipboardTextProps {
 export const ClipboardText = (props: ClipboardTextProps) => {
   const { label, value } = props;
   return (
-    <div className={styles.copyGroup}>
+    <div data-slot="clipboard-text" className={styles.copyGroup}>
       <div
+        data-slot="clipboard-text-copy"
         className={styles.copy}
         onClick={() => {
           navigator.clipboard.writeText(props.value);
@@ -24,7 +25,7 @@ export const ClipboardText = (props: ClipboardTextProps) => {
       >
         <Icon color={'--n700'}>{IconNames.duplicate}</Icon>
       </div>
-      <div>
+      <div data-slot="clipboard-text-content">
         <Text textTight={true} color={'--n400'}>
           {props.label}
         </Text>

@@ -194,6 +194,7 @@ export const TreeView = (props: TreeViewProps) => {
   return (
     <TreeViewContext.Provider value={context}>
       <ul
+        data-slot="tree-view"
         ref={rootRef}
         role="tree"
         aria-label={ariaLabel}

@@ -27,8 +27,8 @@ export const ErrorImagesList = (props: Props) => {
     return null;
   }
   return (
-    <ComponentContainer className={'ErrorImagesList-container'}>
-      <div className={classNames(dFlex, mb3, justifyContentCenter, alignItemsCenter)}>
+    <ComponentContainer data-slot="error-images-list" className={'ErrorImagesList-container'}>
+      <div data-slot="error-images-list-summary" className={classNames(dFlex, mb3, justifyContentCenter, alignItemsCenter)}>
         <Icon className={mr2} hasCircle={true} type={IconSize.small} color={'--e500'}>
           {IconNames.exclamation}
         </Icon>
@@ -38,7 +38,7 @@ export const ErrorImagesList = (props: Props) => {
       </div>
       {Object.keys(mediaItemsErrors).map((errorText, idx) => {
         return (
-          <div key={idx} className={classNames(dFlexColumn, alignItemsCenter)}>
+          <div data-slot="error-images-list-error" key={idx} className={classNames(dFlexColumn, alignItemsCenter)}>
             <Text type={TextTypes.textHelp} replacements={mediaItemsErrors[errorText].replacements}>
               {errorText}
             </Text>

@@ -1,4 +1,5 @@
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import React, { useContext } from 'react';
 
 import { TreeItemDepthContext, useTreeViewContext } from './TreeView.context';
@@ -64,6 +65,9 @@ export const TreeItem = (props: TreeItemProps) => {
 
   return (
     <li
+      data-slot="tree-item"
+      data-selected={dataFlag(selected)}
+      data-disabled={dataFlag(disabled)}
       role="treeitem"
       data-node-id={nodeId}
       data-testid={testId}
@@ -84,18 +88,19 @@ export const TreeItem = (props: TreeItemProps) => {
       }}
     >
       <div
+        data-slot="tree-item-content"
         className={classNames(styles.content, 'vanguard-tree-item-content', contentClassName)}
         data-testid={`${testId}-content`}
         onClick={onContentClick}
       >
-        <span className={classNames(styles.iconContainer, 'vanguard-tree-item-icon')} aria-hidden={true}>
+        <span data-slot="tree-item-icon" className={classNames(styles.iconContainer, 'vanguard-tree-item-icon')} aria-hidden={true}>
           {stateIcon}
         </span>
-        <div className={classNames(styles.label, 'vanguard-tree-item-label', labelClassName)}>{label}</div>
+        <div data-slot="tree-item-label" className={classNames(styles.label, 'vanguard-tree-item-label', labelClassName)}>{label}</div>
       </div>
       {expanded && (
         <TreeItemDepthContext.Provider value={depth + 1}>
-          <ul role="group" className={classNames(styles.group, 'vanguard-tree-item-group')}>
+          <ul data-slot="tree-item-group" role="group" className={classNames(styles.group, 'vanguard-tree-item-group')}>
             {children}
           </ul>
         </TreeItemDepthContext.Provider>

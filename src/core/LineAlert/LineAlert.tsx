@@ -54,7 +54,7 @@ export const LineAlert = (props: LineAlertProps) => {
    * Return View
    */
   return (
-    <ComponentContainer className={classNames(styles.lineAlert, styles[type])}>
+    <ComponentContainer data-slot="line-alert" data-type={type} className={classNames(styles.lineAlert, styles[type])}>
       {renderIcon()}
       <Text className={styles.text}>{children}</Text>
     </ComponentContainer>

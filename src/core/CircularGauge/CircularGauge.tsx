@@ -1,4 +1,5 @@
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { parseCssVariable } from '@helpers/css-variables-parser';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React from 'react';
@@ -52,10 +53,11 @@ export const CircularGauge = (props: CircularGaugeProps) => {
   const trackStroke = parseCssVariable(trackColor);
 
   return (
-    <ComponentContainer className={classNames(styles.container, className)} style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className={styles.svg}>
-        <circle cx={center} cy={center} r={radius} fill={'none'} stroke={trackStroke} strokeWidth={strokeWidth} />
+    <ComponentContainer data-slot="circular-gauge" data-loading={dataFlag(loading)} className={classNames(styles.container, className)} style={{ width: size, height: size }}>
+      <svg data-slot="circular-gauge-ring" width={size} height={size} viewBox={`0 0 ${size} ${size}`} className={styles.svg}>
+        <circle data-slot="circular-gauge-track" cx={center} cy={center} r={radius} fill={'none'} stroke={trackStroke} strokeWidth={strokeWidth} />
         <circle
+          data-slot="circular-gauge-value"
           cx={center}
           cy={center}
           r={radius}
@@ -69,7 +71,7 @@ export const CircularGauge = (props: CircularGaugeProps) => {
           className={loading ? undefined : styles.valueArc}
         />
       </svg>
-      {children ? <div className={styles.center}>{children}</div> : null}
+      {children ? <div data-slot="circular-gauge-center" className={styles.center}>{children}</div> : null}
     </ComponentContainer>
   );
 };

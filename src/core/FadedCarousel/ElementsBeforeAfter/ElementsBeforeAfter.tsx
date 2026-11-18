@@ -30,7 +30,7 @@ export const ElementsBeforeAfter = (props: ElementsBeforeAfterProps) => {
   return (
     <>
       {children.map((element, index) => (
-        <div key={index} style={style(index)} className={className}>
+        <div data-slot="elements-before-after" key={index} style={style(index)} className={className}>
           {element}
         </div>
       ))}

@@ -30,6 +30,8 @@ export const PhotoPlaceholder = (props: Props) => {
 
   return (
     <ComponentContainer
+      data-slot="photo-placeholder"
+      data-variant={format}
       onClick={() => onClick && onClick()}
       className={classNames('PhotoPlaceholder-container', `format-${format}`)}
     >
@@ -40,7 +42,7 @@ export const PhotoPlaceholder = (props: Props) => {
       </Render>
 
       <Render if={!!secondIcon}>
-        <div className={classNames('PhotoPlaceholder-multiple-icons-container')}>
+        <div data-slot="photo-placeholder-icons" className={classNames('PhotoPlaceholder-multiple-icons-container')}>
           <Icon type={IconSize.large} color={'--n000'} className={classNames('first-icon')}>
             {firstIcon}
           </Icon>

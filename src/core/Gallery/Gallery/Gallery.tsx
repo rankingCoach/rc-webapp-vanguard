@@ -564,10 +564,10 @@ export const Gallery = (props: Props) => {
    * ---
    */
   return (
-    <div className={classNames('gallery-container')}>
+    <div data-slot="gallery-container" className={classNames('gallery-container')}>
       <InfoBox {...inlineAlert} />
 
-      <div className={`gallery-list ${className}`}>
+      <div data-slot="gallery" className={`gallery-list ${className}`}>
         <MediaItemSelectInput
           multiple={!maxNumberOfMediaItems || maxNumberOfMediaItems > 1}
           accept={acceptTypes}
@@ -601,7 +601,7 @@ export const Gallery = (props: Props) => {
                 : ''
             }
           >
-            <div className={classNames(dFlex, dFlexColumn, gap1)}>
+            <div data-slot="gallery-item" className={classNames(dFlex, dFlexColumn, gap1)}>
               <GalleryMediaItem
                 format={placeholderConfig?.format}
                 mediaItem={item}
