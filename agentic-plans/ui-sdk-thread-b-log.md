@@ -551,3 +551,9 @@ Usage ledger (direct JSX / service / internal / WordPress):
 1. `src/core/NotificationAction/NotificationAction.tsx` now re-exports `NotificationAction` + `NotificationActionProps` from `src/core/Notification/NotificationAction/` (the root export). Same names importable from the old path; no public export added or removed.
 2. Spec `_NotificationAction.reexport.spec.tsx`: identity (red before: two different functions; green after) + markup equality over 4 prop combinations (label, width, iconLeft, iconRight).
 3. `NotificationAction.scss` in the old folder is now imported by nobody; kept because `_showcase/CssUpdatesShowcase/data.ts:580` lists its path. Its `NotificationAction.stories.tsx` has no underscore, so it was never collected (on the never-run list); it imports from the old path and so now renders the single implementation.
+
+### Audit item 3: Table footer controls on one renderer (watchdog APPROVED)
+1. New internal `TableFooter/FooterAction/FooterAction.tsx` (not exported): CtaWithIcon + Text label, colour by `disabled`. FooterPagination (Back/Next), FooterShowMore and FooterShowLess render it; their hooks, callbacks, containers, slots and module classes are unchanged; every file and export stays.
+2. SCSS: `FooterAction/_footer-action.scss` mixin emits the shared `.spacer` + `.link-color` rules; FooterPagination/FooterShowMore modules `@include` it and keep their own `.disabled` rule (descendant vs compound selector preserved). Compiled CSS (sass, both modules) byte-identical before/after; class names unchanged (same files, same class names).
+3. Characterization spec `_TableFooterControls.characterization.spec.tsx`: 3 controls × 5 pagination states × hidden → 30 markup snapshots captured from the pre-refactor code (8f3b328) into `__fixtures__/footer-controls.json` (stable across 2 re-runs, icons awaited); identical after the refactor.
+4. Table specs 23/23, stories 18/18, tsc 0, biome same diagnostics before/after.
