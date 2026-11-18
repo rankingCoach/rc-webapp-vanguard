@@ -1,5 +1,3 @@
-import './ToggleButton.scss';
-
 import { classNames } from '@helpers/classNames';
 import { Icon } from '@vanguard/Icon/Icon';
 import React from 'react';

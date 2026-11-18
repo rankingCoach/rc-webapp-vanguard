@@ -80,7 +80,7 @@ export default defineConfig({
           environment: 'jsdom',
           // Own-core components paint with plain SCSS (no runtime CSS-in-JS), so jsdom must see those sheets for
           // the computed-style characterization tests. Scoped to migrated code; grow it per migrated component.
-          css: { include: [/src\/primitives\//, /src\/core\/ToggleButton(Group)?\//, /src\/core\/_internal\/InputBase\//] },
+          css: { include: [/src\/styles\/mui-compat\.scss/, /src\/primitives\//, /src\/core\/ToggleButton(Group)?\//, /src\/core\/_internal\/InputBase\//] },
           include: ['**/_*.spec.{ts,tsx}'],
           exclude: [...configDefaults.exclude, 'scripts/**', ...staleCopies],
           setupFiles: ['src/test-utils/vitest.setup.tsx'],

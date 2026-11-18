@@ -1,0 +1,58 @@
+// ToggleButtonGroup group layout: the MUI 9.5 emotion paint (joined corners via the first/middle/last position classes
+// of the direct children) at emotion's own specificity (D15): `.css-hash .MuiToggleButtonGroup-middleButton` (0,2,0)
+// becomes `.MuiToggleButtonGroup-horizontal .MuiToggleButtonGroup-middleButton` (0,2,0), the disabled join (0,3,0).
+// Part of src/styles/mui-compat.scss, appended LAST to vanguard.css, so position decides ties as emotion's did in
+// production: wins against the segmented skin and consumer CSS loaded before vanguard.css (entry chunk, e.g.
+// AgentChatAdmin), loses against route CSS loaded after it (e.g. ColorSchemeToggle). Do NOT import from a component.
+.MuiToggleButtonGroup-root {
+  display: inline-flex;
+  border-radius: 4px;
+}
+
+.MuiToggleButtonGroup-fullWidth {
+  width: 100%;
+}
+
+.MuiToggleButtonGroup-horizontal {
+  .MuiToggleButtonGroup-firstButton,
+  .MuiToggleButtonGroup-middleButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton,
+  .MuiToggleButtonGroup-middleButton {
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton.Mui-disabled,
+  .MuiToggleButtonGroup-middleButton.Mui-disabled {
+    border-left: 1px solid transparent;
+  }
+}
+
+.MuiToggleButtonGroup-vertical {
+  flex-direction: column;
+
+  .MuiToggleButtonGroup-firstButton,
+  .MuiToggleButtonGroup-middleButton {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton,
+  .MuiToggleButtonGroup-middleButton {
+    margin-top: -1px;
+    border-top: 1px solid transparent;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton.Mui-disabled,
+  .MuiToggleButtonGroup-middleButton.Mui-disabled {
+    border-top: 1px solid transparent;
+  }
+}

@@ -1,5 +1,7 @@
 // ToggleButton default look: the MUI 9.5 ToggleButton paint Vanguard shipped (default MUI theme), on the legacy
 // class names. Specificity matches the old emotion output: base and variants one class, selected two.
+// Part of src/styles/mui-compat.scss, appended LAST to vanguard.css (D15): wins ties against the Vanguard skin
+// (segmented ToggleButtonGroup) like emotion did. Do NOT import from a component.
 // `.vg-typography-vanguard` = inside VanguardThemeProvider (16px base, no uppercase), like the bundled MUI theme.
 
 @use '../../primitives/react/ButtonBase/button-base' as *;

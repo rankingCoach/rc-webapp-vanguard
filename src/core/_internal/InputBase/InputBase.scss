@@ -1,7 +1,5 @@
-// Own-core field/menu base (MUI-equivalent) FIRST, in this same file: the base rules carry +0,0,1 (type) to win
-// equal-specificity ties like emotion did; the skin rules below that were exactly one type above emotion must still
-// win their tie, which they do by coming later in this file (deterministic in every bundle).
-@import "../../../primitives/react/TextField/TextField";
+// The own-core field/menu base (MUI-equivalent, TextField.scss) is NOT imported here: it lives in
+// src/styles/mui-compat.scss, appended last to vanguard.css (D15), so it wins ties against this skin like emotion did.
 @import "@styles/spacings";
 @import "@styles/media-mixins";
 

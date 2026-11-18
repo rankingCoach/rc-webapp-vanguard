@@ -1,8 +1,13 @@
 import type { Preview } from "@storybook/react-vite";
 // import "./theming/direct-channel/direct-channel.scss";
 import "./theming.css";
+// D15: MUI-ported CSS, kept as the last stylesheet in <head> like the builds append it last to vanguard.css.
+import "../src/styles/mui-compat.scss";
+import { keepMuiCompatLast } from "../src/styles/keep-mui-compat-last";
 import React, { useEffect } from "react";
 import { ModalService } from "../src/core/Modal/ModalService";
+
+keepMuiCompatLast();
 
 // Global modal cleanup function
 const closeAllModals = async () => {

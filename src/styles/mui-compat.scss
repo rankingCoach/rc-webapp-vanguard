@@ -1,0 +1,12 @@
+// D15 (agentic-plans/ui-sdk-architecture-investigation.md §21): every rule ported from MUI's runtime emotion output,
+// at emotion's own specificity. Emotion's tag used to come after vanguard.css, so MUI won equal ties against the
+// Vanguard skin and against consumer CSS loaded before vanguard.css (rc-webapp entry chunk) and lost them against
+// consumer CSS loaded after it (rc-webapp route chunks). Appending this file LAST to vanguard.css reproduces that by
+// position alone.
+//
+// Not imported by any module: the lib/WordPress builds append it with the `vanguard-mui-compat-last` vite plugin
+// (vite-plugins/mui-compat-last.ts), Storybook and the spec setup import it and keep its <style> last in <head>
+// (src/styles/keep-mui-compat-last.ts). Guarded by scripts/_mui-compat-order.spec.ts.
+@use '../core/ToggleButton/ToggleButton.compat';
+@use '../core/ToggleButtonGroup/ToggleButtonGroup.compat';
+@use '../primitives/react/TextField/TextField';

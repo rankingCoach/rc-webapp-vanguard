@@ -1,8 +1,12 @@
 // Outlined TextField + Select + Menu base styles: the exact MUI 9.5 (default theme) emotion output Vanguard shipped,
 // extracted per element with agentic-plans/uisdk-tools/extract-emotion-rules.mjs and from MUI source for variants no
-// story triggered. Specificity rule (D13): each emotion `.css-hash` becomes ONE stable class; prop variants sit in
-// `:where(...)`, and every block is scoped to own-core elements with `:where([data-slot])` (zero specificity) so
-// components still rendered by MUI are untouched. Every rule keeps emotion's specificity and Vanguard/consumer overrides keep winning/losing as before.
+// story triggered. Specificity rule (D15): each emotion `.css-hash` becomes ONE stable class at emotion's own
+// specificity (no type bump); prop variants sit in `:where(...)`, and every block is scoped to own-core elements with
+// `:where([data-slot])` (zero specificity) so components still rendered by MUI are untouched. Tie order comes from
+// position instead: this file is part of src/styles/mui-compat.scss, which the build appends LAST to vanguard.css
+// (vite plugin `vanguard-mui-compat-last`), so it wins ties against the Vanguard skin and against consumer CSS loaded
+// before vanguard.css, and loses ties against consumer CSS loaded after it, exactly as emotion did in production.
+// Do NOT import this file from a component.
 
 @use '../ButtonBase/button-base' as *;
 
@@ -13,7 +17,7 @@ $primary: rgb(25, 118, 210);
 $error: rgb(211, 47, 47);
 
 // ---------------------------------------------------------------- FormControl (TextField root)
-div.MuiFormControl-root:where([data-slot]) {
+.MuiFormControl-root:where([data-slot]) {
   display: inline-flex;
   flex-direction: column;
   position: relative;
@@ -29,7 +33,7 @@ div.MuiFormControl-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- InputLabel (outlined, form control, animated)
-:is(label, span, div).MuiInputLabel-root:where([data-slot]) {
+.MuiInputLabel-root:where([data-slot]) {
   color: rgba(0, 0, 0, 0.6);
   font-family: $font;
   font-weight: 400;
@@ -89,14 +93,14 @@ div.MuiFormControl-root:where([data-slot]) {
   }
 }
 
-span.MuiFormLabel-asterisk:where([data-slot]) {
+.MuiFormLabel-asterisk:where([data-slot]) {
   &.Mui-error {
     color: $error;
   }
 }
 
 // ---------------------------------------------------------------- InputBase + OutlinedInput root
-div.MuiInputBase-root:where([data-slot]) {
+.MuiInputBase-root:where([data-slot]) {
   font-family: $font;
   font-weight: 400;
   font-size: 1rem;
@@ -163,7 +167,7 @@ div.MuiInputBase-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- Notched outline
-fieldset.MuiOutlinedInput-notchedOutline:where([data-slot]) {
+.MuiOutlinedInput-notchedOutline:where([data-slot]) {
   text-align: left;
   position: absolute;
   inset: -5px 0 0;
@@ -179,8 +183,7 @@ fieldset.MuiOutlinedInput-notchedOutline:where([data-slot]) {
 }
 
 // legend had only an emotion class in MUI; `vg-notched-legend` stands in for it at the same specificity.
-// No type bump here: Vanguard's own `.vanguard-input legend` (0,1,1) out-ranked MUI's hashed legend rule (0,1,0);
-// a bumped (0,1,1) rule loading later would win that tie and show the hidden legend.
+// Vanguard's own `.vanguard-input legend` (0,1,1) out-ranks it, as it out-ranked MUI's hashed legend rule (0,1,0).
 .vg-notched-legend {
   float: unset;
   width: auto;
@@ -218,7 +221,7 @@ fieldset.MuiOutlinedInput-notchedOutline:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- Select display (InputBase input + Select select)
-div.MuiSelect-select:where([data-slot]) {
+.MuiSelect-select:where([data-slot]) {
   font: inherit;
   letter-spacing: inherit;
   color: currentcolor;
@@ -291,12 +294,12 @@ div.MuiSelect-select:where([data-slot]) {
   }
 }
 
-div.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select) {
+.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select) {
   --_caret: 32px;
   --_endAdornment: 0px;
 }
 
-div.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select ~ .MuiInputAdornment-root) {
+.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select ~ .MuiInputAdornment-root) {
   --_endAdornment: 28px;
 }
 
@@ -312,7 +315,7 @@ div.MuiInputBase-root:where([data-slot]):has(> .MuiSelect-select ~ .MuiInputAdor
   }
 }
 
-input.MuiSelect-nativeInput:where([data-slot]) {
+.MuiSelect-nativeInput:where([data-slot]) {
   bottom: 0;
   left: 0;
   position: absolute;
@@ -322,7 +325,7 @@ input.MuiSelect-nativeInput:where([data-slot]) {
   box-sizing: border-box;
 }
 
-:is(svg, span, div, i):where(.MuiInputBase-root[data-slot] > *).MuiSelect-icon {
+.MuiSelect-icon:where(.MuiInputBase-root[data-slot] > *) {
   position: absolute;
   top: calc(50% - 0.5em);
   pointer-events: none;
@@ -354,7 +357,7 @@ svg.MuiSvgIcon-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- Helper text
-p.MuiFormHelperText-root:where([data-slot]) {
+.MuiFormHelperText-root:where([data-slot]) {
   color: rgba(0, 0, 0, 0.6);
   font-family: $font;
   font-weight: 400;
@@ -378,7 +381,7 @@ p.MuiFormHelperText-root:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- Menu popup (Modal + Popover + Paper + List)
-div.MuiModal-root:where([data-slot]) {
+.MuiModal-root:where([data-slot]) {
   position: fixed;
   z-index: 1300;
   inset: 0;
@@ -388,7 +391,7 @@ div.MuiModal-root:where([data-slot]) {
   }
 }
 
-div.MuiBackdrop-root:where([data-slot]) {
+.MuiBackdrop-root:where([data-slot]) {
   position: fixed;
   display: flex;
   align-items: center;
@@ -406,7 +409,7 @@ div.MuiBackdrop-root:where([data-slot]) {
   }
 }
 
-div.MuiPopover-paper:where([data-slot]) {
+.MuiPopover-paper:where([data-slot]) {
   // Light: MUI's white paper, unchanged. Dark: the --fn-bg-surface token instead of MUI's white (approved delta, fixes
   // the white-menu bug where root-components.scss is not loaded). rc-webapp already paints this paper with the same
   // token via `.MuiMenu-root > .MuiPaper-root` (higher specificity), so the app is unchanged. `color` stays MUI's so
@@ -429,7 +432,7 @@ div.MuiPopover-paper:where([data-slot]) {
   }
 }
 
-ul.MuiMenu-list:where([data-slot]) {
+.MuiMenu-list:where([data-slot]) {
   list-style: none;
   margin: 0;
   padding: 8px 0;
@@ -438,7 +441,7 @@ ul.MuiMenu-list:where([data-slot]) {
 }
 
 // ---------------------------------------------------------------- MenuItem (option)
-li.MuiMenuItem-root:where([data-slot]) {
+.MuiMenuItem-root:where([data-slot]) {
   // ButtonBase reset in the same rule (D3), then the MenuItem paint.
   @include button-base-reset;
 
@@ -526,12 +529,12 @@ li.MuiMenuItem-root:where([data-slot]) {
 // ---------------------------------------------------------------- Inside VanguardThemeProvider
 // The bundled MUI theme it set (fontSize 16, htmlFontSize 16) scales body1/caption by 16/14. Same specificity as the
 // base rules above and later in this file, so they win deterministically.
-div.MuiInputBase-root:where([data-slot]):where(.vg-typography-vanguard),
-:is(label, span, div).MuiInputLabel-root:where([data-slot]):where(.vg-typography-vanguard),
-li.MuiMenuItem-root:where([data-slot]):where(.vg-typography-vanguard) {
+.MuiInputBase-root:where([data-slot]):where(.vg-typography-vanguard),
+.MuiInputLabel-root:where([data-slot]):where(.vg-typography-vanguard),
+.MuiMenuItem-root:where([data-slot]):where(.vg-typography-vanguard) {
   font-size: unquote("1.1428571428571428rem");
 }
 
-p.MuiFormHelperText-root:where([data-slot]):where(.vg-typography-vanguard) {
+.MuiFormHelperText-root:where([data-slot]):where(.vg-typography-vanguard) {
   font-size: unquote("0.8571428571428571rem");
 }

@@ -1,3 +1,4 @@
+import { muiCompatLast } from './config/mui-compat-last';
 import { withBundledUseClientFilter } from './config/rollup-onwarn';
 import { defineConfig, build, Connect, Plugin, UserConfig, mergeConfig } from "vite";
 import fs from "fs";
@@ -45,6 +46,8 @@ export const BaseViteConfig: UserConfig = {
     // cssInjectedByJsPlugin({topExecutionPriority: false}),
     // onVIteBuildEnd(),
     vitePluginAssetAnalyzer(),
+    // D15: MUI-ported CSS appended last to vanguard.css (default and WordPress builds).
+    muiCompatLast(),
     // react(),
     viteTsconfigPaths(),
     // customConfigPlugin(),
