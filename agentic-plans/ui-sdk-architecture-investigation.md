@@ -823,3 +823,143 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    is the likely default. Scope: only exact ties with Mui classes (Select/Input/Form are what the WordPress bundle
    exports); generic theme rules on elements (0,0,1) or `input[type=text]` (0,1,1) resolve as before. Mitigation if
    wanted: enqueue `vanguard.css` with the theme stylesheet as a dependency (or at a later priority). RISK LOGGED.
+
+## 22. Group A: Input and Textarea on the own-core text field (handoff 6)
+
+1. `TextFieldFrame` (FormControl root, label, notched outline, helper text) is shared by `SelectTextField` and the
+   new `InputTextField`. Select DOM is byte-identical before/after the extraction (4 stories incl. the open menu).
+2. `InputTextField` ports MUI 9.5 InputBase/OutlinedInput/TextField behaviour: focused/filled state machine
+   (uncontrolled typing, autofill animation hook, mount read), root click focuses the input, `slotProps.input`
+   InputBase keys override the TextField's own (MUI spread order; two InputProps bug-lock tests pin it).
+   `TextareaAutosize` ports MUI's (hidden shadow twin, resize + ResizeObserver resync, maths in core/autosize.ts).
+3. Routing (`MuiTextField.tsx`): outlined, non-select, no `inputComponent`/`InputProps.ref`/MUI slots/classes/function
+   slots → own core; everything else stays on MUI until its own port.
+4. rc-webapp `textFieldProps` inventory (65 uses): `inputProps` (58; aria-invalid, aria-describedby, autoComplete,
+   inputMode, maxLength, style, min, type, aria-label), `name`, `autoComplete`, `autoFocus`, `error`, and one
+   `InputProps.inputComponent` (stays on MUI). All covered.
+5. Native select and filled/standard variants: no use in Vanguard or rc-webapp (`textFieldProps` never sets `variant`
+   or `SelectProps.native`); the package fixtures only use them in type-level checks (`mui-typed.tsx`
+   `@ts-expect-error` cases, `mui-gated.tsx` `native: false`, `components.tsx` `native: false`), none renders them.
+   DECIDED (watchdog): stay on MUI for now. At the MUI-removal step: native select gets an own implementation on
+   the shared frame (a real `<select>` in the input slot); `variant="filled" | "standard"` stay accepted and render
+   as outlined with a dev warning, listed as an API/visual delta with this zero-usage evidence.
+6. Inventory fixtures (`_TextFieldConsumerOverride.stories.tsx`): AiVisibilityCustomQueryDraftRow (route, 17 rules,
+   6 states) and SetupKeywordChipsEditor (entry, 1 rule, 2 states): 0 differing pixels against the MUI-rendered
+   legacy column. ArrayMapViewer's 2 rules target react-json-editor, not Vanguard.
+
+## 23. Paths still on MUI (keep current; each line names what removes it)
+
+1. Text field: custom `inputComponent`, `InputProps.ref` (Autocomplete), MUI `slots`/`classes`, function slots →
+   removed by the Autocomplete port (ref path) and the MUI-exit step (the rest renders as outlined/own or warns).
+2. Text field `variant` filled/standard, native select → MUI-exit step (decided above).
+3. Autocomplete, AutocompleteWithAnchor, SearchableSelect → Autocomplete group (MUI Autocomplete + Popper).
+4. Menu, MenuItem, DropdownMenu, Popover, PopoverPopper, PopoverModal → group B (ModalHost + MenuPopup).
+5. Button, Chip, Breadcrumbs, Pagination, ProgressBar, Slider, Accordion, Collapse, Fade, AIAssistant (Collapse/Fade/
+   Grow), FocusTrap, List (ListShowMore) → simple ports on ButtonBase/transition core (group C).
+6. Drawer, AppBar, Toolbar, Snackbar, SnackbarRoot → layout/overlay group (Modal manager exists).
+7. DatePicker (@mui/x-date-pickers), DateRangeInput, DateRangePicker (+ adornment), FlagAdornment, FormControl,
+   Documents (DocumentDisplay/Upload) → pickers group (largest; x-date-pickers is the only @mui/x import).
+8. InputBase `Skeleton` import, `use-media-query` (MUI useMediaQuery), `helpers/hex-to-rgba` (@mui/system) → trivial.
+9. VanguardThemeProvider (`createTheme`/ThemeProvider): source of the two `@mui` strings in `dist-wordpress/index.js`
+   (createTheme's palette error message and `toRuntimeSource` template) → last, once nothing reads the MUI theme.
+10. Types: `core/_internal/mui-legacy-props.ts` (public prop types derived from MUI types) and `mui-slot-compat.ts`;
+    11 emitted `.d.ts` files import `@mui/*` → vendored MUI types rolled into the published declarations (§26).
+11. Redux (not MUI): the bundles import `react-redux` as an external module (dispatch shim, legacy useFormConfig), so
+    consumers must have it installed although useFormStore needs no Provider/store → deferred end step with the
+    rc-webapp fork change.
+
+## 24. Earliest point MUI can leave `dependencies` (measured 2026-11-18, scratch run, not committed)
+
+1. Experiment: package.sh on fe3ace1 with `@mui/material`, `@mui/system`, `@mui/x-date-pickers` moved to
+   devDependencies (scratch worktree, reverted). Result: **all 26 runtime tests pass**, including default-declared
+   7/7 and wp-declared 6/6 where no `@mui/*` resolves (isolation probe: MODULE_NOT_FOUND for all three). MUI is
+   bundled into both `dist` and `dist-wordpress` (not in rollup `external`), so at runtime nothing needs it installed.
+   WordPress-without-MUI therefore works at runtime TODAY; the open risk is types, not runtime.
+2. Types without MUI installed: the declared consumers' measured declaration pass shows 26 `Unused @ts-expect-error`
+   (MUI-typed public props degrade to `any`) and 2 implicit-any parameters; the gated pass shows the same 6
+   baseline errors as the MUI-present consumer (3 unused expect-error, 3 missing subpath modules: pre-existing).
+3. So the earliest point is a TYPE milestone, not a runtime one. The 11 `.d.ts` files extend MUI prop types
+   (AppBarProps, DrawerProps, AutocompleteProps (generic), AccordionProps, ToolbarProps, MenuItemProps, MenuProps,
+   PopperProps, FormControlProps, TooltipClasses, and in `mui-legacy-props` TextField/Select/Menu/Modal/Paper/
+   Snackbar/Backdrop/... props). Copying them is not small (they pull in SxProps/Theme). Options:
+   1. `@mui/*` → devDependencies + optional `peerDependencies` (`peerDependenciesMeta.optional`): runtime unchanged
+      (bundled); consumers that have MUI (rc-webapp: 9.5.0) keep identical types; consumers without it (WordPress)
+      get `any` for those MUI-derived props (the 26 measured). Cheapest; one package.json change; declared consumers
+      go green at runtime immediately (30/30 with F4).
+   2. Bundle the declarations (vite-plugin-dts `rollupTypes`/api-extractor) so the needed MUI types are vendored into
+      Vanguard's `.d.ts`. Exact types without MUI installed; build-tooling change, larger d.ts.
+   3. Own prop interfaces per component as each is ported (groups B/C/pickers): the natural end state; MUI-derived
+      types disappear with the last port.
+   PROPOSED: 1 now (closes the never-run 13 runtime tests and the WordPress-without-MUI runtime risk), 3 over the
+   remaining groups, 2 only if a typed WordPress consumer appears before the ports finish. Decision: watchdog.
+
+## 25. F4 / F5 (handoff 7)
+
+1. F4 `useFormStore<T, R>({ initialValues, inputs, validateOn, serverErrors, action, validateBeforeAction })`:
+   per-form store (`primitives/core/form-store.ts`, framework-free, immutable snapshots) read with
+   useSyncExternalStore. Same field-element shape as `useFormConfig`: each element's `reducer` is the values object
+   and `slice` holds `set<Key>` / `set<Key>inArray`, so FormElement, the F3 `field` path and every input work
+   unchanged. The setters are pure (FormElement calls `setStateValue` during render without dispatching, as Redux
+   action creators allow): they return a marked local form action that the F1 seam's shim applies itself; legacy
+   results take the old path. No react-redux store or Provider on this path. `getData` returns the typed store
+   values. Note: the bundles still import react-redux as an external module (the shim and the legacy path), so a
+   consumer must have the package installed; it needs no Provider/store.
+2. F5: Form today renders a `<div>` (ComponentContainer) and never used its `onSubmit` prop. With the new `action`
+   prop it renders a real `<form action noValidate class="Form-form">` inside the same container; without it the
+   DOM is unchanged. `useFormStore` wires `options.action(values, previous)` through `useActionState` (`result`).
+   Pending is read with `useFormStatus` in the form's children (browser story; jsdom does not commit the host
+   transition state). Validation runs in the submit event with a side-effect-free check and prevents the submit when
+   invalid (then shows the field errors); any field-error state update in the submit event or inside the action
+   cancels the form's pending state (measured). A hook-level `isPending` was dropped: it only rendered inside the
+   suspended transition.
+3. Tests: `_form-store.spec.ts` (4), `_FormStore.spec.tsx` (7, no Provider), `_FormAction.spec.tsx` (3),
+   `_FormAction.stories.tsx` (pending + result in Chromium), shim local-action spec; package fixture F4 smoke
+   (both bundles, no Provider). F0's 36 tests unchanged and green.
+
+## 26. Watchdog round on §24: rc-webapp gets MUI only transitively → types first (2026-11-18)
+
+1. Fact (read-only): rc-webapp `html/react/package.json` declares no `@mui/*` or `@emotion/*` (121 deps, 72 devDeps)
+   and no source file imports `@mui/*`; its lockfile shows `@mui/material` 9.5.0 only as a dependency of
+   `@rankingcoach/vanguard`. The package-fixture consumers: `*-mui` install MUI on purpose, `*-declared` do not.
+   So moving MUI out now would turn MUI-derived prop types into `any` in rc-webapp (consumer-visible type
+   regression). DECIDED (watchdog): do not move yet; remove `@mui` from every published `.d.ts` first.
+2. Guard added (cfaaeff): `scripts/_dts-package-imports.spec.ts`. Published `.d.ts` (default + WordPress) may only
+   import declared packages; the 21 pre-existing undeclared ones are frozen and may only shrink. Red check: MUI
+   out of `dependencies` fails it on 11 files.
+3. Sizing the type work (measured): hand-written own prop types for the 11 files would change the public type
+   surface (e.g. `MenuProps extends MuiMenuProps` accepts every MUI Menu prop today). Exact preservation =
+   vendoring. api-extractor (already installed with vite-plugin-dts) rolls exactly the 28 MUI names the 11 files
+   import, with `@mui/*`, `@emotion/*`, react-transition-group and popper inlined, into ONE file: 14.4k lines,
+   559 KB, external imports only `react` and `csstype`. A probe file using Menu/Autocomplete/TextField/Popper/
+   Transition props (incl. a rejected bad `variant` via `@ts-expect-error`) typechecks against it; the only gap is
+   popper's `export * from './lib'` (4 names), fixed by rolling popper's lib types too.
+4. Implementation plan (post-build, no source change): (1) `scripts/vendor-mui-types.mjs` produces
+   `types/_vendor/mui.d.ts` for both bundles; (2) rewrite the `@mui/*` imports of the emitted `.d.ts` to that file
+   (relative path); (3) guard: no published `.d.ts` imports `@mui`; (4) acceptance: the declared consumers' typed
+   fixtures (`mui-typed.tsx`, `mui-gated.tsx`) give the same result as the MUI consumers; (5) then MUI →
+   devDependencies (+ nothing else), package.sh 30/30 runtime in all four consumers. Estimate: half a day.
+5. react-redux (F4 caveat) on the remaining-paths list: "not yet Redux-free for consumers: the package must be
+   installed, no Provider or store needed", exit = the deferred end step together with the rc-webapp fork change.
+
+## 27. Group B design: shared overlay pieces (for watchdog review; pure-core work starts now)
+
+| Piece | Pure core (no React) | React wiring | Used by (MUI today) | Proves it first |
+|---|---|---|---|---|
+| Anchored placement (popper.js semantics: 12 placements, offset, flip, preventOverflow/shift, arrow, hide) | `core/anchored-placement.ts` | `react/Popper/use-anchored` (rAF/scroll/resize/ResizeObserver updates, portal) | Popover (Tooltip), PopoverPopper, DropdownMenu, PopoverModal, AutocompleteWithAnchor, Autocomplete, SearchableSelect, DatePicker, DateRangePicker (9) | PopoverPopper (thin wrapper), then DropdownMenu |
+| Click-away | `core/click-away.ts` (event classification: composedPath/contains, touch vs mouse, ignore the opening event, inside-React-portal marker) | `react/ClickAway` (capture listener on document, React-tree marker via onClickCapture) | DropdownMenu, Autocomplete, PopoverModal (via Popper/ClickAwayListener) | DropdownMenu |
+| Tooltip timing / hover intent | `core/tooltip-timing.ts` (enter/leave/enterNext delays, global hysteresis, touch long-press, focus-visible open, `disableInteractive`) as a state machine | `react/Tooltip` | Popover (MUI Tooltip with Vanguard skin) | Popover |
+| Focus management | `roving-focus.ts` (exists) for MenuList; `core/focus-trap.ts` (tabbable order, sentinel wrap, restore target) | MenuList on MenuPopup (exists), `react/FocusTrap` | DropdownMenu (MenuList), PopoverModal, FocusTrap component, Drawer later | DropdownMenu (MenuList), then PopoverModal |
+| Transitions | `transition.ts` (exists: Grow), add Fade timing | existing Grow wiring | DropdownMenu (Fade), Tooltip (Grow) | DropdownMenu |
+
+1. Order: anchored placement first (9 users, every other piece sits on it), then click-away + MenuList focus
+   (DropdownMenu proves both), then tooltip timing (Popover), then focus trap (PopoverModal). Menu/MenuItem already
+   share MenuPopup + MenuOption from Select (popover-style positioning `position.ts`, not popper).
+2. Verification method for placement: a differential story in Chromium that runs the real `@popperjs/core`
+   (MUI's own dependency, dev-only) and the pure core on the same reference/floating rects across a scenario grid
+   (all placements × viewport edges × offset/flip/shift/arrow), asserting identical x/y/placement/arrow, like the
+   ripple parity spec. Parity target = popper with MUI Popper's default modifiers and Tooltip's modifier set.
+3. Scope limit, stated: clipping boundary = viewport (`clippingParents` of nested scroll containers is not modelled
+   in v1; recorded as a delta to check against the inventory before replacing MUI Popper in a component).
+4. Each component keeps its public props (PopperProps-derived types stay vendored, §26) and its DOM classes
+   (`MuiPopper-root`, `MuiTooltip-*`, `MuiMenuList-root`) as aliases, plus data-slot hooks; fixtures per inventory
+   rule (root-components.scss Menu/Autocomplete paper/listbox are entry-chunk rules).
