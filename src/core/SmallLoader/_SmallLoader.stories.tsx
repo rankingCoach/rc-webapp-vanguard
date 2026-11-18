@@ -4,10 +4,12 @@ import React from "react";
 import {SbDecorator} from "@test-utils/get-storybook-decorator";
 
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/SmallLoader",
   component: SmallLoader,
-});
+}),
+};
 
 export const SmallLoaderStory = (props:SmallLoaderProps) => {
   return (

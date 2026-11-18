@@ -3,11 +3,24 @@ import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 import { mapStorybookActionToProps } from "@test-utils/map-storybook-action-to-props";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/Rating/RatingDistribution",
   component: RatingDistribution,
   extra: {
     ...disableControls([""]),
+    // Storybook 7+ ignores argTypes.defaultValue; the same defaults as meta args so the story renders.
+    args: {
+      ratingDistributionData: [
+        { ratingsNumber: 46, starsNumber: 5, color: "var(--s400)" },
+        { ratingsNumber: 24, starsNumber: 4, color: "var(--w400)" },
+        { ratingsNumber: 10, starsNumber: 3, color: "var(--e500)" },
+        { ratingsNumber: 10, starsNumber: 2, color: "var(--e500)" },
+        { ratingsNumber: 2, starsNumber: 1, color: "var(--e500)" },
+      ],
+      showTotalNumberOfRatings: true,
+      title: "Rating distribution",
+    },
     argTypes: {
       ratingDistributionData: {
         defaultValue: [
@@ -46,7 +59,8 @@ export default SbDecorator({
       },
     },
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories

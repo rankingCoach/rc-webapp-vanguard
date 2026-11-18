@@ -542,3 +542,7 @@ Usage ledger (direct JSX / service / internal / WordPress):
 | RcTransparentShowcase | 0 | 0 | 0 | no |
 | CssUpdatesShowcase | 0 | 0 | 0 | no |
 
+
+### Story renames so verifier 2 can check slotted components (watchdog)
+1. `Rating.stories.tsx`, `RatingDistribution.stories.tsx`, `SmallLoader.stories.tsx` → `_*.stories.tsx` (never collected before; also added to the never-run list above).
+2. Setup-only edits after the rename, listed: (a) all three: `export default SbDecorator({...})` → `export default { ...SbDecorator({...}) }` (the Storybook indexer rejects a call expression as default export; this is the shape every collected story uses); (b) RatingDistribution: the meta `argTypes.*.defaultValue` values (ignored since Storybook 7, so `ratingDistributionData` was undefined and the render threw) repeated as meta `args` with the same values. No story body, render or assertion changed. Result: 3/3 stories green.
