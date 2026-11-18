@@ -1,3 +1,4 @@
+import styles from './ModalStepper.module.scss';
 import { SetupSliceType } from '@custom-hooks/use-stepper/helpers/types';
 import { useStepper } from '@custom-hooks/use-stepper/use-stepper';
 import { alignItemsCenter, dFlex, justifyContentBetween, mb2, mt6 } from '@globalStyles';
@@ -11,9 +12,7 @@ import { ModalFooter, ModalFooterProps } from '@vanguard/Modal/ModalFooter/Modal
 import { Render } from '@vanguard/Render/Render';
 import { Text } from '@vanguard/Text/Text';
 import React, { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-
-import styles from './ModalStepper.module.scss';
+import { useLegacyDispatch } from '../../../primitives/react/form/use-legacy-dispatch';
 import { ModalStepperSteps } from './ModalStepperSteps/ModalStepperSteps';
 
 export type StepperStepsPosition = 'left' | ' right' | 'center';
@@ -90,7 +89,8 @@ export const ModalStepper = (props: ModalStepperProps) => {
   bgColor = parseCssVariable(bgColor);
   const scrollToTopFn = useScrollToTop();
   const ref = useRef<HTMLDivElement | null>(null);
-  const dispatch = useDispatch();
+  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
+  const dispatch = useLegacyDispatch();
   useEffect(() => {
     if (ref.current && scrollToTop) {
       setTimeout(() => {
