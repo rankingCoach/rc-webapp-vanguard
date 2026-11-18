@@ -702,3 +702,13 @@ No real-bug candidates in this group.
 
 ### Agent docs coverage (watchdog item 4 of the (d) round)
 The generator also reads the component folder's own `_*.stories.tsx` story objects (args) after `stories/*.story.tsx`. Pages with examples: 49 → 56 of 298 (most newly enabled stories are render functions, not args, so they add little). Spec 8/8.
+
+### Item 1: common SCSS import paths fixed (watchdog decision)
+1. 10 files under `src/common` imported `src/styles/*` one directory too high (`../../../styles/` at depth 3, `../../../../styles/` at depth 4): DiscountBadge, FeatureBox, HoverableCard, IncentiveBox, InvoiceAddress, PageSectionRecommended, RecommendationBadge, StatisticsBoard, UpsellingTrigger (the watchdog's 9) + ListingServiceConnectionStatus (same bug, B7 folder). Each import path corrected by one level; nothing else changed.
+2. Proof: `dist/vanguard.css` sha256 f2c14688…f233 and `dist-wordpress/vanguard.css` 15c8329e…df1a — identical before (build of 3e83951; only stories/scripts changed since) and after (build of this tree). All 9 stories now render (temporary explicit Storybook list, reverted): 9/9; FeatureBox's story additionally needed an import-only fix (`../../../vanguard/…mock-anim.json` → `../../core/…`, the old path does not exist). ListingServiceConnectionStatus has no story; its spec renders it (jsdom does not compile CSS) and `sass --load-path=.` compiles its stylesheet.
+3. Same bug in A's folders, reported to A: ListPage/ListPageHeader, PaymentMethod, SpendingForecastSection.
+4. Runner guard added to my enable/run scripts: an empty file list aborts (exit 2) instead of running the whole project.
+
+## Dead-code candidates for the user (no removal)
+1. DiscountBadge, FeatureBox, HoverableCard, IncentiveBox, InvoiceAddress, PageSectionRecommended (+ RecommendationBadge), StatisticsBoard (+ StatisticsBoardItem), UpsellingTrigger, ListingServiceConnectionStatus: exported from neither `src/index.ts` nor `src/index-wordpress.ts`, imported by nothing outside their own pair, and their stylesheets could never compile until this fix. Kept and now buildable; user decides.
+2. Earlier entry: local `GoogleMapsMarker/Marker.tsx` (see "Candidates for removal").

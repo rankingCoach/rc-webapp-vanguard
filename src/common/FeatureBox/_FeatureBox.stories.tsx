@@ -3,7 +3,7 @@ import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 import { IconNames } from "@vanguard/Icon/IconNames";
 // @ts-ignore
-import animation from "../../../vanguard/LottieAnimationLoader/LottieBase/mock/mock-anim.json";
+import animation from "../../core/LottieAnimationLoader/LottieBase/mock/mock-anim.json";
 
 export default {
   ...SbDecorator({
