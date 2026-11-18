@@ -55,12 +55,15 @@ export const ListItems = <ObjectType,>(props: ListItemsProps<ObjectType>) => {
 
   useEffect(() => {
     if (ulRef.current) {
-      const sticky = Array.from(ulRef.current?.querySelectorAll('.sticky') ?? []);
-      ulRef.current.addEventListener('scroll', () => {
+      const ul = ulRef.current;
+      const sticky = Array.from(ul.querySelectorAll('.sticky') ?? []);
+      const onScroll = () => {
         detectIntersection(sticky);
-      });
+      };
+      ul.addEventListener('scroll', onScroll);
 
       detectIntersection(sticky);
+      return () => ul.removeEventListener('scroll', onScroll);
     }
   }, [ulRef, items]);
 
