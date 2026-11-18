@@ -5,7 +5,7 @@ import { InputAdornment } from '@mui/material';
 import { InputBase, rcInputBaseProps } from '@vanguard/_internal/InputBase/InputBase';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
+import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
 import { Button, ButtonSizes, ButtonTypes } from '../Button/Button';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { DateRangeInitialProps, DateRangePickerResp, RcDateRangePickerProps } from '../DateRange/DateRange';
@@ -28,8 +28,8 @@ export const DateRangeInput = (props: Props) => {
   const { formatFn, reverseFormatFn } = inputFormatter || {};
   let inputRef = formconfig?._inputRef;
   const [s, updateState] = useState({});
-  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
-  const dispatch = useLegacyDispatch();
+  // F1: form writes go through the binding seam (plain setStateValue, as before).
+  const binding = useFieldBinding(formconfig);
   if (!inputRef) {
     inputRef = useRef(null);
   }
@@ -55,8 +55,8 @@ export const DateRangeInput = (props: Props) => {
           formattedValue = formatFn(formattedValue);
         }
         inputRef.current.value = formattedValue;
-        if (formconfig?.setStateValue) {
-          dispatch(formconfig.setStateValue(formattedValue));
+        if (binding.canWrite) {
+          binding.writeScalar(formattedValue);
           validInput(props.formconfig);
         }
       }
