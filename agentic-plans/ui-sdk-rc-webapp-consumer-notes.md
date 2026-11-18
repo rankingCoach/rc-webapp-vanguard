@@ -22,3 +22,49 @@ Rules that tie today are listed in `tmp/research/vanguard-ui-sdk-visual-baseline
 Storybook dev (`.storybook/preview.tsx` imports `style.css` statically, CSS modules follow) has a different order,
 so colour/border-only differences on entry-rule ties in rc-webapp stories are dev-order artefacts; Vanguard's
 production-order fixtures (`src/test-utils/consumer-css.tsx`) are the reference.
+
+## Writing a new form (F4 + F5): no Redux slice, no Provider
+
+Existing forms (`useFormConfig` + a Redux slice) keep working unchanged. For a new form, keep the values in the
+form's own store and submit with a React 19 action:
+
+```tsx
+import { Form, Input, Select, useFormStore } from '@rankingcoach/vanguard';
+import { useFormStatus } from 'react-dom';
+
+type Values = { name: string; plan: string };
+
+const SaveButton = () => {
+  const { pending } = useFormStatus(); // pending is read in a CHILD of <Form action>
+  return <button type="submit" disabled={pending}>{pending ? 'Saving…' : 'Save'}</button>;
+};
+
+export const ProfileForm = () => {
+  const form = useFormStore<Values, string>({
+    initialValues: { name: '', plan: 'basic' },
+    inputs: { name: { fieldType: 'Input', validation: { required: true, minLength: 2 } } },
+    action: async (values) => {
+      await api.saveProfile(values); // typed values, not FormData
+      return 'Saved';
+    },
+  });
+  return (
+    <Form config={form.formConfig} action={form.formAction}>
+      <Section>
+        <Input label="Name" field="name" />   {/* bound by name at any depth, no prop drilling */}
+        <Select label="Plan" field="plan" options={plans} />
+      </Section>
+      <SaveButton />
+      {form.result && <Text>{form.result}</Text>}
+    </Form>
+  );
+};
+```
+
+1. `form.values` re-renders the owner on every change; `form.getData()` returns the typed values;
+   `form.setValue(key, value)`, `form.resetForm()`, `form.isValid()`, `form.getChangedData()` as in useFormConfig.
+2. An invalid form does not submit: the action is not started and the field errors are shown.
+3. Without `action` the Form renders exactly as before (a `<div>`); with it, a real `<form>` inside the same
+   container.
+4. The package still needs `react-redux` installed (Vanguard's legacy form path imports it), but this path needs no
+   Provider and no store.
