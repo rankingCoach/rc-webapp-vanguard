@@ -29,6 +29,10 @@ export const StarRating = (props: StarRatingProps) => {
   bgHoverColor = parseCssVariable(bgHoverColor);
   const [hoverValue, setHoverValue] = useState(0);
   const [isHoverInteractionEnabled, setIsHoverInteractionEnabled] = useState(!readonly);
+  const reEnableTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (reEnableTimer.current) clearTimeout(reEnableTimer.current);
+  }, []);
   const container = useRef<HTMLDivElement>(null);
   const isContainerHovered = useHover(container);
 
@@ -52,7 +56,8 @@ export const StarRating = (props: StarRatingProps) => {
     onChange({ value: getRatingValueFromEvent(event, index) });
     setIsHoverInteractionEnabled(false);
     setHoverValue(0);
-    setTimeout(() => setIsHoverInteractionEnabled(!readonly), 2000);
+    if (reEnableTimer.current) clearTimeout(reEnableTimer.current);
+    reEnableTimer.current = setTimeout(() => setIsHoverInteractionEnabled(!readonly), 2000);
   };
 
   const handleHoverChange = (event: StarValueChangedEvent, index: number) => {
