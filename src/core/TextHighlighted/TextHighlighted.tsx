@@ -1,36 +1,38 @@
-import { FontWeights, LinkReplacements, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
+import { Text, TextProps } from '@vanguard/Text/Text';
 import React from 'react';
 
-export interface Props {
-  testId?: string;
-  className?: string;
+/** The Text props TextHighlighted accepts, taken from Text so the two cannot drift apart. */
+type TextPropsSubset = Pick<
+  TextProps,
+  | 'testId'
+  | 'className'
+  | 'children'
+  | 'type'
+  | 'fontWeight'
+  | 'textTight'
+  | 'fontSize'
+  | 'color'
+  | 'balanced'
+  | 'maxWidth'
+  | 'maxChar'
+  | 'textAlign'
+  | 'ellipsis'
+  | 'display'
+  | 'replacements'
+  | 'translate'
+  | 'uppercase'
+  | 'capitalize'
+  | 'context'
+  | 'links'
+  | 'disabled'
+  | 'highlightWords'
+  | 'highlightColor'
+  | 'highlightMode'
+>;
 
-  children: string | string[] | React.ReactNode | React.ReactNode[];
-
-  type?: TextTypes;
-  fontWeight?: FontWeights;
-  textTight?: boolean;
-  fontSize?: number;
-  color?: null | string;
-  balanced?: boolean;
-
-  maxWidth?: number;
-  maxChar?: number;
+export interface Props extends TextPropsSubset {
+  /** Narrower than Text's (no 'pre-wrap' | 'pre'): TextHighlighted never accepted those. */
   textWrap?: 'wrap' | 'no-wrap' | 'wrap-break-word';
-  textAlign?: 'center' | 'end' | 'justify' | 'left' | 'match-parent' | 'right' | 'start';
-  ellipsis?: boolean;
-  display?: 'block' | 'inline';
-
-  replacements?: TextReplacements;
-  translate?: boolean;
-  uppercase?: boolean;
-  capitalize?: boolean;
-  context?: 'one' | 'other';
-  links?: LinkReplacements;
-  disabled?: boolean;
-  highlightWords?: string[];
-  highlightColor?: string;
-  highlightMode?: 'background' | 'text' | 'bold';
   caseInsensitive?: boolean;
 }
 

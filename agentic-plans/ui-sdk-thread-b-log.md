@@ -562,3 +562,8 @@ Usage ledger (direct JSX / service / internal / WordPress):
 1. `src/helpers/charts/translate-labels.ts` `translateLabels(labels)` replaces three identical copies (BarChart `getCategories` + `getCustomLegendItems`, HSBChart `getCategories`); the local names stay as aliases so the options code is untouched. BarChart's now-unused `translationService` import removed.
 2. Options builder NOT extracted: diffing the two option objects shows ~25 differing values (orientation, column width, radius, fonts Roboto vs theme typeface, legend position/size/markers, grid colour/position, axis visibility, formatters); a shared builder would be only parameters. Recorded as not worth it.
 3. Spec `_translate-labels.spec.ts` (red: module missing → green 3/3): order, call keys, new array, input untouched, empty. Chart stories 7/7, tsc 0, biome same before/after.
+
+### Audit item 10: TextHighlighted props derived from Text's (watchdog APPROVED, type-only)
+1. `Props` = `Pick<TextProps, 24 keys>` + `caseInsensitive`; `textWrap` stays written out because Text's is wider (`'pre-wrap' | 'pre'`), so a plain Pick would have widened TextHighlighted. `TextHighlightedProps extends Props` unchanged; no runtime change.
+2. Type spec `_TextHighlighted.types.spec.ts` (checked by `tsc -p tsconfig.spec.json`): `Props` and `TextHighlightedProps` `toEqualTypeOf` the hand-written legacy shape. Sensitivity shown: a plain Pick including `textWrap` fails it (TS2344 on textWrap); final version passes. TextHighlighted spec 1/1 + stories 3/3, tsc 0, biome: only the pre-existing `noChildrenProp` in the old spec.
+3. Left as logged (watchdog): ActionCardBody (returns children only), RcNavLink (raw prop spread). QuoteContainer pair: known divergence, left. Masked inputs: A's.
