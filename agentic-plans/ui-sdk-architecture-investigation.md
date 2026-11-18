@@ -7,6 +7,9 @@
 > 4. gates.sh base warnings: **APPROVED as a separate cleanup change.**
 > 5. Form: **DECIDED: hybrid, staged F0–F5 (D14).**
 > 6. Local commits per component after Tier A PASS: **APPROVED (§14.14).**
+> 7. F2 (registration replacing child-walking): **CLOSED, not done by design** (fallback accepted; analysis in §D14/F2). F3 `field` prop: **GO**.
+> 8. **Known bug left in place: Slider on the legacy `formconfig` path** calls `setStateValue` without dispatching, so slider values are never stored. Kept, because fixing it would start writing into consumer stores. Verifier: rc-webapp renders Slider in 7 files and none binds a formconfig, so **zero consumer impact**; the decision stands. On the new `field` path Slider DOES store its value.
+> 9. Reporting rule: "passed" only for a Tier A/B verdict returned by the verifier; my own gates are "green on my side".
 
 
 Date: 2026-11-18 · Branch: `feature/ui-sdk-architecture-investigation` (from `feature/file-manager-variants`)
@@ -665,3 +668,44 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    4. Then **F5**: React 19 actions / pending.
    5. FormElement's child-walking may be retired later, once rc-webapp has migrated its forms to `field`. That's a future, separately decided step.
 3. Collision check for the prop name `field`: none of Input, Textarea, Select, CheckBox, Autocomplete, ColorPicker, DateRangeInput, Slider, RadioButtonGroup, PhoneNumber, DatePicker, TimePicker or InputBase has a `field` prop today, so the name is free.
+
+## 20. F3 and Tier B follow-ups
+1. **Logs page ToggleButtonGroup "1px left shift" (Tier B): status (c), not reproducible in Vanguard.**
+   1. Commit `0992855`'s differential story renders the MUI-backed legacy DOM vs the own core under LogsPage's exact override (and AgentChatAdmin's).
+   2. Pill offsets, group geometry, margins and borders are identical.
+   3. The verifier's own recapture matched on both builds (capture artefact).
+   4. The verifier is asked to confirm, or to send element, rule and offsets. F3 is not handed off until this is closed.
+2. **F3 implementation:**
+   1. `useFormElementBinding` is extracted from FormElement, with identical code and hook order plus an `active` flag; FormElement = hook + cloneElement.
+   2. Form exposes `fieldApi` through FormConfigProvider.
+   3. `useResolvedFormConfig(formconfig, field, index)`:
+      1. An explicit `formconfig` wins (dev warning if `field` is also given).
+      2. `field` binds through the nearest Form's context with the same per-field logic.
+      3. No Form above, or an unknown key: unbound, with a dev warning.
+   4. Inputs: InputBase (Input / Textarea / Select), CheckBox (reports to Form on the field path), Slider (stores on the field path; legacy no-op kept), Autocomplete, ColorPicker, DateRangeInput, DatePicker, TimePicker.
+   5. `useLegacyDispatch` now reads `ReactReduxContext` (no throw without a Provider; results dropped with a dev warning). Found because Slider, which had no Redux before, would otherwise have thrown.
+   6. Guards, green on my side: F0 36 + F3 specs 8 + shim 4, and wide specs 60 files / 724 tests, wide stories 32 / 303.
+3. **Tier B #1 (milestone 1, pack sel-r4): PASS**, from the verifier's shadow rc-webapp on :6010.
+   1. 40 stories: Select 21/21, ToggleButtonGroup 6/7, root 38/40 with 2 unstable.
+   2. Logs: not reproducible, closed.
+   3. AgentChatAdmin: computed `border-left-color` on joined middle/last buttons with 0 px changed (under the -1px join). Logged as invisible; no round.
+4. **F3 handed off as HANDOFF 5** (snapshot `558dbc3`, pack `f3`). Commits only after Tier A PASS + the final package.sh (WordPress `field` smoke, expected 26).
+5. **Group A started (while F3 is in Tier A): Input / Textarea on the own TextField frame.**
+   1. Emotion rules were extracted from the verifier's MUI baseline (:6007, read-only) for 17 Input / Textarea / InputBase-contract stories: 111 emotion classes, saved at `scratchpad/input-emotion.json`. Re-extract with `agentic-plans/uisdk-tools/extract-emotion-rules.mjs` if the scratchpad is gone.
+   2. Element variants seen:
+      1. FormControl root.
+      2. OutlinedInput root: plain, adornedStart, adornedStart+End, multiline, multiline+adornedStart.
+      3. The `input` / `textarea` `.MuiInputBase-input.MuiOutlinedInput-input`.
+      4. Label: plain, shrink, filled+shrink.
+      5. The asterisk, the legend, and the helper (contained ± filled).
+   3. Plan:
+      1. Generalise SelectTextField's frame (FormControl / label / outlined root / notch / helper, already MUI-exact incl. the D13 type bump) into a TextField frame with an input slot.
+      2. Add the `input` slot (text / number / email / password / date; `inputProps`/`htmlInput`; `inputComponent`; startAdornment/endAdornment; inputRef; autoFocus).
+      3. Add the `textarea` slot as a port of MUI TextareaAutosize (hidden shadow textarea measuring rows / minRows / maxRows, the same inline height style).
+      4. Route MuiTextField's non-select outlined path to it. The native select and non-outlined variants come last.
+   4. Guards: `_InputBase.mui.spec.tsx`, `_MuiTextFieldCompatibility.spec.tsx`, `_TextFieldV9Compatibility.spec.tsx`, the Input / Textarea stories and the InputBase MUI-contract stories, plus a style diff vs :6007 across the extracted story list.
+   5. Tier A request when ready:
+      1. The Vanguard Input / Textarea / InputBase stories (light / dark; empty / filled / error / disabled / focused).
+      2. The two rc-webapp form screens.
+      3. One Input-adornment screen (verifier to pick).
+      4. `tierB-inputs.json` (Tier B #2 after group A).
