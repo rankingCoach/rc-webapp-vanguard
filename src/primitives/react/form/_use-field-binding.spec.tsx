@@ -68,4 +68,17 @@ describe('useFieldBinding', () => {
     b.notifyChange();
     expect(onChange).toHaveBeenCalledTimes(1);
   });
+
+  it('writeScalar: always setStateValue(value), never the array branch and no mapping (CheckBox/Slider semantics)', () => {
+    const arr = vi.fn();
+    const { b, store } = setup({
+      setStateValue: set,
+      setStateValueArray: arr,
+      arrayPosition: 0,
+      valueMappers: { toObject: () => ({ mapped: true }) as never, toPrimitive: (v) => String(v) },
+    });
+    act(() => b.writeScalar(true));
+    expect(arr).not.toHaveBeenCalled();
+    expect(store.getState().last).toBe(true);
+  });
 });

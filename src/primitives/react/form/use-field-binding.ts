@@ -17,6 +17,8 @@ export interface FieldBinding {
    * `{ el, idx }` as-is; otherwise the scalar transform runs and `setStateValue(value)` is dispatched.
    */
   write: (stored: unknown, scalar?: ScalarTransform) => void;
+  /** Plain `setStateValue(value)`: no mapping, no array branch (inputs that never used them: CheckBox, Slider). */
+  writeScalar: (value: unknown) => void;
   /** Tell the Form this field changed (`_onChange`). */
   notifyChange: () => void;
 }
@@ -42,6 +44,9 @@ export const useFieldBinding = (formconfig: FormConfigElement | undefined): Fiel
         const out = scalar ? scalar(stored) : { value: stored };
         if (out.skip) return;
         dispatch(formconfig.setStateValue(out.value));
+      },
+      writeScalar: (value) => {
+        if (formconfig?.setStateValue) dispatch(formconfig.setStateValue(value));
       },
       notifyChange: () => {
         formconfig?._onChange?.();
