@@ -17,8 +17,8 @@ export const Loader = (props: Props) => {
   }
 
   return (
-    <ComponentContainer className={'Loader-container'} testId={testId}>
-      <div className="loading">
+    <ComponentContainer className={'Loader-container'} testId={testId} data-slot={'loader-container'}>
+      <div className="loading" data-slot={'loader'}>
         <div className="uil-ring-css">
           <div />
         </div>

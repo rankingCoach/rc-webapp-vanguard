@@ -1,4 +1,5 @@
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { ComponentContainer, ComponentContainerProps } from '@vanguard/ComponentContainer/ComponentContainer';
 import React from 'react';
 
@@ -23,12 +24,16 @@ export const GlobalStateComponent = (props: GlobalStateComponentProps) => {
 
   return (
     <ComponentContainer
+      data-slot={'global-state'}
+      data-hoverable={dataFlag(hoverable)}
+      data-blurred={dataFlag(blurred)}
+      data-shimmering={dataFlag(shimmering)}
       {...containerProps}
       className={classNames(styles.globalStateComponent, hoverable ? styles.hoverable : undefined, className)}
     >
       {children}
-      {blurred && <span className={styles.blurLayer} />}
-      {shimmering && <span className={styles.shimmerLayer} />}
+      {blurred && <span data-slot={'global-state-blur'} className={styles.blurLayer} />}
+      {shimmering && <span data-slot={'global-state-shimmer'} className={styles.shimmerLayer} />}
     </ComponentContainer>
   );
 };

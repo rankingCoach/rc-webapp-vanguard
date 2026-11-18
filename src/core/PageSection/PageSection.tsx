@@ -71,7 +71,7 @@ export const PageSection = (props: PageSectionProps) => {
   return (
     <PageSectionContainer {...props}>
       {(title || headerActionArea) && (
-        <div className={styles.header}>
+        <div className={styles.header} data-slot={'page-section-header'}>
           <Render if={!!title}>
             <Header
               title={title}
@@ -86,7 +86,9 @@ export const PageSection = (props: PageSectionProps) => {
         </div>
       )}
 
-      <div data-testid={testId ? `${testId}_Children` : undefined}>{children}</div>
+      <div data-testid={testId ? `${testId}_Children` : undefined} data-slot={'page-section-content'}>
+        {children}
+      </div>
     </PageSectionContainer>
   );
 };
@@ -134,14 +136,26 @@ const PageSectionContainer = (props: PageSectionProps) => {
 
   if (background === PageSectionBackground.frostedGlass) {
     return (
-      <FrostedGlass testId={testId} className={containerClasses} innerRef={innerRef}>
+      <FrostedGlass
+        testId={testId}
+        className={containerClasses}
+        innerRef={innerRef}
+        data-slot={'page-section'}
+        data-background={background}
+      >
         {children}
       </FrostedGlass>
     );
   }
 
   return (
-    <ComponentContainer testId={testId} className={containerClasses} innerRef={innerRef}>
+    <ComponentContainer
+      testId={testId}
+      className={containerClasses}
+      innerRef={innerRef}
+      data-slot={'page-section'}
+      data-background={background}
+    >
       {background === PageSectionBackground.gradientPrimaryMesh && <GradientPrimaryMeshBackground />}
       {children}
     </ComponentContainer>

@@ -1,6 +1,7 @@
 import './Switch.scss';
 
 import { classNames } from '@helpers/classNames';
+import { dataFlag } from '@helpers/data-attributes';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { ChangeEventHandler } from 'react';
 
@@ -60,8 +61,14 @@ export const Switch = (props: SwitchProps) => {
   } = props;
 
   return (
-    <ComponentContainer className={'vanguard-switch'} testId={testId}>
+    <ComponentContainer className={'vanguard-switch'} testId={testId} data-slot={'switch-container'}>
       <label
+        data-slot={'switch'}
+        data-size={size}
+        data-checked={dataFlag(value === true)}
+        data-disabled={dataFlag(disabled)}
+        data-readonly={dataFlag(readOnly)}
+        data-loading={dataFlag(loading)}
         style={{ color: labelColor }}
         className={classNames(
           'vanguard-switch-label',
@@ -90,6 +97,7 @@ export const Switch = (props: SwitchProps) => {
                 e.preventDefault();
               }
             }}
+            data-slot={'switch-input'}
             className={`vanguard-switch-input vanguard-switch-${size}`}
             type="checkbox"
             onChange={(e) => {
@@ -102,7 +110,7 @@ export const Switch = (props: SwitchProps) => {
             disabled={disabled}
           />
         ) : (
-          <div className={classNames(`vanguard-switch-${size}`, 'loader-container')}>
+          <div data-slot={'switch-loader'} className={classNames(`vanguard-switch-${size}`, 'loader-container')}>
             <div className={'loader-spinner'} />
           </div>
         )}

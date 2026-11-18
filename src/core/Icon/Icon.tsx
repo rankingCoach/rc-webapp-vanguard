@@ -111,6 +111,9 @@ export const Icon = (props: IconProps) => {
   return (
     <span
       data-testid={testId}
+      data-slot={'icon'}
+      data-icon={children ?? undefined}
+      data-size={type}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
