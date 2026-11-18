@@ -3,14 +3,15 @@ import { useFormConfig } from '@custom-hooks/useFormConfig';
 import { combineReducers, configureStore, createSlice } from '@reduxjs/toolkit';
 import { writeInAutocomplete } from '@test-utils/autocomplete-test-utils';
 import { writeInInput } from '@test-utils/input-test-utils';
-import { renderHook } from '@testing-library/react';
+import { renderHook, within } from '@testing-library/react';
 import { Autocomplete } from '@vanguard/Autocomplete/Autocomplete';
 import { Form, FormStatus } from '@vanguard/Form/Form';
 import { Input } from '@vanguard/Input/Input';
 import React from 'react';
+import { Provider } from 'react-redux';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 import { render } from '../../../test-utils/test-utils';
-import { RenderRoot } from '../../load-component';
 
 describe('Form component test suite ', () => {
   interface TestSlice {
@@ -52,9 +53,8 @@ describe('Form component test suite ', () => {
         }),
       {
         wrapper: ({ children }) => (
-          <RenderRoot shouldPersist={true} customStore={store}>
-            {children}
-          </RenderRoot>
+          // F0 setup fix: RenderRoot (removed from Vanguard) only provided the store.
+          <Provider store={store}>{children}</Provider>
         ),
       },
     );
@@ -78,8 +78,8 @@ describe('Form component test suite ', () => {
           label={'autocomplete'}
         />
       </Form>,
-      null as any,
-      store,
+      // F0 setup fix: current test-utils signature render(ui, { customStore }).
+      { customStore: store },
     );
 
     return hookRez.result.current;
@@ -95,7 +95,8 @@ describe('Form component test suite ', () => {
     };
     await createForm(onChange);
 
-    await writeInInput('form-input-1', 'this is written in input');
+    // F0 setup fix: writeInInput now takes the query scope as 3rd argument.
+    await writeInInput('form-input-1', 'this is written in input', within(document.body));
 
     expect(hasChanges).toBe(true);
   });
