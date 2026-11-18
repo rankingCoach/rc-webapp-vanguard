@@ -82,6 +82,7 @@ export const Star = (props: Props) => {
 
   return (
     <div
+      data-slot={'star'}
       style={{ display: visible ? '' : 'none', filter: isBlurred ? 'blur(3px)' : '' }}
       className="rating"
       onClick={handleClick}
@@ -90,10 +91,10 @@ export const Star = (props: Props) => {
       aria-checked={value === 1 ? true : value === 0 ? false : 'mixed'}
       {...indexBasedProps}
     >
-      <span style={{ width: size * value, height: size }} ref={starResult} className="rating__result">
+      <span data-slot={'star-result'} style={{ width: size * value, height: size }} ref={starResult} className="rating__result">
         <StyledSVG width={size} height={size} color={color ? color : 'var(--p500)'} src={SvgIcon} />
       </span>
-      <span style={{ width: size * hoverValue, height: size }} ref={starHover} className="rating__result">
+      <span data-slot={'star-hover'} style={{ width: size * hoverValue, height: size }} ref={starHover} className="rating__result">
         <StyledSVG
           width={size}
           height={size}
@@ -102,7 +103,7 @@ export const Star = (props: Props) => {
           fillOpacity={bgHoverColor ? '1' : '0.2'}
         />
       </span>
-      <span style={{ width: size, height: size }} ref={star} className="rating__max">
+      <span data-slot={'star-background'} style={{ width: size, height: size }} ref={star} className="rating__max">
         <StyledSVG width={size} height={size} color={bgColor ? bgColor : 'var(--n200)'} src={SvgIcon} />
       </span>
     </div>

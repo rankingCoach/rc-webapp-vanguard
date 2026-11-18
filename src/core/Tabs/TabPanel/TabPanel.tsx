@@ -25,7 +25,7 @@ export const TabPanel = (props: TabPanelProps) => {
 
   return (
     <Render if={currentTab === value} keepInDom={keepInDom}>
-      <div role="tabpanel" id={id} aria-labelledby={labelledBy} className={className} data-testid={testId}>
+      <div data-slot={'tab-panel'} role="tabpanel" id={id} aria-labelledby={labelledBy} className={className} data-testid={testId}>
         {children}
       </div>
     </Render>

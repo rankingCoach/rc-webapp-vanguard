@@ -84,9 +84,189 @@ Evidence: new specs 12 files, red 17/18 before implementation (the passing one a
 
 ### 3A Text + TextHighlighted (facts; nothing to implement)
 1. `TextHighlighted` has been a thin `@deprecated` wrapper since 33feb08 (also on base 9d3b75b): `({ caseInsensitive, ...props }) => <Text {...props} highlightCaseInsensitive={caseInsensitive} />`. Text owns `highlightWords`, `highlightColor`, `highlightMode`, `highlightCaseInsensitive`.
-2. rc-webapp usage: zero (component-usage.md zero-usage section; grep 0). Migration list: empty.
+2. Usage: rc-webapp direct imports zero (component-usage.md counts direct imports only; grep 0 for the name, no service/factory path renders it), but exported from the WordPress entry, so in use. rc-webapp migration list: empty; WordPress consumers would need `Text` + `highlightWords` (+ `highlightCaseInsensitive` for `caseInsensitive`).
 3. Decided by the watchdog: "force consumers to update" is not done in this run; the wrapper stays (API identical).
 4. Leftovers commit: deleted the empty, unimported `TextHighlighted.module.scss` (2 newlines); renamed `TextHighlighted.spec.tsx` → `_TextHighlighted.spec.tsx` so it runs. Setup-only edit after the rename: added `import { describe, test } from 'vitest';` (failed with `describe is not defined`). Assertions unchanged; 1/1 green. Pre-existing biome warning `noChildrenProp` in that spec, untouched.
 
 ## Decisions for the user
-1. TextHighlighted: remove at the next major. Zero rc-webapp usage, already deprecated. The WordPress entry DOES export it (`src/index-wordpress.ts:23-24`), so check WordPress consumers first.
+1. TextHighlighted: IN USE via the WordPress entry (`src/index-wordpress.ts:23-24`; user: every WordPress export is curated and in use). Stays as the deprecated thin wrapper; removal only after the WordPress consumers migrate to `Text` + `highlightWords`.
+
+## Usage rule (user via watchdog)
+Usage = direct rc-webapp JSX OR service call sites (ModalService/DrawerService/snackbarService/actionBarService/videoPlayerService) OR internal Vanguard importers OR export from `src/index-wordpress.ts`. The verifier's first "zero usage" list counted direct imports only and is wrong (ConfirmModal: 21+ files via `ModalService.openConfirmModal`); nothing is treated as unused until the reachability map arrives. Zero-usage components still get migrated, last in order.
+
+## One branch (user via watchdog)
+Everything lands on A's `feature/ui-sdk-architecture-investigation`. A merges this branch after every verifier PASS; B sends A "ready to merge: <SHA range>" per pass and merges A's branch into this one regularly (never rebase).
+
+### Never-run test files (watchdog item 4; reported, not enabled)
+Rules: vitest `spec` runs `**/_*.spec.{ts,tsx}`; `scripts` runs `scripts/**/_*.spec.ts`; Storybook collects `src/core/**/_*.stories.*` plus only `src/common/SectionMissing/_SectionMissing.stories.tsx`.
+1. Specs without the underscore, never run: 75 files:
+   - src/core/AIAssistant/AIAssistentPanel/AIAssistantPanel.spec.tsx
+   - src/core/ActionCard/ActionCardBody/ActionCardBody.spec.tsx
+   - src/core/ActionCard/ActionCardHeader/ActionCardHeader.spec.tsx
+   - src/core/AnimatedConditional/AnimatedConditional.spec.tsx
+   - src/core/AutocompleteWithAnchor/AutocompleteWithAnchor.spec.tsx
+   - src/core/Avatar/Avatar.spec.tsx
+   - src/core/Button/Button.spec.tsx
+   - src/core/Charts/AreaChart/AreaChart.spec.tsx
+   - src/core/Charts/BarChart/BarChart.spec.tsx
+   - src/core/Charts/BigLegend/BigLegend.spec.tsx
+   - src/core/Charts/BigLegend/BigLegendItem/BigLegendItem.spec.tsx
+   - src/core/Charts/ChartTabs/ChartTabs.spec.tsx
+   - src/core/Charts/DonutChart/DonutChart.spec.tsx
+   - src/core/Charts/HSBChart/HSBChart.spec.tsx
+   - src/core/Charts/LineChart/LineChart.spec.tsx
+   - src/core/ClipboardText/ClipboardText.spec.tsx
+   - src/core/CreditCard/CreditCard.spec.tsx
+   - src/core/DateRangePicker/DateRangePicker.formatter.spec.ts
+   - src/core/DateRangePicker/DateRangePickerBase/DateRangePickerBase.spec.tsx
+   - src/core/DateRangePicker/DateRangePickerBase/DateRangePickerBaseInputAdornment/DateRangePickerBaseInputAdornment.spec.tsx
+   - src/core/DateTimePicker/DateTimePicker.spec.tsx
+   - src/core/DragAndDropFile/DragAndDropFile.spec.tsx
+   - src/core/DropdownMenu/DropdownMenu.spec.tsx
+   - src/core/ExportXLS/ExportXLS.spec.tsx
+   - src/core/FadedCarousel/ElementsBeforeAfter/ElementsBeforeAfter.spec.tsx
+   - src/core/FlagAdornment/FlagAdornment.spec.tsx
+   - src/core/FrostedGlass/FrostedGlass.spec.tsx
+   - src/core/GoogleMaps/GoogleMapsMarker/GoogleMapsMarker.spec.tsx
+   - src/core/ImgLoader/ImgLoader.spec.tsx
+   - src/core/ImgWithLoader/ImgWithLoader.spec.tsx
+   - src/core/LineAlert/LineAlert.spec.tsx
+   - src/core/List/List.spec.tsx
+   - src/core/List/ListShowMore/ListShowMore.spec.tsx
+   - src/core/ListItem/ListItem.spec.tsx
+   - src/core/ListItems/ListItem/ListItem.spec.tsx
+   - src/core/ListItems/ListItems.spec.tsx
+   - src/core/LottieAnimationLoader/LottieAnimationLoader.spec.tsx
+   - src/core/LottieAnimationLoader/LottieBase/LottieBase.spec.tsx
+   - src/core/Modal/FullScreenModalContainer/FullScreenModalContainer.spec.tsx
+   - src/core/Modal/ModalStepper/ModalStepper.spec.tsx
+   - src/core/Modal/ModalStepper/ModalStepperSteps/ModalStepperStep/ModalStepperStep.spec.tsx
+   - src/core/Modal/ModalStepper/ModalStepperSteps/ModalStepperSteps.spec.tsx
+   - src/core/PhoneNumber/PhoneNumber.spec.tsx
+   - src/core/PhoneNumber/PhoneNumberBase/PhoneNumberBase.spec.tsx
+   - src/core/PhoneNumber/PhoneNumberIMask/PhoneNumberIMask.spec.tsx
+   - src/core/PhoneNumber/PhoneNumberPrefix/PhoneNumberPrefix.spec.tsx
+   - src/core/ProgressBar/ProgressBar.spec.tsx
+   - src/core/ProgressCircle/ProgressCircle.spec.tsx
+   - src/core/Rating/Rating.spec.tsx
+   - src/core/Rating/RatingDistribution/RatingDistribution.spec.tsx
+   - src/core/Render/Render.spec.tsx
+   - src/core/SmallLoader/SmallLoader.spec.tsx
+   - src/core/SocialMediaLink/utils.spec.ts
+   - src/core/StatusBadge/StatusBadge.spec.tsx
+   - src/core/Table/Table.spec.tsx
+   - src/core/Table/TableBody/TableBody.spec.tsx
+   - src/core/Table/TableBody/TableBodyRenderer/TableBodyRenderer.spec.tsx
+   - src/core/Table/TableCell/TableCell.spec.tsx
+   - src/core/Table/TableFooter/FooterPagination/FooterPagination.spec.tsx
+   - src/core/Table/TableFooter/FooterShowLess/FooterShowLess.spec.tsx
+   - src/core/Table/TableFooter/FooterShowMore/FooterShowMore.spec.tsx
+   - src/core/Table/TableFooter/TableFooter.spec.tsx
+   - src/core/Table/TableHeader/TableHeader.spec.tsx
+   - src/core/Table/common/CtaWithIcon/CtaWithIcon.spec.tsx
+   - src/core/Table/common/TablePlaceholder/TablePlaceholder.spec.tsx
+   - src/core/Text/TextWrapBalancer/TextWrapBalancer.spec.tsx
+   - src/core/TogglerWithText/TogglerWithText.spec.tsx
+   - src/core/VideoPlayer/VideoPlayer.spec.tsx
+   - src/custom-hooks/__tests__/use-facebook-sdk.spec.ts
+   - src/helpers/__tests__/array-of-length.spec.ts
+   - src/helpers/__tests__/format-utils.spec.ts
+   - src/helpers/__tests__/get-path-id.spec.ts
+   - src/helpers/__tests__/random-number-between.spec.ts
+   - src/helpers/__tests__/round-number.spec.ts
+   - src/services/odata.service.spec.ts
+2. Stories without the underscore, never collected: 61 files (some are imported by an underscored story; the file itself is not collected):
+   - src/common/ListPage/ListPage.stories.tsx
+   - src/common/ListPage/ListPageRadioGroup/ListPageRadioGroup.stories.tsx
+   - src/common/ListPage/ListPageSwitchGroup/ListPageSwitchGroup.stories.tsx
+   - src/core/AIAssistant/AIAssistent.stories.tsx
+   - src/core/ActionCard/ActionCardActions/ActionCardActions.stories.tsx
+   - src/core/ActionCard/ActionCardBody/ActionCardBody.stories.tsx
+   - src/core/ActionCard/ActionCardHeader/ActionCardHeader.stories.tsx
+   - src/core/Charts/DonutChart/Custom/DonutChartDirectories/DonutChartDirectories.stories.tsx
+   - src/core/Charts/DonutChart/Custom/DonutChartStatistics/DonutChartStatistics.stories.tsx
+   - src/core/Charts/DonutChart/DonutChart.stories.tsx
+   - src/core/Charts/LineChart/LineChart.stories.tsx
+   - src/core/CheckBox/CheckBoxIcon/CheckBoxIcon.stories.tsx
+   - src/core/DateRangePicker/DateRangePickerBase/DateRangePickerBase.stories.tsx
+   - src/core/DateRangePicker/DateRangePickerBase/DateRangePickerBaseInputAdornment/DateRangePickerBaseInputAdornment.stories.tsx
+   - src/core/Drawer/DrawerRoot/DrawerRoot.stories.tsx
+   - src/core/FadeCarouselAuto/FadeCarouselAuto.stories.tsx
+   - src/core/FadedCarousel/ElementsBeforeAfter/ElementsBeforeAfter.stories.tsx
+   - src/core/Form/FormElement/FormElement.stories.tsx
+   - src/core/GlobalStateComponent/GlobalStateComponent.stories.tsx
+   - src/core/GoogleMaps/GoogleMapsMarker/GoogleMapsMarker.stories.tsx
+   - src/core/InfoBox/InfoBox.stories.tsx
+   - src/core/Input/stories/validation/stories/Input.validation.blur.stories.tsx
+   - src/core/List/ListShowMore/ListShowMore.stories.tsx
+   - src/core/ListItem/ListItem.stories.tsx
+   - src/core/ListItems/ListItem/ListItem.stories.tsx
+   - src/core/ListItems/ListItems.stories.tsx
+   - src/core/LottieAnimationLoader/LottieAnimationLoader.stories.tsx
+   - src/core/LottieAnimationLoader/LottieBase/LottieBase.stories.tsx
+   - src/core/Modal/FullScreenModalContainer/FullScreenModalContainer.stories.tsx
+   - src/core/Modal/ModalStepper/ModalStepper.stories.tsx
+   - src/core/Modal/ModalStepper/ModalStepperSteps/ModalStepperStep/ModalStepperStep.stories.tsx
+   - src/core/Modal/ModalStepper/ModalStepperSteps/ModalStepperSteps.stories.tsx
+   - src/core/Modal/Modalheader/ModalHeader.stories.tsx
+   - src/core/Notification/Notification.stories.tsx
+   - src/core/NotificationAction/NotificationAction.stories.tsx
+   - src/core/PhoneNumber/PhoneNumberBase/PhoneNumberBase.stories.tsx
+   - src/core/PhoneNumber/PhoneNumberIMask/PhoneNumberIMask.stories.tsx
+   - src/core/PhoneNumber/PhoneNumberPrefix/PhoneNumberPrefix.stories.tsx
+   - src/core/Popover/Popover.stories.tsx
+   - src/core/PopoverModal/PopoverModal.stories.tsx
+   - src/core/ProgressCircle/ProgressCircle.stories.tsx
+   - src/core/RadioButtonGroup/RadioButtonGroup.stories.tsx
+   - src/core/Rating/Rating.stories.tsx
+   - src/core/Rating/RatingDistribution/RatingDistribution.stories.tsx
+   - src/core/Render/Render.stories.tsx
+   - src/core/SmallLoader/SmallLoader.stories.tsx
+   - src/core/SnackbarRoot/Snackbar.stories.tsx
+   - src/core/Table/Table.stories.tsx
+   - src/core/Table/TableBody/TableBody.stories.tsx
+   - src/core/Table/TableBody/TableBodyRenderer/TableBodyRenderer.stories.tsx
+   - src/core/Table/TableCell/TableCell.stories.tsx
+   - src/core/Table/TableFooter/FooterPagination/FooterPagination.stories.tsx
+   - src/core/Table/TableFooter/FooterShowLess/FooterShowLess.stories.tsx
+   - src/core/Table/TableFooter/FooterShowMore/FooterShowMore.stories.tsx
+   - src/core/Table/TableFooter/TableFooter.stories.tsx
+   - src/core/Table/TableHeader/TableHeader.stories.tsx
+   - src/core/Table/common/CtaWithIcon/CtaWithIcon.stories.tsx
+   - src/core/Table/common/TablePlaceholder/TablePlaceholder.stories.tsx
+   - src/core/Text/TextWrapBalancer/TextWrapBalancer.stories.tsx
+   - src/core/TogglerWithText/TogglerWithText.stories.tsx
+   - src/core/VideoPlayer/VideoPlayer.stories.tsx
+3. Underscored src/common stories not in the Storybook glob (commented out since VAN-82), never collected: 44 files (all `src/common/**/_*.stories.tsx` except SectionMissing).
+4. Consequence for Track 1: src/common components have no running stories; their batches rely on the new specs plus a render of every story module's default export in the spec (no Storybook run possible without changing .storybook/main.ts, A's config).
+
+### Batch 2: Tabs, Table, TagList, Rating, StarRating, ActionCard and small own components
+Drafted by Codex (gpt-6.1-sol, medium) from a written contract + batch 1 as pattern; every line read, 4 renames and 1 fix by me, reviewed by Codex (high).
+| Component | Attributes |
+|---|---|
+| Tabs | ComponentContainer wrapper `tabs` + `data-variant` (EXCEPTION: the bar div that takes `className` stays attribute-free because `stories/DomHygiene.story.tsx` pins its attributes to `['class']`); `tabs-scroller`; `tabs-list` (role=tablist) |
+| Tab | `<button>` `tab` + `data-selected`, `data-variant` (theme), `data-size` (tabHeight); own attrs before the caller spread |
+| TabPanel | `tab-panel` |
+| Table | `table-container` (ComponentContainer), `<table>` `table` |
+| TableHeader | `<thead>` `table-header`, `<tr>` `table-row`, `<th>` `table-header-cell`, sort `<button>` `table-sort-button` |
+| TableBodyRenderer / TableBody | `<tbody>` `table-body`, rows `table-row`; blurred `<tbody>` `table-body-blurred` + `table-blurred-message-row/-cell`, `table-blurred-message` |
+| TableCell | `<td>` `table-cell`, inner `table-cell-inner`; prefix/postfix `table-cell-content` + `data-type` |
+| TableToolbar | `table-toolbar`, `table-toolbar-title`, `table-toolbar-controls` |
+| TableFooter | `<tfoot>` `table-footer`, `<tr>` `table-footer-row`, `<td>` `table-footer-cell`, `table-footer-controls`, `table-footer-more-controls`, `table-footer-pagination` |
+| FooterShowLess / FooterShowMore | `footer-show-less-container` / `footer-show-more-container` |
+| CtaWithIcon | `cta-with-icon` + `data-disabled` |
+| TablePlaceholder / TableRowPlaceholder | `table-placeholder` / `table-row-placeholder` + `-content` |
+| TagList | `tag-list` + `data-variant` |
+| Tag | `tag-container`; styled div `tag` + `data-variant`, `data-type`; `tag-content`; `tag-delete` |
+| Rating | `rating-container` (consumer className); `rating` (state class `ratingAlignTop`); `rating-value` |
+| RatingDistribution | `rating-distribution`, `-title`, `-content`, `-bars` |
+| RatingStarsAndProgressBar | `rating-stars-and-progress-bar`, `-stars`, `-progress` (wrapper div of MUI ProgressBar; ProgressBar itself untouched) |
+| StarRating | `star-rating` + `data-readonly` |
+| Star | `star`, `star-result`, `star-hover`, `star-background` |
+| ActionCard | `action-card`, `action-card-content`; ActionCardHeader `action-card-header`, `-menu`; ActionCardActions `action-card-actions`; ActionCardAction `action-card-action` + `data-disabled`, `data-loading`, `action-card-action-loader` |
+| AiGlow / AnimatedNumber / Divider / FrostedGlass | `ai-glow` / `animated-number` / `divider` (before rest spread) / `frosted-glass` (before props spread, so PageSection's `page-section` wins) |
+| SmallLoader | `small-loader` (ComponentContainer, no separate root), `small-loader-image` |
+| TrendDelta | `trend-delta`, `trend-delta-value` |
+| RelativeTime, TrendIndicator, ActionCardInfo, ActionCardBody, FooterPagination | nothing: they render only Text/Icon/fragments, which slot themselves |
+
+Evidence: new specs 13 files; red 22/24 with the implementation removed (the 2 passes assert "no own slot" for RelativeTime by design); green 24/24 after; specs of touched folders 21 files / 71 tests; stories of touched folders 20 files / 169 tests (1 failure on the first try — Tabs DomHygiene, fixed by the exception above, then Tabs stories 5 files / 81 green); tsc spec + lib 0; biome lint on the 31 changed files 39 before = 39 after (same rules/files), 0 on new specs; mechanical attribute-only check (every removed line equals an added line minus data-* attributes): 59 = 59 OK.

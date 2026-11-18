@@ -83,11 +83,11 @@ export const TrendDelta = (props: TrendDeltaProps) => {
   const text = format ? format(magnitude) : formatMagnitude(magnitude);
 
   return (
-    <span className={[styles.delta, className].filter(Boolean).join(' ')} style={{ color }}>
+    <span data-slot={'trend-delta'} className={[styles.delta, className].filter(Boolean).join(' ')} style={{ color }}>
       <Icon forceSize={size} color={color}>
         {outcomeIcon(outcome)}
       </Icon>
-      {showValue ? <span className={styles.deltaValue}>{text}</span> : null}
+      {showValue ? <span data-slot={'trend-delta-value'} className={styles.deltaValue}>{text}</span> : null}
     </span>
   );
 };

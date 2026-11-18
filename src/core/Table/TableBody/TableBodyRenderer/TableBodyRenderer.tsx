@@ -15,14 +15,14 @@ export interface TableBodyRendererProps {
 export const TableBodyRenderer = (props: TableBodyRendererProps) => {
   const { rows = [], columns = [], options = {}, hideBlurred, hasGreyBody } = props;
   return (
-    <tbody className={styles.tableBody}>
+    <tbody data-slot={'table-body'} className={styles.tableBody}>
       {rows.map((row, i) => {
         const hideRow = row.isBlurred && hideBlurred;
         if (hideRow) {
           return null;
         }
         return (
-          <tr key={i}>
+          <tr data-slot={'table-row'} key={i}>
             {columns?.map((column, j) => {
               return (
                 <TableCell

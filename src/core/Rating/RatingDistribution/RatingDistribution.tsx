@@ -47,8 +47,8 @@ export const RatingDistribution = (props: RatingDistributionProps) => {
    * ---
    */
   return (
-    <ComponentContainer className={styles.container} testId={testId}>
-      <div className={styles.ratingTitle}>
+    <ComponentContainer data-slot={'rating-distribution'} className={styles.container} testId={testId}>
+      <div data-slot={'rating-distribution-title'} className={styles.ratingTitle}>
         <Text fontWeight={FontWeights.bold} className={mr1_5} testId={'title_testId'}>
           {title ? title : 'Rating distribution'}
         </Text>
@@ -65,7 +65,7 @@ export const RatingDistribution = (props: RatingDistributionProps) => {
         </Render>
       </div>
 
-      <div className={styles.ratingStars}>
+      <div data-slot={'rating-distribution-content'} className={styles.ratingStars}>
         <Rating
           className={classNames(styles.rating)}
           valueAlign={'top'}
@@ -76,7 +76,7 @@ export const RatingDistribution = (props: RatingDistributionProps) => {
           color={'--a2900'}
         />
 
-        <div className={styles.progressBarRating}>
+        <div data-slot={'rating-distribution-bars'} className={styles.progressBarRating}>
           {ratingDistributionData.map((item, key) => {
             return (
               <RatingStarsAndProgressBar

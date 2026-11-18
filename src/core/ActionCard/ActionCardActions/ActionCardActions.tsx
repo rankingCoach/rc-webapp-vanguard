@@ -14,7 +14,7 @@ export const ActionCardActions = (props: ActionCardActionsProps) => {
   let { actions = [] } = props;
   actions = actions.filter((x) => !!x);
   return (
-    <div className={styles.actionsContainer}>
+    <div data-slot={'action-card-actions'} className={styles.actionsContainer}>
       {actions.map((action, index) => {
         return (
           <ActionCardAction

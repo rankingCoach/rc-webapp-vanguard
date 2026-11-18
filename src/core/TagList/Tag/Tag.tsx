@@ -64,9 +64,9 @@ export const Tag = (props: TagProps) => {
    * Return View
    */
   return (
-    <ComponentContainer className={classNames('Tag-container', hidden ? 'hidden' : '')}>
+    <ComponentContainer data-slot={'tag-container'} className={classNames('Tag-container', hidden ? 'hidden' : '')}>
       {applyPopover(
-        <div className={`${variant} ${type}`} style={active ? { opacity: '1' } : {}}>
+        <div data-slot={'tag'} data-variant={variant} data-type={type} className={`${variant} ${type}`} style={active ? { opacity: '1' } : {}}>
           <Text
             color={textColor ?? textColor}
             fontWeight={variant === 'chip-filled' ? FontWeights.medium : undefined}
@@ -75,10 +75,11 @@ export const Tag = (props: TagProps) => {
             {text}
           </Text>
           <Render if={hasInnerElement}>
-            <div className={classNames(px1)}>{innerElement}</div>
+            <div data-slot={'tag-content'} className={classNames(px1)}>{innerElement}</div>
           </Render>
           {hasDeleteBtn && (
             <div
+              data-slot={'tag-delete'}
               className={'tag-btn-delete'}
               onClick={() => {
                 // @todo Move delete event to the Tag itself??

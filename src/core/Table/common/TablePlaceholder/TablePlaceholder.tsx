@@ -10,8 +10,8 @@ export const TablePlaceholder = (props: TablePlaceholderProps) => {
   const {} = props;
 
   return (
-    <ComponentContainer className={w100}>
-      <div className={classNames(dFlex, mt2, w100)}>
+    <ComponentContainer data-slot={'table-placeholder'} className={w100}>
+      <div data-slot={'table-placeholder-content'} className={classNames(dFlex, mt2, w100)}>
         <Skeleton
           type={SkeletonTypes.fill}
           style={{ height: '128px', minWidth: 'calc(33.33% - 16px)', width: 'auto' }}
@@ -36,8 +36,8 @@ export const TableRowPlaceholder = (props: TablePlaceholderProps) => {
   const {} = props;
 
   return (
-    <ComponentContainer className={w100}>
-      <div className={classNames(dFlex, mt2, w100)}>
+    <ComponentContainer data-slot={'table-row-placeholder'} className={w100}>
+      <div data-slot={'table-row-placeholder-content'} className={classNames(dFlex, mt2, w100)}>
         <Skeleton
           type={SkeletonTypes.fill}
           style={{ height: '128px', minWidth: '100%', width: '1000px' }}

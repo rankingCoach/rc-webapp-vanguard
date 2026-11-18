@@ -1,3 +1,4 @@
+import { dataFlag } from '@helpers/data-attributes';
 import { alignItemsCenter, dFlex, gap1, ml1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { Avatar } from '@vanguard/Avatar/Avatar';
@@ -179,6 +180,10 @@ export const Tab = (props: TabProps & InternalTabProps) => {
   return (
     <button
       tabIndex={selected ? 0 : -1}
+      data-slot={'tab'}
+      data-selected={dataFlag(selected)}
+      data-variant={theme}
+      data-size={tabHeight}
       {...buttonProps}
       type="button"
       role="tab"

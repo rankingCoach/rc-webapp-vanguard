@@ -259,7 +259,7 @@ export const Tabs = (props: TabsProps) => {
     tab.component !== undefined && (keepInactiveTabsInDom || resolveValue(tab, index) === currentValue);
 
   return (
-    <ComponentContainer className={wrapperClassName}>
+    <ComponentContainer data-slot={'tabs'} data-variant={config.theme ?? 'highlight'} className={wrapperClassName}>
       <div
         {...rootProps}
         className={classNames(
@@ -269,8 +269,9 @@ export const Tabs = (props: TabsProps) => {
           className ?? '',
         )}
       >
-        <div ref={scrollerRef} className={styles.scroller} onScroll={onScroll}>
+        <div data-slot={'tabs-scroller'} ref={scrollerRef} className={styles.scroller} onScroll={onScroll}>
           <div
+            data-slot={'tabs-list'}
             ref={listRef}
             role="tablist"
             aria-orientation="horizontal"

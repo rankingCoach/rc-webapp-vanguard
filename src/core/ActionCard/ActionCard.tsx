@@ -24,12 +24,13 @@ export const ActionCard = (props: ActionCardProps) => {
 
   return (
     <div
+      data-slot={'action-card'}
       ref={innerRef}
       data-testid={'ActionCardTestId'}
       id={id}
       className={classNames(dFlexColumn, styles.card, transparent ? styles.transparent : '')}
     >
-      <div className={classNames(styles.cardBody)} style={cardBodyStyle}>
+      <div data-slot={'action-card-content'} className={classNames(styles.cardBody)} style={cardBodyStyle}>
         {children}
       </div>
       <Render if={!!primaryActions}>

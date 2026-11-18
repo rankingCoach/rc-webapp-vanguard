@@ -22,7 +22,7 @@ export const FooterShowLess = (props: FooterShowLessProps) => {
     return null;
   }
   return (
-    <ComponentContainer>
+    <ComponentContainer data-slot={'footer-show-less-container'}>
       <CtaWithIcon
         onClick={(evt: SyntheticEvent) => {
           onShowLess && onShowLess();
