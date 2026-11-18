@@ -1,3 +1,94 @@
+// ToggleButton default look: the MUI 9.5 ToggleButton paint Vanguard shipped (default MUI theme), on the legacy
+// class names. Specificity matches the old emotion output: base and variants one class, selected two.
+// `.vg-typography-vanguard` = inside VanguardThemeProvider (16px base, no uppercase), like the bundled MUI theme.
 
-.ToggleButton-container{
+@use '../../primitives/react/ButtonBase/button-base' as *;
+
+.MuiToggleButton-root {
+  // ButtonBase reset inside the skin's own rule: order-independent, MUI's single-class specificity.
+  @include button-base-reset;
+
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 11px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.54);
+
+  &.Mui-disabled {
+    color: rgba(0, 0, 0, 0.26);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  &:hover {
+    text-decoration: none;
+    background-color: rgba(0, 0, 0, 0.04);
+
+    @media (hover: none) {
+      background-color: transparent;
+    }
+  }
+}
+
+.MuiToggleButton-standard.Mui-selected {
+  color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.12);
+
+    @media (hover: none) {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+
+@each $name, $rgb in (primary: (25, 118, 210), secondary: (156, 39, 176), error: (211, 47, 47), info: (2, 136, 209), success: (46, 125, 50), warning: (237, 108, 2)) {
+  $r: nth($rgb, 1);
+  $g: nth($rgb, 2);
+  $b: nth($rgb, 3);
+
+  .MuiToggleButton-#{$name}.Mui-selected {
+    color: rgb($r, $g, $b);
+    background-color: rgba($r, $g, $b, 0.08);
+
+    &:hover {
+      background-color: rgba($r, $g, $b, 0.12);
+
+      @media (hover: none) {
+        background-color: rgba($r, $g, $b, 0.08);
+      }
+    }
+  }
+}
+
+.MuiToggleButton-fullWidth {
+  width: 100%;
+}
+
+.MuiToggleButton-sizeSmall {
+  padding: 7px;
+  font-size: 0.8125rem;
+}
+
+.MuiToggleButton-sizeLarge {
+  padding: 15px;
+  font-size: 0.9375rem;
+}
+
+.vg-typography-vanguard {
+  font-size: 1rem;
+  text-transform: none;
+
+  &.MuiToggleButton-sizeSmall {
+    font-size: unquote("0.9285714285714285rem"); // exact MUI pxToRem(13), unrounded
+  }
+
+  &.MuiToggleButton-sizeLarge {
+    font-size: unquote("1.0714285714285714rem"); // exact MUI pxToRem(15), unrounded
+  }
 }

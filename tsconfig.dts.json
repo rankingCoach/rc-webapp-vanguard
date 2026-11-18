@@ -9,6 +9,7 @@
     "src/styles.ts",
     "src/rootReducer.ts",
     "src/global.slice.ts",
+    "src/primitives",
     "src/core",
     "src/common",
     "src/custom-hooks",

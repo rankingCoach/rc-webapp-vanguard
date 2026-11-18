@@ -1,5 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material';
 import React from 'react';
+import { VanguardTypographyContext } from '../../primitives/react/typography-context';
 
 /**
  * MUI theme of Vanguard's internal (bundled) MUI: 16px base font, 1rem = 16px, no uppercase buttons.
@@ -19,5 +20,7 @@ export interface VanguardThemeProviderProps {
 
 /** Wrap the app root (and every separately mounted React root) once so Vanguard components get their theme. */
 export const VanguardThemeProvider = (props: VanguardThemeProviderProps) => (
-  <ThemeProvider theme={vanguardMuiTheme}>{props.children}</ThemeProvider>
+  <ThemeProvider theme={vanguardMuiTheme}>
+    <VanguardTypographyContext.Provider value="vanguard">{props.children}</VanguardTypographyContext.Provider>
+  </ThemeProvider>
 );

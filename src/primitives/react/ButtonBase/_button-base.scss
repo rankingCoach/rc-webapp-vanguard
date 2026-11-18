@@ -1,0 +1,38 @@
+// The MUI 9.5 ButtonBase reset Vanguard shipped, as a mixin. Include it at the top of a skin's root rule (e.g.
+// `.MuiToggleButton-root { @include button-base-reset; ... }`): reset and skin then live in one rule with MUI's
+// single-class specificity, independent of stylesheet order (per-component imports, code splitting, WordPress
+// bundle). Not `@layer`/`:where()`: those lose to host-page `button {}` element rules (WordPress themes).
+@mixin button-base-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  text-decoration: none;
+  color: inherit;
+
+  &::-moz-focus-inner {
+    border-style: none;
+  }
+
+  &.Mui-disabled {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  @media print {
+    color-adjust: exact;
+  }
+}

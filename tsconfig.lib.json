@@ -79,6 +79,7 @@
   "include": [
     "src/global.d.ts",
     "src/index.ts",
+    "src/primitives",
     "src/core",
     "src/common",
     "src/custom-hooks",

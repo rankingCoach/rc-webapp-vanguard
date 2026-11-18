@@ -114,3 +114,60 @@
     }
   }
 }
+
+// Group layout: the MUI 9.5 ToggleButtonGroup paint (joined corners via the first/middle/last position classes of
+// the direct children), same selectors and specificity as before. Kept LAST in this file: MUI injected these at
+// runtime after all static CSS, so they won equal-specificity ties against the segmented rules above (D13), e.g. a
+// disabled middle/last item keeps `border-left: 1px solid transparent` in the segmented variant.
+.MuiToggleButtonGroup-root {
+  display: inline-flex;
+  border-radius: 4px;
+}
+
+.MuiToggleButtonGroup-fullWidth {
+  width: 100%;
+}
+
+.MuiToggleButtonGroup-horizontal {
+  .MuiToggleButtonGroup-firstButton,
+  .MuiToggleButtonGroup-middleButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton,
+  .MuiToggleButtonGroup-middleButton {
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton.Mui-disabled,
+  .MuiToggleButtonGroup-middleButton.Mui-disabled {
+    border-left: 1px solid transparent;
+  }
+}
+
+.MuiToggleButtonGroup-vertical {
+  flex-direction: column;
+
+  .MuiToggleButtonGroup-firstButton,
+  .MuiToggleButtonGroup-middleButton {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton,
+  .MuiToggleButtonGroup-middleButton {
+    margin-top: -1px;
+    border-top: 1px solid transparent;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .MuiToggleButtonGroup-lastButton.Mui-disabled,
+  .MuiToggleButtonGroup-middleButton.Mui-disabled {
+    border-top: 1px solid transparent;
+  }
+}
