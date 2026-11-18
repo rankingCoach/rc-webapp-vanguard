@@ -134,6 +134,14 @@ $error: rgb(211, 47, 47);
     --_trailingPad: 0px;
   }
 
+  &:where(.MuiOutlinedInput-root.MuiInputBase-multiline) {
+    padding: 16.5px 14px;
+  }
+
+  &:where(.MuiOutlinedInput-root.MuiInputBase-multiline.MuiInputBase-sizeSmall) {
+    padding: 8.5px 14px;
+  }
+
   &.Mui-disabled {
     color: rgba(0, 0, 0, 0.38);
     cursor: default;
@@ -217,6 +225,135 @@ $error: rgb(211, 47, 47);
     display: inline-block;
     opacity: 0;
     visibility: visible;
+  }
+}
+
+// ---------------------------------------------------------------- Text input / textarea (InputBase + OutlinedInput input)
+// One emotion class per input in MUI, variants by ownerState; here the ownerState is read from the InputBase root
+// inside `:where()` so every rule keeps emotion's (0,1,0) (+ its pseudo-classes). The autosize shadow textarea
+// carries the same class (and data-slot prefix), as in MUI, so it measures with the same font and padding.
+@keyframes mui-auto-fill {
+  from {
+    display: block;
+  }
+}
+
+@keyframes mui-auto-fill-cancel {
+  from {
+    display: block;
+  }
+}
+
+$control: '[data-slot^="text-field-control"]';
+
+.MuiInputBase-input:where(#{$control}) {
+  font: inherit;
+  letter-spacing: inherit;
+  color: currentColor;
+  padding: 4px 0 5px;
+  border: 0;
+  box-sizing: content-box;
+  background: none;
+  height: 1.4375em;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+  display: block;
+  min-width: 0;
+  width: 100%;
+  animation-name: mui-auto-fill-cancel;
+  animation-duration: 10ms;
+
+  &::-webkit-input-placeholder {
+    color: currentColor;
+    opacity: 0.42;
+    transition: opacity 200ms $ease-in-out;
+  }
+
+  &::-moz-placeholder {
+    color: currentColor;
+    opacity: 0.42;
+    transition: opacity 200ms $ease-in-out;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:invalid {
+    box-shadow: none;
+  }
+
+  &::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+
+  &.Mui-disabled {
+    opacity: 1;
+    -webkit-text-fill-color: rgba(0, 0, 0, 0.38);
+  }
+
+  &:-webkit-autofill {
+    animation-duration: 5000s;
+    animation-name: mui-auto-fill;
+  }
+
+  // InputBase variants
+  &:where(.MuiInputBase-sizeSmall > *) {
+    padding-top: 1px;
+  }
+
+  &:where(.MuiInputBase-multiline > *) {
+    height: auto;
+    resize: none;
+    padding: 0;
+    padding-top: 0;
+  }
+
+  &:where([type='search']) {
+    -moz-appearance: textfield;
+  }
+
+  // OutlinedInput input (after the InputBase base, as emotion composed them)
+  &:where(.MuiOutlinedInput-root > *) {
+    padding: 16.5px 14px;
+  }
+
+  &:where(.MuiOutlinedInput-root > *):-webkit-autofill {
+    border-radius: inherit;
+  }
+
+  &:where(.MuiOutlinedInput-root.MuiInputBase-sizeSmall > *) {
+    padding: 8.5px 14px;
+  }
+
+  &:where(.MuiOutlinedInput-root.MuiInputBase-multiline > *) {
+    padding: 0;
+  }
+
+  &:where(.MuiOutlinedInput-root.MuiInputBase-adornedStart > *) {
+    padding-left: 0;
+  }
+
+  &:where(.MuiOutlinedInput-root.MuiInputBase-adornedEnd > *) {
+    padding-right: 0;
+  }
+}
+
+label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where(#{$control}) {
+  &::-webkit-input-placeholder {
+    opacity: 0 !important;
+  }
+
+  &::-moz-placeholder {
+    opacity: 0 !important;
+  }
+
+  &:focus::-webkit-input-placeholder {
+    opacity: 0.42;
+  }
+
+  &:focus::-moz-placeholder {
+    opacity: 0.42;
   }
 }
 

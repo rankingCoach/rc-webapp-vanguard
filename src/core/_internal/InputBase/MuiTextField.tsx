@@ -1,6 +1,7 @@
 import { InputLabel, InputLabelProps, TextField } from '@mui/material';
 import { useThemeProps } from '@mui/material/styles';
 import React from 'react';
+import { InputTextField } from '../../../primitives/react/TextField/InputTextField';
 import { SelectTextField } from '../../../primitives/react/TextField/SelectTextField';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { mapLegacyComponentAliases, mapLegacyModalAliases, mapLegacySlots } from '../mui-slot-compat';
@@ -13,6 +14,22 @@ const CompatibleInputLabel = React.forwardRef<HTMLLabelElement, CompatibleInputL
   ({ vanguardComponent, ...props }, ref) => <InputLabel {...props} component={vanguardComponent} ref={ref} />,
 );
 CompatibleInputLabel.displayName = 'CompatibleInputLabel';
+
+/** InputBase-root props only MUI models: their presence keeps a text field on MUI. */
+const OWN_TEXT_FALLBACK_INPUT_KEYS = [
+  'ref',
+  'inputComponent',
+  'inputProps',
+  'slots',
+  'slotProps',
+  'components',
+  'componentsProps',
+  'classes',
+  'renderSuffix',
+  'sx',
+  'disableInjectingGlobalStyles',
+];
+const OWN_TEXT_FALLBACK_SLOT_PROPS = ['root', 'select'];
 
 /** Resolve theme defaults before removing the legacy public TextField aliases. */
 export const MuiTextField = (inProps: VanguardTextFieldProps) => {
@@ -84,6 +101,37 @@ export const MuiTextField = (inProps: VanguardTextFieldProps) => {
             ...(mapLabel(resolve(inputLabel) as never) as Record<string, unknown>),
           },
           select: mapSelect(resolve(select) as never) as Record<string, unknown>,
+        }}
+      />
+    );
+  }
+  const resolvedInput = typeof input === 'function' ? undefined : (mapInput(input as never) as Record<string, unknown>);
+  const resolvedHtmlInput = mapped.slotProps?.htmlInput;
+  const ownText =
+    !mapped.select &&
+    (mapped.variant ?? 'outlined') === 'outlined' &&
+    typeof input !== 'function' &&
+    typeof resolvedHtmlInput !== 'function' &&
+    typeof inputLabel !== 'function' &&
+    !OWN_TEXT_FALLBACK_INPUT_KEYS.some((key) => resolvedInput?.[key] !== undefined) &&
+    Object.keys(mapped.slots ?? {}).every((key) => key === 'inputLabel') &&
+    !OWN_TEXT_FALLBACK_SLOT_PROPS.some((key) => (mapped.slotProps as Record<string, unknown> | undefined)?.[key]) &&
+    (mapped as { classes?: unknown }).classes === undefined;
+  if (ownText) {
+    // Text mode (input / auto-growing textarea) on Vanguard's own core, MUI-identical DOM and behaviour. Anything the
+    // own core does not model (custom input components, refs on the InputBase root, MUI classes/slots) stays on MUI.
+    return (
+      <InputTextField
+        {...(mapped as Record<string, unknown>)}
+        id={id}
+        slots={mapped.slots as Record<string, unknown>}
+        slotProps={{
+          ...(mapped.slotProps as Record<string, unknown>),
+          input: resolvedInput,
+          inputLabel: {
+            ...(labelThemeDefaults.component ? { component: labelThemeDefaults.component } : {}),
+            ...(mapLabel(inputLabel as never) as Record<string, unknown>),
+          },
         }}
       />
     );
