@@ -1,7 +1,7 @@
 import { InputLabel, InputLabelProps, TextField } from '@mui/material';
 import { useThemeProps } from '@mui/material/styles';
 import React from 'react';
-
+import { SelectTextField } from '../../../primitives/react/TextField/SelectTextField';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { mapLegacyComponentAliases, mapLegacyModalAliases, mapLegacySlots } from '../mui-slot-compat';
 
@@ -17,6 +17,8 @@ CompatibleInputLabel.displayName = 'CompatibleInputLabel';
 /** Resolve theme defaults before removing the legacy public TextField aliases. */
 export const MuiTextField = (inProps: VanguardTextFieldProps) => {
   const props = useThemeProps({ props: inProps, name: 'MuiTextField' });
+  // Theme defaults for the label (consumer MUI ThemeProvider), honoured on the own-core select path too.
+  const labelThemeDefaults = useThemeProps({ props: {}, name: 'MuiInputLabel' }) as { component?: React.ElementType };
   const generatedId = React.useId();
   const id = props.id ?? generatedId;
   const mapped = mapLegacySlots(
@@ -63,6 +65,29 @@ export const MuiTextField = (inProps: VanguardTextFieldProps) => {
     const { component, ...labelProps } = withDefaults;
     return { ...labelProps, vanguardComponent: component };
   };
+  const resolvedSelect = typeof select === 'function' ? undefined : select;
+  const ownSelect = mapped.select && !resolvedSelect?.native && (mapped.variant ?? 'outlined') === 'outlined';
+  if (ownSelect) {
+    // Select mode runs on Vanguard's own core (no MUI): same post-mapping props, MUI-identical DOM/behaviour.
+    const resolve = <T,>(slot: T) => (typeof slot === 'function' ? (slot as (s: object) => T)({}) : slot);
+    return (
+      <SelectTextField
+        {...(mapped as Record<string, unknown>)}
+        id={id}
+        select
+        slots={mapped.slots as Record<string, unknown>}
+        slotProps={{
+          ...(mapped.slotProps as Record<string, unknown>),
+          input: mapInput(resolve(input) as never) as Record<string, unknown>,
+          inputLabel: {
+            ...(labelThemeDefaults.component ? { component: labelThemeDefaults.component } : {}),
+            ...(mapLabel(resolve(inputLabel) as never) as Record<string, unknown>),
+          },
+          select: mapSelect(resolve(select) as never) as Record<string, unknown>,
+        }}
+      />
+    );
+  }
   return (
     <TextField
       {...mapped}

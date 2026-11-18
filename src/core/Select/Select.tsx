@@ -1,6 +1,6 @@
+import styles from './Select.module.scss';
 import { dFlex, gap1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { MenuItem } from '@mui/material';
 import { translationService } from '@services/translation.service';
 import {
   InputBase,
@@ -16,8 +16,7 @@ import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContai
 import { Render } from '@vanguard/Render/Render';
 import { Text, TextTypes } from '@vanguard/Text/Text';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-
-import styles from './Select.module.scss';
+import { MenuOption } from '../../primitives/react/Menu/MenuOption';
 
 export type SelectOptionsComponentProps = Omit<SelectOptionProp, 'component'> & {
   selectedItem: SelectOptionProp | null;
@@ -169,7 +168,7 @@ export const Select = (props: Props) => {
       >
         {options &&
           options.map((item, index) => (
-            <MenuItem
+            <MenuOption
               key={item.key ?? index}
               value={item.value}
               disabled={item.disabled}
@@ -197,7 +196,7 @@ export const Select = (props: Props) => {
                     selectedItem: selectedItemValue ?? null,
                   })}
               </Render>
-            </MenuItem>
+            </MenuOption>
           ))}
       </InputBase>
     </ComponentContainer>

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-import { MenuItem } from '@mui/material';
+import { MenuOption as MenuItem } from '../../../primitives/react/Menu/MenuOption';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';

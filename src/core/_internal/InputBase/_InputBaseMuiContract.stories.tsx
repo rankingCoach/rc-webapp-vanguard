@@ -5,7 +5,8 @@
  * silently dead, so each story asserts a computed value that only OUR SCSS produces.
  * Values come from src/core/_internal/InputBase/InputBase.scss.
  */
-import { InputAdornment, MenuItem } from '@mui/material';
+import { InputAdornment } from '@mui/material';
+import { MenuOption as MenuItem } from '../../../primitives/react/Menu/MenuOption';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { FlagAdornment } from '@vanguard/FlagAdornment/FlagAdornment';

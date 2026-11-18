@@ -9,7 +9,7 @@
  * agentic-plans/mui-upgrade-breaking-changes.md, "MUI class names Vanguard depends on").
  */
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
-import { MenuItem } from '@mui/material';
+import { MenuOption as MenuItem } from '../../../primitives/react/Menu/MenuOption';
 import userEvent from '@testing-library/user-event';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { createRef, MutableRefObject } from 'react';

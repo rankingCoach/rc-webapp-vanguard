@@ -4,6 +4,10 @@ import { Icon, IconProps } from '@vanguard/Icon/Icon';
 import { Text, TextTypes } from '@vanguard/Text/Text';
 import React from 'react';
 
+import { MenuOption } from '../../primitives/react/Menu/MenuOption';
+import { useInOwnOptionHost } from '../../primitives/react/Menu/option-host-context';
+import { sxToStyle } from '../../primitives/react/sx-compat';
+
 export type MenuItemIconPosition = 'before' | 'after';
 
 export type MenuItemProps = {
@@ -27,6 +31,7 @@ export const MenuItem = ({
   useActiveIcon = false,
   ...rest
 }: MenuItemProps) => {
+  const inOwnHost = useInOwnOptionHost();
   const text = typeof children === 'string' ? <Text type={textType}>{children}</Text> : children;
 
   const isSelected = rest.selected;
@@ -55,6 +60,34 @@ export const MenuItem = ({
   ) : (
     text
   );
+
+  if (inOwnHost) {
+    // Inside an own-core popup (Select menu): same content and props on the own-core option.
+    const {
+      autoFocus: _autoFocus,
+      classes: _classes,
+      focusVisibleClassName: _fvc,
+      disableRipple: _dr,
+      disableTouchRipple: _dtr,
+      focusRipple: _fr,
+      TouchRippleProps: _trp,
+      touchRippleRef: _trr,
+      component: _component,
+      sx,
+      style,
+      ...optionProps
+    } = rest as typeof rest & Record<string, unknown>;
+    return (
+      <MenuOption
+        data-testid={testId}
+        className={className}
+        style={sx || style ? { ...sxToStyle(sx as never, 'MenuItem'), ...(style as React.CSSProperties) } : undefined}
+        {...(optionProps as Record<string, unknown>)}
+      >
+        {content}
+      </MenuOption>
+    );
+  }
 
   return (
     <MuiMenuItem data-testid={testId} className={className} {...rest}>
