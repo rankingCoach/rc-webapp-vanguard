@@ -27,9 +27,10 @@ function ensureOutDir() {
   if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 }
 
-function log(...args) {
+function logLine(...args) {
   console.log('[generate-exports-props]', ...args);
 }
+let log = logLine;
 
 /**
  * Parse index.ts to extract all value (non-type) exports.
@@ -567,11 +568,18 @@ function getPropsTypeForSymbol(checker, symbol, fromPath) {
   return null;
 }
 
-function main() {
+/**
+ * Builds one record per value export of src/index.ts. `write` (default, the CLI) also writes src/exports-props/*.json;
+ * scripts/generate-agent-docs.mjs calls it with `write: false` and its own export list (`names`: the line-based
+ * parser below misses multi-line `export { ... }` blocks) and uses the returned records.
+ */
+function main({ write = true, quiet = false, names } = {}) {
+  log = quiet ? () => {} : logLine;
+  const records = [];
   log('Starting analysis of', INDEX);
 
   // Step 1: Parse index.ts to get all value exports
-  const allExports = parseValueExportsFromIndex(INDEX);
+  const allExports = names ?? parseValueExportsFromIndex(INDEX);
   log('Found', allExports.length, 'value exports in index.ts');
 
   // Step 2: Load metadata to enrich context
@@ -587,7 +595,7 @@ function main() {
     process.exit(1);
   }
 
-  ensureOutDir();
+  if (write) ensureOutDir();
 
   // Step 4: Build a map of export name -> symbol for type extraction
   const symbolMap = new Map();
@@ -787,7 +795,10 @@ function main() {
               // shorten import("...").Name -> Name for readability
               const ptypeStrShort = ptypeStr.replace(importRegex, '$1');
               const optional = decl0 && !!decl0.questionToken;
-              propsObj[ps.getName()] = { type: ptypeStrShort, optional };
+              const description = ts.displayPartsToString(ps.getDocumentationComment(checker)).trim();
+              const declFile = decl0 && decl0.getSourceFile && decl0.getSourceFile().fileName;
+              const source = declFile ? path.relative(ROOT, declFile) : undefined;
+              propsObj[ps.getName()] = { type: ptypeStrShort, optional, ...(description && { description }), ...(source && { source }) };
             } catch (e) {
               propsObj[ps.getName()] = { type: 'unknown', optional: false };
             }
@@ -837,7 +848,8 @@ function main() {
         }),
       };
 
-      fs.writeFileSync(path.join(OUT_DIR, `${name}.json`), JSON.stringify(out, null, 2), 'utf8');
+      records.push(out);
+      if (write) fs.writeFileSync(path.join(OUT_DIR, `${name}.json`), JSON.stringify(out, null, 2), 'utf8');
       processed++;
     } catch (error) {
       console.error('Error processing', name, ':', error.message);
@@ -849,6 +861,7 @@ function main() {
   log('  - Processed:', processed);
   log('  - Skipped:', skipped);
   log('  - Output directory:', OUT_DIR);
+  return records;
 }
 
 if (require.main === module) main();

@@ -63,3 +63,6 @@ dist-wordpress/.version
 codereview_FE.md
 codereview_BE.md
 codereview.md
+
+# Agent docs: build output of scripts/generate-agent-docs.mjs (shipped in the tarball, not committed)
+/docs/
