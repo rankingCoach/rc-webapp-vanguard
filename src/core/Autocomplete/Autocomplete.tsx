@@ -29,7 +29,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Text } from '../Text/Text';
-import { useLegacyDispatch } from '../../primitives/react/form/use-legacy-dispatch';
+import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
 
 /** State handed to a custom `renderOption`. */
 export interface AutocompleteOptionState {
@@ -181,8 +181,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
   delete slotMapped.renderTags;
   const listboxProps = slotMapped.slotProps?.listbox;
 
-  // D9: consumer setters go through the single dispatch shim (dispatches any non-undefined result).
-  const dispatch = useLegacyDispatch();
+  // F1: form writes go through the binding seam (plain setStateValue, as before).
+  const binding = useFieldBinding(formconfig);
   const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
 
   const [adornmentIndex, setAdornmentIndex] = useState<number | undefined>(undefined);
@@ -322,12 +322,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
 
     setVal(nextVal as any);
 
-    if (formconfig) {
-      // Dispatch value
-      if (formconfig && formconfig.setStateValue) {
-        dispatch(formconfig.setStateValue(nextVal));
-      }
-    }
+    // Store value
+    binding.writeScalar(nextVal);
 
     // Callback
     if (onChange) {
