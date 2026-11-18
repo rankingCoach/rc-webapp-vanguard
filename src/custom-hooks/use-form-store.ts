@@ -9,12 +9,12 @@
  */
 import { setFieldValidity, validInput } from '@helpers/validators/valid-input/valid-input';
 import type { ValidationResultWithInfo } from '@vanguard/Form/extract-error-scopes';
-import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import { useActionState, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { createFormStore, FormStore } from '../primitives/core/form-store';
-import { LocalFormAction, localFormAction } from '../primitives/react/form/local-form-action';
+import { LocalFormAction, localFormAction, withBeforeAction } from '../primitives/react/form/local-form-action';
 import type { FormConfig, FormConfigElement } from './useFormConfig';
 
-export interface UseFormStoreOptions<T extends object> {
+export interface UseFormStoreOptions<T extends object, R = unknown> {
   /** The form's values; their keys are the form's fields. */
   initialValues: T;
   /** Per-field config (fieldType, validation, valueMappers, errorMatching, ...), as in `useFormConfig`. */
@@ -22,9 +22,17 @@ export interface UseFormStoreOptions<T extends object> {
   validateOn?: 'change' | 'blur';
   /** Server-side errors to match against each field's `errorMatching` (re-applied whenever this changes). */
   serverErrors?: ValidationResultWithInfo[];
+  /**
+   * F5: React 19 action for `<Form action={form.formAction}>`. Receives the typed values (not FormData) and the
+   * previous result and runs inside a transition; its return value becomes `result` (`useActionState`). Pending is
+   * read with `useFormStatus` inside the form. Not started (the submit is prevented) while the form is invalid,
+   * unless `validateBeforeAction` is false.
+   */
+  action?: (values: T, previous: R | undefined) => R | Promise<R>;
+  validateBeforeAction?: boolean;
 }
 
-export interface UseFormStoreResult<T extends object> {
+export interface UseFormStoreResult<T extends object, R = unknown> {
   formConfig: Partial<FormConfig<T>>;
   /** Current values (re-renders the owner on every change). */
   values: T;
@@ -35,6 +43,10 @@ export interface UseFormStoreResult<T extends object> {
   resetForm: () => void;
   validateFromState: () => void;
   store: FormStore<T>;
+  /** F5: pass to `<Form action>`; runs `options.action` with the current values. */
+  formAction: (formData?: FormData) => void;
+  /** F5: the last value the action returned (undefined before the first run). Pending: `useFormStatus` in children. */
+  result: R | undefined;
 }
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
@@ -83,8 +95,17 @@ const domValue = function (this: FormConfigElement) {
   return (node?.value ?? undefined) as string;
 };
 
-export function useFormStore<T extends object>(options: UseFormStoreOptions<T>): UseFormStoreResult<T> {
-  const { initialValues, inputs: inputConfig = {}, validateOn = 'change', serverErrors } = options;
+export function useFormStore<T extends object, R = unknown>(
+  options: UseFormStoreOptions<T, R>,
+): UseFormStoreResult<T, R> {
+  const {
+    initialValues,
+    inputs: inputConfig = {},
+    validateOn = 'change',
+    serverErrors,
+    action,
+    validateBeforeAction = true,
+  } = options;
   const storeRef = useRef<FormStore<T> | undefined>(undefined);
   if (!storeRef.current) storeRef.current = createFormStore(initialValues);
   const store = storeRef.current;
@@ -153,6 +174,19 @@ export function useFormStore<T extends object>(options: UseFormStoreOptions<T>):
     return valid;
   }, []);
 
+  // Side-effect-free validity for the submit check: validInput on a copy whose error setters are no-ops. Updating
+  // field error state during the submit event cancels the form's pending (useFormStatus) state, so the visible
+  // validation (isValid) only runs when the form is invalid and the submit is prevented anyway.
+  const canSubmit = useCallback(() => {
+    let valid = true;
+    for (const key in internalInputs.current) {
+      const input = internalInputs.current[key];
+      valid = validInput({ ...input, setErrors: () => undefined, setHasError: undefined }) && valid;
+    }
+    if (!valid) isValid();
+    return valid;
+  }, [isValid]);
+
   const getData = useCallback((): Partial<T> => ({ ...store.getSnapshot() }), [store]);
 
   const getChangedData = useCallback((): Partial<T> => {
@@ -179,8 +213,22 @@ export function useFormStore<T extends object>(options: UseFormStoreOptions<T>):
     if (serverErrors && serverErrors.length > 0) validateFromState();
   }, [serverErrors, validateFromState]);
 
+  const actionRef = useRef(action);
+  actionRef.current = action;
+  const [result, formAction] = useActionState<R | undefined, FormData | undefined>(async (previous) => {
+    const run = actionRef.current;
+    if (!run) return previous;
+    return run(store.getSnapshot(), previous);
+  }, undefined);
+
   return {
     formConfig: formConfig as Partial<FormConfig<T>>,
+    // Validation runs in the submit event (Form calls the attached check and prevents the submit when invalid).
+    formAction: useMemo(
+      () => (validateBeforeAction ? withBeforeAction(formAction, canSubmit) : formAction),
+      [formAction, canSubmit, validateBeforeAction],
+    ) as (formData?: FormData) => void,
+    result,
     values,
     setValue: store.set,
     isValid,

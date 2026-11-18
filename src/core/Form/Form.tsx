@@ -3,8 +3,8 @@ import './Form.scss';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { FormElement, FormElementChildChange } from '@vanguard/Form/FormElement/FormElement';
 import React, { useEffect, useState } from 'react';
-
 import { FormConfigElement } from '../../custom-hooks/useFormConfig';
+import { beforeActionOf } from '../../primitives/react/form/local-form-action';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { FormConfigProvider, useFormConfigContext } from './FormConfigContext';
 
@@ -26,10 +26,15 @@ interface Props<T = any> {
   onSubmit?: (data: T) => void;
   config?: ConfigWithInternal<T>; //FormConfig<any>;
   onChange?: (status: FormStatus<T>) => void;
+  /**
+   * F5 (new forms, with `useFormStore`): pass `form.formAction`. The children are then wrapped in a real `<form>`
+   * whose React 19 action runs it, so `useFormStatus` works in them. Without it Form renders exactly as before.
+   */
+  action?: (formData: FormData) => void | Promise<void>;
 }
 
 export const Form = <T,>(props: Props<T>) => {
-  const { className, children, config, onChange } = props;
+  const { className, children, config, onChange, action } = props;
   const idxMap = {};
 
   // Check if there's a parent form context
@@ -216,7 +221,24 @@ export const Form = <T,>(props: Props<T>) => {
         childRemoved,
       }}
     >
-      <ComponentContainer className={`Form-container ${className}`}>{childrenWithProps(children)}</ComponentContainer>
+      <ComponentContainer className={`Form-container ${className}`}>
+        {action ? (
+          <form
+            action={action}
+            noValidate
+            className="Form-form"
+            onSubmit={(event) => {
+              // A check attached by useFormStore (validation) runs here, before React starts the action.
+              const check = beforeActionOf(action);
+              if (check && !check()) event.preventDefault();
+            }}
+          >
+            {childrenWithProps(children)}
+          </form>
+        ) : (
+          childrenWithProps(children)
+        )}
+      </ComponentContainer>
     </FormConfigProvider>
   );
 };
