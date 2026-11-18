@@ -6,9 +6,20 @@ import Compressor from 'compressorjs';
 import { InternalFile } from '../MediaItemSelectInput';
 import { MediaItemTransformer } from './MediaItemTransformer';
 
+/**
+ * Answers whether an image file goes through the compressor. `false` keeps the file as it is: the
+ * same object, the same bytes, its metadata included. May be async.
+ */
+export type ShouldCompressImageFile = (file: File | Blob) => boolean | Promise<boolean>;
+
 type ImageCompressorTransformerProps = {
   compressorOptions: Compressor.Options;
   showLoadingModalDuringCompression?: boolean;
+  /**
+   * Asked once per image file before it is compressed. Not set, answering `true`, throwing or
+   * rejecting: the file is compressed.
+   */
+  shouldCompress?: ShouldCompressImageFile;
 };
 
 /**
@@ -46,6 +57,12 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
   private showLoadingModalDuringCompression: boolean;
 
   /**
+   * Optional answer of the consumer on whether a file is compressed at all.
+   * @private
+   */
+  private shouldCompress?: ShouldCompressImageFile;
+
+  /**
    * Constructor for ImageCompressorTransformer.
    *
    * @param config - Configuration options for the transformer.
@@ -54,6 +71,7 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
     super();
     this.compressorOptions = config.compressorOptions;
     this.showLoadingModalDuringCompression = config.showLoadingModalDuringCompression ?? false;
+    this.shouldCompress = config.shouldCompress;
   }
 
   /**
@@ -81,10 +99,39 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
     }
 
     if (files.length === 1) {
-      this.compressSingleFile(files[0]);
+      void this.compressSingleFile(files[0]);
     } else {
       this.compressMultipeFiles(files);
     }
+  };
+
+  /**
+   * Whether the file goes through the compressor. Only an image file is put to the consumer's
+   * `shouldCompress`; a consumer that throws or rejects gets the file compressed, as without it.
+   *
+   * @param internalFile - The file about to be compressed.
+   * @private
+   */
+  private shouldCompressFile = async (internalFile: InternalFile): Promise<boolean> => {
+    if (!this.shouldCompress || !this.applicableFileTypes.includes(internalFile.file.type as MediaItemFileType)) {
+      return true;
+    }
+
+    try {
+      return (await this.shouldCompress(internalFile.file)) !== false;
+    } catch {
+      return true;
+    }
+  };
+
+  /**
+   * The file as picked: what the input recorded, or the incoming file when this transformer is
+   * used on its own.
+   *
+   * @private
+   */
+  private getOriginalFile = (internalFile: InternalFile): File | Blob => {
+    return internalFile.originalFile ?? internalFile.file;
   };
 
   /**
@@ -93,13 +140,27 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
    * @param selectedFile - The file to be compressed.
    * @private
    */
-  private compressSingleFile = (selectedFile: InternalFile) => {
+  private compressSingleFile = async (selectedFile: InternalFile) => {
     const t0 = performance.now();
+
+    if (!(await this.shouldCompressFile(selectedFile))) {
+      this.handleLoadingModalClose(t0);
+
+      this.resolveTransformPromise?.([{ ...selectedFile, originalFile: this.getOriginalFile(selectedFile) }]);
+      this.resolveTransformPromise = undefined;
+      return;
+    }
 
     this.compressorOptions.success = (compressedResult) => {
       this.handleLoadingModalClose(t0);
 
-      this.resolveTransformPromise?.([{ file: compressedResult, filePriority: selectedFile.filePriority }]);
+      this.resolveTransformPromise?.([
+        {
+          file: compressedResult,
+          filePriority: selectedFile.filePriority,
+          originalFile: this.getOriginalFile(selectedFile),
+        },
+      ]);
       this.resolveTransformPromise = undefined;
     };
 
@@ -118,27 +179,35 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
     const promises = [];
     for (const internalFile of selectedFiles) {
       promises.push(
-        new Promise<InternalFile>((resolve, reject) => {
-          if (
-            !internalFile.file ||
-            (internalFile.file.type && !this.applicableFileTypes.includes(internalFile.file.type as MediaItemFileType))
-          ) {
-            resolve(internalFile);
+        this.shouldCompressFile(internalFile).then((shouldCompress) => {
+          if (!shouldCompress) {
+            return { ...internalFile, originalFile: this.getOriginalFile(internalFile) };
           }
 
-          // If we need to compress only one image it is easy
-          this.compressorOptions.success = (compressedResult) => {
-            resolve({
-              file: compressedResult,
-              filePriority: internalFile.filePriority,
-            });
-          };
+          return new Promise<InternalFile>((resolve, reject) => {
+            if (
+              !internalFile.file ||
+              (internalFile.file.type &&
+                !this.applicableFileTypes.includes(internalFile.file.type as MediaItemFileType))
+            ) {
+              resolve(internalFile);
+            }
 
-          this.compressorOptions.error = (err) => {
-            reject(err);
-          };
+            // If we need to compress only one image it is easy
+            this.compressorOptions.success = (compressedResult) => {
+              resolve({
+                file: compressedResult,
+                filePriority: internalFile.filePriority,
+                originalFile: this.getOriginalFile(internalFile),
+              });
+            };
 
-          new Compressor(internalFile.file, this.compressorOptions);
+            this.compressorOptions.error = (err) => {
+              reject(err);
+            };
+
+            new Compressor(internalFile.file, this.compressorOptions);
+          });
         }),
       );
     }
