@@ -16,8 +16,8 @@ export const DiscountBadge = (props: DiscountBadgeProps) => {
   const { className, percentValue, resellerName } = props;
 
   return (
-    <ComponentContainer className={classNames(styles.badge, className)}>
-      <div className={styles.dashedBorder} />
+    <ComponentContainer data-slot={'discount-badge'} className={classNames(styles.badge, className)}>
+      <div data-slot={'discount-badge-border'} className={styles.dashedBorder} />
       <Text testId={'discount'} type={TextTypes.heading4} fontWeight={FontWeights.bold} color={'var(--fn-bg)'}>
         {roundNumber(percentValue, 0)}%
       </Text>

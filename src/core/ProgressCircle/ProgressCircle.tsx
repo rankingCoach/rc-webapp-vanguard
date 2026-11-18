@@ -27,11 +27,13 @@ export const ProgressCircle = (props: ProgressCircleProps) => {
 
   return (
     <ComponentContainer
+      data-slot={'progress-circle'}
       className={classNames(styles.progressCircleContainer, className)}
       style={{ width: diameter, height: diameter }}
     >
-      <svg height={diameter} width={diameter} className={styles.progressCircleSvg}>
+      <svg data-slot={'progress-circle-svg'} height={diameter} width={diameter} className={styles.progressCircleSvg}>
         <circle
+          data-slot={'progress-circle-track'}
           fill={'transparent'}
           strokeWidth={stroke}
           strokeDasharray={`${circumference} ${circumference}`}
@@ -41,6 +43,7 @@ export const ProgressCircle = (props: ProgressCircleProps) => {
           cy={radius}
         />
         <circle
+          data-slot={'progress-circle-value'}
           className={styles.progressCircleValue}
           fill={'transparent'}
           strokeWidth={stroke}
@@ -52,7 +55,7 @@ export const ProgressCircle = (props: ProgressCircleProps) => {
           cy={radius}
         />
       </svg>
-      <div className={styles.progress}>
+      <div data-slot={'progress-circle-label'} className={styles.progress}>
         <Text type={TextTypes.textIntro} fontWeight={FontWeights.bold} translate={false}>
           {progress}
         </Text>

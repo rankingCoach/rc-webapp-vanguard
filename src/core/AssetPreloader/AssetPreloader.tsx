@@ -15,6 +15,7 @@ export const AssetPreloader = (props: AssetPreloaderProps) => {
 
   return (
     <span
+      data-slot={'asset-preloader'}
       style={{
         position: 'absolute',
         top: -10000,

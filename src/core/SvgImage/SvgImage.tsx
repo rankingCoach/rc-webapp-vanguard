@@ -8,5 +8,5 @@ export const SvgImage = (props: Props) => {
   const { path } = props;
   const reactLogo = require(`${path}`);
 
-  return <img src={reactLogo.default} height="120" />;
+  return <img data-slot={'svg-image'} src={reactLogo.default} height="120" />;
 };

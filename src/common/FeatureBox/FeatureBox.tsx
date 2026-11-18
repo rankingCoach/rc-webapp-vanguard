@@ -84,6 +84,7 @@ export const FeatureBox = (props: FeatureBoxProps) => {
 
   return (
     <ComponentContainer
+      data-slot={'feature-box'}
       style={style ? style : undefined}
       className={classNames(
         className,
@@ -94,8 +95,8 @@ export const FeatureBox = (props: FeatureBoxProps) => {
         width > breakpoints.tablet ? undefined : classNames(dFlexColumn, p3, gapTablet9, alignItemsTabletCenter),
       )}
     >
-      <div className={classNames(leftColumnClass ? leftColumnClass : '', styles.feature, pl3, pr3)}>
-        <div className={classNames(dFlex, flexWrap)}>
+      <div data-slot={'feature-box-content'} className={classNames(leftColumnClass ? leftColumnClass : '', styles.feature, pl3, pr3)}>
+        <div data-slot={'feature-box-title'} className={classNames(dFlex, flexWrap)}>
           <Text
             replacements={replacements}
             type={TextTypes.heading3}
@@ -107,7 +108,7 @@ export const FeatureBox = (props: FeatureBoxProps) => {
         <Text type={TextTypes.textIntro} className={pt1}>
           {subtitle}
         </Text>
-        <div className={classNames(py4)}>
+        <div data-slot={'feature-box-features'} className={classNames(py4)}>
           <List listElements={featuresList} type={type} />
         </div>
         <AnimatedConditional condition={buttonPosition == 'left'}>
@@ -125,6 +126,7 @@ export const FeatureBox = (props: FeatureBoxProps) => {
         </AnimatedConditional>
       </div>
       <div
+        data-slot={'feature-box-media'}
         className={classNames(
           gap2,
           dFlexColumn,
@@ -139,7 +141,7 @@ export const FeatureBox = (props: FeatureBoxProps) => {
         <div className={classNames(positionRelative)} style={{ width: '100%' }}>
           {bgAnimationIlustration && bgAnimationIlustration}
           {animation && (
-            <div style={animationStyle} className={classNames(styles.animation)}>
+            <div data-slot={'feature-box-animation'} style={animationStyle} className={classNames(styles.animation)}>
               <LottieAnimationLoader src={animation} translations={animationTranslations} />
             </div>
           )}

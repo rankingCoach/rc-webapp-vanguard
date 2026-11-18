@@ -17,8 +17,8 @@ export const InfoText = (props: InfoTextProps) => {
   const { title, replacements, size = IconSize.large, onClick } = props;
 
   return (
-    <ComponentContainer>
-      <div className={styles.container} onClick={onClick ? onClick : () => {}}>
+    <ComponentContainer data-slot={'info-text-container'}>
+      <div data-slot={'info-text'} className={styles.container} onClick={onClick ? onClick : () => {}}>
         <Icon color={'--i500'} hasCircle={true} fillColor={'--i100'} type={size} className={styles.icon}>
           {IconNames.info}
         </Icon>

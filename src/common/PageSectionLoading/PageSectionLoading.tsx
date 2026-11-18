@@ -55,8 +55,8 @@ export const PageSectionLoading = (props: PageSectionLoadingProps) => {
 
   return (
     <PageSection testId={testId} {...pageSectionProps}>
-      <div className={styles.container}>
-        <img className={classNames(imgClass)} src={SvgIcon} alt="loading..." />
+      <div data-slot={'page-section-loading-content'} className={styles.container}>
+        <img data-slot={'page-section-loading-image'} data-size={imgSize} className={classNames(imgClass)} src={SvgIcon} alt="loading..." />
         <Text type={titleTypeString} fontWeight={FontWeights.bold}>
           {title}
         </Text>

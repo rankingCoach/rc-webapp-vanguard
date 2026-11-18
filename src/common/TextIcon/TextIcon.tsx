@@ -79,6 +79,7 @@ export const TextIcon = (props: TextIconProps) => {
    */
   return (
     <ComponentContainer
+      data-slot={'text-icon'}
       testId={testId}
       key={children}
       className={classNames(styles.container, getContainerClasses())}

@@ -15,7 +15,7 @@ export const GeneratedWithAIPill = (props: GeneratedWithAIPillProps) => {
   const { text, testId } = props;
 
   return (
-    <ComponentContainer testId={testId} className={styles.aiPill}>
+    <ComponentContainer data-slot={'generated-with-ai-pill'} testId={testId} className={styles.aiPill}>
       <Icon color="var(--a1-500)">{IconNames.ai}</Icon>
       <Text type={TextTypes.textHelp} color="var(--a1-500)">
         {text ?? 'Found by us'}

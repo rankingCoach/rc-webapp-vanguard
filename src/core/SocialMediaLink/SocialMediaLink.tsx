@@ -32,7 +32,7 @@ export const SocialMediaLink = (props: SocialMediaLinkProps) => {
 
   if (greyScale) {
     return (
-      <div className={classNames(styles.missingSocialMediaLink)} data-testid={testId}>
+      <div data-slot={'social-media-link'} className={classNames(styles.missingSocialMediaLink)} data-testid={testId}>
         <Avatar icon={network} size={"small"} noHover={true} greyScale />
       </div>
     );
@@ -40,6 +40,7 @@ export const SocialMediaLink = (props: SocialMediaLinkProps) => {
 
   return (
     <a
+      data-slot={'social-media-link'}
       href={url}
       target="_blank"
       rel="noopener noreferrer"

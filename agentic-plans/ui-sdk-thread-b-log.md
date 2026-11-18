@@ -602,3 +602,22 @@ Evidence: red 15/16 (ActionButton "no own slot" passes by design), green 16/16; 
 | ModalFooter | ComponentContainer root `modal-footer` (consumer className); `modal-footer-buttons` + `data-position` (start/end/between/center; default end, matching the default class). Render group and Buttons untouched |
 Evidence: red 3/3 → green 3/3; Modal/StandardModals/CustomModals specs 12 files / 243, stories 12 / 112; tsc 0; biome 1 = 1; attribute-only stream check OK (the line check now also reports reflow; the stream check compares the concatenated text per file); collision: `[data-mode="basic"|"advanced"]` in legacy html/{integrum,jump}/jira.css only, values never emitted.
 3. Verifier 2's reachability map (rc-webapp `tmp/research/vanguard-ui-sdk-visual-baseline/v2/reachability-map.md`, Vanguard ef2ee15, 300 value exports: direct 230 / indirect 50 / WordPress-only 4 / unreachable 16): confirms TextHighlighted = WordPress-only. AdvancedMarker / AdvancedMarkerF are public exports but unreachable from rc-webapp and not in the WordPress closure; the local `Marker.tsx` is not even an export. All 16 unreachable rows are public exports, so removing any is a breaking change: user decides at the next major (list + evidence in the map). Batch order: the unreachable components I still slot (AIBudgetEnd, OnboardingWelcomeAnimation, RcNavLink, SvgImage, DragAndDropFile done) go last, per the user's "zero-usage still migrated, last".
+
+### Batch 6: core leftovers + first src/common group
+Drafted by Codex (medium), read by me; spec fixes by me (SvgImage's runtime `require(path)` needs a resolvable module in jsdom; SegmentBar spec forEach lint).
+| Component | Attributes |
+|---|---|
+| ProgressCircle | `progress-circle`, `-svg`, `-track`, `-value`, `-label` |
+| QuoteContainer (public) | `quote-container`, `-body`, `-marks` |
+| RcNavLink | `<a>` `rc-nav-link` (before the raw props spread) |
+| SegmentBar | `segment-bar`, `segment-bar-segment` (loading only changes inline styles: no state attr) |
+| SocialMediaLink | `social-media-link` (both branches) |
+| SvgImage | `<img>` `svg-image` |
+| AssetPreloader | `asset-preloader` (its own hidden wrapper) |
+| TextIcon / GeneratedWithAIPill | `text-icon` / `generated-with-ai-pill` |
+| InfoText | `info-text-container`, `info-text` |
+| PageSectionLoading | `page-section-loading-content`, `page-section-loading-image` + `data-size` (small/medium/large, default large); root is PageSection (already `page-section`) |
+| DiscountBadge | `discount-badge`, `-border` |
+| FeatureBox | `feature-box`, `-content`, `-title`, `-features`, `-media`, `-animation` |
+| ErrorText | nothing (Text + AnimatedConditional only) |
+Evidence: red 13/14 → green 14/14; touched-folder specs 16 files / 19 (incl. existing); collected stories 3 files / 19 (src/common stories are not collected; the new specs render each component); tsc 0; biome 6 = 6, 0 on new specs; attribute-only stream OK; collision: `[data-size=default|sm|lg]` + shadcn slots only in rc-webapp editor-bridge `__fixture__/lumen-*.html` / `studio-*.html` test fixtures; none in Vanguard-rendering code.
