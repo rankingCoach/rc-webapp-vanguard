@@ -227,3 +227,70 @@ export const StylesMatchMuiPopper: Story = {
     await expect(muiDrift.filter((name) => name !== 'inline-center-modal')).toEqual([]);
   },
 };
+
+/** Grows from empty to a 16×16 box after `delay` ms through its own state (like Icon's lazy SVG import). */
+const LateIcon = ({ delay }: { delay: number }) => {
+  const [loaded, setLoaded] = useState(false);
+  React.useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+  return loaded ? <span style={{ display: 'inline-block', width: 16, height: 16 }} /> : <span />;
+};
+
+const LateAnchor = () => {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  return (
+    <div style={{ padding: 40 }}>
+      <span ref={setAnchor} data-late-anchor style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        <LateIcon delay={150} />
+        {'trigger'}
+      </span>
+      {anchor ? (
+        <OwnPopper
+          open
+          anchorEl={anchor}
+          placement="bottom"
+          modifiers={[{ name: 'offset', options: { offset: [0, 20] } }]}
+          data-testid="late"
+        >
+          <div style={{ width: 120, height: 60, background: '#eee' }}>{'floating'}</div>
+        </OwnPopper>
+      ) : null}
+    </div>
+  );
+};
+
+/**
+ * Verifier handoff 10 (DropdownMenu `default`, 4px): the anchor's content loads after the popper opened (lazy Icon) and
+ * re-renders only itself. The own Popper must end where a fresh popper.js run puts it; MUI reached the settled spot.
+ */
+export const FollowsAnchorResizeAfterOpen: Story = {
+  render: () => <LateAnchor />,
+  play: async () => {
+    const el = await waitFor(() => {
+      const node = document.querySelector<HTMLElement>('[data-testid="late"]');
+      if (!node?.getAttribute('data-popper-placement')) throw new Error('not placed yet');
+      return node;
+    });
+    const anchor = document.querySelector<HTMLElement>('[data-late-anchor]') as HTMLElement;
+    await waitFor(() => expect(anchor.querySelector('span[style*="width: 16px"]')).not.toBeNull());
+    await new Promise((r) => setTimeout(r, 100));
+    const clone = el.cloneNode(true) as HTMLElement;
+    clone.removeAttribute('style');
+    Object.assign(clone.style, { position: 'absolute', top: '0', left: '0', visibility: 'hidden' });
+    el.parentNode?.appendChild(clone);
+    const inst = createPopper(anchor, clone, {
+      placement: 'bottom',
+      modifiers: [
+        { name: 'offset', options: { offset: [0, 20] } },
+        { name: 'eventListeners', enabled: false },
+      ],
+    });
+    await inst.update();
+    const fresh = clone.style.transform;
+    inst.destroy();
+    clone.remove();
+    await expect(el.style.transform).toBe(fresh);
+  },
+};

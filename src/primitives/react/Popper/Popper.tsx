@@ -121,9 +121,15 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     for (const t of targets) t.addEventListener('scroll', onEvent, { passive: true });
     const win = node.ownerDocument.defaultView ?? window;
     win.addEventListener('resize', onEvent, { passive: true });
+    // Beyond popper.js: an anchor that changes size without a render reaching the popper (a lazily loaded Icon inside
+    // the trigger, verifier handoff 10) re-positions it. MUI's result in that case was the settled position.
+    const RO = (win as typeof window).ResizeObserver;
+    const observer = RO && 'nodeType' in anchor ? new RO(onEvent) : null;
+    observer?.observe(anchor as Element);
     return () => {
       for (const t of targets) t.removeEventListener('scroll', onEvent);
       win.removeEventListener('resize', onEvent);
+      observer?.disconnect();
     };
   }, [anchor, open, options.strategy, disablePortal]);
 
