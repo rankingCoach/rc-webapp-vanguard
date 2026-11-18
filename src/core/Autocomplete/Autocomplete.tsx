@@ -30,6 +30,7 @@ import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Text } from '../Text/Text';
 import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 /** State handed to a custom `renderOption`. */
 export interface AutocompleteOptionState {
@@ -123,7 +124,9 @@ export const Autocomplete = (props: AutocompleteProps) => {
     labelType,
     placeholder,
     inputRef,
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     optionKey,
     options,
     noOptionsText = null,
@@ -154,6 +157,8 @@ export const Autocomplete = (props: AutocompleteProps) => {
     inputAriaLabel,
     ...rest
   } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
 
   // Resolve only the intercepted callback; Vanguard's own defaults retain their precedence.
   const effective = useThemeProps({

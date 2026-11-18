@@ -9,6 +9,7 @@ import { Label } from '@vanguard/Label/Label';
 import { TextReplacements } from '@vanguard/Text/Text';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 const DEBOUNCE_VALUE_DEFAULT = 50;
 export interface ColorPickerProps {
@@ -24,6 +25,10 @@ export interface ColorPickerProps {
   replacements?: TextReplacements;
   onColorChange?: (color: string) => void;
   formconfig?: FormConfigElement;
+  /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   /**
    * Controls max-width of the ColorPicker container. Accepts CSS length or percentage, e.g. "300px" or "50%".
    */
@@ -41,10 +46,14 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
     onColorChange,
     initialColor,
     color: externalColor,
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     maxWidth,
     testId,
   } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
   // F1: form writes go through the binding seam (plain setStateValue, as before).
   const binding = useFieldBinding(formconfig);
   // Use color prop if provided, fallback to initialColor for backward compatibility

@@ -14,8 +14,13 @@ import { IconNames } from '../Icon/IconNames';
 import { ModalResponseHandler } from '../Modal/ModalRoot/ModalRoot';
 import { ModalService } from '../Modal/ModalService';
 import { DateRangeModal } from '../StandardModals/DateRangeModal/DateRangeModal';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 type Props = {
+  /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   datePicker?: RcDateRangePickerProps;
   inputFormatter?: {
     formatFn: (val: string) => string;
@@ -24,7 +29,9 @@ type Props = {
 } & rcInputBaseProps;
 
 export const DateRangeInput = (props: Props) => {
-  const { formconfig, inputFormatter } = props;
+  const { formconfig: formconfigProp, inputFormatter, field, index: fieldIndex } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
   const { formatFn, reverseFormatFn } = inputFormatter || {};
   let inputRef = formconfig?._inputRef;
   const [s, updateState] = useState({});
@@ -57,7 +64,7 @@ export const DateRangeInput = (props: Props) => {
         inputRef.current.value = formattedValue;
         if (binding.canWrite) {
           binding.writeScalar(formattedValue);
-          validInput(props.formconfig);
+          validInput(formconfig);
         }
       }
     }

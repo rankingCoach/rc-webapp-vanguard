@@ -24,18 +24,18 @@ export interface FormElementProps {
   idx?: number;
 }
 
-export const FormElement = (props: FormElementProps) => {
-  const {
-    children,
-    childConfig,
-    formConfig,
-    idx,
-    onChange,
-    onBlur,
-    childAdded,
-    childRemoved,
-    formConfigKey = 'formconfig',
-  } = props;
+export type FormElementBindingOptions = Omit<FormElementProps, 'children' | 'formConfigKey'> & {
+  /** false: the hook is inert (no state binding, no effects acting): lets inputs call it unconditionally. */
+  active?: boolean;
+};
+
+/**
+ * The per-field form logic FormElement always had (state binding, dev/server errors, dirty tracking, change
+ * listener, add/remove notifications), as a hook. FormElement (legacy child-walking path) and the F3 `field` path
+ * share it, so both kinds of children behave and report identically.
+ */
+export const useFormElementBinding = (props: FormElementBindingOptions): FormConfigElement => {
+  const { childConfig, formConfig, idx, onChange, onBlur, childAdded, childRemoved, active = true } = props;
   const ref = useRef(null);
 
   //Setup the states of the config
@@ -45,10 +45,12 @@ export const FormElement = (props: FormElementProps) => {
   const [errorsByDev, setErrorsByDev] = useState<string | null>('');
 
   useEffect(() => {
+    if (!active) return;
     activateErrors(childConfig);
   }, [childConfig]);
 
   useEffect(() => {
+    if (!active) return;
     const stringKey = childConfig.stateFieldName;
 
     if (stringKey && errorsByDev) {
@@ -64,12 +66,14 @@ export const FormElement = (props: FormElementProps) => {
   }, [errorsByDev]);
 
   useEffect(() => {
+    if (!active) return undefined;
     return () => {
       childRemoved && childRemoved(childConfig);
     };
   }, []);
 
   useEffect(() => {
+    if (!active) return;
     childAdded && childAdded(childConfig);
   }, [childConfig]);
 
@@ -206,8 +210,17 @@ export const FormElement = (props: FormElementProps) => {
     //   }, 0);
     // }
   };
-  bindStateVars(childConfig);
-  bindChangeListener(childConfig);
+
+  if (active) {
+    bindStateVars(childConfig);
+    bindChangeListener(childConfig);
+  }
+  return childConfig;
+};
+
+export const FormElement = (props: FormElementProps) => {
+  const { children, formConfigKey = 'formconfig', ...rest } = props;
+  const childConfig = useFormElementBinding(rest);
 
   if (React.isValidElement(children)) {
     const newProps = {};

@@ -4,6 +4,8 @@ import { FormConfigElement } from '@custom-hooks/useFormConfig';
 import { Slider as MuiSlider } from '@mui/material';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { MutableRefObject, useEffect, useState } from 'react';
+import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 /**
  * Props @todo Implement formConfig integration
@@ -23,6 +25,10 @@ export interface SliderProps {
   size?: 'default' | 'small';
   targetRef?: MutableRefObject<HTMLInputElement | null>;
   formconfig?: FormConfigElement;
+  /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   externalControlled?: boolean;
 }
 
@@ -43,9 +49,16 @@ export const Slider = (props: SliderProps) => {
     valueLabelDisplay = 'off',
     type = 'default',
     size = 'default',
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     externalControlled = false,
   } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
+  // F3 `field` path stores the value; the legacy formconfig path keeps its known no-op (decision log).
+  const boundViaField = !formconfigProp && Boolean(formconfig);
+  const binding = useFieldBinding(boundViaField ? formconfig : undefined);
 
   let { targetRef } = props;
   const [controlledValue, setControlledValue] = useState(value);
@@ -89,6 +102,11 @@ export const Slider = (props: SliderProps) => {
   const handleOnChange = (event: Event | null, value: number | number[], activeThumb: number) => {
     if (!externalControlled) {
       setControlledValue(value);
+    }
+
+    if (boundViaField && event) {
+      binding.writeScalar(value);
+      binding.notifyChange();
     }
 
     // Callback

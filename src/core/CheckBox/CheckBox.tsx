@@ -8,6 +8,7 @@ import { CheckBoxIcon } from '@vanguard/CheckBox/CheckBoxIcon/CheckBoxIcon';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { ChangeEvent, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
 import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 import { Text, TextReplacements } from '../Text/Text';
 
 /**
@@ -27,6 +28,10 @@ export interface CheckBoxProps {
   backgroundColor?: string;
   inputRef?: MutableRefObject<HTMLInputElement | null>;
   formconfig?: FormConfigElement;
+  /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   testId?: string;
   /**
@@ -56,7 +61,9 @@ export interface CheckBoxProps {
  */
 export const CheckBox = (props: CheckBoxProps) => {
   const {
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     label,
     checked = false,
     hovered,
@@ -73,11 +80,15 @@ export const CheckBox = (props: CheckBoxProps) => {
     _size = 'large',
     _hoverMode = 'border',
   } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
 
   let { backgroundColor } = props;
 
   // F1: form writes go through the binding seam (plain setStateValue, as before; no Form notification, as before).
   const binding = useFieldBinding(formconfig);
+  // F3: bound via `field` (not a legacy formconfig prop) -> also report to the Form (the legacy quirk stays legacy-only).
+  const boundViaField = !formconfigProp && Boolean(formconfig);
   const ref = useRef(null);
   const [isChecked, setIsChecked] = useState<boolean>(checked);
   const [isHovered, setIsHovered] = useState<boolean | undefined>(hovered);
@@ -158,6 +169,7 @@ export const CheckBox = (props: CheckBoxProps) => {
 
     // Dispatch value to formConfig
     binding.writeScalar(!isChecked);
+    if (boundViaField) binding.notifyChange();
 
     // Callback
     onChange && onChange(e);

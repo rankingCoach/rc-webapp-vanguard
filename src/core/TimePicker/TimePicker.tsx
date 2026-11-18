@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Icon } from '../Icon/Icon';
 import { IconNames } from '../Icon/IconNames';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 export type TimePickerProps = {
   id?: string;
@@ -24,6 +25,10 @@ export type TimePickerProps = {
   onChange?: SelectOnChange;
   testId?: string;
   formconfig?: FormConfigElement;
+  /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   freeSolo?: boolean;
 };
 
@@ -39,9 +44,13 @@ export const TimePicker = (props: TimePickerProps) => {
     showAmPm,
     id,
     testId,
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     freeSolo,
   } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
 
   const [valueFormatted, setValueFormatted] = useState(formatHours(value ?? formconfig?.getValue?.() ?? '', showAmPm));
   useEffect(() => {

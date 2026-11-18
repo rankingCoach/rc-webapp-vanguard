@@ -1,5 +1,8 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Button, Input, Select, Textarea } from '@rankingcoach/vanguard';
+import { Button, Form, Input, Select, Textarea, useFormConfig } from '@rankingcoach/vanguard';
+import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { Provider } from 'react-redux';
+import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
@@ -29,6 +32,40 @@ describe('installed Vanguard bundle', () => {
   it('renders Textarea from the installed bundle', () => {
     renderWithProviders(<Textarea value="Fixture biography" rows={3} />);
     expect(screen.getByDisplayValue('Fixture biography').tagName).toBe('TEXTAREA');
+  });
+  // F3 (both bundles): an Input bound with `field` two components deep, no formconfig prop drilling.
+  it('binds an installed Input to the nearest Form by field name', async () => {
+    const user = userEvent.setup();
+    const slice = createSlice({
+      name: 'fixtureForm',
+      initialState: { name: '', initialState: { name: '' } },
+      reducers: { setName: (s, a: { payload: string }) => ({ ...s, name: a.payload }) },
+    });
+    const store = configureStore({ reducer: { fixtureForm: slice.reducer } });
+    const Row = () => (
+      <section>
+        <Input field="name" textFieldProps={{ inputProps: { 'aria-label': 'Fixture name' } }} />
+      </section>
+    );
+    const Fixture = () => {
+      const { formConfig } = useFormConfig({
+        slice: slice.actions as never,
+        reducer: ((s: { fixtureForm: { name: string } }) => s.fixtureForm) as never,
+        inputs: { name: { fieldType: 'Input' } },
+      });
+      return (
+        <Form config={formConfig}>
+          <Row />
+        </Form>
+      );
+    };
+    render(
+      <Provider store={store}>
+        <Fixture />
+      </Provider>,
+    );
+    await user.type(screen.getByRole('textbox', { name: 'Fixture name' }), 'Ann');
+    expect(store.getState().fixtureForm.name).toBe('Ann');
   });
   // Select runs on Vanguard's own core in both bundles (WordPress exports it): open, pick an option, read it back.
   it('opens the installed Select and picks an option', async () => {

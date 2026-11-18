@@ -202,7 +202,20 @@ export const Form = <T,>(props: Props<T>) => {
    * Return View
    */
   return (
-    <FormConfigProvider formConfig={config || null} parentOnChange={onChange}>
+    <FormConfigProvider
+      formConfig={config || null}
+      parentOnChange={onChange}
+      fieldApi={{
+        onChange: childChange,
+        onBlur: childBlur,
+        childAdded: (element) => {
+          if (config) {
+            config._addInternalInput && config._addInternalInput(element);
+          }
+        },
+        childRemoved,
+      }}
+    >
       <ComponentContainer className={`Form-container ${className}`}>{childrenWithProps(children)}</ComponentContainer>
     </FormConfigProvider>
   );

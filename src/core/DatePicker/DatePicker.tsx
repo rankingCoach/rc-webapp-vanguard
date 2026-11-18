@@ -29,6 +29,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../_internal/InputBase/InputBase.scss';
 
 import styles from './DatePicker.module.scss';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 export interface DatePickerProps {
   value?: number;
@@ -38,6 +39,10 @@ export interface DatePickerProps {
   maxDate?: number;
   disablePast?: boolean;
   formconfig?: FormConfigElement;
+  /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   closeOnCLickAway?: boolean;
   onChange?: (value: number | null | undefined) => void;
   locale: string;
@@ -219,12 +224,16 @@ export const DatePicker = (props: DatePickerProps) => {
     value = null,
     label,
     required,
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     minDate,
     maxDate,
     disablePast,
     locale,
   } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
 
   // const { locale } = useLocationSettings();
   const datePattern = getDatePatternFromLocale(locale);

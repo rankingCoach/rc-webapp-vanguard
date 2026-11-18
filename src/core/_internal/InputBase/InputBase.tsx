@@ -24,6 +24,7 @@ import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { CSSProperties, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react';
 
 import { useFieldBinding } from '../../../primitives/react/form/use-field-binding';
+import { useResolvedFormConfig } from '../../Form/use-resolved-form-config';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { MuiTextField as TextField } from './MuiTextField';
 import { useNumberInputGuard } from './use-number-input-guard';
@@ -252,6 +253,13 @@ export type InputEventsProps = {
  */
 export type InputFormConfigProps = {
   formconfig?: FormConfigElement; // @todo rename to formConfig
+  /**
+   * F3: bind to the nearest <Form config>'s field of this name, at any depth, without passing `formconfig`.
+   * An explicit `formconfig` wins.
+   */
+  field?: string;
+  /** F3: element index for array fields bound with `field`. */
+  index?: number;
   inputRef?: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null>;
 };
 
@@ -345,7 +353,9 @@ export const InputBase = (props: rcInputBaseProps) => {
     selectDisplayEmpty,
     menuItemHeight = 36,
     maxMenuItemsUntilScroll = 7,
-    formconfig,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
     children,
     onFocus,
     onBlur,
@@ -377,6 +387,8 @@ export const InputBase = (props: rcInputBaseProps) => {
     hideOptionalLabel = false,
     size = 'medium',
   } = props;
+  // F3: explicit formconfig (legacy, child-walking Form) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
 
   const isSmall = size === 'small';
 
