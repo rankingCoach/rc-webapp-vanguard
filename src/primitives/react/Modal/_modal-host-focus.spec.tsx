@@ -102,4 +102,45 @@ describe('ModalHost focus enforcement equals MUI FocusTrap', () => {
     expect(mui).toBe('portaled');
     expect(await run('own')).toBe(mui);
   });
+
+  // SearchableSelect differential (queue 2.5): root and backdrop DOM as MUI 9.5 Modal renders them.
+  it('root and backdrop DOM: class order, attribute order, no aria-hidden on the backdrop', async () => {
+    const norm = (html: string) =>
+      html
+        .replace(/ ?\bcss-[a-z0-9]+(-[A-Za-z0-9]+)*/g, '')
+        .replace(/ class=""/g, '')
+        .replace(/ data-vg-core=""/g, '')
+        .replace(/ data-slot="[^"]*"/g, '')
+        .replace(/ data-open=""/g, '')
+        .replace(/ (id|aria-labelledby)="[^"]*"/g, ' $1="ID"')
+        .replace(
+          /<div tabindex="0" data-testid="sentinelStart"><\/div>.*<div tabindex="0" data-testid="sentinelEnd"><\/div>/s,
+          'BODY',
+        );
+    const go = async (host: Host) => {
+      const view = render(
+        host === 'mui' ? (
+          <MuiModal open className="custom" style={{ zIndex: 1101 }} slotProps={{ backdrop: { invisible: true } }}>
+            <div tabIndex={-1}>{'content'}</div>
+          </MuiModal>
+        ) : (
+          // MenuPopup passes MUI Modal's backdrop Fade style (opacity 1, 225 ms) as backdropStyle.
+          <ModalHost
+            open
+            className="custom"
+            style={{ zIndex: 1101 }}
+            backdropStyle={{ opacity: 1, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms' }}
+          >
+            <div tabIndex={-1}>{'content'}</div>
+          </ModalHost>
+        ),
+      );
+      await flush();
+      const root = document.body.querySelector('.MuiModal-root') as HTMLElement;
+      const out = norm(root.outerHTML);
+      view.unmount();
+      return out;
+    };
+    expect(await go('own')).toBe(await go('mui'));
+  });
 });

@@ -159,8 +159,9 @@ export const ModalHost = (props: ModalHostProps) => {
     <div
       role="presentation"
       id={id}
-      className={classNames('MuiModal-root', className ?? '', !open && !exiting ? 'MuiModal-hidden' : '')}
       style={style}
+      // MUI Modal: clsx(className, classes.root, hidden) after the root props.
+      className={[className, 'MuiModal-root', !open && !exiting ? 'MuiModal-hidden' : ''].filter(Boolean).join(' ')}
       ref={rootRef}
       onKeyDown={handleKeyDown}
       onFocus={(event) => {
@@ -171,16 +172,14 @@ export const ModalHost = (props: ModalHostProps) => {
       {...rest}
     >
       <div
-        aria-hidden="true"
         data-slot="modal-backdrop"
         data-vg-core=""
-        className={classNames(
-          'MuiBackdrop-root',
-          'MuiBackdrop-invisible',
-          'MuiModal-backdrop',
-          backdropClassName ?? '',
-        )}
+        // MUI Modal backdrop: class, the Fade style, then aria-hidden.
+        className={['MuiBackdrop-root', 'MuiBackdrop-invisible', 'MuiModal-backdrop', backdropClassName]
+          .filter(Boolean)
+          .join(' ')}
         style={backdropStyle}
+        aria-hidden="true"
         onClick={(event) => open && onClose?.(event, 'backdropClick')}
       />
       <div tabIndex={open ? 0 : -1} data-testid="sentinelStart" ref={contentRef} onFocus={trap('start')} />
