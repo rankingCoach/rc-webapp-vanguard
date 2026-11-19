@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.11.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.10.0...v2.11.0) (2026-11-19)
+
+
+### Features
+
+* **gallery:** expose the picked file and let the app skip compression (VAN-91) ([2a325b9](https://github.com/rankingCoach/rc-webapp-vanguard/commit/2a325b906efd943ea641493b3700311cb8fe6e4d))
+
 ## [2.10.0](https://github.com/rankingCoach/rc-webapp-vanguard/compare/v2.9.2...v2.10.0) (2026-11-13)
 
 
