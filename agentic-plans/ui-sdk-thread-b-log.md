@@ -973,3 +973,36 @@ Source: verifier 2's retro scan of 1400 stories, base vs candidate. Regressions:
    5.1 If the props are required by type → story-only fix (give it args).
    5.2 If optional → red spec + smallest guard keeping every existing combination byte-identical. Tell the watchdog which case it is.
 Reply to the watchdog after step 1's grep result.
+
+### g9 Pagination (own core: ButtonBase primitive per item)
+1. Rendering: `Pagination.tsx` now renders MUI 9.5 Pagination's DOM itself (variant text, color standard).
+   1.1 Structure: `nav[aria-label="pagination navigation"]` (MuiPagination-root/-text) > `ul.MuiPagination-ul` > `li` per item.
+   1.2 Items: pages and first/previous/next/last are A's ButtonBase (native button) with MuiPaginationItem-* classes (size, text, shape, Mui-disabled, Mui-selected, type), aria-label ("Go to page n" / "page n" / "Go to <type> page"), and aria-current on the selected page. Ellipses are plain divs.
+   1.3 Icons: MUI's FirstPage/LastPage/NavigateBefore/NavigateNext svgs.
+   1.4 Behaviour: MUI's usePagination item model (boundary/sibling ranges, disabled edges), controlled/uncontrolled exactly as MUI (`if (!pageProp) setState`), and the focus hand-over to the new aria-current page when the activated first/previous/next/last button becomes disabled.
+   1.5 Public props unchanged; no MUI fallback.
+2. Compat: `_Pagination.compat.scss` comes from the injected rules.
+   2.1 Item = ButtonBase reset + PaginationItem. Ellipsis has its own base.
+   2.2 Sizes keyed by class; shape rounded applies to buttons only (as emitted); state rules in emotion's order.
+   2.3 Icons use `svg.` (0,1,1). A has since scoped the generic SvgIcon rule (d936811); I'll drop the workaround only if the differential stays green after merging that.
+   2.4 VanguardThemeProvider rem sizes via `vg-typography-vanguard` on the nav.
+3. Markers:
+   3.1 `data-vg-core` on all parts.
+   3.2 Slots: pagination, pagination-list, pagination-item, pagination-ellipsis.
+   3.3 nav data-size/data-shape/data-disabled; item data-selected.
+   3.4 Own class strings are filtered joins (no junk tokens).
+4. Evidence:
+   4.1 `_pagination-parity.spec` vs `_PaginationMui.reference.tsx` (former code verbatim):
+       4.1.1 Whole subtree over 446 combinations × 2 themes: count 0–20 × page × sibling/boundary × button sets; size × shape × disabled; defaultPage; className/testId.
+       4.1.2 Four click/keyboard timelines, controlled and uncontrolled, including the focus hand-over and onChange calls.
+       4.1.3 Total 6/6. Mutations: focus hand-over removed → 4 fail; sibling range off by one → 4 fail.
+   4.2 Chromium `_PaginationParity.stories` (both themes):
+       4.2.1 13 cases, 30 computed properties plus boxes and positions of nav/ul/li/items/ellipses/icons.
+       4.2.2 States: rest, forced :hover/:active on a page and the selected page (guarded), keyboard focus on the selected page, after paging.
+       4.2.3 Compat mutation (rounded 4px → 5px) caught.
+   4.3 `_Pagination.cleanup.spec` 2/2.
+   4.4 Pagination + VanguardThemeProvider specs 4 files / 13; stories 3 / 6; `_mui-compat-order` 6/6; tsc lib 0.
+5. Size: Pagination 93.1 → 6.6 KB gzip, no emotion.
+6. Consumers:
+   6.1 rc-webapp RankingsInsightWidget (admin PartnerApiTester; shape rounded, controlled). Its module CSS targets `.MuiPagination-ul` / `.MuiPaginationItem-root`, which are kept.
+   6.2 Internally: the VanguardThemeProvider story. Not a WordPress export.
