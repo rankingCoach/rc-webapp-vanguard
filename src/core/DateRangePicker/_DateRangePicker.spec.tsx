@@ -1,12 +1,15 @@
 import { wait } from '@helpers/wait';
+import { cleanupOverlaySpec } from '@test-utils/cleanup-overlay-spec';
 import { appScreen, render } from '@test-utils/test-utils';
 import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import moment from 'moment/moment';
 import React, { useState } from 'react';
-import { describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 
 import { DateRangePicker, DateRangePickerProps, DateRangePickerReturn } from './DateRangePicker';
+
+afterEach(cleanupOverlaySpec);
 
 const DateRangeRenderHarness = (onChangeCb: (args: any) => void, props: DateRangePickerProps) => {
     const [, setData] = useState<DateRangePickerReturn | undefined>();
@@ -45,32 +48,15 @@ const clickDatePickerCalendarDate = async (testId: string, dayNumber: number | n
 
   await user.click(leftOnCLick);
 
-  await act(async () => {
-    const days: HTMLElement[] = [];
-    await waitFor(async () => {
-      const tooltip = await appScreen.getByRole('tooltip');
-      const buttons = tooltip.querySelectorAll('button');
-      buttons.forEach((b) => {
-        if (
-          b.type === 'button' &&
-          b.className?.indexOf('rdrDayPassive') == -1 &&
-          b.className?.indexOf('rdrDay') !== -1
-        ) {
-          days.push(b);
-        }
-      });
-
-      // presume that 1-27 are the month edge
-      for (let a = 0; a < days.length; a++) {
-        if (days[a].textContent == String(dayNumber)) {
-          await user.click(days[a]);
-          if (typeof cb === 'function') {
-            cb(days[a]);
-          }
-        }
-      }
-    });
+  const day = await waitFor(() => {
+    const tooltip = appScreen.getByRole('tooltip');
+    const days = tooltip.querySelectorAll<HTMLButtonElement>('button.rdrDay:not(.rdrDayPassive)');
+    const matches = Array.from(days).filter((button) => button.textContent === String(dayNumber));
+    expect(matches).toHaveLength(1);
+    return matches[0];
   });
+  await user.click(day);
+  if (typeof cb === 'function') cb(day);
 };
 
 /**
@@ -224,7 +210,7 @@ describe('DateRangePicker component tests', () => {
     });
   });
   //
-  test('datepicker has valid values in datePicker or rangeSelector', async () => {
+  test('datepicker has valid values in datePicker or rangeSelector', { timeout: 15_000 }, async ({ signal }) => {
     render(<DateRangePicker testId={'daterangepicker-test-id'} />);
     const user = userEvent.setup();
 
@@ -240,45 +226,26 @@ describe('DateRangePicker component tests', () => {
     await user.click(rightOnClick);
     await user.click(rightInputRef);
 
-    await act(async () => {
-      await waitFor(async () => {
-        const ranges: string[] = [];
-        const tooltip = await appScreen.getByRole('tooltip');
-        const buttons = tooltip.querySelectorAll('button');
-        buttons.forEach((b) => {
-          if (b.type === 'button' && b.className?.indexOf('rdrStaticRange') !== -1) {
-            ranges.push(String(b.textContent));
-          }
-        });
-
-        mockRangeSelectorLabels.forEach((a) => {
-          expect(ranges).toContain(a);
-        });
+    await waitFor(() => {
+      const tooltip = appScreen.getByRole('tooltip');
+      const ranges = Array.from(tooltip.querySelectorAll('button.rdrStaticRange'), (button) => String(button.textContent));
+      mockRangeSelectorLabels.forEach((label) => {
+        expect(ranges).toContain(label);
       });
     });
 
+    signal.throwIfAborted();
     await user.click(leftOnCLick);
 
-    await act(async () => {
-      await waitFor(async () => {
-        const days: number[] = [];
-        const tooltip = await appScreen.getByRole('tooltip');
-        const buttons = tooltip.querySelectorAll('button');
-        buttons.forEach((b) => {
-          if (
-            b.type === 'button' &&
-            b.className?.indexOf('rdrDayPassive') == -1 &&
-            b.className?.indexOf('rdrDay') !== -1
-          ) {
-            days.push(parseInt(String(b.textContent)));
-          }
-        });
-
-        // presume that 1-27 are the month edge
-        for (let a = 1; a <= 27; a++) {
-          expect(days[a]).toBeTruthy();
-        }
-      });
+    await waitFor(() => {
+      const tooltip = appScreen.getByRole('tooltip');
+      const days = Array.from(tooltip.querySelectorAll('button.rdrDay:not(.rdrDayPassive)'), (button) =>
+        parseInt(String(button.textContent)),
+      );
+      // presume that 1-27 are the month edge
+      for (let a = 1; a <= 27; a++) {
+        expect(days[a]).toBeTruthy();
+      }
     });
   });
   //

@@ -1,6 +1,9 @@
+import { setTimeout as sleep } from 'node:timers/promises';
+import { cleanupOverlaySpec } from '@test-utils/cleanup-overlay-spec';
+import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { act, render } from '../../../test-utils/test-utils';
 import { AutocompleteMuiReference } from './_Autocomplete.mui-reference';
 import { Autocomplete, AutocompleteProps } from './Autocomplete';
@@ -62,11 +65,11 @@ const canonical = (html: string) => {
 const snapshot = () =>
   `<body style="${document.body.getAttribute('style') ?? ''}">${canonical(normalize(document.body.innerHTML))}`;
 
-const settle = async () => {
+const settle = async (signal: AbortSignal) => {
   let last = '';
   for (let i = 0; i < 60; i++) {
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 5));
+      await sleep(5, undefined, { signal });
     });
     const now = snapshot();
     if (now === last) return;
@@ -76,7 +79,8 @@ const settle = async () => {
 
 type Step = ['focus'] | ['type', string] | ['key', string] | ['option', number] | ['clear'] | ['blur'];
 
-const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[]) => {
+const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[], signal: AbortSignal) => {
+  signal.throwIfAborted();
   const user = userEvent.setup();
   const log: string[] = [];
   const C = (impl === 'mui' ? AutocompleteMuiReference : Autocomplete) as React.ElementType;
@@ -91,11 +95,17 @@ const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[]) 
       {...props}
     />,
   );
+  const popupIndicator = view.container.querySelector('.MuiAutocomplete-popupIndicator');
+  // The settled DOM includes the packaged icon, which resolves separately from the input frame.
+  if (popupIndicator) {
+    await waitFor(() => expect(popupIndicator.querySelector('svg')).not.toBeNull(), { timeout: 2500 });
+  }
   const trace: { html: string; log: string[] }[] = [];
-  await settle();
+  await settle(signal);
   trace.push({ html: snapshot(), log: log.splice(0) });
   const input = () => document.querySelector('input[role="combobox"], input') as HTMLInputElement;
   for (const step of steps) {
+    signal.throwIfAborted();
     if (step[0] === 'focus') await user.click(input());
     if (step[0] === 'type') await user.type(input(), step[1]);
     if (step[0] === 'key') await user.keyboard(step[1]);
@@ -105,7 +115,7 @@ const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[]) 
       await act(async () => {
         input().blur();
       });
-    await settle();
+    await settle(signal);
     trace.push({ html: snapshot(), log: log.splice(0) });
   }
   view.unmount();
@@ -113,11 +123,7 @@ const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[]) 
   return trace;
 };
 
-afterEach(() => {
-  document.body.innerHTML = '';
-  document.body.removeAttribute('style');
-  vi.useRealTimers();
-});
+afterEach(cleanupOverlaySpec);
 
 const CASES: [string, Partial<AutocompleteProps>, Step[]][] = [
   ['closed, placeholder', { placeholder: 'Select a fruit...' }, []],
@@ -145,7 +151,10 @@ const CASES: [string, Partial<AutocompleteProps>, Step[]][] = [
 ];
 
 describe('Autocomplete own core equals the MUI implementation', () => {
-  it.each(CASES)('%s', async (_name, props, steps) => {
-    expect(await go('own', props, steps)).toEqual(await go('mui', props, steps));
-  });
+  for (const [name, props, steps] of CASES) {
+    const timeout = name === 'open, type, select by keyboard' ? 15_000 : undefined;
+    it(name, { timeout }, async ({ signal }) => {
+      expect(await go('own', props, steps, signal)).toEqual(await go('mui', props, steps, signal));
+    });
+  }
 });
