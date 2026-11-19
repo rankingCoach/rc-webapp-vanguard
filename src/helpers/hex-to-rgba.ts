@@ -4,7 +4,7 @@
 export const hexToRgb = (hexColor: string): string => {
   const color = hexColor.slice(1);
   const re = new RegExp(`.{1,${color.length >= 6 ? 2 : 1}}`, 'g');
-  let colors = color.match(re);
+  let colors: string[] | null = color.match(re);
   if (colors && colors[0].length === 1) colors = colors.map((n) => n + n);
   if (!colors) return '';
   const values = colors.map((n, index) =>
