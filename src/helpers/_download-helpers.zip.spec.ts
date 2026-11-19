@@ -24,7 +24,14 @@ describe('downloadZipFile', () => {
       vi.fn(async (src: string) => ({ arrayBuffer: async () => Buffer.from(`content of ${src}`) })),
     );
     let blob: Blob | undefined;
-    vi.stubGlobal('URL', { ...URL, createObjectURL: (b: Blob) => ((blob = b), 'blob:zip'), revokeObjectURL: () => {} });
+    vi.stubGlobal('URL', {
+      ...URL,
+      createObjectURL: (b: Blob) => {
+        blob = b;
+        return 'blob:zip';
+      },
+      revokeObjectURL: () => {},
+    });
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
 
     await downloadZipFile(
