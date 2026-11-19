@@ -9,6 +9,7 @@ import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
 import { ClickAway } from './ClickAway/ClickAway';
 import { Drawer } from './Drawer/Drawer';
+import { FocusTrap } from './FocusTrap/FocusTrap';
 import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
@@ -569,6 +570,28 @@ describe('own-core resources are released', () => {
     view.rerender(tree(false));
     settle();
     done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('FocusTrap (focusin/keydown listeners, 50ms body-focus interval): open, close, unmount; and unmount while open', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <FocusTrap open={open}>
+        <div tabIndex={-1}>
+          <button type="button">{'inside'}</button>
+        </div>
+      </FocusTrap>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    settle();
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    const openView = render(tree(true));
+    settle();
+    done(openView);
     settle();
     expect(leftovers(before)).toEqual(CLEAN);
   });

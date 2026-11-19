@@ -1,5 +1,5 @@
-import { Unstable_TrapFocus as MuiTrapFocus } from '@mui/material';
 import React from 'react';
+import { FocusTrap as OwnFocusTrap } from '../../primitives/react/FocusTrap/FocusTrap';
 
 export interface FocusTrapProps {
   /** Trap is mounted and active while true. */
@@ -16,11 +16,11 @@ export interface FocusTrapProps {
   children: React.ReactElement;
 }
 
-/** Keeps keyboard focus inside its child while open (wrapper of MUI's Unstable_TrapFocus). */
+/** Keeps keyboard focus inside its child while open (own-core port of MUI's Unstable_TrapFocus). */
 export const FocusTrap = (props: FocusTrapProps) => {
   const { open, isEnabled, disableAutoFocus, disableEnforceFocus, disableRestoreFocus, children } = props;
   return (
-    <MuiTrapFocus
+    <OwnFocusTrap
       open={open}
       isEnabled={isEnabled}
       disableAutoFocus={disableAutoFocus}
@@ -28,6 +28,6 @@ export const FocusTrap = (props: FocusTrapProps) => {
       disableRestoreFocus={disableRestoreFocus}
     >
       {children}
-    </MuiTrapFocus>
+    </OwnFocusTrap>
   );
 };
