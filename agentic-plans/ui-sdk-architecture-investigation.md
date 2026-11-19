@@ -856,22 +856,39 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
 
 ## 23. Paths still on MUI (keep current; each line names what removes it)
 
-1. Text field: custom `inputComponent`, `InputProps.ref` (Autocomplete), MUI `slots`/`classes`, function slots →
-   removed by the Autocomplete port (ref path) and the MUI-exit step (the rest renders as outlined/own or warns).
-2. Text field `variant` filled/standard, native select → MUI-exit step (decided above).
-3. Autocomplete, AutocompleteWithAnchor, SearchableSelect → Autocomplete group (MUI Autocomplete + Popper).
-4. Menu, MenuItem, DropdownMenu, Popover, PopoverPopper, PopoverModal → group B (ModalHost + MenuPopup).
-5. Button, Chip, Breadcrumbs, Pagination, ProgressBar, Slider, Accordion, Collapse, Fade, AIAssistant (Collapse/Fade/
-   Grow), FocusTrap, List (ListShowMore) → simple ports on ButtonBase/transition core (group C).
-6. Drawer, AppBar, Toolbar, Snackbar, SnackbarRoot → layout/overlay group (Modal manager exists).
-7. DatePicker (@mui/x-date-pickers), DateRangeInput, DateRangePicker (+ adornment), FlagAdornment, FormControl,
+Status 2026-11-19 (tip 0109680 + pack-16 Drawer). "Own" = renders on src/primitives; a remaining MUI path is a
+fallback a consumer reaches only through the props named.
+
+1. Text field: custom `inputComponent`, MUI `slots`/`classes`, function slots, `variant` filled/standard, native
+   select → MUI-exit step (renders as outlined/own or warns). InputBase `Skeleton` import → trivial.
+2. Autocomplete (own since H15, 01bcea8): MUI `Autocomplete` stays for consumers passing `slots`, `slotProps`,
+   `componentsProps`, `sx`, `ListboxProps`, `ListboxComponent`, `ChipProps`, `PaperComponent`, `PopperComponent` or
+   `renderGroup` (rc-webapp passes none) → MUI-exit step (port or warn). `useThemeProps` import → same step.
+   AutocompleteWithAnchor: MUI `ClickAwayListener` → own ClickAway (next small item).
+3. Menu / MenuItem: own for modelled props; MUI `Menu` for unmodelled consumer props (routing), MUI `MenuItem` outside
+   own lists → MUI-exit step. Popover: `TooltipClasses` type only → types step (10). PopoverModal / PopoverPopper:
+   MUI `Popper` for the non-modelled path → MUI-exit step.
+4. Popper: own OwnPopper everywhere it is wired; the `altBoundary` handling differs from popper.js only where the
+   shared resolution (ed9af0e) applies, no consumer passes it → keep, documented in Popper.tsx.
+5. ProgressBar: determinate/indeterminate own (B, de017d4); `buffer` and `query` keep `ProgressBarMui` (MUI
+   LinearProgress) → B's ProgressBar follow-up (no rc-webapp usage of either variant found yet; reachability map).
+6. B leaf queue (B owns): Button (in progress, Grow), Chip (b9f8736 passed, merge pending), Breadcrumbs, Pagination,
+   Slider, then the react-spring motion group. Accordion: `AccordionProps` type import only → types step (10).
+7. Drawer (pack-16): own (ModalHost + Slide + Paper markup). Open, not reached by rc-webapp: (a) a Drawer open together
+   with a MUI-rendered Modal (any MUI fallback above) has two scroll-lock owners, so non-LIFO closing can restore
+   scroll early / leave it locked; removed when the last MUI Modal path goes (MUI-exit step); (b) with
+   `disableAutoFocus`, focus restore targets the opener, not the first focus inside (MUI FocusTrap) → ModalHost
+   follow-up if a consumer ever passes it.
+8. AppBar, Toolbar, Snackbar, SnackbarRoot, FocusTrap, AIAssistantPanel → layout/overlay group (A, next after Drawer).
+9. DatePicker (@mui/x-date-pickers), DateRangeInput, DateRangePicker (+ adornment), FlagAdornment, FormControl,
    Documents (DocumentDisplay/Upload) → pickers group (largest; x-date-pickers is the only @mui/x import).
-8. InputBase `Skeleton` import, `use-media-query` (MUI useMediaQuery), `helpers/hex-to-rgba` (@mui/system) → trivial.
-9. VanguardThemeProvider (`createTheme`/ThemeProvider): source of the two `@mui` strings in `dist-wordpress/index.js`
-   (createTheme's palette error message and `toRuntimeSource` template) → last, once nothing reads the MUI theme.
-10. Types: `core/_internal/mui-legacy-props.ts` (public prop types derived from MUI types) and `mui-slot-compat.ts`;
-    11 emitted `.d.ts` files import `@mui/*` → vendored MUI types rolled into the published declarations (§26).
-11. Redux (not MUI): the bundles import `react-redux` as an external module (dispatch shim, legacy useFormConfig), so
+10. `use-media-query` (MUI useMediaQuery), `helpers/hex-to-rgba` (@mui/system) → trivial.
+11. VanguardThemeProvider (`createTheme`/ThemeProvider): source of the two `@mui` strings in `dist-wordpress/index.js`
+    (createTheme's palette error message and `toRuntimeSource` template) → last, once nothing reads the MUI theme.
+12. Types: `core/_internal/mui-legacy-props.ts` (public prop types derived from MUI types), `mui-slot-compat.ts` and the
+    type-only imports above; emitted `.d.ts` files import `@mui/*` → vendored MUI types in the published declarations
+    (§26).
+13. Redux (not MUI): the bundles import `react-redux` as an external module (dispatch shim, legacy useFormConfig), so
     consumers must have it installed although useFormStore needs no Provider/store → deferred end step with the
     rc-webapp fork change.
 
