@@ -840,3 +840,20 @@ Answers:
 Conclusion: this is Blink holding detached elements that have in-flight CSS animations until the next animation tick. It is bounded at one instance and does not accumulate, so it is not a leak. No code change.
 
 Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, not even per cycle. The difference is the harness: Storybook dev instrumentation (actions/interactions, the DevTools hook) can keep the args and fibers of earlier renders. I've asked for a post-idle sample (10 s idle + forced GC) of the Storybook scenario.
+
+### g5 List / ListShowMore (own Collapse, timeout 1500)
+1. MUI's only use in List/ListShowMore was `<Collapse in timeout={1500}>` in ListShowMore. It now renders the component-local OwnCollapse with the same props. List.tsx had no MUI. No new compat CSS: the Collapse rules come from `_Collapse.compat.scss`. No `@use` line needed.
+2. Red/green:
+   2.1 New `_listshowmore-parity.spec` vs `_ListShowMoreMui.reference.tsx` (the former code verbatim, test-only).
+   2.2 Red: the own-core marker test failed on the MUI path.
+   2.3 Green after the swap, 3/3: the whole-subtree timeline (show all / show less, including interrupted transitions, Collapse writes with 1500 ms) is identical step by step, and below-limit / no-limit renders the same.
+3. Other checks:
+   3.1 A's `_ListShowMore.mui.spec` and the `_ListShowMoreMuiContract` story (Chromium geometry + 1500 ms timing) are unchanged and green.
+   3.2 List specs green: 9 files / 36.
+   3.3 tsc lib: 0.
+   3.4 `ListShowMore.stories.tsx` is on the known never-indexed list (no leading underscore), so it is not run.
+4. Size and consumers:
+   4.1 List/ListShowMore eager closure: 234.0 → 166.7 KB gzip. Emotion is no longer in it; the rest is ListItem/Text/CTA.
+   4.2 Not a WordPress export.
+   4.3 rc-webapp imports List in several screens, but none passes `limit`, so none reaches the ListShowMore branch.
+5. Biome: 4 warnings, all pre-existing in the verbatim code (unused `e` params, empty effect).
