@@ -1,3 +1,4 @@
+import { moduleGraph } from './config/module-graph';
 import { muiCompatLast } from './config/mui-compat-last';
 import { withBundledUseClientFilter } from './config/rollup-onwarn';
 import { thirdPartyNotices } from './config/third-party-notices';
@@ -51,6 +52,8 @@ export const BaseViteConfig: UserConfig = {
     muiCompatLast(),
     // Licence notices of every bundled npm package (the minifier drops legal comments).
     thirdPartyNotices(),
+    // Chunk graph with source module ids for the eager-@mui gate (plan §36.2 B.3).
+    moduleGraph(),
     // react(),
     viteTsconfigPaths(),
     // customConfigPlugin(),

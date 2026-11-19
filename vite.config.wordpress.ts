@@ -1,3 +1,4 @@
+import { inlineMuiFallbacks } from './config/inline-mui-fallbacks';
 import { withBundledUseClientFilter } from './config/rollup-onwarn';
 import { resolve, sep } from 'node:path';
 import { defineConfig, mergeConfig } from 'vite';
@@ -51,6 +52,8 @@ export default defineConfig(
       },
     },
     plugins: [
+      // Plan §36.2 B.5: WordPress keeps the MUI fallback routes inline (its cleanup keeps no other chunks).
+      inlineMuiFallbacks(),
       // Plugin to exclude all dynamic assets from WordPress build since they are not used
       {
         name: 'exclude-unused-assets',

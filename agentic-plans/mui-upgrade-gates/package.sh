@@ -10,4 +10,10 @@ bash "$HERE/package-fixture/run.sh" "$@" || fixture=$?
 python3 "$HERE/package-counts.py" "$PACKAGE_FIXTURE_OUT"
 # Track 2: llms.txt, the skill and one docs page per value export ship in the tarball.
 node "$HERE/../../scripts/check-package-contents.mjs" "$PACKAGE_FIXTURE_OUT"/pack/*.tgz
+# WordPress output integrity: every import() / static chunk import of dist-wordpress/index.js exists after cleanup.
+node "$HERE/../../scripts/check-wordpress-dynamic-imports.mjs" "$HERE/../../dist-wordpress"
+# Plan §36.2 B.3: exports whose EAGER ESM graph contains @mui/* (report until every fallback is lazy, then --assert-zero).
+node "$HERE/../../scripts/check-eager-mui.mjs" > "$PACKAGE_FIXTURE_OUT/eager-mui.txt"
+node "$HERE/../../scripts/check-eager-mui.mjs" --wordpress-table > "$PACKAGE_FIXTURE_OUT/eager-mui-wordpress.txt"
+head -1 "$PACKAGE_FIXTURE_OUT/eager-mui.txt"
 exit "$fixture"

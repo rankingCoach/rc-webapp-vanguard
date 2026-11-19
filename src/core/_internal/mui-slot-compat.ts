@@ -1,4 +1,4 @@
-import { mergeSlotProps } from '@mui/material';
+import { mergeSlotProps } from './merge-slot-props';
 
 /** Match MUI's legacy fallback followed by explicit slotProps precedence. */
 export function mapLegacySlots<T extends object>(

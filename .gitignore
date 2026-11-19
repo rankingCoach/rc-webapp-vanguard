@@ -67,3 +67,6 @@ codereview.md
 # Agent docs: build output of scripts/generate-agent-docs.mjs (shipped in the tarball, not committed)
 /docs/
 __pycache__/
+
+# Build metadata for gates (module graph), never packed
+.vg-build/

@@ -9,7 +9,7 @@ Hand-maintained: config/derived-notices.txt (appended by config/third-party-noti
 @mui/material@9.5.0 (MIT) — Material UI: Autocomplete/useAutocomplete, Popper (BasePopper), Tooltip, Menu/MenuList,
 Modal/FocusTrap/ModalManager, Portal, Backdrop, Fade/Grow/Collapse/Slide/Transition, Select/SelectInput, InputBase/
 TextField/InputAdornment, ClickAwayListener, ButtonBase/TouchRipple, Drawer, Snackbar/useSnackbar/SnackbarContent,
-Paper, Skeleton and their emotion styles (mui-compat.scss).
+Paper, Skeleton, AppBar/Toolbar, Unstable_TrapFocus and their emotion styles (mui-compat.scss).
 @mui/system@9.5.0 (MIT) — MUI System: useMediaQuery, colorManipulator (hexToRgb). Same copyright and licence.
 --------------------------------------------------------------------------------
 MIT License

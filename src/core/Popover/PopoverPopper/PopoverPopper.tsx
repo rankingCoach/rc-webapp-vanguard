@@ -1,9 +1,13 @@
 import './PopoverPopper.scss';
 
-import { Popper, PopperProps } from '@mui/material';
+import type { PopperProps } from '@mui/material';
 import React from 'react';
 import { OwnPopper, OwnPopperProps } from '../../../primitives/react/Popper/Popper';
 import { resolvePopperOptions } from '../../../primitives/react/Popper/popper-options';
+import { lazyFallback } from '../../_internal/lazy-fallback';
+
+// MUI's Popper route behind a lazy boundary (plan §36.2 B.3).
+const Popper = lazyFallback(() => import('./MuiPopperFallback') as never) as React.ComponentType<PopperProps>;
 
 /**
  * ---------------------------------------------------------------------------------------------------------------------

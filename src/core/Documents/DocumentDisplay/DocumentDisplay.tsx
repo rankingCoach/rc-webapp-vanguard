@@ -1,6 +1,6 @@
+import styles from './DocumentDisplay.module.scss';
 import { px2 } from '@globalStyles';
 import { downloadFile, inspectFileMimeTypeFromURL } from '@helpers/download-helpers';
-import { Collapse } from '@mui/material';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
@@ -8,7 +8,7 @@ import { IconNames } from '@vanguard/Icon/IconNames';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
 import React, { useEffect, useState } from 'react';
-
+import { OwnCollapse as Collapse } from '../../Collapse/Collapse/own-collapse';
 import {
   CONTENT_TYPE_IMAGE_JPEG,
   CONTENT_TYPE_IMAGE_JPG,
@@ -16,7 +16,6 @@ import {
   DocumentDataType,
   DocumentFileMimeType,
 } from '../Document.types';
-import styles from './DocumentDisplay.module.scss';
 
 export type DocumentDisplayProps = {
   testId?: string;

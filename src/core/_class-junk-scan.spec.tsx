@@ -2,6 +2,7 @@ import { act, render } from '@test-utils/test-utils';
 import { cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Accordion } from '@vanguard/Accordion/Accordion';
+import { AppBar } from '@vanguard/AppBar/AppBar';
 import { Autocomplete } from '@vanguard/Autocomplete/Autocomplete';
 import { Chip } from '@vanguard/Chip/Chip';
 import { Drawer } from '@vanguard/Drawer/Drawer';
@@ -10,6 +11,7 @@ import { Select } from '@vanguard/Select/Select';
 import { Snackbar } from '@vanguard/Snackbar/Snackbar';
 import { ToggleButton } from '@vanguard/ToggleButton/ToggleButton';
 import { ToggleButtonGroup } from '@vanguard/ToggleButtonGroup/ToggleButtonGroup';
+import { Toolbar } from '@vanguard/Toolbar/Toolbar';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -107,6 +109,16 @@ describe('own-core class attributes carry no junk tokens', () => {
         </Drawer>
         <Snackbar open message="Saved" action={<button type="button">{'Undo'}</button>} />
       </>,
+    );
+    await settle();
+    expect(scan()).toEqual([]);
+  });
+
+  it('AppBar / Toolbar (rc-webapp Navbar shape)', async () => {
+    render(
+      <AppBar className="appBar  scrolled " position="fixed">
+        <Toolbar className="toolbar">{'Nav'}</Toolbar>
+      </AppBar>,
     );
     await settle();
     expect(scan()).toEqual([]);

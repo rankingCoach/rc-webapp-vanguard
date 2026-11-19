@@ -2,13 +2,12 @@ import './Autocomplete.scss';
 
 import { classNames } from '@helpers/classNames';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Autocomplete as MuiAutocomplete, type AutocompleteChangeReason } from '@mui/material';
+import type { AutocompleteChangeReason } from '@mui/material';
 import type {
-  AutocompleteProps as MUIAutocompleteProps,
   AutocompleteRenderOptionState,
   AutocompleteRenderValueGetItemProps,
+  AutocompleteProps as MUIAutocompleteProps,
 } from '@mui/material/Autocomplete';
-import { useThemeProps } from '@mui/material/styles';
 import { translationService } from '@services/translation.service';
 import {
   InputBase,
@@ -17,21 +16,25 @@ import {
   InputPopoverProps,
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
+import { mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { CheckBoxIcon } from '@vanguard/CheckBox/CheckBoxIcon/CheckBoxIcon';
 import { Chip } from '@vanguard/Chip/Chip';
-import { mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
-
-import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
-import { Text } from '../Text/Text';
-import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
-import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 import { OwnAutocomplete } from '../../primitives/react/Autocomplete/Autocomplete';
+import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
+import { lazyFallback } from '../_internal/lazy-fallback';
+import { useThemeDefaultProps } from '../_internal/theme-default-props';
+import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
+import { Text } from '../Text/Text';
+
+// MUI's Autocomplete route behind a lazy boundary (plan §36.2 B.3): the eager graph stays free of @mui/*.
+const MuiAutocomplete = lazyFallback(() => import('./MuiAutocompleteFallback') as never);
 
 /** State handed to a custom `renderOption`. */
 export interface AutocompleteOptionState {
@@ -162,14 +165,19 @@ export const Autocomplete = (props: AutocompleteProps) => {
   const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
 
   // Resolve only the intercepted callback; Vanguard's own defaults retain their precedence.
-  const effective = useThemeProps({
-    props: rest as Partial<MUIAutocompleteProps<any, any, any, any>> & {
+  // MUI's useThemeProps semantics without importing MUI (src/core/_internal/theme-default-props.ts, option 5.3).
+  const effective = useThemeDefaultProps(
+    rest as Partial<MUIAutocompleteProps<any, any, any, any>> & {
       ListboxComponent?: React.ElementType;
       componentsProps?: MUIAutocompleteProps<any, any, any, any>['slotProps'];
       renderTags?: unknown;
-    },
-    name: 'MuiAutocomplete',
-  });
+    } as Record<string, unknown>,
+    'MuiAutocomplete',
+  ) as Partial<MUIAutocompleteProps<any, any, any, any>> & {
+    ListboxComponent?: React.ElementType;
+    componentsProps?: MUIAutocompleteProps<any, any, any, any>['slotProps'];
+    renderTags?: unknown;
+  };
   const {
     onInputChange,
     renderValue: consumerRenderValue,
@@ -491,7 +499,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
       return '';
     }
     if (typeof option === 'object') {
-      if (!optionKey || (!option.hasOwnProperty(optionKey) && !option.hasOwnProperty('objectType'))) {
+      if (!optionKey || (!Object.hasOwn(option, optionKey) && !Object.hasOwn(option, 'objectType'))) {
         console.warn(
           `Autocomplete: 'optionKey' = ${optionKey} doesn't match options properties! available are:: ${keys.join(
             ', ',
@@ -522,7 +530,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     if (typeof option === 'object') {
       const optionObj: Record<string, any> = option as unknown as object;
       if (optionObj && optionKey) {
-        if (!optionObj.hasOwnProperty(optionKey)) {
+        if (!Object.hasOwn(optionObj, optionKey)) {
           console.warn("Autocomplete: 'optionKey' doesn't match options properties!", optionKey);
         }
 
@@ -534,7 +542,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
     if (typeof value === 'object') {
       const valueObj: Record<string, any> = value as unknown as object;
       if (valueObj && optionKey) {
-        if (!valueObj.hasOwnProperty(optionKey)) {
+        if (!Object.hasOwn(valueObj, optionKey)) {
           console.warn("Autocomplete: 'optionKey' doesn't match value's properties!", optionKey);
         }
 

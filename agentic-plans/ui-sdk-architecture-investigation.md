@@ -11,6 +11,7 @@
 > 8. **Known bug left in place: Slider on the legacy `formconfig` path** calls `setStateValue` without dispatching, so slider values are never stored. Kept, because fixing it would start writing into consumer stores. Verifier: rc-webapp renders Slider in 7 files and none binds a formconfig, so **zero consumer impact**; the decision stands. On the new `field` path Slider DOES store its value.
 > 9. Reporting rule: "passed" only for a Tier A/B verdict returned by the verifier; my own gates are "green on my side".
 > 10. SnackbarRoot pub-sub subscription leak (2026-11-19): **DECIDED (watchdog), fix after H17's PASS** in a separate commit with a reproducing spec (0 observers after unmount, flat over N mounts, remount replay unchanged); the `[bug-lock]` in `_SnackbarRoot.mui.spec.tsx` is rewritten to the fixed behaviour in that commit. User-facing behaviour delta: none; internal leak fixed. Tier P scenario for verifier 2: mount/unmount ×200 + service events.
+> 11. Class builders (2026-11-19): **DECIDED (watchdog), two documented contracts, not duplication.** Internal `cx` (src/primitives/react/class-names.ts, never exported) for own-core components that reproduce MUI markup (clsx semantics, collapses whitespace inside tokens); the public `@helpers/classNames` keeps its contract for everything else (drops non-string/empty entries, byte-identical for all-string calls). Conditions: a one-line header per file, src/helpers/_class-builders-contract.spec.ts pins the difference, `cx` never exported.
 
 
 Date: 2026-11-18 · Branch: `feature/ui-sdk-architecture-investigation` (from `feature/file-manager-variants`)
@@ -832,6 +833,19 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    exports); generic theme rules on elements (0,0,1) or `input[type=text]` (0,1,1) resolve as before. Mitigation if
    wanted: enqueue `vanguard.css` with the theme stylesheet as a dependency (or at a later priority). RISK LOGGED.
 
+4. **DatePicker date format per locale (watchdog decision A, 2026-11-19; pre-existing, not changed).**
+   rc-webapp passes dash locales (`localeFormatted`), but `getDatePatternFromLocale` is keyed by underscores, so
+   every DatePicker shows DD.MM.YYYY and logs a console.error. Fixing the lookup (accepting `-`) would show:
+
+   | locale | today | after a fix |
+   | --- | --- | --- |
+   | de-DE, de-AT | DD.MM.YYYY | DD.MM.YYYY |
+   | en-GB, es-ES | DD.MM.YYYY | DD/MM/YYYY |
+   | en-US | DD.MM.YYYY | MM/DD/YYYY |
+   | en-IE, en (no entry) | DD.MM.YYYY | DD.MM.YYYY (fallback, still an error) |
+
+   Locked by `src/helpers/_locale-date-pattern.bug-lock.spec.ts`. The DatePicker port keeps the lookup byte-for-byte.
+
 ## 22. Group A: Input and Textarea on the own-core text field (handoff 6)
 
 1. `TextFieldFrame` (FormControl root, label, notched outline, helper text) is shared by `SelectTextField` and the
@@ -1256,3 +1270,198 @@ Pending full run: 501d8cb (styled-components dropped, package.json).
    1. Its snapshots covered `body.innerHTML` (sibling aria-hidden) but not body's own inline style. That applied to
       Drawer, SearchableSelect, Autocomplete and Snackbar; all four now include it.
    2. The harness had no app root (ModalRoot). `_Drawer.body-lock.spec.tsx` now reproduces the story condition.
+
+## 36. DatePicker off @mui/x-date-pickers (staged, 2026-11-19)
+
+DatePicker (8 rc-webapp sites) is the last user of `@mui/x-date-pickers`. It uses DatePicker (desktop popper / mobile
+dialog via `(pointer: fine)`), DateField (sectioned keyboard editing, the accessible section DOM), the day/year calendar
+views (`renderDateViewCalendar`), PickersLayout, DatePickerToolbar with the keyboard-view toggle, and AdapterMoment.
+Existing contract: 13 spec files + 2 MUI contract stories. Staged so nothing is wired before it is proven against the
+MUI X component it replaces:
+1. S1 DateCalendar primitive (day grid, month switch header, year view, keyboard navigation, min/max/disablePast,
+   focus) vs MUI X DateCalendar: DOM + keyboard timelines, Chromium computed styles. Not wired.
+2. S2 DateField primitive (sections: format parsing, typing, arrows, Backspace, paste, clear, invalid states, the
+   accessible section DOM) vs MUI X DateField. Not wired.
+3. S3 picker shell on OwnPopper (desktop) / ModalHost dialog (mobile), toolbar + keyboard-view toggle, layout; then
+   the DatePicker switch, judged by the 13 existing specs + the frozen-reference differential + Chromium parity.
+Each stage is its own commit; S3 is the handoff. `@mui/x-date-pickers` leaves `dependencies` only after S3 passes.
+
+### 36.0 Watchdog decision and reachable-surface inventory (2026-11-19)
+
+**Decision (decided-by-watchdog): APPROVED WITH CONDITIONS.**
+1. Inventory before S1 (below).
+2. The S2 parity matrix is locale × format plus paste, IME, Backspace across sections, invalid/partial input,
+   min/max clamp, readOnly/disabled, controlled change mid-edit and the section a11y DOM. Each case is a differential
+   vs MUI X, mutation-checked.
+3. AdapterMoment stays: the own code talks to one adapter seam, so a later moment swap is one change.
+4. S3 desktop/mobile switch on the ported useMediaQuery `(pointer: fine)` incl. the SSR/first-render value. The mobile
+   dialog goes on ModalHost only after H16b PASS. Scroll lock and focus restore asserted; Tier P open/close scenario.
+5. Stop rule: two behaviour FAILs at a verifier on S2 or S3 → DatePicker stays on MUI X as the one remaining user,
+   logged with the evidence.
+6. MUI X is MIT: derived-notices entry plus file headers.
+7. The cheaper, more reachable @mui/material leftovers go before S2/S3 (§36.1).
+
+**Public API.** `DatePickerProps` is a closed interface with no pass-through:
+`value, required, label, minDate, maxDate, disablePast, formconfig, field, index, closeOnCLickAway, onChange, locale`.
+Every one of these must be implemented; no MUI X prop is reachable from outside.
+
+**rc-webapp sites.** 8 sites in 4 files:
+1. GoogleAdsPerformanceDateRange (2): locale "en-GB", label, required, value, minDate, maxDate, onChange, key.
+2. BoostDuration (1): locale, disablePast, label, required, value, minDate, onChange.
+3. PostCount.step (2): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange.
+4. EventsSetupFormMain (2+): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange, label.
+
+No formconfig/field use was found at the sites.
+
+**Locales.**
+1. `localeFormatted` is the location's locale with `_` → `-` (de-DE, de-AT, en-GB, en-IE, en-US, es-ES, …).
+2. FINDING, pre-existing, not changed: `getDatePatternFromLocale` keys are `de_DE`-style. Every rc-webapp locale
+   misses, so all production sites use the fallback `DD.MM.YYYY` and log a console.error. Fixing it would change the
+   visible format per locale (en-US → MM/DD/YYYY). That is a behaviour change for the user to decide, not part of the
+   port.
+3. The port keeps the lookup as is. The S2 matrix still covers every format the map can produce: MM/DD/YYYY,
+   DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY, YYYY-MM-DD, YYYY/MM/DD.
+4. Week start: moment's global locale. Vanguard passes no adapterLocale and rc-webapp never calls `moment.locale()`,
+   so the reachable case is `en`, week starting Sunday.
+5. Digits: Latin only (no ar/fa/hi locales in the map).
+
+**WordPress.** DatePicker is not exported from index-wordpress.ts.
+
+**Reachable MUI X behaviour.** Only through the props above: the DatePicker shell (desktop popper / mobile dialog by
+`(pointer: fine)`), DateField sections in the locale pattern, the day/year calendar views, min/max/disablePast, the
+toolbar keyboard-view toggle (mobile) and closeOnClickAway (Vanguard's own outside callback).
+
+### 36.1 Order check: what is still on @mui/material after H19 (cac6a6b)
+
+No item below is reached by rc-webapp, the WordPress bundle or another Vanguard component through a modelled prop.
+Each remaining import is a type, the last theme step, an unreachable component, or a fallback route for public
+props the own core does not model.
+
+1. Types only:
+   1. Accordion (`AccordionProps`)
+   2. Popover (`TooltipClasses`)
+   3. `_internal/mui-legacy-props.ts`, `_internal/mui-slot-compat.ts`
+
+   These go to the types step (§23.12): vendored types.
+2. Fallback routes, reachable only with unmodelled public props:
+   1. Autocomplete (slots, slotProps, componentsProps, sx, ListboxProps, ListboxComponent, ChipProps,
+      PaperComponent, PopperComponent, renderGroup; useThemeProps)
+   2. Menu (unmodelled MuiMenuProps; useThemeProps, useRtl) and MenuItem (outside own lists)
+   3. Snackbar (slots, slotProps, ContentProps, ClickAwayListenerProps, TransitionProps, componentsProps, sx,
+      classes; useThemeProps)
+   4. AppBar / Toolbar (sx, component, classes, elevation; useThemeProps)
+   5. PopoverPopper / PopoverModal (popper.js modifiers or options the own Popper does not model)
+   6. `_internal/InputBase/MuiTextField.tsx` (non-outlined variants, native select, custom inputComponent, MUI slots)
+3. Unreachable: FormControl. Reachability map: no runtime importer; rc-webapp only has a `.FormControl-container`
+   SCSS selector. It is migrated last, per the user decision.
+4. Last: VanguardThemeProvider (`createTheme`/`ThemeProvider`, the source of the 2 `@mui` strings in dist-wordpress).
+
+**Consequence for the order.** None of these is cheaper and more reachable than S2/S3 in rc-webapp terms. The
+fallback routes are the "MUI-exit step". Their props are part of the public types, so removing MUI means either
+implementing each prop or narrowing the types (a breaking change for a next major). That needs a decision before
+MUI can leave `dependencies` (§24). Proposed: (a) types step (vendored, no API change); (b) exit step per fallback,
+implement what has any usage evidence and keep MUI as an optional dependency for the rest until the next major.
+
+### 36.2 Watchdog decisions on the locale finding and the MUI-exit step (2026-11-19)
+
+**A. Locale finding: user decision, do NOT fix.**
+1. The port keeps `getDatePatternFromLocale` byte-for-byte, including the console.error.
+2. Bug-lock spec: `_locale-date-pattern.bug-lock.spec.ts`.
+3. The per-locale before/after table is on the user's list.
+
+**B. MUI-exit step, interim rule for this major (identical API is a hard limit; narrowing is not granted).**
+1. Types are vendored, no API change.
+2. Fallback props get implemented on the own core when either:
+   1. they have reachability evidence (rc-webapp, service paths, other Vanguard components), or
+   2. they are cheap and exact (`className`, `classes` keys already emitted, `style`, flat `sx` as on ToggleButton).
+
+   Each component declares what remains.
+3. The remainder keeps a working MUI fallback, isolated in its own module behind a lazy boundary. The eager import
+   graph of every public export (ESM build) must contain zero `@mui/*`; a gate script over the built graph asserts
+   this per export and states the count. `@mui/material` stays a regular dependency in this major. Removing it and
+   those props goes on a logged list for the next major (user decision).
+4. Lazy consequence: a fallback route renders async on first use. That is acceptable only because it is unreachable
+   in rc-webapp. Once loaded the fallback renders the same DOM, and the MUI contract specs keep running against it,
+   awaiting the chunk.
+5. WordPress is a single file, so there are no lazy chunks and nothing is stripped. Deliverable: a table of the WP
+   exports that still pull `@mui/*` into dist-wordpress through a fallback route, with the byte cost of each. It goes
+   to the user with the question "does the plugin pass any of these props?". Until answered, WP keeps them.
+6. FormControl and VanguardThemeProvider go last. VanguardThemeProvider needs a separate proposal to the watchdog
+   first, since it is where consumers may theme.
+
+**C. S1.** Refactor onto the adapter interface before the parity spec goes green, so the green proves what ships.
+
+### 36.3 Eager-@mui gate: baseline at 0f9e383 + build (2026-11-19)
+
+The gate has three parts:
+1. `config/module-graph.ts` writes `.vg-build/module-graph.<outDir>.json` on every build: chunk → module ids with
+   rendered bytes, static and dynamic imports. The directory is gitignored and not packed.
+2. `scripts/check-eager-mui.mjs` walks each public export's static closure of dist/index.js.
+3. `package.sh` records `eager-mui.txt` and `eager-mui-wordpress.txt`. `--assert-zero` becomes the gate once every
+   fallback sits behind a lazy boundary.
+
+**Baseline: 32 of 298 exports.** The eager @mui sources are:
+1. DatePicker / DateTimePicker (MUI X, §36 S1–S3).
+2. Autocomplete (fallback).
+3. MuiTextField fallback in InputBase. This one drags in Input, InputBase, Select, Textarea, SearchableSelect, Table*
+   (4), PhoneNumber, RichTextEditor, TextEditDrawer, TimePicker, ColorPicker, DateRangeInput, DateRangePicker,
+   DrawerRoot/DrawerService and AIAssistant.
+4. Menu (fallback), MenuItem.
+5. Snackbar / SnackbarRoot (fallback).
+6. PopoverModal (MUI Popper fallback).
+7. AppBar / Toolbar (fallback).
+8. ProgressBar (B: buffer/query keep MUI LinearProgress).
+9. FormControl (unreachable).
+10. VanguardThemeProvider.
+
+Fixing the InputBase fallback alone clears most of the list.
+
+**WordPress (deliverable for the user, B.5): 4 of 64 WP exports pull @mui/* through a fallback route.** Bytes are
+rendered module sizes before minification; the MUI core is shared, so they do not add up.
+
+| WP export | @mui code in its graph | packages |
+| --- | --- | --- |
+| Autocomplete | 737,581 B | @mui/material, @mui/system, @mui/styled-engine |
+| Input | 531,529 B | same |
+| Select | 531,529 B | same |
+| Textarea | 531,529 B | same |
+
+Question for the user: does the WordPress plugin pass any of the fallback props to these four (Autocomplete: slots,
+slotProps, componentsProps, sx, ListboxProps, ListboxComponent, ChipProps, PaperComponent, PopperComponent,
+renderGroup; Input/Select/Textarea: textFieldProps with a non-outlined variant, native select, custom
+inputComponent, MUI slots/classes)? Until answered, WordPress keeps them.
+
+**Allow-list (watchdog decision, 2026-11-19).** The gate allows one context module, `@mui/system/RtlProvider`
+(MUI's RtlContext, ~1 KB, React-only). A context works by object identity, and `_MenuOwnRouting`'s RtlProvider case
+needs MUI's own object. Conditions:
+1. 2 KB cap.
+2. The module's own eager graph contains no further @mui/@emotion module.
+3. The gate output states the allow-listed count separately. Count: N = 1.
+4. On the next-major removal list together with Menu's RTL routing.
+
+**MenuItem reachability.** Inside an own-core option host (Menu's own route, Select, SearchableSelect) Vanguard
+MenuItem already renders the own MenuOption. rc-webapp's 3 MenuItem sites are all inside Menu (AccountNavMenu), and
+TableToolbar / SearchableSelect use it inside own hosts. The MUI MenuItem path is reached only outside an own host
+(Menu's MUI route or a standalone MenuItem): not in rc-webapp, and MenuItem is not a WordPress export. So it needs
+only the lazy split (done), no new route.
+
+**After the lazy splits (2026-11-19, local build at bfbe154 + WP fix 764a089): eager @mui 4 of 298 (+1 allow-listed
+context module).** What remains and why:
+1. DatePicker / DateTimePicker: MUI X, §36 S1–S3.
+2. VanguardThemeProvider: separate proposal to the watchdog first.
+3. ProgressBar: B's buffer/query route on MUI LinearProgress; B's to split.
+
+Split into lazy fallback modules: MuiTextField (Input, Select, Textarea, SearchableSelect, Table*, …), Autocomplete,
+Menu, MenuItem, Snackbar, AppBar, Toolbar, PopoverPopper/PopoverModal (shared MUI Popper), FormControl. Theme
+defaults on the own routes come from `useThemeDefaultProps` (5.3). Spec and Storybook setups preload the fallbacks, so
+the existing MUI contract specs run unchanged.
+
+**WordPress.** The single file inlines the fallbacks. `config/inline-mui-fallbacks.ts` turns them into static imports
+for the WP build only. FINDING, fixed before any pack: the WordPress cleanup keeps only index.js and icon/loading
+chunks, so lazy chunks there would have been deleted and the bundle broken. The new `check-wordpress-dynamic-imports`
+gate catches that. The WP table (4 of 64: Autocomplete, Input, Select, Textarea) is unchanged and remains the user
+question.
+
+**Owed for the next package gate.** Consumer-side evidence: a consumer's own MUI ThemeProvider with
+`components.MuiTextField.defaultProps` around a packed Vanguard Input, on .472's Vanguard and on the candidate. Does
+the default apply? MUI and emotion are both bundled in dist, so the expected answer is no on both.

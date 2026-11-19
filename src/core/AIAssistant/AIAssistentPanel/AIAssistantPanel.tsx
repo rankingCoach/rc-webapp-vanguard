@@ -1,3 +1,4 @@
+import styles from './AIAssistantPanel.module.scss';
 import { useDynamicImport } from '@custom-hooks/use-dynamic-import/use-dynamic-import';
 import {
   alignItemsCenter,
@@ -12,9 +13,6 @@ import {
   w100,
 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import Collapse from '@mui/material/Collapse';
-import Fade from '@mui/material/Fade';
-import Grow from '@mui/material/Grow';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -25,11 +23,12 @@ import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
 import { Textarea } from '@vanguard/Textarea/Textarea';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-
+import { Fade } from '../../../primitives/react/Transitions/Fade';
+import { Grow } from '../../../primitives/react/Transitions/Grow';
+import { OwnCollapse as Collapse } from '../../Collapse/Collapse/own-collapse';
 // @ts-ignore
 import animation from '../_assets/ai-loader-loop.json';
 import { AIAssistantAdjustOptions, AIAssistantProps, AIAssistantStatus } from '../AIAssistant';
-import styles from './AIAssistantPanel.module.scss';
 
 // The writing bar and the menu share one spot: the outgoing one leaves at once, so they never show together.
 const STATE_SWAP_TIMEOUT = { enter: 225, exit: 0 };
@@ -198,7 +197,10 @@ export const AIAssistantPanel = (props: AIAssistantPanelProps) => {
             </div>
 
             <div>
-              <Fade in={status === 'open' || status === 'adjust' || status === 'needsCommand'} timeout={STATE_SWAP_TIMEOUT}>
+              <Fade
+                in={status === 'open' || status === 'adjust' || status === 'needsCommand'}
+                timeout={STATE_SWAP_TIMEOUT}
+              >
                 <div className={classNames(styles.container, className)}>
                   <div className={styles.menu}>
                     <div className={classNames(dFlex, dFlexRow, alignItemsCenter, w100, justifyContentBetween)}>
