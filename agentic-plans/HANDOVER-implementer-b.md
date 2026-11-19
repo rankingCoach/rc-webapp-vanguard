@@ -183,9 +183,10 @@ Verify any row with `git merge-base --is-ancestor <sha> feature/ui-sdk-architect
    1.1 Handed to verifier 2 (queued after their H19) with all three reachability results. The evidence is in the log,
        last section.
    1.2 On PASS: tell A "READY TO MERGE f94d932". A merges only that exact SHA.
-2. **Allow-list follow-up for f94d932.** The entry `src/core/ProgressBar/_ProgressBar.mui.spec.tsx` in
-   `fallback-audit-allowlist.json` (A asked B to add it). Status at handover: see section 9. Once committed, tell
-   verifier 2 it is a test-infra-only follow-up, and tell A.
+2. **Allow-list follow-up for f94d932: COMMITTED as `d4cdc1d`.**
+   2.1 The entry `src/core/ProgressBar/_ProgressBar.mui.spec.tsx` is in `fallback-audit-allowlist.json` (A asked B
+       to add it). check-fallback-audit: 17/17/0.
+   2.2 It is test-infra only. Verifier 2 and A were told; A merges it after f94d932 passes.
 3. **Merge A's latest tip** (f703205 and anything after). Then confirm:
    3.1 the full spec project is green without global preload (that run is the reachability audit);
    3.2 `check-fallback-audit` reports 17/17/0;
@@ -225,10 +226,23 @@ Verify any row with `git merge-base --is-ancestor <sha> feature/ui-sdk-architect
 4. **A's preload `beforeAll` hook timeout** (cold cache: 5/6 files at the 10 s hook, setup 52.5 s; full project
    20 files failed on A's tip). The watchdog ruled to fix the cause. A fixed it in f703205 (no global preload).
    Confirm with a green full spec run after merging A's tip.
-5. Residue documented, not to be swept: ApexCharts/video.js spacing (third-party) and internal `_showcase` story
+5. **`src/primitives/react/Modal/_modal-host-order.spec.tsx` "SearchableSelect menu: open, Escape"** (A's file)
+   times out at 5 s, reproducibly, even when run alone, on B's tree after merging A's tip incl. f703205.
+   5.1 Full spec project on 803a087 + d4cdc1d: 4 files / 10 tests failed of 377 / 2713.
+   5.2 Re-run alone, 9 of those 10 pass (load timeouts in A's Autocomplete/DateRangePicker differentials); this one
+       does not.
+   5.3 Told A. A green full run is still pending on that.
+   5.4 ProgressBar + Rating (B's scope) are green: 6 files / 33.
+6. Residue documented, not to be swept: ApexCharts/video.js spacing (third-party) and internal `_showcase` story
    files (101 elements).
 
 ## 9. State at handover
 
-See the commit that adds this file. Its parent states whether the allow-list follow-up was committed. The tree is
-clean.
+1. The tree is clean.
+2. Last B commits:
+   2.1 `d4cdc1d` (allow-list).
+   2.2 `c9802f8` (this file).
+   2.3 The follow-up commit with these final updates.
+3. Last merge of A's tip: `803a087` (incl. f703205).
+4. Pending verification: f94d932 (verifier 2).
+5. Nothing in progress.
