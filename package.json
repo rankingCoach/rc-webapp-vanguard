@@ -3,7 +3,10 @@
   "description": "rC React components library",
   "author": "rankingCoach",
   "private": false,
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
   "version": "2.10.0",
   "packageManager": "pnpm@11.5.1",
   "main": "dist/index.js",

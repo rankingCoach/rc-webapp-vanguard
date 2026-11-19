@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 TextareaAutosize/TextareaAutosize.js (MIT)
 /**
  * Textarea autosize maths (framework-free), identical to MUI TextareaAutosize: the content height measured on a
  * hidden shadow textarea, clamped to [minRows, maxRows] rows of `singleRowHeight` (never below one row), plus

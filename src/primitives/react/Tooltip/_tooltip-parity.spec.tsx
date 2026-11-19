@@ -9,7 +9,7 @@ import { Tooltip } from './Tooltip';
  * Tooltip. Same props → same DOM (trigger attributes, portaled popper / tooltip / arrow classes and inline styles),
  * same body style during touch, same callbacks reaching the trigger.
  */
-type Impl = typeof MuiTooltip | typeof Tooltip;
+type Impl = React.ElementType;
 
 const normalize = (html: string) =>
   html
@@ -214,7 +214,9 @@ describe('own Tooltip equals MUI Tooltip (controlled)', () => {
       const calls: string[] = [];
       const ref = (node: HTMLElement | null) => {
         calls.push(node ? 'attach' : 'null');
-        return () => calls.push('cleanup');
+        return () => {
+          calls.push('cleanup');
+        };
       };
       const tree = (open: boolean) => (
         <Impl open={open} title={<Title />}>

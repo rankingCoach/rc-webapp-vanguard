@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { join, sep } from 'node:path';
 import type { Plugin } from 'vite';
 
@@ -57,6 +58,9 @@ export const formatNotices = (title: string, notices: PackageNotice[]) =>
       .map((n) => `${'='.repeat(80)}\n${n.name}@${n.version} (${n.license})\n${'-'.repeat(80)}\n${n.text}\n`),
   ].join('\n');
 
+/** Hand-maintained notices for ported (not bundled) code: config/derived-notices.txt. */
+const DERIVED_NOTICES = fileURLToPath(new URL('./derived-notices.txt', import.meta.url));
+
 /**
  * Writes THIRD_PARTY_NOTICES.txt next to the bundle: the licence of every npm package whose code is bundled into
  * this build (MIT requires the notice to ship with copies). The minifier drops legal comments, so this file is the
@@ -81,10 +85,12 @@ export const thirdPartyNotices = (): Plugin => ({
     this.emitFile({
       type: 'asset',
       fileName: 'THIRD_PARTY_NOTICES.txt',
-      source: formatNotices(
+      // Bundled packages (derived from the build), then the hand-maintained "Portions derived from" section for code
+      // ported into the own core: it ships even once MUI / popper.js are no longer bundled (watchdog licence point).
+      source: `${formatNotices(
         'Third-party software bundled into @rankingcoach/vanguard (runtime). Vendored type declarations: types/_vendor/mui.d.ts header.',
         [...unique.values()],
-      ),
+      )}\n${readFileSync(DERIVED_NOTICES, 'utf8')}`,
     });
   },
 });

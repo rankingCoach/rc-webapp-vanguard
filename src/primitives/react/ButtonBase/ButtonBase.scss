@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ButtonBase/ButtonBase.js, TouchRipple.js (emotion styles) (MIT)
 // Vanguard ButtonBase ripple styles (MUI 9.5 TouchRipple parity). Ripple classes are unique, so load order
 // does not matter. The ButtonBase reset is NOT a global rule: each skin includes `button-base-reset` (from
 // _button-base.scss) inside its own root rule, so reset and skin share one selector and order cannot flip them.

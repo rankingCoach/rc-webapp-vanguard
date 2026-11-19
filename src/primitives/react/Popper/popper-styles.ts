@@ -1,3 +1,4 @@
+// Ported from @popperjs/core@2.11.8 lib/modifiers/computeStyles.js, applyStyles.js (MIT)
 import { getOffsetParent } from './dom-geometry';
 
 /**

@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Select/SelectInput.js (MIT)
 /**
  * Hit test for the "release after opening" pattern (framework-free), identical to MUI SelectInput: the event path or
  * target containment wins (synthetic events carry clientX/Y = 0), a zero-size element is never hit, otherwise the

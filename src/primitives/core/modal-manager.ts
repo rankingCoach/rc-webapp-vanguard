@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Modal/ModalManager.js (MIT)
 /**
  * Modal manager (framework-free): port of the MUI ModalManager Vanguard shipped. While a modal (menu, popover,
  * dialog) is open it aria-hides the container's other children (except the top modal and forbidden tags), and locks
@@ -167,6 +168,11 @@ export class ModalManager {
       if (modal.modalRef) ariaHidden(modal.modalRef, ariaHiddenState);
     }
     return index;
+  }
+
+  /** Whether `el` is the root of a modal registered here (own-core host), as opposed to a MUI-managed one. */
+  isRegisteredRoot(el: Element): boolean {
+    return this.modals.some((m) => m.modalRef === el);
   }
 
   /** Registered modals (leak checks: 0 once everything is closed). */

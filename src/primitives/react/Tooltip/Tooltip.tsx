@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Tooltip/Tooltip.js (MIT)
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { OwnPopper } from '../Popper/Popper';
 import { Grow } from '../Transitions/Grow';

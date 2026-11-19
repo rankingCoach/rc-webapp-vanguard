@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Popover/Popover.js (MIT)
 /**
  * Popover positioning (framework-free), identical to the MUI Popover maths Vanguard shipped: anchor point from
  * `anchorOrigin`, element offset from `transformOrigin`, then clamped `marginThreshold` px inside the viewport with

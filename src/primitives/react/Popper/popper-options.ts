@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Popper/BasePopper.js, @popperjs/core@2.11.8 lib/utils/mergeByName.js (MIT)
 import type { AnchoredPlacementInput, Placement } from '../../core/anchored-placement';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

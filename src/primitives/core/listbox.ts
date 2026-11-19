@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 MenuList/MenuList.js (MIT)
 /**
  * Open-list keyboard behavior (framework-free), matching MUI MenuList (v9 roving tab index): arrows / Home / End
  * move the active item skipping disabled ones (Select disables wrapping), and a 500 ms text-criteria typeahead that

@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 InputAdornment/InputAdornment.js (MIT)
 import React from 'react';
 import { useVanguardTypography } from '../typography-context';
 import { OwnFormControlContext, useOwnFormControl } from './form-control-context';

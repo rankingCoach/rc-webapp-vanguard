@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ButtonBase/TouchRipple.js (MIT)
 /**
  * Ripple geometry (framework-free), identical to the MUI TouchRipple maths Vanguard shipped with, so the
  * pressed/focus feedback keeps its size and origin.

@@ -1,3 +1,4 @@
+// Ported from @popperjs/core@2.11.8 lib/dom-utils/*.js (MIT)
 /**
  * DOM measurement for anchored placement (plan §27, watchdog MAJOR 1): a port of popper.js 2.11's dom-utils that
  * matter for MUI Popper: clipping parents (overflow-clipping ancestors intersected with the viewport), the offset

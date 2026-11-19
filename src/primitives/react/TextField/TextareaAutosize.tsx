@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 TextareaAutosize/TextareaAutosize.js (MIT)
 import React, { useCallback, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 import { autosizeHeight, styleNumber } from '../../core/autosize';
 

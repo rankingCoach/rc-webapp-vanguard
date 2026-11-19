@@ -30,26 +30,26 @@ const renderMenu = (props: Record<string, unknown>, children?: React.ReactNode) 
 
 describe('Menu routing to the own core', () => {
   it('takes the own path for the rc-webapp shape (PaperProps className, items)', () => {
-    const view = renderMenu({ PaperProps: { className: 'paper-x' }, items: [{ id: 'a', text: 'A' }] });
+    const view = renderMenu({ PaperProps: { className: 'paper-x' }, items: [{ id: 'a', children: 'A' }] });
     expect(ownRoot()).not.toBeNull();
     view.unmount();
   });
 
   it('keeps MUI for unmodelled paper slot content (elevation)', () => {
-    const view = renderMenu({ slotProps: { paper: { elevation: 0 } }, items: [{ id: 'a', text: 'A' }] });
+    const view = renderMenu({ slotProps: { paper: { elevation: 0 } }, items: [{ id: 'a', children: 'A' }] });
     expect(ownRoot()).toBeNull();
     expect(muiRoot()).not.toBeNull();
     view.unmount();
   });
 
   it('keeps MUI for unmodelled list slot content (disablePadding)', () => {
-    const view = renderMenu({ slotProps: { list: { disablePadding: true } }, items: [{ id: 'a', text: 'A' }] });
+    const view = renderMenu({ slotProps: { list: { disablePadding: true } }, items: [{ id: 'a', children: 'A' }] });
     expect(ownRoot()).toBeNull();
     view.unmount();
   });
 
   it('keeps MUI when an item renders as another component (component="a", href)', () => {
-    const view = renderMenu({ items: [{ id: 'a', text: 'Settings', component: 'a', href: '/settings' }] });
+    const view = renderMenu({ items: [{ id: 'a', children: 'Settings', component: 'a', href: '/settings' }] });
     expect(ownRoot()).toBeNull();
     expect(document.querySelector('a[href="/settings"]')).not.toBeNull();
     view.unmount();
@@ -58,7 +58,9 @@ describe('Menu routing to the own core', () => {
   it('keeps MUI when a child MenuItem renders as another component', () => {
     const view = renderMenu(
       {},
-      <MenuItem id="a" text="Settings" {...({ component: 'a', href: '/s' } as Record<string, unknown>)} />,
+      <MenuItem id="a" {...({ component: 'a', href: '/s' } as Record<string, unknown>)}>
+        {'Settings'}
+      </MenuItem>,
     );
     expect(ownRoot()).toBeNull();
     expect(document.querySelector('a[href="/s"]')).not.toBeNull();
@@ -68,7 +70,7 @@ describe('Menu routing to the own core', () => {
   it('keeps MUI in an RTL context (MUI flips the default origins)', () => {
     const view = render(
       <RtlProvider value>
-        <Menu open anchorEl={anchor()} onClose={() => undefined} items={[{ id: 'a', text: 'A' }]} />
+        <Menu open anchorEl={anchor()} onClose={() => undefined} items={[{ id: 'a', children: 'A' }]} />
       </RtlProvider>,
     );
     expect(ownRoot()).toBeNull();
@@ -96,7 +98,7 @@ describe('own Menu focus equals MUI Menu', () => {
     );
     const own = await focused(
       <Menu open anchorEl={anchor()} onClose={() => undefined} disableAutoFocusItem>
-        <MenuItem id="a" text="A" />
+        <MenuItem id="a">{'A'}</MenuItem>
       </Menu>,
     );
     expect(ownRoot).toBeDefined();
@@ -114,7 +116,12 @@ describe('own Menu focus equals MUI Menu', () => {
   });
 
   it('MenuItem role={undefined} keeps the menuitem role inside the own host', () => {
-    const view = renderMenu({}, <MenuItem id="a" text="A" role={undefined} />);
+    const view = renderMenu(
+      {},
+      <MenuItem id="a" role={undefined}>
+        {'A'}
+      </MenuItem>,
+    );
     expect(ownRoot()).not.toBeNull();
     expect(document.querySelector('[data-slot="menu-popup"] [role="menuitem"]')).not.toBeNull();
     view.unmount();

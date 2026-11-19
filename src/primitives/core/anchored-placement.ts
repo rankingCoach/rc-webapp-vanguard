@@ -1,3 +1,4 @@
+// Ported from @popperjs/core@2.11.8 lib/modifiers/(popperOffsets,offset,flip,preventOverflow,arrow,hide).js, lib/utils/detectOverflow.js (MIT)
 /**
  * Anchored placement (group B, plan §27): a framework-free port of popper.js 2.11's main-phase modifiers as MUI
  * Popper/Tooltip run them: popperOffsets → offset → flip (resets the run once when it changes the placement) →

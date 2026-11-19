@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Popper/BasePopper.js (MIT)
 import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import type { Placement } from '../../core/anchored-placement';
 import { Portal } from '../Portal/Portal';

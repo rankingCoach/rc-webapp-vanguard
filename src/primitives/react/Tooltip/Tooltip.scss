@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Tooltip/Tooltip.js (emotion styles) (MIT)
 // MUI 9.5 Tooltip emotion styles (TooltipPopper / TooltipTooltip / TooltipArrow) for the own-core Tooltip, at
 // emotion's specificity (D15): `.css-x` = (0,1,0) → `.MuiTooltip-*:where([data-vg-core]…)`; nested
 // `&[data-popper-placement*=…] .MuiTooltip-arrow` and `.MuiTooltip-popper[data-popper-placement*=…] &` = (0,3,0).

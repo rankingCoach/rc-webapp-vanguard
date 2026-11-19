@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ButtonBase/ButtonBase.js, TouchRipple.js (emotion styles) (MIT)
 // The MUI 9.5 ButtonBase reset Vanguard shipped, as a mixin. Include it at the top of a skin's root rule (e.g.
 // `.MuiToggleButton-root { @include button-base-reset; ... }`): reset and skin then live in one rule with MUI's
 // single-class specificity, independent of stylesheet order (per-component imports, code splitting, WordPress
