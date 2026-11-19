@@ -7,8 +7,8 @@ export {
   CONTENT_TYPE_UNKNOWN,
   CONTENT_TYPE_VIDEO_MOV,
   CONTENT_TYPE_VIDEO_MP4,
-  ContentType,
   CONTENY_TYPE_APPLICATION_PDF,
+  ContentType,
 } from './Document.types';
 export type { DocumentDisplayProps } from './DocumentDisplay/DocumentDisplay';
 export { DocumentDisplay } from './DocumentDisplay/DocumentDisplay';

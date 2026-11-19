@@ -1,5 +1,4 @@
 import { StoryObj } from '@storybook/react';
-
 import { DocumentDisplay } from '../DocumentDisplay';
 
 export type Story = StoryObj<typeof DocumentDisplay>;

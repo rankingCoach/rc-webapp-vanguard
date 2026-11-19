@@ -16,7 +16,6 @@ import userEvent from '@testing-library/user-event';
 import { snackbarService } from '@vanguard/SnackbarRoot/SnackBarService';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-
 import { render, screen, waitFor } from '../../../../test-utils/test-utils';
 import { DocumentUpload, DocumentUploadProps } from './DocumentUpload';
 

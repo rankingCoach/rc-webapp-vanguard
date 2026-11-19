@@ -1,13 +1,14 @@
-import { Collapse } from '@mui/material';
+import styles from './DocumentUpload.module.scss';
 import { translationService } from '@services/translation.service';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
+import { DocumentDisplay } from '@vanguard/Documents';
 import { ContentType } from '@vanguard/Documents/Document.types';
 import { DocumentContentProcessor } from '@vanguard/FileSelect/MediaItemProcessors/DocumentContentProcessor';
 import { ImageContentProcessor } from '@vanguard/FileSelect/MediaItemProcessors/ImageContentProcessor';
+import { MediaItemSelectInput } from '@vanguard/FileSelect/MediaItemSelectInput';
 import { ImageCompressorTransformer } from '@vanguard/FileSelect/MediaItemTransformers/ImageCompressorTransformer';
 import { FileSizeValidator } from '@vanguard/FileSelect/MediaItemValidators/FileSizeValidator';
-import { MediaItemSelectInput } from '@vanguard/FileSelect/MediaItemSelectInput';
 import { MediaItemFile } from '@vanguard/Gallery/Gallery/Gallery';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -15,10 +16,8 @@ import { Render } from '@vanguard/Render/Render';
 import { snackbarService } from '@vanguard/SnackbarRoot/SnackBarService';
 import { FontWeights, Text, TextTypes } from '@vanguard/Text/Text';
 import React, { useState } from 'react';
-
+import { OwnCollapse as Collapse } from '../../Collapse/Collapse/own-collapse';
 import { DocumentDataType, DocumentFileMimeType } from '../Document.types';
-import { DocumentDisplay } from '@vanguard/Documents';
-import styles from './DocumentUpload.module.scss';
 
 export type DocumentUploadProps = {
   onDocumentSelected: (document: DocumentDataType) => void;
