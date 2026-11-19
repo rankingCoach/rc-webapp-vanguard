@@ -1,0 +1,100 @@
+// Ported from @mui/material@9.5.0 Breadcrumbs/Breadcrumbs.js, Breadcrumbs/BreadcrumbCollapsed.js, Typography/Typography.js, ButtonBase/ButtonBase.js, SvgIcon/SvgIcon.js (emotion styles) (MIT)
+// MUI 9.5 Breadcrumbs emotion output as Vanguard's Breadcrumbs renders it (Typography body1 colour textSecondary,
+// collapsed ellipsis = ButtonBase + BreadcrumbCollapsed + MoreHoriz SvgIcon), extracted from the injected rules, at
+// emotion's specificity (D15): `.css-x` (0,1,0) → `.<MuiClass>:where([data-vg-core]…)` (the ellipsis button has no
+// MuiBreadcrumbCollapsed class in MUI's DOM, so it is keyed by its own-core slot); real classes/pseudos
+// (`.Mui-disabled`, `:hover`, `:focus`, `:active`) stay outside. `.vg-typography-vanguard` (root) = inside
+// VanguardThemeProvider (htmlFontSize 14 → other rem values). Appended last to vanguard.css via mui-compat.scss.
+
+// ---------------------------------------------------------------- Root (Typography body1 + Breadcrumbs)
+.MuiBreadcrumbs-root:where([data-vg-core]) {
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+  color: rgba(0, 0, 0, 0.6);
+}
+.MuiBreadcrumbs-root:where([data-vg-core].vg-typography-vanguard) {
+  font-size: unquote('1.1428571428571428rem'); // exact MUI pxToRem(16) with htmlFontSize 14, unrounded
+}
+
+// ---------------------------------------------------------------- List / separator
+.MuiBreadcrumbs-ol:where([data-vg-core]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.MuiBreadcrumbs-separator:where([data-vg-core]) {
+  display: flex;
+  user-select: none;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+// ---------------------------------------------------------------- Collapsed ellipsis (ButtonBase + BreadcrumbCollapsed)
+.MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand']) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: #f5f5f5;
+  outline: 0;
+  border: 0;
+  margin: 0;
+  border-radius: 2px;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  text-decoration: none;
+  color: #616161;
+  margin-left: calc(8px * 0.5);
+  margin-right: calc(8px * 0.5);
+}
+.MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand'])::-moz-focus-inner {
+  border-style: none;
+}
+.MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand']).Mui-disabled {
+  pointer-events: none;
+  cursor: default;
+}
+@media print {
+  .MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand']) {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}
+.MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand']):hover,
+.MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand']):focus {
+  background-color: #eeeeee;
+}
+.MuiButtonBase-root:where([data-vg-core][data-slot='breadcrumbs-expand']):active {
+  box-shadow: none;
+  background-color: rgb(209, 209, 209);
+}
+
+// ---------------------------------------------------------------- MoreHoriz icon (SvgIcon fontSize medium, 24×16)
+// `svg.` = (0,1,1): ties with the generic own-core SvgIcon rule in primitives/react/TextField (which would otherwise
+// give 1em × 1em); this partial comes after it, so the BreadcrumbCollapsed values win as emotion's did.
+svg.MuiSvgIcon-root:where([data-slot='breadcrumbs-expand'] > [data-vg-core]) {
+  user-select: none;
+  width: 24px;
+  height: 16px;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  fill: currentColor;
+  font-size: 1.5rem;
+}
+svg.MuiSvgIcon-root:where(.vg-typography-vanguard [data-slot='breadcrumbs-expand'] > [data-vg-core]) {
+  font-size: unquote('1.7142857142857142rem'); // exact MUI pxToRem(24) with htmlFontSize 14, unrounded
+}

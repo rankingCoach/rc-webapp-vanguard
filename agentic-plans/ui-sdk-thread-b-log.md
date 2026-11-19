@@ -921,3 +921,35 @@ Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, n
 4. Size: Button eager closure 162.6 → 109.3 KB gzip, no emotion. Modal 167.2 → 113.8. Exports with the emotion runtime eager: 82 → 43 of 299.
 5. Consumers: rc-webapp iconLargeOnHover user is StatisticsBoardItem; every other Button renders unchanged by construction (only the Grow path changed). WordPress export → smoke patch to A.
 6. Biome: 4 infos (`?? <></>` fragment fallbacks), verbatim from the former code.
+
+### g8 Breadcrumbs (own core: ButtonBase primitive for the ellipsis)
+1. Rendering: `Breadcrumbs.tsx` now renders MUI 9.5 Breadcrumbs' DOM itself.
+   1.1 Structure: Typography body1 `nav` (MuiTypography-root/-body1/MuiBreadcrumbs-root) > `ol.MuiBreadcrumbs-ol` > `li.MuiBreadcrumbs-li` entries with aria-hidden `li.MuiBreadcrumbs-separator`. Non-element children are dropped.
+   1.2 Collapsing: past `maxItems` (default 8; before/after default 1; an invalid combination shows everything) a plain `li` holds A's ButtonBase (native button, focusRipple, aria-label "Show path"). Its only class is MuiButtonBase-root, as in MUI.
+   1.3 Expanding: a click expands and focuses the first `a[href],button,[tabindex]` in the list. Expanded state persists across rerenders.
+   1.4 Icon: MUI's MoreHoriz svg.
+   1.5 Public props unchanged; no MUI fallback.
+2. Compat: `_Breadcrumbs.compat.scss` comes from the injected rules, identical in both themes except rem.
+   2.1 Root font-size `pxToRem(16)` and icon `pxToRem(24)` follow VanguardThemeProvider via `vg-typography-vanguard` on the root, keyed with `:where()` for the svg.
+   2.2 The ellipsis button has no MuiBreadcrumbCollapsed class in MUI's DOM, so it is keyed by its own-core slot.
+   2.3 The icon rule is `svg.MuiSvgIcon-root:where(…)` (0,1,1). A's generic own-core SvgIcon rule in primitives/react/TextField.scss is `svg.MuiSvgIcon-root:where([data-vg-core])` (0,1,1) and gave 1em × 1em. At 0,1,0 my rule lost: the Chromium differential caught it (24×24 vs 16). Now it ties and wins by order. Told A.
+3. Markers:
+   3.1 `data-vg-core` on every part.
+   3.2 Slots: breadcrumbs, breadcrumbs-list, breadcrumbs-item, breadcrumbs-separator, breadcrumbs-collapsed, breadcrumbs-expand.
+   3.3 Root `data-expanded`.
+   3.4 The root class is a filtered join, so no stray spaces from an unset className.
+4. Evidence:
+   4.1 `_breadcrumbs-parity.spec` vs `_BreadcrumbsMui.reference.tsx` (former code verbatim):
+       4.1.1 Whole subtree over 171 combinations × 2 themes: n 0–12 × maxItems undefined/3/0 × before/after incl. invalid × links/mixed, plus node separator, aria-label/className/testId and text-only collapsed. Null/string children included.
+       4.1.2 Three expand timelines: focus, ripple press, Enter+click → expanded + focused entry, rerender keeps expanded.
+       4.1.3 Total 5/5. Mutations: no focus after expand → 2 fail; separator aria-hidden dropped → 5 fail.
+   4.2 Chromium `_BreadcrumbsParity.stories` (both themes):
+       4.2.1 5 cases, 28 computed properties plus boxes and positions of nav/ol/li/button/svg.
+       4.2.2 States: rest, forced :hover/:active (with a guard), :focus, expanded.
+   4.3 `_Breadcrumbs.cleanup.spec` 2/2: no timer or global listener after focus/press/expand/unmount; DOM contract; no junk class tokens on own parts.
+   4.4 Breadcrumbs specs 3 files / 9; stories 2 / 4; `_mui-compat-order` 6/6; tsc lib 0.
+5. Size: Breadcrumbs 89.9 → 5.6 KB gzip, no emotion.
+6. Consumers:
+   6.1 rc-webapp AdminTopNav (separator "→"; its module CSS targets `.MuiBreadcrumbs-separator`, which is kept) and PartnerLayout.
+   6.2 No internal consumer. Not a WordPress export.
+7. Note for A: A's ButtonBase emits stray spaces in its class attribute (`"MuiButtonBase-root    "`) from empty classNames entries. MUI has none. That is A's primitive, so it's reported rather than changed.

@@ -1,8 +1,10 @@
-import { classNames } from '@helpers/classNames';
-import { Breadcrumbs as MuiBreadcrumbs } from '@mui/material';
-import React from 'react';
+// Ported from @mui/material@9.5.0 Breadcrumbs/Breadcrumbs.js, Breadcrumbs/BreadcrumbCollapsed.js, internal/svg-icons/MoreHoriz.js (MIT)
 
 import styles from './Breadcrumbs.module.scss';
+import { classNames } from '@helpers/classNames';
+import React, { useRef, useState } from 'react';
+import { ButtonBase } from '../../primitives/react/ButtonBase/ButtonBase';
+import { useVanguardTypography } from '../../primitives/react/typography-context';
 
 export interface BreadcrumbsProps {
   /** Breadcrumb entries (links, text). The last one is usually the current page. */
@@ -19,28 +21,112 @@ export interface BreadcrumbsProps {
   'aria-label'?: string;
 }
 
+/** MUI's internal MoreHoriz icon path (svg-icons/MoreHoriz.js). */
+const MORE_HORIZ_PATH =
+  'M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z';
+
+/**
+ * Renders MUI 9.5 Breadcrumbs' DOM itself (Typography body1 `nav` > `ol` of `li` entries with aria-hidden separators;
+ * past `maxItems` the middle collapses into an ellipsis button that expands the list and focuses its first focusable
+ * entry). Emotion's rules are static in _Breadcrumbs.compat.scss (D15 last block); `vg-typography-vanguard` selects
+ * VanguardThemeProvider's rem sizes.
+ */
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const {
     children,
     separator = '/',
-    maxItems,
-    itemsBeforeCollapse,
-    itemsAfterCollapse,
+    maxItems = 8,
+    itemsBeforeCollapse = 1,
+    itemsAfterCollapse = 1,
     className,
     testId = 'breadcrumbs',
     'aria-label': ariaLabel = 'breadcrumb',
   } = props;
+  const [expanded, setExpanded] = useState(false);
+  const listRef = useRef<HTMLOListElement>(null);
+  const vgType = useVanguardTypography() === 'vanguard' ? 'vg-typography-vanguard' : undefined;
+
+  const allItems = React.Children.toArray(children)
+    .filter((child) => React.isValidElement(child))
+    .map((child, index) => (
+      <li data-vg-core="" data-slot={'breadcrumbs-item'} className={'MuiBreadcrumbs-li'} key={`child-${index}`}>
+        {child}
+      </li>
+    ));
+
+  const renderItemsBeforeAndAfter = (items: React.ReactElement[]) => {
+    const handleClickExpand = () => {
+      setExpanded(true);
+      const focusable = listRef.current?.querySelector<HTMLElement>('a[href],button,[tabindex]');
+      if (focusable) focusable.focus();
+    };
+    // MUI: an invalid combination (before + after >= all) shows everything.
+    if (itemsBeforeCollapse + itemsAfterCollapse >= items.length) return items;
+    return [
+      ...items.slice(0, itemsBeforeCollapse),
+      <li data-vg-core="" data-slot={'breadcrumbs-collapsed'} key="ellipsis">
+        <ButtonBase
+          data-vg-core=""
+          data-slot={'breadcrumbs-expand'}
+          focusRipple
+          aria-label={'Show path'}
+          onClick={handleClickExpand}
+        >
+          <svg
+            data-vg-core=""
+            className={'MuiSvgIcon-root MuiSvgIcon-fontSizeMedium'}
+            focusable="false"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            data-testid="MoreHorizIcon"
+          >
+            <path d={MORE_HORIZ_PATH} />
+          </svg>
+        </ButtonBase>
+      </li>,
+      ...items.slice(items.length - itemsAfterCollapse, items.length),
+    ];
+  };
+
+  const shown = expanded || (maxItems && allItems.length <= maxItems) ? allItems : renderItemsBeforeAndAfter(allItems);
+  const withSeparators = shown.reduce<React.ReactNode[]>((acc, current, index) => {
+    acc.push(current);
+    if (index < shown.length - 1)
+      acc.push(
+        <li
+          data-vg-core=""
+          data-slot={'breadcrumbs-separator'}
+          aria-hidden={true}
+          className={'MuiBreadcrumbs-separator'}
+          key={`separator-${index}`}
+        >
+          {separator}
+        </li>,
+      );
+    return acc;
+  }, []);
+
   return (
-    <MuiBreadcrumbs
-      separator={separator}
-      maxItems={maxItems}
-      itemsBeforeCollapse={itemsBeforeCollapse}
-      itemsAfterCollapse={itemsAfterCollapse}
+    <nav
+      data-vg-core=""
+      data-slot={'breadcrumbs'}
+      data-expanded={expanded ? '' : undefined}
+      // Only real tokens (@helpers/classNames joins as-is): no stray spaces for an unset className / theme marker.
+      className={classNames(
+        ...[
+          'MuiTypography-root MuiTypography-body1 MuiBreadcrumbs-root',
+          styles.breadcrumbs,
+          'vanguard-breadcrumbs',
+          className,
+          vgType,
+        ].filter((c): c is string => !!c),
+      )}
       aria-label={ariaLabel}
       data-testid={testId}
-      className={classNames(styles.breadcrumbs, 'vanguard-breadcrumbs', className)}
     >
-      {children}
-    </MuiBreadcrumbs>
+      <ol data-vg-core="" data-slot={'breadcrumbs-list'} className={'MuiBreadcrumbs-ol'} ref={listRef}>
+        {withSeparators}
+      </ol>
+    </nav>
   );
 };
