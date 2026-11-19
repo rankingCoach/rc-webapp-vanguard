@@ -88,6 +88,16 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
   };
 
   /**
+   * The file as picked: what the input recorded, or the incoming file when this transformer is
+   * used on its own.
+   *
+   * @private
+   */
+  private getOriginalFile = (internalFile: InternalFile): File | Blob => {
+    return internalFile.originalFile ?? internalFile.file;
+  };
+
+  /**
    * Compresses a single file.
    *
    * @param selectedFile - The file to be compressed.
@@ -99,7 +109,13 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
     this.compressorOptions.success = (compressedResult) => {
       this.handleLoadingModalClose(t0);
 
-      this.resolveTransformPromise?.([{ file: compressedResult, filePriority: selectedFile.filePriority }]);
+      this.resolveTransformPromise?.([
+        {
+          file: compressedResult,
+          filePriority: selectedFile.filePriority,
+          originalFile: this.getOriginalFile(selectedFile),
+        },
+      ]);
       this.resolveTransformPromise = undefined;
     };
 
@@ -131,6 +147,7 @@ export class ImageCompressorTransformer extends MediaItemTransformer {
             resolve({
               file: compressedResult,
               filePriority: internalFile.filePriority,
+              originalFile: this.getOriginalFile(internalFile),
             });
           };
 
