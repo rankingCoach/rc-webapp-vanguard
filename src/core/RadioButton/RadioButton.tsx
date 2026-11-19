@@ -4,7 +4,6 @@ import { classNames } from '@helpers/classNames';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements } from '@vanguard/Text/Text';
 import React, { ReactNode } from 'react';
-
 import { FormConfigElement } from '../../custom-hooks/useFormConfig';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 
@@ -51,7 +50,7 @@ export const RadioButton = <ValueType,>(props: RadioButtonProps<ValueType>) => {
     <ComponentContainer
       className={classNames('RadioButton', theme, checked ? 'checked' : '', disabled ? 'disabled' : '')}
     >
-      <label className={`RadioButton-label ${labelClassName}`}>
+      <label className={classNames('RadioButton-label', labelClassName)}>
         <input
           data-testid={testId}
           className={'RadioButton-input'}
@@ -64,9 +63,11 @@ export const RadioButton = <ValueType,>(props: RadioButtonProps<ValueType>) => {
           onChange={() => onChangeFn()}
         />
         <div
-          className={`${theme === 'success' ? 'RadioButton-label-text-success' : 'RadioButton-label-text'} ${
-            checked ? 'checked' : ''
-          } ${disabled ? 'disabled' : ''}`}
+          className={classNames(
+            theme === 'success' ? 'RadioButton-label-text-success' : 'RadioButton-label-text',
+            checked ? 'checked' : undefined,
+            disabled ? 'disabled' : undefined,
+          )}
         >
           {typeof labelText === 'string' ? (
             <Text

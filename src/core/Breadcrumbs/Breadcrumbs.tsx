@@ -1,9 +1,10 @@
 // Ported from @mui/material@9.5.0 Breadcrumbs/Breadcrumbs.js, Breadcrumbs/BreadcrumbCollapsed.js, internal/svg-icons/MoreHoriz.js (MIT)
 
 import styles from './Breadcrumbs.module.scss';
-import { classNames } from '@helpers/classNames';
 import React, { useRef, useState } from 'react';
 import { ButtonBase } from '../../primitives/react/ButtonBase/ButtonBase';
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+import { cx } from '../../primitives/react/class-names';
 import { useVanguardTypography } from '../../primitives/react/typography-context';
 
 export interface BreadcrumbsProps {
@@ -111,15 +112,12 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
       data-vg-core=""
       data-slot={'breadcrumbs'}
       data-expanded={expanded ? '' : undefined}
-      // Only real tokens (@helpers/classNames joins as-is): no stray spaces for an unset className / theme marker.
-      className={classNames(
-        ...[
-          'MuiTypography-root MuiTypography-body1 MuiBreadcrumbs-root',
-          styles.breadcrumbs,
-          'vanguard-breadcrumbs',
-          className,
-          vgType,
-        ].filter((c): c is string => !!c),
+      className={cx(
+        'MuiTypography-root MuiTypography-body1 MuiBreadcrumbs-root',
+        styles.breadcrumbs,
+        'vanguard-breadcrumbs',
+        className,
+        vgType,
       )}
       aria-label={ariaLabel}
       data-testid={testId}

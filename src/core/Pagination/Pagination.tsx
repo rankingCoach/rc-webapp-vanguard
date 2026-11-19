@@ -1,9 +1,10 @@
 // Ported from @mui/material@9.5.0 Pagination/Pagination.js, usePagination/usePagination.js, PaginationItem/PaginationItem.js, internal/svg-icons/{FirstPage,LastPage,NavigateBefore,NavigateNext}.js (MIT)
 
 import styles from './Pagination.module.scss';
-import { classNames } from '@helpers/classNames';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ButtonBase } from '../../primitives/react/ButtonBase/ButtonBase';
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+import { cx } from '../../primitives/react/class-names';
 import { useVanguardTypography } from '../../primitives/react/typography-context';
 
 export interface PaginationProps {
@@ -61,8 +62,6 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const range = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => start + i);
 const ariaLabel = (type: ItemType, page: number | null, selected: boolean) =>
   type === 'page' ? `${selected ? '' : 'Go to '}page ${page}` : `Go to ${type} page`;
-/** Only real tokens (@helpers/classNames joins as-is). */
-const cls = (...c: Array<string | false | undefined>) => classNames(...c.filter((x): x is string => !!x));
 
 /**
  * Renders MUI 9.5 Pagination's DOM itself (variant text, color standard): `nav` > `ul` > `li` per item; pages and
@@ -184,7 +183,7 @@ export const Pagination = (props: PaginationProps) => {
       data-shape={shape}
       data-disabled={disabled ? '' : undefined}
       aria-label="pagination navigation"
-      className={cls(
+      className={cx(
         'MuiPagination-root MuiPagination-text',
         styles.pagination,
         'vanguard-pagination',
@@ -200,7 +199,7 @@ export const Pagination = (props: PaginationProps) => {
           if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis')
             return (
               <li key={index}>
-                <div data-vg-core="" data-slot={'pagination-ellipsis'} className={cls(...itemClasses(item))}>
+                <div data-vg-core="" data-slot={'pagination-ellipsis'} className={cx(...itemClasses(item))}>
                   …
                 </div>
               </li>
@@ -212,7 +211,7 @@ export const Pagination = (props: PaginationProps) => {
                 data-vg-core=""
                 data-slot={'pagination-item'}
                 data-selected={item.selected ? '' : undefined}
-                className={cls(...itemClasses(item))}
+                className={cx(...itemClasses(item))}
                 disabled={item.disabled}
                 aria-current={item.selected ? 'page' : undefined}
                 aria-label={label}

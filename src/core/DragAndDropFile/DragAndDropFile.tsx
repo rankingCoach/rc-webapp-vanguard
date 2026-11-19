@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
-
 import styles from './DragAndDropFile.module.scss';
+import { classNames } from '@helpers/classNames';
+import React, { useRef, useState } from 'react';
 
 interface FileData {
   name: string;
@@ -72,7 +72,7 @@ export const DragAndDropFile: React.FC<DragAndDropFileProps> = ({ onFileDrop }) 
   return (
     <div
       data-slot={'drag-and-drop-file'}
-      className={`${styles.dropzone} ${dragging ? styles.dragging : ''}`}
+      className={classNames(styles.dropzone, dragging ? styles.dragging : undefined)}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -80,7 +80,13 @@ export const DragAndDropFile: React.FC<DragAndDropFileProps> = ({ onFileDrop }) 
     >
       <label data-slot={'drag-and-drop-file-label'}>
         Drag and drop files here
-        <input data-slot={'drag-and-drop-file-input'} type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileInputChange} />
+        <input
+          data-slot={'drag-and-drop-file-input'}
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileInputChange}
+        />
       </label>
     </div>
   );

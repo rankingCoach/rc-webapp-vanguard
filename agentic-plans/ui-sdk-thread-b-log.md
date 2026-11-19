@@ -1044,3 +1044,87 @@ Reply to the watchdog after step 1's grep result.
    7.2 rc-webapp TaskTray `[data-dragging]` is on its own module class, so no collision.
    7.3 Internal: Cropper, AgeSlider, MUIComponentsShowcase, Form binding.
    7.4 Not a WordPress export.
+
+### Track (h) step 1 → watchdog decision (decided-by-watchdog)
+1. Grep result (rc-webapp + Vanguard):
+   1.1 No CSS or selectors on junk tokens.
+   1.2 No snapshot or fixture files with junk tokens; no cypress/e2e folders in rc-webapp.
+   1.3 rc-webapp class assertions are regex or self-comparisons.
+   1.4 Ten Vanguard exact-className `toBe` specs, all currently junk-free.
+   1.5 Button.module.scss `[class^="icon-"]`: no producer of `icon-*` classes found.
+   1.6 About 25 `[class*=…]` substring selectors, none on junk.
+   1.7 The one assertion on junk itself: `_FormCharacterization.spec` `'Form-container undefined'`.
+2. Approved:
+   2.1 Rewrite that bug-lock to `'Form-container'` in the same commit as the `classNames` fix; the commit message names the declared change.
+   2.2 Conditions:
+       2.2.1 A differential spec proves identical helper output for every junk-free input and that only non-string/empty tokens drop.
+       2.2.2 The 10 exact-className specs stay unchanged and green.
+       2.2.3 A before/after junk scan over all stories, with a count of changed elements in the log (regex and story count stated).
+       2.2.4 Template-literal sites fixed per site, token order kept.
+       2.2.5 A spec locks that Button does not start matching `[class^="icon-"]`.
+3. Chip matrix 60 s timeout accepted.
+4. G10 goes to verifier 2 after H15/G8/G9.
+5. Then ProgressCircle NaN, then verification support. No new components.
+
+### StyledSVG descendant width/height (verifier 2 on 817bf04): MAJOR withdrawn by the watchdog
+1. Old styled-components rule: `.sc-<hash> path { width/height: Npx }` (0,1,1). Rects got fill only; image/use/foreignObject/nested svg had no rule.
+2. The static rule keeps it: `.vg-styled-svg--size path { width/height: var(--vg-svg-size) }` (0,1,1), last block of vanguard.css.
+3. Enumeration (tags parsed):
+   3.1 Vanguard assets: 752 SVGs, 401 with SVG2-geometry children (397 rect, 2 image, 2 use).
+   3.2 rc-webapp StyledSVG consumers: 82 files → 36 SVGs, 28 with rect.
+4. Chromium legacy (817bf04^ verbatim) vs current, 882 pairs at 16/32 px: 0 descendant computed-width/height or bbox differences. Pixel diffs equal the A/A baseline (89/810 + 11/72 vs 90/810 + 10/72).
+5. Lock: `_StyledSVGLegacyParity.stories` (Icon-ado, Icon-maps, shield_secured, superpages). Deleting `.vg-styled-svg--size path` reproduces 16px → auto.
+6. Open MINOR: which of 6.1–6.3 explains rc-webapp's auto (pack-15 CSS without the block / last block not loaded / consumer rule winning). Waiting for verifier 2's matched-rules dump; 6.2/6.3 would be a D15 order data point.
+7. Watchdog also approved the TableFooter fixture regeneration (track h) and the ProgressCircle story-only fix.
+
+### Track (h) junk class tokens: implementation + proof (decided-by-watchdog)
+1. Public helper `@helpers/classNames` (API, rc-webapp imports it):
+   1.1 It drops non-string (`false|true|undefined|null|NaN|0`) and empty/whitespace-only entries. Order is kept; output is single-spaced.
+   1.2 For all-string, non-empty calls it is byte-identical to the former `args.join(' ')`.
+   1.3 `_class-names.spec` checks this with 2000 seeded random calls against the inlined legacy join, plus the drop rules and a junk-free-output fuzz.
+2. Watchdog split (confirmed):
+   2.1 Internal `cx` (A, src/primitives/react/class-names.ts, not exported) for own-core components reproducing MUI markup.
+   2.2 The public helper for everything else.
+   2.3 Two contracts on purpose: the helper keeps internal double spaces of string arguments (identity guarantee), while cx collapses them.
+   2.4 Conditions: one-line header per file; a spec pins the difference; cx is never exported; A mirrors the decision in the plan.
+3. Template-literal sites moved to the helper, per site, token order kept:
+   3.1 Form `Form-container ${className}`.
+   3.2 RadioButton label + text div.
+   3.3 SectionMissing.
+   3.4 Found by the scan: Divider `rc-divider ${className}`, Gallery `gallery-list ${className}`, TagList (template inside classNames), DragAndDropFile.
+   3.5 `_junk-class-sites.spec` compares each against its inlined former expression over all prop combinations. Red on old code: 5 + 4 failures. Green: 12/12.
+   3.6 Declared deltas: Divider/Gallery no longer render a literal "undefined" token; Form without className is `Form-container`.
+4. Bug-lock rewritten (approved, same commit): `_FormCharacterization.spec` `'Form-container undefined'` → `'Form-container'`. The assertion stays an exact string.
+5. Lock: the Button `[class^="icon-"]` spec. No Button element's class starts with `icon-` across 144 variants, including after hover.
+6. The 10 exact-className specs (TimePicker, Input, Snackbar, Slider, PhoneNumberBase, PhoneNumberPrefix, Textarea, Select, FormControl, Form) pass unchanged.
+7. TableFooter fixture regenerated (approved). A script proves 15/30 keys change, only stray spaces inside class attributes, 0 junk tokens left.
+8. Story scan. Derivation: static Storybook build of 0cac8bd (before) vs the track-(h) tree (after). Playwright, every indexed story (1408; 1407 scanned, 1 timeout on both sides: slider-slidermuicontract--drag-in-real-browser, reported to verifier 2). Every `[class]` attribute. Junk regex `(^|\s)(false|true|undefined|null|NaN)(\s|$)`, spacing regex `\s{2,}|^\s|\s$`.
+
+   | measure | before | after |
+   |---|---|---|
+   | elements with junk tokens or irregular spacing | 14,009 | 278 (0 junk tokens) |
+   | elements changed (each == old minus junk/whitespace) | — | 13,496 in 1008 stories |
+   | changes other than junk removal | — | 140, all in stories that also change in a before-vs-before noise run (19 ⊆ 20) |
+   | structural (element-count) diffs | — | 9; 5 not in the noise run, identical in 3× isolated rescans per side → load noise |
+
+   8.1 Targeted rescan for the 4 scan-found sites: 17 stories, 60 → 0 elements, 0 other changes.
+9. Residue (documented, not touched), 278 elements, spacing only:
+   9.1 ApexCharts text 153 (third-party).
+   9.2 video.js 6 (third-party).
+   9.3 Internal `_showcase` stories 101 (CssUpdatesShowcase `item_*` 87, RcTransparentShowcase 16; not shipped; no sweep).
+   9.4 After the per-site fixes, the shipped-site residue is 0.
+10. ProgressCircle: `size` and `progress` are REQUIRED by type, so this is a story-only fix: args plus a play asserting finite svg geometry. Without the args the play fails on NaN.
+11. Full spec project: 342 files / 2497 tests, 0 failures.
+
+### Track (h) follow-up: own-core markup on A's internal `cx` (watchdog split)
+1. Merged A's tip (incl. e04a23c `cx`) as 3e75f4c. The mui-compat conflict was resolved keeping both lines: Slider, then StyledSVG last.
+2. A removed `styled-components` from the dependencies. `_StyledSVGLegacy.reference.tsx` now reproduces what styled-components did at runtime: per-instance class; the former template interpolated the styled-components way, falsy → '', so invalid declarations drop; `<style>` at the end of <head>. The lock story still passes, and deleting `.vg-styled-svg--size path` still fails it.
+3. My own-core files now build classes with `cx`: Accordion, OwnCollapse, Chip, Breadcrumbs, Pagination, Slider, own-progress-bar. The local `cls` helpers in Pagination and Slider are removed, leaving one internal builder. Each import carries a one-line header comment.
+4. Public helper: one-line contract note.
+5. New `_class-builders-contract.spec`: `classNames('a  b','c')` keeps the double space, `cx` collapses it; both drop junk; neither package entry exports `cx`.
+6. A's `_class-junk-scan.spec`: the Accordion/own-Collapse case flipped from `it.fails` to `it` (passes).
+7. Gates:
+   7.1 Specs of the 7 components + helpers + junk-scan: 40 files / 348.
+   7.2 Parity stories (8 files / 14): green in 3 consecutive runs. The very first run had 1 failure (517 ms) that did not reproduce; logged as a cold-start flake.
+   7.3 FULL spec project on the merged tree: 367 files / 2659 tests, 0 failures.
+8. Open for A (not my file): tsc lib error `src/helpers/hex-to-rgba.ts(8,41)` TS2741 (RegExpMatchArray) from A's eb0df11.

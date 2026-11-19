@@ -87,9 +87,8 @@ describe('own-core class attributes carry no junk tokens', () => {
     expect(scan()).toEqual([]);
   });
 
-  // KNOWN, B's files (track h, told 2026-11-19): Accordion root and the own Collapse join empty parts. `it.fails`
-  // turns red once fixed, as a reminder to make this a plain `it`.
-  it.fails('Accordion expanded (B: Accordion root, own Collapse)', async () => {
+  // Fixed in track (h): Accordion root and the own Collapse build their classes with `cx`.
+  it('Accordion expanded (B: Accordion root, own Collapse)', async () => {
     render(
       <Accordion
         accordionId="scan"

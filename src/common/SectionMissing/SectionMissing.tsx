@@ -20,7 +20,11 @@ interface Props {
 export const SectionMissing = (props: Props) => {
   const { title, description, buttonText, buttonCallback, className, testId } = props;
   return (
-    <ComponentContainer data-slot={'section-missing'} testId={testId} className={`BusinessProfileSectionMissing-container ${className}`}>
+    <ComponentContainer
+      data-slot={'section-missing'}
+      testId={testId}
+      className={classNames('BusinessProfileSectionMissing-container', className)}
+    >
       <Text type={TextTypes.textIntro} color={'--w900'} fontWeight={FontWeights.medium} className={mb3}>
         {title}
       </Text>

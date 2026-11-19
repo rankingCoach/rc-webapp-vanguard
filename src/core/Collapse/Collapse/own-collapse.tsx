@@ -1,6 +1,8 @@
 // Ported from @mui/material@9.5.0 Collapse/Collapse.js (MIT)
-import { classNames } from '@helpers/classNames';
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+
 import React, { useRef } from 'react';
+import { cx } from '../../../primitives/react/class-names';
 import { Transition } from '../../../primitives/react/Transitions/Transition';
 
 /** MUI theme `transitions.duration.standard`: MUI Collapse's default timeout. */
@@ -93,7 +95,7 @@ export const OwnCollapse = ({
           data-slot={'collapse'}
           data-orientation={orientation}
           data-open={inProp ? '' : undefined}
-          className={classNames(
+          className={cx(
             'MuiCollapse-root',
             `MuiCollapse-${orientation}`,
             className,
@@ -106,12 +108,12 @@ export const OwnCollapse = ({
             ref={wrapperRef}
             data-vg-core=""
             data-slot={'collapse-wrapper'}
-            className={classNames('MuiCollapse-wrapper', `MuiCollapse-${orientation}`)}
+            className={cx('MuiCollapse-wrapper', `MuiCollapse-${orientation}`)}
           >
             <div
               data-vg-core=""
               data-slot={'collapse-content'}
-              className={classNames('MuiCollapse-wrapperInner', `MuiCollapse-${orientation}`)}
+              className={cx('MuiCollapse-wrapperInner', `MuiCollapse-${orientation}`)}
             >
               {children}
             </div>

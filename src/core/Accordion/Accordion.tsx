@@ -1,11 +1,12 @@
 // Ported from @mui/material@9.5.0 Accordion/Accordion.js, AccordionSummary/AccordionSummary.js, AccordionDetails/AccordionDetails.js, Paper/Paper.js (MIT)
 import './Accordion.scss';
 
-import { classNames } from '@helpers/classNames';
 import type { AccordionProps as BaseProps } from '@mui/material';
 import * as React from 'react';
 import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { ButtonBase } from '../../primitives/react/ButtonBase/ButtonBase';
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+import { cx } from '../../primitives/react/class-names';
 import type { VanguardLegacyAccordionProps } from '../_internal/mui-legacy-props';
 import { OwnCollapse } from '../Collapse/Collapse/own-collapse';
 import { Icon, IconSize } from '../Icon/Icon';
@@ -77,7 +78,7 @@ export const Accordion = (props: AccordionProps) => {
       data-slot={'accordion'}
       data-variant={outlined ? 'outlined' : 'elevation'}
       data-open={isExpanded ? '' : undefined}
-      className={classNames(
+      className={cx(
         'MuiPaper-root',
         outlined ? 'MuiPaper-outlined' : 'MuiPaper-elevation',
         'MuiPaper-rounded',
@@ -95,7 +96,7 @@ export const Accordion = (props: AccordionProps) => {
         <ButtonBase
           data-vg-core=""
           data-slot={'accordion-summary'}
-          className={classNames(
+          className={cx(
             'MuiAccordionSummary-root',
             expandedClass,
             disableGutters ? undefined : 'MuiAccordionSummary-gutters',
@@ -113,7 +114,7 @@ export const Accordion = (props: AccordionProps) => {
           <span
             data-vg-core=""
             data-slot={'accordion-summary-content'}
-            className={classNames('MuiAccordionSummary-content', expandedClass)}
+            className={cx('MuiAccordionSummary-content', expandedClass)}
           >
             {summaryChildren ?? <></>}
           </span>
@@ -121,7 +122,7 @@ export const Accordion = (props: AccordionProps) => {
             <span
               data-vg-core=""
               data-slot={'accordion-icon'}
-              className={classNames('MuiAccordionSummary-expandIconWrapper', expandedClass)}
+              className={cx('MuiAccordionSummary-expandIconWrapper', expandedClass)}
             >
               <Icon className={'Accordion-icon'} type={iconSize ?? IconSize.large}>
                 {iconName ?? IconNames.caretDown}
