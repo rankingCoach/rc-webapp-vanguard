@@ -1,4 +1,3 @@
-import MuiInputAdornment from '@mui/material/InputAdornment';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import React from 'react';
@@ -6,16 +5,14 @@ import { InputAdornment } from '../../../../primitives/react/TextField/InputAdor
 
 export interface DateRangePickerBaseInputAdornmentProps {
   onClick?: () => void;
-  muiFrame?: boolean;
 }
 
 export const DateRangePickerBaseInputAdornment = (props: DateRangePickerBaseInputAdornmentProps) => {
-  const { onClick, muiFrame = false } = props;
-  const Adornment = muiFrame ? MuiInputAdornment : InputAdornment;
+  const { onClick } = props;
 
   return (
     // TODO calendar icon should toggle the input
-    <Adornment
+    <InputAdornment
       onClick={
         //   () => {
         //   setIsPopoverOpen(true);
@@ -29,6 +26,6 @@ export const DateRangePickerBaseInputAdornment = (props: DateRangePickerBaseInpu
       <Icon forceSize={18} color={'--n400'} type={IconSize.small}>
         {IconNames.calendar}
       </Icon>
-    </Adornment>
+    </InputAdornment>
   );
 };

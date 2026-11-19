@@ -585,7 +585,6 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             className={classNames('input-left', selectedState === 'date-range-picker' ? 'input-closed' : '')}
             endAdornment={
               <DateRangePickerBaseInputAdornment
-                muiFrame
                 onClick={() => {
                   if (!disabled) {
                     leftRef.current?.focus();

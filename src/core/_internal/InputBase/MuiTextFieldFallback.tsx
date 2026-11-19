@@ -12,8 +12,8 @@ CompatibleInputLabel.displayName = 'CompatibleInputLabel';
 
 /**
  * The MUI TextField route of MuiTextField (props the own core does not model: non-outlined variants, native select,
- * custom input components, MUI slots/classes, refs on the InputBase root). Loaded lazily (plan §36.2 B.3) so the eager
- * graph of Input/Select/Textarea/… stays free of @mui/*. Receives the already mapped props and slotProps.
+ * MUI slots/classes). The route stays eager pending the separate reachability check. Receives the already mapped
+ * props and slotProps.
  */
 const MuiTextFieldFallback = (props: TextFieldProps) => (
   <TextField

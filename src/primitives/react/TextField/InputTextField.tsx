@@ -60,9 +60,20 @@ const isFilled = (obj: { value?: unknown; defaultValue?: unknown } | null | unde
       ((hasValue(obj.value) && obj.value !== '') || (ssr && hasValue(obj.defaultValue) && obj.defaultValue !== '')),
   );
 
-const setRef = <T,>(ref: React.Ref<T> | undefined, value: T | null) => {
-  if (typeof ref === 'function') ref(value);
-  else if (ref && typeof ref === 'object') (ref as React.MutableRefObject<T | null>).current = value;
+const attachRef = <T,>(ref: React.Ref<T> | undefined, value: T): (() => void) | undefined => {
+  if (!ref) return;
+  if (typeof ref === 'function') {
+    const cleanup = ref(value);
+    return typeof cleanup === 'function'
+      ? cleanup
+      : () => {
+          ref(null);
+        };
+  }
+  ref.current = value;
+  return () => {
+    ref.current = null;
+  };
 };
 
 /**
@@ -119,6 +130,8 @@ export const InputTextField = (props: InputTextFieldProps) => {
   const {
     startAdornment,
     endAdornment,
+    ref: inputRootRef,
+    inputComponent: Control = 'input',
     className: inputRootClassName,
     readOnly = false,
     onClick: inputRootOnClick,
@@ -170,11 +183,21 @@ export const InputTextField = (props: InputTextFieldProps) => {
   const htmlValue = htmlInput.value != null ? htmlInput.value : ibValue;
   const isControlled = useRef(htmlValue != null).current;
   const nodeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const detachRefs = useRef<(() => void) | undefined>(undefined);
   const handleRef = useCallback(
     (node: HTMLInputElement | HTMLTextAreaElement | null) => {
+      detachRefs.current?.();
+      detachRefs.current = undefined;
+      if (!node) return;
       nodeRef.current = node;
-      setRef(ibInputRef, node);
-      setRef(htmlInput.ref, node);
+      const detachInput = attachRef(ibInputRef, node);
+      const detachHtml = attachRef(htmlInput.ref, node);
+      // IMask relays the element and null to this callback without returning its cleanup to React.
+      detachRefs.current = () => {
+        nodeRef.current = null;
+        detachInput?.();
+        detachHtml?.();
+      };
     },
     [ibInputRef, htmlInput.ref],
   );
@@ -195,7 +218,8 @@ export const InputTextField = (props: InputTextFieldProps) => {
     if (!autoFocus) return;
     const input = nodeRef.current;
     if (!input) return;
-    const doc = input.ownerDocument;
+    // A custom InputBase control can expose value/focus through an imperative handle.
+    const doc = input.ownerDocument ?? document;
     const active = doc.activeElement;
     if (input === active) setFocused(true);
     else if (active == null || active === doc.body || active === doc.documentElement) input.focus();
@@ -235,6 +259,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
     value: _v,
     ...htmlRest
   } = htmlInput;
+  const autosize = ibMultiline && Control === 'input';
   const controlProps = {
     'aria-invalid': ibError,
     'aria-describedby': ib('aria-describedby', helperId),
@@ -252,7 +277,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
     value: htmlValue,
     onKeyDown: ibOnKeyDown,
     onKeyUp: ibOnKeyUp,
-    type: ibMultiline ? undefined : ibType,
+    type: autosize ? undefined : ibType,
     ...htmlRest,
     'data-slot': 'text-field-control',
     'data-vg-core': '',
@@ -270,15 +295,19 @@ export const InputTextField = (props: InputTextFieldProps) => {
   };
 
   const ibRows = ib('rows', rows);
-  const control = ibMultiline ? (
+  // MUI styles the default input and uses `as` for its custom control. The styling props stay at that boundary.
+  const { ownerState: _ownerState, theme: _theme, sx: _sx, as: _as, ...customControlProps } = controlProps as AnyProps;
+  const control = autosize ? (
     <TextareaAutosize
       {...controlProps}
       minRows={ibRows ?? ib('minRows', minRows)}
       maxRows={ibRows ?? ib('maxRows', maxRows)}
       ref={handleRef as React.Ref<HTMLTextAreaElement>}
     />
-  ) : (
+  ) : Control === 'input' ? (
     <input {...controlProps} ref={handleRef as React.Ref<HTMLInputElement>} />
+  ) : (
+    <Control {...customControlProps} ref={handleRef} />
   );
 
   // MUI InputBase root class order: root, color, disabled, error, fullWidth, focused, formControl, size, multiline,
@@ -324,7 +353,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
       vgType={vgType}
       inputRootRest={inputRootRest}
       inputRootClasses={inputRootClasses}
-      inputRootHandlers={{ onClick: handleRootClick }}
+      inputRootHandlers={{ ref: inputRootRef, onClick: handleRootClick }}
       startAdornment={startAdornment}
       endAdornment={endAdornment}
       helperText={helperText}

@@ -20,6 +20,7 @@ const normalize = (html: string) =>
     .replace(/ ?\bcss-[a-z0-9]+(-[A-Za-z0-9]+)*/g, '')
     .replace(/ ?\bvg-z-n?\d+/g, '')
     .replace(/ class=""/g, '')
+    .replace(/<legend class="vg-notched-legend">/g, '<legend>')
     .replace(/ data-vg-core=""/g, '')
     .replace(/ data-slot="[^"]*"/g, '')
     .replace(/ (id|for|aria-labelledby|aria-controls|aria-describedby)="[^"]*"/g, ' $1="ID"')
@@ -70,6 +71,10 @@ const go = async (impl: Impl, signal: AbortSignal) => {
     </div>,
   );
   await settle(signal);
+  const calendarInput = screen.getByTestId('datepicker-reference');
+  const legend = calendarInput.closest('.MuiOutlinedInput-root')?.querySelector('legend');
+  expect(legend).not.toBeNull();
+  expect(legend?.classList.contains('vg-notched-legend')).toBe(impl === 'own');
   const trace = [snapshot()];
   await user.click(screen.getByTestId('datepicker-reference'));
   await settle(signal);

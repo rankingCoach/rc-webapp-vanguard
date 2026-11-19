@@ -103,15 +103,23 @@ describe('DateRangePicker contract: initial render', () => {
 
   test('the masked calendar field inherits its end adornment classes from the actual frame', () => {
     const calendarAdornmentClasses = () =>
-      getLeftInput().parentElement?.querySelector('.MuiInputAdornment-positionEnd')?.getAttribute('class');
+      getLeftInput()
+        .parentElement?.querySelector('.MuiInputAdornment-positionEnd')
+        ?.getAttribute('class')
+        ?.split(' ') ?? [];
+    const isAdornmentEmotionClass = (token: string) => /^css-[a-z0-9]+-MuiInputAdornment-root$/.test(token);
 
+    // The frozen picker pins MUI's default disableInjectingGlobalStyles:false so the shared Input keeps its old frame.
     const reference = render(<DateRangePickerMuiReference testId={TEST_ID} />);
     const expected = calendarAdornmentClasses();
-    expect(expected).toContain('MuiInputAdornment-outlined MuiInputAdornment-sizeMedium');
+    expect(expected).toEqual(expect.arrayContaining(['MuiInputAdornment-outlined', 'MuiInputAdornment-sizeMedium']));
+    expect(expected.filter(isAdornmentEmotionClass)).toHaveLength(1);
     reference.unmount();
 
     renderPicker();
-    expect(calendarAdornmentClasses()).toBe(expected);
+    const candidate = calendarAdornmentClasses();
+    expect(candidate.filter((token) => token.startsWith('css-'))).toHaveLength(0);
+    expect(candidate).toEqual(expected.filter((token) => !isAdornmentEmotionClass(token)));
   });
 
   test('emits onChange(AUTOMATIC) once on mount with the default preset range', async () => {

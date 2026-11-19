@@ -6,14 +6,10 @@ import { mapLegacyComponentAliases, mapLegacyModalAliases, mapLegacySlots } from
 import { useThemeDefaultProps } from '../theme-default-props';
 import MuiTextFieldFallback from './MuiTextFieldFallback';
 
-// MUI's TextField route stays EAGER: it is reachable (Autocomplete's renderInput passes InputProps.ref, IMask inputs
-// pass inputComponent), so a lazy boundary would render an empty field on first use (package smoke, 2026-11-19).
-// Removing it needs the own text field to model those props (plan §36.3).
+// Keep the fallback eager while the remaining public shapes are audited for first-render reachability (plan §36.4).
 
 /** InputBase-root props only MUI models: their presence keeps a text field on MUI. */
 const OWN_TEXT_FALLBACK_INPUT_KEYS = [
-  'ref',
-  'inputComponent',
   'inputProps',
   'slots',
   'slotProps',
@@ -115,7 +111,7 @@ export const MuiTextField = (inProps: VanguardTextFieldProps) => {
     (mapped as { classes?: unknown }).classes === undefined;
   if (ownText) {
     // Text mode (input / auto-growing textarea) on Vanguard's own core, MUI-identical DOM and behaviour. Anything the
-    // own core does not model (custom input components, refs on the InputBase root, MUI classes/slots) stays on MUI.
+    // own core does not model (MUI classes/slots, for example) stays on MUI.
     return (
       <InputTextField
         {...(mapped as Record<string, unknown>)}

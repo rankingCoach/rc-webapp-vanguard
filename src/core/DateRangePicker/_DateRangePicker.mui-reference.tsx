@@ -577,6 +577,8 @@ export const DateRangePickerMuiReference = (props: DateRangePickerProps) => {
             textFieldProps={{
               InputProps: {
                 inputComponent: DateRangePickerIMaskInput as any,
+                // Explicitly keep MUI's default behavior as the shared Input starts routing masks to the own field.
+                disableInjectingGlobalStyles: false,
               },
               inputProps: {
                 readOnly: selectedState === 'date-range-picker' || disabled,

@@ -1630,7 +1630,7 @@ caller. Its spread has source coverage in the real wrapper. PopoverPopper has so
 entry. Icon and StatusBadgeIcon's WordPress tests assert their existing empty first commit and then the local SVG
 load separately.
 
-#### Proposed own TextField port (for watchdog review)
+#### Own TextField port (approved with conditions, decided-by-watchdog)
 
 1. Keep the legacy slot mapping and theme-default precedence. Address the two reachable outlined-text fallback
    keys separately in the differential. Route `slotProps.input.ref` to the outlined InputBase root. The TextField
@@ -1645,6 +1645,30 @@ load separately.
    restore the own calendar adornment inside the newly own masked picker frame in the same change. Keep the
    remaining MUI props and routes available. Validate first paint of packed Autocomplete and Input in WordPress
    and rerun the combined shape audit before proposing any change to fallback loading.
+
+Approval conditions for H21:
+
+1. Enumerate every field supplied by Autocomplete's real `renderInput` callbacks in the differential and check
+   that the ref, ARIA, DOM attributes, adornments and event handlers survive the legacy bridge.
+2. Exercise both actual masks' focusable refs, programmatic value assignment, paste/caret and controlled reset
+   against the frozen field. Use the registered input ref in a consumer handler responding to Form validation.
+3. Reopen H19b for the actual masked frame on H21. The candidate must keep the exact reference class-token order
+   with the single generated `css-<hash>-MuiInputAdornment-root` token removed. Assert exactly one on the reference
+   and zero `css-` tokens on the candidate. Check the complete computed adornment box, icon geometry and text start
+   in Chromium in the normal, hover, focus and disabled frame states. The H21 declared delta is the absence of the
+   Emotion class. The own frame also emits `vg-notched-legend`, pinned separately in the picker timeline.
+4. Compare the label shrink state, outline notch width and popup geometry for chips/autofill at the three consumer
+   size settings. The MUI fallback remains eager in this change.
+5. **WordPress behavior note:** callers that supply `textFieldProps.InputProps.ref` or `inputComponent` with the
+   modeled outlined field shape move to the own route. Any proposed escape hatch needs a demonstrated parity gap
+   and a user decision before adding a public prop.
+
+Local H21 evidence: the photographed browser conditions were exercised by six scoped, guarded Chromium stories
+on port 6031, with zero denied destinations during stories. The full targeted spec set was green, 213/213, and
+library tsc exited zero. The mask ref cleanup differential showed an additional native ref contract: React 19
+callback cleanups must run even when IMask relays `null` without returning the cleanup to React. The red trace
+recorded `null` callbacks where the frozen MUI field ran cleanup functions. The final targeted run includes the
+fix. H21 still needs the exact packed WordPress smoke and the independent masked-frame recheck.
 
 **Autocomplete Clear icon (decided-by-watchdog).** The keyboard differential sampled the own side before the
 shared asset cache was warm and the frozen MUI side afterwards. Resetting the dynamic-import module before each
