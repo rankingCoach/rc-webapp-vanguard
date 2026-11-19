@@ -3,8 +3,7 @@
  * Anchored placement (group B, plan §27): a framework-free port of popper.js 2.11's main-phase modifiers as MUI
  * Popper/Tooltip run them: popperOffsets → offset → flip (resets the run once when it changes the placement) →
  * preventOverflow. Input is plain rects (viewport coordinates); output is the floating element's top-left and the
- * final placement. Clipping boundary = one rect (the viewport by default): nested scroll containers
- * (`clippingParents`) are not modelled (plan §27.3).
+ * final placement. The DOM adapter can supply each modifier's own clipping rect for nested scroll containers.
  */
 
 export type BasePlacement = 'top' | 'bottom' | 'left' | 'right';
@@ -33,8 +32,11 @@ export interface AnchoredPlacementInput {
    */
   clientReference?: Rect;
   floating: Size;
-  /** Clipping rect for flip/preventOverflow (popper detectOverflow with the caller's altBoundary). */
+  /** Default clipping rect for modifiers without a supplied boundary. */
   boundary: Rect;
+  /** Clipping rect for `flip` and `preventOverflow`, each with its own popper.js `altBoundary`. */
+  flipBoundary?: Rect;
+  preventOverflowBoundary?: Rect;
   /**
    * Clipping rect for scoring `auto` placements. popper's computeAutoPlacement does not forward `altBoundary`, so it
    * always clips against the floating element's clipping parents. Default: `boundary`.
@@ -213,7 +215,7 @@ const flip = (input: AnchoredPlacementInput, preferred: Placement): Placement =>
     const isStart = variation(placement) === 'start';
     const isVertical = b === 'top' || b === 'bottom';
     const len = isVertical ? 'width' : 'height';
-    const overflow = detectOverflow(input, placement, options.padding);
+    const overflow = detectOverflow(input, placement, options.padding, input.flipBoundary);
     let mainVariationSide: BasePlacement = isVertical ? (isStart ? 'right' : 'left') : isStart ? 'bottom' : 'top';
     if (input.reference[len] > input.floating[len]) mainVariationSide = OPPOSITE[mainVariationSide] as BasePlacement;
     const altVariationSide = OPPOSITE[mainVariationSide] as BasePlacement;
@@ -234,7 +236,7 @@ const preventOverflow = (input: AnchoredPlacementInput, placement: Placement, at
   const options = input.preventOverflow || {};
   const tether = options.tether ?? true;
   const tetherOffset = options.tetherOffset ?? 0;
-  const overflow = detectOverflow(input, placement, options.padding);
+  const overflow = detectOverflow(input, placement, options.padding, input.preventOverflowBoundary);
   const base = basePlacement(placement) as BasePlacement;
   const v = variation(placement);
   const isBase = !v;

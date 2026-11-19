@@ -1806,3 +1806,30 @@ combobox and the Input anchor/custom-control ref paths. [Gate output](/Users/a.k
 Both verifiers received the pack. The masked-frame H19b recheck is assigned to verifier 2, and the first-render
 consumer and keyboard checks are assigned to verifier 1. The six local Chromium cases predate the last routing
 correction. The exact packed smoke exercises the WordPress bundle using jsdom.
+
+### 36.8 Planner PopoverModal independent clipping (decided-by-watchdog)
+
+The centered, portaled planner card at rc-webapp `73673465091`, `EngagementPlannerCalendar.tsx:298`, uses
+`top` placement and Popper's default absolute strategy. `flip` uses the anchor's clipping parents, the viewport
+root boundary and 8 px padding. `preventOverflow` uses the floating element's clipping parents, the default
+viewport root and zero padding, with `altAxis` and `tether` enabled. Auto-placement scoring still uses the
+floating element's boundary and hide still uses the reference boundary. PopoverModal constructs all its modifiers
+internally, so it can render synchronously on the own Popper. The independent PopoverPopper fallback for unsupported
+public shapes is preserved.
+
+The new Popper.js 2.11.8 differential was red before production edits. For the planner-shaped case it reproduced
+`x=123.4375` on the old own solver when Popper.js gave `226.71875`, `183.71875` and `157.4375` on the initial,
+scrolled and resized frames. The corrected port matched the reference on all three and on 240 matrix frames
+varying the clipping ancestor, portal, both flags, placement, scroll and viewport. The scoped Chromium fixture
+matched frozen MUI on first visible and scrolled geometry with both render orders. Local guarded Chromium passed
+9/9, including the existing Popper and PopoverModal contracts. The real rc-webapp coordinates remain the paired
+verifier check. The fixture does not target those absolute coordinates. [Red differential](/Users/a.kott/vanguard-verify/logs/dual-boundary-popper-red.log) ·
+[Targeted specs](/Users/a.kott/vanguard-verify/logs/dual-boundary-popper-green.log) ·
+[Guarded Chromium](/Users/a.kott/vanguard-verify/logs/dual-boundary-popper-browser/guarded-scoped.log).
+
+The watchdog authorized both interim route assertion updates in the same production commit. The option spec went
+from one asserted unsupported case to zero. Its replacement requires `supported: true`, an empty unsupported list,
+`flipAltBoundary: true`, and `preventOverflowAltBoundary: false` for that exact shape. The first-render spec keeps
+the planner content and body-portal assertions, requires `data-vg-core`, and asserts the MUI fallback module was
+never requested. The ESM source change is scoped to the planner's former eager PopoverModal fallback. The later packed
+first-render and paired rc-webapp evidence still apply. [Recorded planner anchor geometry](/Users/a.kott/vanguard-verify/v1/logs/h20-rc472-planner-clip.json).

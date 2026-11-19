@@ -1,7 +1,13 @@
 import { act, render } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PopoverModal } from './PopoverModal';
+
+const { loadMuiPopper } = vi.hoisted(() => ({ loadMuiPopper: vi.fn() }));
+vi.mock('../Popover/PopoverPopper/MuiPopperFallback', (importOriginal) => {
+  loadMuiPopper();
+  return importOriginal();
+});
 
 /** Queue 2.4: PopoverModal renders the own Popper, Backdrop and Portal (own-core markers), inline and portaled. */
 describe('PopoverModal on the own core', () => {
@@ -58,7 +64,8 @@ describe('PopoverModal on the own core', () => {
     try {
       const card = view.getByText('Create event').closest('[role="tooltip"]');
       expect(card?.parentElement).toBe(document.body);
-      expect(card?.hasAttribute('data-vg-core')).toBe(false);
+      expect(card?.hasAttribute('data-vg-core')).toBe(true);
+      expect(loadMuiPopper).not.toHaveBeenCalled();
     } finally {
       view.unmount();
       trigger.remove();

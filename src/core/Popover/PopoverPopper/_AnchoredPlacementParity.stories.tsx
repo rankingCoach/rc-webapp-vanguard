@@ -310,7 +310,7 @@ export const MatchesPopperJsInTheDom: Story = {
                     boxSizing: 'border-box',
                     border: '2px solid',
                   });
-                  const actual = computeAnchored(dom.anchor, dom.floating, { ...resolved, altBoundary: !portal });
+                  const actual = computeAnchored(dom.anchor, dom.floating, resolved);
                   const ok =
                     actual.hide?.isReferenceHidden === expectedHide.isReferenceHidden &&
                     actual.hide?.hasPopperEscaped === expectedHide.hasPopperEscaped &&

@@ -4,11 +4,7 @@ import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackin
 import React, { useEffect, useRef, useState } from 'react';
 import { Backdrop } from '../../primitives/react/Backdrop/Backdrop';
 import { OwnPopper } from '../../primitives/react/Popper/Popper';
-import { resolvePopperOptions } from '../../primitives/react/Popper/popper-options';
 import { Portal } from '../../primitives/react/Portal/Portal';
-// EngagementPlanner centers a portaled PopoverModal. Its flip and overflow boundaries differ, so the MUI route
-// must render synchronously until the own placement primitive models them independently (plan §36.3).
-import MuiPopper from '../Popover/PopoverPopper/MuiPopperFallback';
 
 /**
  * Top navigation has 1030 so we need at least that
@@ -182,13 +178,6 @@ export const PopoverModal = (props: PopoverModalProps) => {
     return null;
   }
 
-  // The own Popper when popper.js's options here are modelled (they are for both placements and centerPopover),
-  // else MUI's Popper.
-  const modifiers = [...centerPopoverModifiers];
-  const ownPopper = resolvePopperOptions({ placement, modifiers, disablePortal: !renderInPortal }).supported;
-  const PopperImpl = (ownPopper ? OwnPopper : MuiPopper) as React.ElementType;
-  const ownCoreAttrs = ownPopper ? { 'data-slot': 'popover-modal', 'data-vg-core': '' } : {};
-
   /**
    * With `renderInPortal` the card is portaled to <body>, so the backdrop must go with it: left inline it is
    * trapped in the stacking context of whatever positioned ancestor hosts the PopoverModal (e.g. `.modalRoot`)
@@ -207,19 +196,20 @@ export const PopoverModal = (props: PopoverModalProps) => {
   return (
     <>
       {backdrop && (renderInPortal ? <Portal>{backdrop}</Portal> : backdrop)}
-      <PopperImpl
+      <OwnPopper
         open={open}
         anchorEl={anchorEl}
         placement={placement}
         disablePortal={!renderInPortal}
         style={{ zIndex: popperZIndex }} // Set z-index higher than backdrop
-        modifiers={modifiers}
-        {...ownCoreAttrs}
+        modifiers={centerPopoverModifiers}
+        data-slot="popover-modal"
+        data-vg-core=""
       >
         <span ref={containerRef} style={{ position: 'relative', zIndex: zIndex + 1 }}>
           {content}
         </span>
-      </PopperImpl>
+      </OwnPopper>
     </>
   );
 };

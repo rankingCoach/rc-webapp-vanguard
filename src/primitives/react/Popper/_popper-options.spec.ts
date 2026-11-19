@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { resolvePopperOptions } from './popper-options';
 
 /**
- * The core takes one clipping boundary for flip and preventOverflow (altBoundary = !portal). popper.js lets each
- * modifier choose its own; when they differ (PopoverModal centerPopover portaled: flip altBoundary true), the own
- * Popper is not used (Codex review, PopoverModal).
+ * Both modifiers inherit altBoundary = !portal unless overridden. The centered planner overrides just flip.
  */
 describe('resolvePopperOptions altBoundary', () => {
   const centerFlip = { name: 'flip', options: { altBoundary: true, rootBoundary: 'viewport', padding: 8 } };
@@ -15,10 +13,14 @@ describe('resolvePopperOptions altBoundary', () => {
     );
   });
 
-  it('portaled: flip altBoundary true differs from preventOverflow false, not supported', () => {
+  it('portaled: flip uses the anchor boundary while preventOverflow keeps the floating boundary', () => {
     const r = resolvePopperOptions({ placement: 'top', modifiers: [centerFlip], disablePortal: false });
-    expect(r.supported).toBe(false);
-    expect(r.unsupported).toContain('altBoundary(flip≠preventOverflow)');
+    expect(r).toMatchObject({
+      supported: true,
+      unsupported: [],
+      flipAltBoundary: true,
+      preventOverflowAltBoundary: false,
+    });
   });
 
   it('portaled, both set to the same value: supported', () => {
