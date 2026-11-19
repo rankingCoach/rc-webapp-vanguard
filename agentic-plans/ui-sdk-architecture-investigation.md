@@ -1317,3 +1317,34 @@ No formconfig/field use was found at the sites.
 **Reachable MUI X behaviour.** Only through the props above: the DatePicker shell (desktop popper / mobile dialog by
 `(pointer: fine)`), DateField sections in the locale pattern, the day/year calendar views, min/max/disablePast, the
 toolbar keyboard-view toggle (mobile) and closeOnClickAway (Vanguard's own outside callback).
+
+### 36.1 Order check: what is still on @mui/material after H19 (cac6a6b)
+
+No item below is reached by rc-webapp, the WordPress bundle or another Vanguard component through a modelled prop.
+Each remaining import is a type, the last theme step, an unreachable component, or a fallback route for public
+props the own core does not model.
+
+1. Types only:
+   1. Accordion (`AccordionProps`)
+   2. Popover (`TooltipClasses`)
+   3. `_internal/mui-legacy-props.ts`, `_internal/mui-slot-compat.ts`
+
+   These go to the types step (§23.12): vendored types.
+2. Fallback routes, reachable only with unmodelled public props:
+   1. Autocomplete (slots, slotProps, componentsProps, sx, ListboxProps, ListboxComponent, ChipProps,
+      PaperComponent, PopperComponent, renderGroup; useThemeProps)
+   2. Menu (unmodelled MuiMenuProps; useThemeProps, useRtl) and MenuItem (outside own lists)
+   3. Snackbar (slots, slotProps, ContentProps, ClickAwayListenerProps, TransitionProps, componentsProps, sx,
+      classes; useThemeProps)
+   4. AppBar / Toolbar (sx, component, classes, elevation; useThemeProps)
+   5. PopoverPopper / PopoverModal (popper.js modifiers or options the own Popper does not model)
+   6. `_internal/InputBase/MuiTextField.tsx` (non-outlined variants, native select, custom inputComponent, MUI slots)
+3. Unreachable: FormControl. Reachability map: no runtime importer; rc-webapp only has a `.FormControl-container`
+   SCSS selector. It is migrated last, per the user decision.
+4. Last: VanguardThemeProvider (`createTheme`/`ThemeProvider`, the source of the 2 `@mui` strings in dist-wordpress).
+
+**Consequence for the order.** None of these is cheaper and more reachable than S2/S3 in rc-webapp terms. The
+fallback routes are the "MUI-exit step". Their props are part of the public types, so removing MUI means either
+implementing each prop or narrowing the types (a breaking change for a next major). That needs a decision before
+MUI can leave `dependencies` (§24). Proposed: (a) types step (vendored, no API change); (b) exit step per fallback,
+implement what has any usage evidence and keep MUI as an optional dependency for the rest until the next major.
