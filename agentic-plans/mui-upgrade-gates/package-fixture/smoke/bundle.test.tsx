@@ -1,5 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Button, Form, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
+import { Autocomplete, Button, Form, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { render } from '@testing-library/react';
@@ -108,6 +108,28 @@ describe('installed Vanguard bundle', () => {
     expect(change.mock.calls[0][1]).toMatchObject({ value: 'banana' });
     expect(screen.queryByRole('listbox')).toBeNull();
     expect(screen.getByRole('combobox').textContent).toBe('Banana');
+  });
+  // Autocomplete runs on Vanguard's own core in both bundles (WordPress exports it): open, filter, pick, read back.
+  it('opens the installed Autocomplete, filters and picks an option', async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    const options = [
+      { key: 0, value: 'apple', title: 'Apple' },
+      { key: 1, value: 'plum', title: 'Plum' },
+    ];
+    renderWithProviders(<Autocomplete id="fruit" testId="fruit" options={options} optionKey="title" onChange={change} />);
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    expect(input.closest('.MuiAutocomplete-root')?.hasAttribute('data-vg-core')).toBe(true);
+    await user.click(input);
+    await user.type(input, 'pl');
+    const listbox = await screen.findByRole('listbox');
+    // Matching splits the label into highlight spans, whose accessible name reads "Pl um": pick the option by text.
+    const plum = within(listbox)
+      .getAllByRole('option')
+      .find((o) => o.textContent === 'Plum') as HTMLElement;
+    await user.click(plum);
+    expect(change).toHaveBeenCalled();
+    expect(input.value).toBe('Plum');
   });
   // Popover runs on Vanguard's own Tooltip in both bundles (WordPress exports it): hover opens, leave closes.
   it('opens the installed Popover on hover with an own-core tooltip', async () => {

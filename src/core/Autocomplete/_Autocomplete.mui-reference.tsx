@@ -1,0 +1,644 @@
+import './Autocomplete.scss';
+
+import { classNames } from '@helpers/classNames';
+import { uuidv4 } from '@helpers/generate-uid';
+import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason } from '@mui/material';
+import {
+  AutocompleteProps as MUIAutocompleteProps,
+  AutocompleteRenderOptionState,
+  AutocompleteRenderValueGetItemProps,
+} from '@mui/material/Autocomplete';
+import { useThemeProps } from '@mui/material/styles';
+import { translationService } from '@services/translation.service';
+import {
+  InputBase,
+  InputFormConfigProps,
+  InputLabelProps,
+  InputPopoverProps,
+  InputValueProps,
+} from '@vanguard/_internal/InputBase/InputBase';
+import { CheckBoxIcon } from '@vanguard/CheckBox/CheckBoxIcon/CheckBoxIcon';
+import { Chip } from '@vanguard/Chip/Chip';
+import { mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
+import { Icon } from '@vanguard/Icon/Icon';
+import { IconNames } from '@vanguard/Icon/IconNames';
+import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
+import match from 'autosuggest-highlight/match';
+import parse from 'autosuggest-highlight/parse';
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+
+import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
+import { Text } from '../Text/Text';
+import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
+
+/** State handed to a custom `renderOption`. */
+export interface AutocompleteOptionState {
+  /** The option is part of the current value (use it for a checkbox). */
+  selected: boolean;
+  inputValue: string;
+  index: number;
+}
+
+/**
+ * Autocomplete Props
+ */
+export type AutocompleteProps = {
+  /**
+   * When true, `value` is the single source of truth (MUI controlled mode): the input/chips always show `value`
+   * and a selection only changes through `onChange`. Default false keeps the legacy uncontrolled behaviour.
+   */
+  controlled?: boolean;
+  /** Text of an option (input value, highlight, chip label). Overrides the `optionKey` lookup. */
+  getOptionLabel?: (option: any) => string;
+  /** Whether `option` represents `value`. Overrides the `optionKey` / identity comparison. */
+  isOptionEqualToValue?: (option: any, value: any) => boolean;
+  /** Custom option row; must return an `<li {...optionProps}>`. Same signature as MUI. */
+  renderOption?: (
+    optionProps: React.HTMLAttributes<HTMLLIElement> & { key?: React.Key },
+    option: any,
+    state: AutocompleteOptionState,
+  ) => React.ReactNode;
+  /** Prefix every default option row with a checkbox reflecting its selection (for `multiple`). */
+  showOptionCheckbox?: boolean;
+  /** Size of the chips of a `multiple` Autocomplete. Default 'medium'. */
+  chipSize?: 'small' | 'medium';
+  /** Accessible name of the input when there is no visible label. */
+  inputAriaLabel?: string;
+  className?: string;
+  testId?: string;
+  optionKey?: string; //If the option is an object, then use this key to get option's value
+  noOptionsText?: string | React.ReactNode; //Works only, if restrictToOptions is true
+  splitCommaTag?: boolean;
+  highlightOptions?: boolean;
+  restrictToOptions?: boolean; //@TODO does not work without FORMCONFIG
+  hideClearButton?: boolean;
+  hideCaret?: boolean;
+  open?: boolean;
+  isLoading?: boolean;
+  noOptionsComponent?: React.ReactNode;
+  autoSelect?: boolean;
+  adornment?: React.ReactNode[];
+} & InputLabelProps &
+  Omit<InputValueProps, 'value'> &
+  InputFormConfigProps &
+  InputPopoverProps &
+  Pick<
+    MUIAutocompleteProps<any, any, any, any, any>,
+    | 'onInputChange'
+    | 'options'
+    | 'multiple'
+    | 'filterOptions'
+    | 'onChange'
+    | 'onKeyUp'
+    | 'onKeyDown'
+    | 'autoHighlight'
+    | 'value'
+    | 'onBlur'
+    | 'onFocus'
+    | 'blurOnSelect'
+    | 'autoComplete'
+    | 'loading'
+    | 'loadingText'
+    | 'disableCloseOnSelect'
+    | 'clearOnBlur'
+    | 'openOnFocus'
+    | 'inputValue'
+    | 'clearText'
+    | 'openText'
+    | 'closeText'
+    | 'size'
+    | 'fullWidth'
+  >;
+
+/**
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+export const AutocompleteMuiReference = (props: AutocompleteProps) => {
+  const {
+    className,
+    id,
+    value,
+    infoText,
+    label,
+    labelType,
+    placeholder,
+    inputRef,
+    formconfig: formconfigProp,
+    field,
+    index: fieldIndex,
+    optionKey,
+    options,
+    noOptionsText = null,
+    splitCommaTag = false,
+    multiple = false,
+    hideCaret = false,
+    hideClearButton = false,
+    restrictToOptions = true,
+    highlightOptions = true,
+    popoverPosition,
+    popoverMessage,
+    onKeyUp,
+    onKeyDown,
+    onChange,
+    autoComplete = true,
+    testId,
+    replacements,
+    disabled,
+    isLoading,
+    autoSelect = true,
+    adornment,
+    controlled = false,
+    getOptionLabel: consumerGetOptionLabel,
+    isOptionEqualToValue: consumerIsOptionEqualToValue,
+    renderOption: consumerRenderOption,
+    showOptionCheckbox = false,
+    chipSize,
+    inputAriaLabel,
+    ...rest
+  } = props;
+  // F3: explicit formconfig (legacy) or `field` resolved from the nearest Form's context.
+  const formconfig = useResolvedFormConfig(formconfigProp, field, fieldIndex);
+
+  // Resolve only the intercepted callback; Vanguard's own defaults retain their precedence.
+  const effective = useThemeProps({
+    props: rest as Partial<MUIAutocompleteProps<any, any, any, any>> & {
+      ListboxComponent?: React.ElementType;
+      componentsProps?: MUIAutocompleteProps<any, any, any, any>['slotProps'];
+      renderTags?: unknown;
+    },
+    name: 'MuiAutocomplete',
+  });
+  const {
+    onInputChange,
+    renderValue: consumerRenderValue,
+    ListboxComponent,
+    componentsProps,
+    ...forwarded
+  } = effective;
+  // slotProps was always replaced by this wrapper. Keep that boundary while
+  // translating the legacy aliases that MUI previously consumed underneath it.
+  const slotMapped = mapLegacySlots(
+    { ...forwarded, slotProps: componentsProps as MUIAutocompleteProps<any, any, any, any>['slotProps'] },
+    { ListboxProps: 'listbox', ChipProps: 'chip' },
+    { PaperComponent: 'paper', PopperComponent: 'popper' },
+  );
+  delete slotMapped.renderTags;
+  const listboxProps = slotMapped.slotProps?.listbox;
+
+  // F1: form writes go through the binding seam (plain setStateValue, as before).
+  const binding = useFieldBinding(formconfig);
+  const optionFocused = useRef<boolean | null>(null); // used as a Boolean to indicate whether user Focused on any option in dropdown
+
+  const [adornmentIndex, setAdornmentIndex] = useState<number | undefined>(undefined);
+
+  /**
+   * Listbox popper stacking
+   * -------
+   * MUI's Autocomplete listbox portals to <body> with no z-index, so inside a
+   * stacked modal/drawer it paints *behind* the surface that opened it.
+   * Register a 'popover' slot on open and release it on close — same pattern
+   * as the Select dropdown in InputBase.
+   */
+  const listboxIdRef = useRef<string>(`autocomplete-listbox-${uuidv4()}`);
+  const [listboxZIndex, setListboxZIndex] = useState(OVERLAY_BASE_Z_INDEX);
+
+  const onListboxOpen = () => {
+    setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
+  };
+  const onListboxClose = () => {
+    // A force-open listbox (controlled `open`) is managed by the effect below —
+    // ignore MUI's transient close callbacks so we don't drop its slot.
+    if (props.open === true) return;
+    OverlayStackingService.unregister(listboxIdRef.current);
+    setListboxZIndex(OVERLAY_BASE_Z_INDEX);
+  };
+  // Release the slot if the autocomplete unmounts while the listbox is still open.
+  useEffect(() => () => OverlayStackingService.unregister(listboxIdRef.current), []);
+
+  // A controlled-open listbox never fires MUI's onOpen, so register its stacking
+  // slot directly off the `open` prop. This keeps a force-open listbox (e.g. the
+  // one AutocompleteWithAnchor renders) above the surface that opened it instead
+  // of stuck at the base z-index.
+  useEffect(() => {
+    if (props.open === true) {
+      setListboxZIndex(OverlayStackingService.register(listboxIdRef.current, 'popover'));
+    } else if (props.open === false) {
+      OverlayStackingService.unregister(listboxIdRef.current);
+      setListboxZIndex(OVERLAY_BASE_Z_INDEX);
+    }
+  }, [props.open]);
+
+  /**
+   * FormConfig @todo test integration when using "multiple" tags...
+   * -------------------------------------------------------------------------------------------------------------------
+   */
+  let innerInputRef = inputRef;
+  if (!innerInputRef) {
+    innerInputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  }
+
+  let autoRef: MutableRefObject<HTMLInputElement | HTMLTextAreaElement | null> | null = null;
+  if (formconfig) {
+    autoRef = formconfig._autocompleteRef ?? null;
+    innerInputRef = formconfig._inputRef;
+  }
+
+  // Required field
+  let { required } = props;
+  if (formconfig?.validation?.required === true || formconfig?.validation?.required === false) {
+    required = formconfig?.validation?.required;
+  }
+
+  useEffect(() => {
+    const autocompleteEl = formconfig?._autocompleteRef?.current;
+    if (autocompleteEl) {
+      autocompleteEl.value = formconfig?.stateValue;
+      setAdornmentIndex(Number(formconfig?.stateValue?.key));
+    }
+  }, [formconfig]);
+
+  const [uncontrolledVal, setVal] = useState((value ?? multiple) ? [] : null); //Autocompletes's Value
+  const val = controlled ? (value ?? (multiple ? [] : null)) : uncontrolledVal;
+  useEffect(() => {
+    if (formconfig) {
+      setTimeout(() => {
+        setVal(formconfig?.stateValue);
+        setAdornmentIndex(Number(formconfig?.stateValue?.key));
+      }, 0);
+    }
+  }, [formconfig?.stateValue]);
+
+  const showAdornment = (index?: number): React.ReactNode | null => {
+    if (!adornment || index === undefined) return null;
+    return adornment[index];
+  };
+
+  /**
+   * -------------------------------------------------------------------------------------------------------------------
+   * AUTOCOMPLETE
+   * -------------------------------------------------------------------------------------------------------------------
+   */
+
+  const renderValue = (value: any[], getItemProps: AutocompleteRenderValueGetItemProps<true>) => {
+    if (!multiple) return null;
+    return (
+      <div className={'vanguard-input-tags'}>
+        {value.map((option: any, index) => (
+          <Chip
+            label={
+              consumerGetOptionLabel ? (
+                <Text translate={false}>{consumerGetOptionLabel(option)}</Text>
+              ) : (
+                <Text>{optionKey && option ? option[optionKey] : option}</Text>
+              )
+            }
+            size={chipSize}
+            {...getItemProps({ index })}
+            testId={`${testId ?? 'autocomplete'}-chip-${index}`}
+            data-tag-index={index}
+            key={index}
+            style={{ height: '100%' }}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  /**
+   * Events: Autocomplete
+   * --------------------
+   */
+  const onAutocompleteChangeFn = (
+    e: React.SyntheticEvent,
+    nextVal: string[] | string | ({ key: string | number; value: string } & Record<string, any>),
+    reason?: AutocompleteChangeReason,
+    details?: any,
+  ) => {
+    if (restrictToOptions && innerInputRef && innerInputRef.current && typeof nextVal === 'string') {
+      innerInputRef.current.value = nextVal;
+    }
+
+    if (nextVal && typeof nextVal === 'object' && !Array.isArray(nextVal) && 'key' in nextVal) {
+      setAdornmentIndex(Number(nextVal.key));
+    } else {
+      setAdornmentIndex(undefined);
+    }
+
+    setVal(nextVal as any);
+
+    // Store value
+    binding.writeScalar(nextVal);
+
+    // Callback
+    if (onChange) {
+      if (!reason) {
+        reason = 'blur';
+      }
+      onChange(e, nextVal, reason, details);
+    }
+  };
+
+  /**
+   * -------------------------------------------------------------------------------------------------------------------
+   * INNER INPUT
+   * -------------------------------------------------------------------------------------------------------------------
+   */
+
+  const splitOnEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Used when Autocomplete is a "multiple" with tags
+    // When Enter pressed and no option is focused --> we parse the input for tags
+    if (e.key === 'Enter' && !optionFocused.current) {
+      const keys = innerInputRef?.current?.value.split(',').filter((x: string) => !!x) ?? [];
+      const mapped: string[] =
+        keys?.map(
+          optionKey
+            ? (x: any) => {
+                return { [optionKey]: x };
+              }
+            : (x: any) => x,
+        ) ?? [];
+
+      // If Enter pressed (input) --> trigger a value changed on Autocomplete itself
+      if (Array.isArray(val)) {
+        onAutocompleteChangeFn(e, [...val, ...mapped], 'selectOption');
+      } else {
+        onAutocompleteChangeFn(e, [...mapped], 'selectOption');
+      }
+
+      // Stop the Event if we have split something
+      if (keys?.length > 0) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.nativeEvent.stopImmediatePropagation();
+      }
+    }
+  };
+
+  const detectFocusedOption = () => {
+    const els: any = document.getElementsByClassName('MuiAutocomplete-option');
+    if (optionFocused.current) {
+      optionFocused.current = false;
+      for (const el of els) {
+        if (el.className.indexOf('Mui-focused') > -1) {
+          optionFocused.current = true;
+        }
+      }
+    }
+  };
+
+  /**
+   * Events: Inner input
+   * --------------------
+   */
+  const onInputChangeFn = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    //
+  };
+
+  const onInputKeyUpFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    detectFocusedOption();
+    onKeyUp && onKeyUp(e);
+  };
+
+  const onInputKeyDownFn = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    detectFocusedOption();
+    splitCommaTag && splitOnEnter(e);
+    onKeyDown && onKeyDown(e);
+  };
+
+  /**
+   * -------------------------------------------------------------------------------------------------------------------
+   * OPTIONS & DROPDOWN MENU
+   * -------------------------------------------------------------------------------------------------------------------
+   */
+  const renderOptionCheckbox = (selected: boolean) =>
+    showOptionCheckbox ? (
+      <span className={'vanguard-autocomplete-option-checkbox'} aria-hidden={true}>
+        <CheckBoxIcon isChecked={selected} intermediate={false} hoverMode={'border'} size={'small'} />
+      </span>
+    ) : null;
+
+  const renderOption = (
+    props: React.HTMLAttributes<HTMLLIElement> & { key?: React.Key },
+    option: any,
+    { inputValue, selected, index }: AutocompleteRenderOptionState,
+  ) => {
+    if (consumerRenderOption) {
+      return consumerRenderOption(props, option, { inputValue, selected, index });
+    }
+    if (highlightOptions) {
+      const title = getOptionLabel(option);
+      const matches = match(title, inputValue);
+      const parts = parse(title, matches);
+      return (
+        <li {...props} key={title}>
+          <div className={'option-style'}>
+            {renderOptionCheckbox(selected)}
+            {showAdornment(option?.key)}
+            <span>
+              {parts.map((part, index) => (
+                <span
+                  style={{
+                    fontWeight: part.highlight ? 700 : 400,
+                  }}
+                  key={index}
+                >
+                  {part.text}
+                </span>
+              ))}
+            </span>
+          </div>
+        </li>
+      );
+    }
+
+    const title = getOptionLabel(option);
+    return (
+      <li {...props} key={title}>
+        {renderOptionCheckbox(selected)}
+        <div>{title}</div>
+      </li>
+    );
+  };
+
+  /**
+   * Returns the "Option Label" that is used to set input's value when an option is being selected
+   */
+  const getOptionLabel = (option?: any) => {
+    if (consumerGetOptionLabel) {
+      return option === null || option === undefined ? '' : consumerGetOptionLabel(option);
+    }
+    const keys = Object.keys(option ?? {});
+    if ((Array.isArray(option) && option.length === 0) || keys.length === 0) {
+      return '';
+    }
+    if (typeof option === 'object') {
+      if (!optionKey || (!option.hasOwnProperty(optionKey) && !option.hasOwnProperty('objectType'))) {
+        console.warn(
+          `Autocomplete: 'optionKey' = ${optionKey} doesn't match options properties! available are:: ${keys.join(
+            ', ',
+          )}`,
+        );
+      }
+      return option && optionKey ? (option[optionKey] ?? '') : '';
+    }
+    return option;
+  };
+
+  /**
+   * Used to determine if the option represents the given value. Uses strict equality by default.
+   * Both arguments need to be handled, an option can only match with one value. ⚠️
+   *
+   *    option: The option to test.
+   *    value: The value to test against.
+   */
+  const isOptionEqualToValue = (option: any, value: any): boolean => {
+    if (consumerIsOptionEqualToValue) {
+      return value !== null && value !== undefined && consumerIsOptionEqualToValue(option, value);
+    }
+    if (!value) {
+      return false;
+    }
+
+    let optionTitle = option;
+    if (typeof option === 'object') {
+      const optionObj: Record<string, any> = option as unknown as object;
+      if (optionObj && optionKey) {
+        if (!optionObj.hasOwnProperty(optionKey)) {
+          console.warn("Autocomplete: 'optionKey' doesn't match options properties!", optionKey);
+        }
+
+        optionTitle = optionObj[optionKey];
+      }
+    }
+
+    let valueTitle = value;
+    if (typeof value === 'object') {
+      const valueObj: Record<string, any> = value as unknown as object;
+      if (valueObj && optionKey) {
+        if (!valueObj.hasOwnProperty(optionKey)) {
+          console.warn("Autocomplete: 'optionKey' doesn't match value's properties!", optionKey);
+        }
+
+        valueTitle = valueObj[optionKey];
+      }
+    }
+
+    return optionTitle === valueTitle;
+  };
+
+  /**
+   * Function: getContainerClasses
+   */
+  const getContainerClasses = () => {
+    const classes = ['vanguard-autocomplete'];
+    if (className) {
+      classes.push(className);
+    }
+    if (hideClearButton) {
+      classes.push('vanguard-autocomplete-no-clear-btn');
+    }
+
+    if (hideCaret || value !== null) {
+      classes.push('vanguard-autocomplete-no-caret');
+    }
+    return classNames(...classes);
+  };
+
+  /**
+   * Translate noOptionsText when it's a string, mirroring how the placeholder is handled in InputBase.
+   * ReactNode values are passed through untouched.
+   */
+  const getNoOptionsText = (): string | React.ReactNode => {
+    if (typeof noOptionsText === 'string') {
+      return translationService.get(noOptionsText, replacements).value;
+    }
+    return noOptionsText;
+  };
+
+  /**
+   * -------------------------------------------------------------------------------------------------------------------
+   * Return View
+   * -------------------------------------------------------------------------------------------------------------------
+   */
+  return (
+    <ComponentContainer className={getContainerClasses()}>
+      <MuiAutocomplete
+        {...slotMapped}
+        onInputChange={(event, inputValue, reason) => {
+          onInputChange?.(
+            event,
+            inputValue,
+            reason === 'selectOption' || reason === 'removeOption' || reason === 'blur' ? 'reset' : reason,
+          );
+        }}
+        data-testid={testId}
+        id={id}
+        ref={autoRef}
+        value={val}
+        freeSolo={!restrictToOptions}
+        autoComplete={autoComplete}
+        autoSelect={autoSelect}
+        multiple={multiple}
+        options={options}
+        noOptionsText={getNoOptionsText()}
+        renderValue={multiple ? renderValue : consumerRenderValue}
+        renderOption={renderOption}
+        isOptionEqualToValue={isOptionEqualToValue}
+        getOptionLabel={getOptionLabel}
+        onChange={onAutocompleteChangeFn}
+        clearIcon={<Icon color={'--n400'}>{IconNames.close}</Icon>}
+        popupIcon={<Icon color={'--n400'}>{IconNames.caretDown}</Icon>}
+        disabled={disabled}
+        onOpen={onListboxOpen}
+        onClose={onListboxClose}
+        slotProps={{
+          ...slotMapped.slotProps,
+          listbox: { component: ListboxComponent, ...listboxProps },
+          popper: {
+            // Override MUI's static z-index via `sx` (not `style`) so the
+            // listbox stacks above any modal/drawer it was opened from (see
+            // OverlayStackingService) WITHOUT clobbering MUI's own inline
+            // `style={{ width: anchorEl.clientWidth }}`, which keeps the
+            // dropdown the same width as the input.
+            sx: { zIndex: listboxZIndex },
+          },
+        }}
+        renderInput={(params) => {
+          // MANUAL v9 compatibility bridge: these are MUI-generated field props,
+          // not consumer overrides. Keep Vanguard's existing adornment/ref merge path.
+          const { slotProps: fieldSlots, ...fieldProps } = params;
+          return (
+            <InputBase
+              formconfig={formconfig}
+              inputRef={innerInputRef}
+              isLoading={isLoading}
+              testId={`${testId}-input`}
+              textFieldProps={{
+                ...fieldProps,
+                InputProps: fieldSlots.input,
+                inputProps: inputAriaLabel
+                  ? { ...fieldSlots.htmlInput, 'aria-label': inputAriaLabel }
+                  : fieldSlots.htmlInput,
+                InputLabelProps: fieldSlots.inputLabel,
+              }}
+              required={required}
+              infoText={infoText}
+              label={label}
+              labelType={labelType}
+              placeholder={placeholder}
+              popoverMessage={popoverMessage}
+              popoverPosition={popoverPosition}
+              onKeyDown={onInputKeyDownFn}
+              onKeyUp={onInputKeyUpFn}
+              onChange={onInputChangeFn}
+              formFieldType={'Autocomplete'}
+              replacements={replacements}
+              adornment={showAdornment(adornmentIndex)}
+            />
+          );
+        }}
+      />
+    </ComponentContainer>
+  );
+};
