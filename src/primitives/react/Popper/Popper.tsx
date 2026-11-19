@@ -53,9 +53,13 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
   const anchor = resolve(anchorEl ?? null);
   const options = resolvePopperOptions({ placement: placementProp, modifiers, popperOptions, disablePortal });
 
+  // The anchor size the last position was computed from (the anchor observer / font triggers compare against it).
+  const anchorSize = useRef<{ width: number; height: number } | null>(null);
   const update = useCallback(() => {
     const node = nodeRef.current;
     if (!node || !anchor || !open) return;
+    const ar = anchor.getBoundingClientRect();
+    anchorSize.current = { width: ar.width, height: ar.height };
     const result = computeAnchored(anchor, node, options);
     const size = layoutSize(node);
     Object.assign(
@@ -130,24 +134,33 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
         if (!cancelled) updateRef.current();
       });
     };
+    // Anchor observer / font triggers: re-position only when the anchor's own size changed. A ResizeObserver delivers an
+    // initial callback after observe(); if the popper's content grew by then (lazy item icons), re-positioning would
+    // move popper and arrow where MUI's popper.js never goes (verifier handoff 14, DropdownMenu arrow 29 → 37).
+    const onAnchorChange = () => {
+      const last = anchorSize.current;
+      const r = anchor.getBoundingClientRect();
+      if (last && last.width === r.width && last.height === r.height) return;
+      onEvent();
+    };
     for (const t of targets) t.addEventListener('scroll', onEvent, { passive: true });
     const win = node.ownerDocument.defaultView ?? window;
     win.addEventListener('resize', onEvent, { passive: true });
     // Beyond popper.js: an anchor that changes size without a render reaching the popper (a lazily loaded Icon inside
     // the trigger, verifier handoff 10) re-positions it. MUI's result in that case was the settled position.
     const RO = (win as typeof window).ResizeObserver;
-    const observer = RO && 'nodeType' in anchor ? new RO(onEvent) : null;
+    const observer = RO && 'nodeType' in anchor ? new RO(onAnchorChange) : null;
     observer?.observe(anchor as Element);
     // ResizeObserver never reports non-replaced inline boxes (an inline text anchor); a web font swapping in after
     // open changes their width (verifier handoff 12, describe-child-chip 63 vs 66). Re-position when fonts load.
     const fonts = (node.ownerDocument as Document).fonts as (EventTarget & FontFaceSet) | undefined;
-    fonts?.addEventListener?.('loadingdone', onEvent);
+    fonts?.addEventListener?.('loadingdone', onAnchorChange);
     return () => {
       cancelled = true;
       for (const t of targets) t.removeEventListener('scroll', onEvent);
       win.removeEventListener('resize', onEvent);
       observer?.disconnect();
-      fonts?.removeEventListener?.('loadingdone', onEvent);
+      fonts?.removeEventListener?.('loadingdone', onAnchorChange);
     };
   }, [anchor, open, options.strategy, disablePortal]);
 
