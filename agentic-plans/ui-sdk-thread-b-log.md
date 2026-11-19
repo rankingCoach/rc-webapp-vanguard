@@ -953,3 +953,23 @@ Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, n
    6.1 rc-webapp AdminTopNav (separator "→"; its module CSS targets `.MuiBreadcrumbs-separator`, which is kept) and PartnerLayout.
    6.2 No internal consumer. Not a WordPress export.
 7. Note for A: A's ButtonBase emits stray spaces in its class attribute (`"MuiButtonBase-root    "`) from empty classNames entries. MUI has none. That is A's primitive, so it's reported rather than changed.
+
+## Track (h) "junk class tokens" (decided-by-watchdog; queued AFTER Pagination + Slider, before Tier C)
+Source: verifier 2's retro scan of 1400 stories, base vs candidate. Regressions: 0. Pre-existing junk: 320 items in 170 stories. Data: rc-webapp tmp/research/vanguard-ui-sdk-visual-baseline/v2/out/junk-*.json.
+- Literal tokens: div false 219, div undefined 72, span false 18, label undefined 8, img false 3. Plus irregular spacing.
+- Sources: BenchmarkGauge family (~158 stories), InfoBox 39, Input 33, PageSection 30, ColorPicker 16, AvatarCheckbox 9, RadioButton 8, Form (`Form-container ${className}`), PageSectionLoading, FrostedGlass, ImgLoader.
+1. Grep first: rc-webapp + Vanguard (scss, tsx, specs, cypress-style selectors) for `.false`, `.undefined`, `[class="…"]`/`[class$=…]` exact matches, and snapshot/innerHTML assertions containing those tokens. List anything found to the watchdog before changing.
+2. Fix at the source, only if step 1 is clean:
+   2.1 `@helpers/classNames` drops non-string and empty entries (order kept, single spaces, no trailing space). A spec must prove identical output for every all-string call.
+   2.2 Template-literal sites (`${className}` with unset prop) move to the helper.
+   2.3 Only `false|true|undefined|null|NaN` and whitespace may disappear.
+3. Proof:
+   3.1 Per touched component, a differential spec: old token set minus junk == new set, real-token order unchanged.
+   3.2 Full spec project; collision/attribute checks.
+   3.3 Fixtures regenerated only where a script proves the diff is confined to those tokens.
+   3.4 A's files (MUI-backed, primitives) → patch list to A. Known so far: ButtonBase stray spaces (g8 note).
+4. Verifier 2 judges by expected form: all 170 stories + rc-webapp shadow specs.
+5. Same track, separate item: ProgressCircle renders `NaN` geometry when size/stroke are missing (story spreads no args).
+   5.1 If the props are required by type → story-only fix (give it args).
+   5.2 If optional → red spec + smallest guard keeping every existing combination byte-identical. Tell the watchdog which case it is.
+Reply to the watchdog after step 1's grep result.
