@@ -747,6 +747,29 @@ Cannot see: consumer tree-shaking inside a file (only file granularity), CSS (si
 4. Base64 assets > 4 KB inlined in JS: 11, 882 KB decoded (rocket.gif 497 KB, loading_cloud.gif 75 KB, error.gif 73 KB, an mp2t video 68 KB, thumbnail_loader.gif 46 KB, …). All are LAZY (reached only through `use-dynamic-import`'s `import()`), none in any export's static closure; cost = +33 % base64 overhead and no image cache/streaming decode when they do load.
 5. WordPress bundle: 2.58 MB raw / 643 KB gzip single file; contains lottie and the MUI/emotion runtime; none of apexcharts, video.js, xlsx/jszip, lexical, moment, google-maps, imask, cropperjs; no base64 > 4 KB (asset cleanup). Of the 59 WordPress value exports, only LottieAnimationLoader pulls lottie. "Bundled but never rendered" cannot be measured without knowing what WordPress hosts render.
 
+### (e) D10 refresh on 5ec56d8
+
+1. Fresh default and WordPress builds from `5ec56d8`, the merge of A’s `da4685d` with B’s `f94d932` and `d4cdc1d`. The build ran `pnpm run build` with outbound networking denied. These numbers identify that snapshot and precede later H20 changes on A’s branch.
+2. `node agentic-plans/uisdk-tools-b/measure-exports.mjs` scanned 2,779 ESM JS files and resolved 299 exports. It walked only static relative ESM imports for each export. The root barrel’s closure was 1,704 files and 1,778,021 gzip bytes. The table sums independently gzipped level-9 JS files with each library’s content signature. Sizes are in KiB (1,024 bytes), and exported callers are the signature hits reached by their static graphs. This estimates a file-level closure and excludes CSS, internal tree-shaking, and cross-file gzip savings.
+
+| Library signature | Matching output files | gzip KiB | Eager callers |
+|---|---:|---:|---|
+| video.js | 2 | 154.5 | `VideoPlayer`, `videoPlayerService` |
+| apexcharts | 8 | 143.7 | `AreaChart`, `BarChart`, `DonutChart`, `DonutChartDirectories`, `DonutChartStatistics`, `HSBChart`, `LineChartBase` |
+| xlsx / jszip / file-saver | 3 | 203.1 | `ExportXLS`, `useExportXLS` match their `saveAs(` call. Rollup module IDs confirm zero eager xlsx, jszip, or file-saver modules for any export. |
+| lexical | 38 | 86.9 | `RichTextEditor` |
+| lottie | 9 | 66.8 | `AIAssistant`, `LottieAnimationLoader`, `LottieBase`, `RichTextEditor`, `getContainerCursorPosition`, `getContainerVisibility`, `useInitInteractivity`, `useLottie`, `useLottieInteractivity` |
+| google-maps | 7 | 42.9 | `AdvancedMarker`, `AdvancedMarkerF`, `GoogleMaps`, `GoogleMapsAdvancedMarker`, `GoogleMapsCircle`, `GoogleMapsMarker`, `GoogleMapsMarkerDefault`, `MarkerF`, `panToOffset` |
+| moment | 3 | 22.1 | 24: `DatePicker`, `DateRangeInput`, `DateRangeModal`, `DateRangePicker`, `DateTimePicker`, `GALLERY_PHOTO_SCOPE`, `Gallery`, `GalleryMediaItem`, `GallerySummary`, `LineChartBase`, `RelativeTime`, `TimePicker`, `areDatesEqual`, `createDatePickerRange`, `ensureIsRealDate`, `formatDateForComparison`, `isBackendDateAfterNow`, `isDateTimePickerAfterNow`, `mapBackendDateToDateTimePicker`, `mapDateTimePickerToBackendDate`, `mapDateTimePickerToBackendDatePlusOneDay`, `mapDateTimePickerToUnix`, `mapToBackendDate`, `maskInput` |
+| react-date-range | 1 | 0.6 | `DateRangeInput`, `DateRangeModal`, `DateRangePicker` |
+| imask | 6 | 10.2 | `DateRangePicker`, `IMaskInput`, `PhoneNumber`, `maskInput` |
+| cropperjs | 1 | 14.8 | `GALLERY_PHOTO_SCOPE`, `Gallery`, `ImageCropperTransformer` |
+| MUI/emotion runtime | 5 | 10.2 | 27: `AIAssistant`, `AppBar`, `Autocomplete`, `ColorPicker`, `DatePicker`, `DateRangeInput`, `DateRangePicker`, `DateTimePicker`, `DrawerRoot`, `DrawerService`, `Input`, `InputBase`, `Menu`, `PhoneNumber`, `RichTextEditor`, `SearchableSelect`, `Select`, `Snackbar`, `SnackbarRoot`, `Table`, `TableBody`, `TableFooter`, `TableHeader`, `TextEditDrawer`, `Textarea`, `TimePicker`, `VanguardThemeProvider` |
+
+3. The emotion signature moved from the last measured 37/299 to **27/299**. The independent B.3 gate, `node scripts/check-eager-mui.mjs`, found **23/298** with eager `@mui/*` module IDs, plus one allow-listed RTL context. The export counts differ because the gate’s parser leaves out the namespace import `VanguardStyle`, which the closure tool includes. The gate excludes the allow-list and measures MUI module IDs, while the D10 table detects emotion by file content.
+4. Selected static closure weights in gzip KiB: `Text` 60.5, `Icon` 36.6, `Button` 104.9, `Table` 433.4, `Gallery` 343.7, `RichTextEditor` 610.7, `ExportXLS` / `useExportXLS` 106.2 each, `ProgressBar` 2.2. The `ProgressBar` graph has one dynamic target and no eager `@mui/*`. Rollup module IDs also confirm that `Text` reaches no react-spring, `Gallery` reaches no jszip, and `Table` still reaches libphonenumber-js.
+5. The 11 inlined base64 assets above 4 KiB total 881,919 estimated decoded bytes. None appear in the barrel’s static Rollup graph. WordPress `index.js` is 2,600,551 bytes on disk and 647,148 bytes at gzip level 9. The same signature scan saw lottie and emotion and found zero base64 assets above 4 KiB. `check-wordpress-dynamic-imports.mjs` reached 336 files with zero missing targets. These measurements cover the shipped static graph and file sizes.
+
 ### (b) correction from verifier 2's render check of fc6c898/df8567a (40/42 render)
 `TogglerWithText` stories reverted to un-collected (original file restored): `toggler-with-node` passes the vitest smoke run but shows the Storybook error overlay when served ("Objects are not valid as a React child (found: object with keys {br, b, em, link, span})", light + dark). Pre-existing story (never collected before); stays on the stale list. TogglerWithText keeps its specs.
 
