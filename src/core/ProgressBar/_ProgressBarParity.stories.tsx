@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { StoryObj } from '@storybook/react';
 import React from 'react';
@@ -27,7 +28,7 @@ const BAR = ['width', 'position', 'left', 'bottom', 'top', 'transition', 'transf
 const pick = (el: Element | null, props: string[], skip: string[] = []) => {
   if (!el) return null;
   const cs = getComputedStyle(el);
-  return Object.fromEntries(props.filter((p) => !skip.includes(p)).map((p) => [p, cs.getPropertyValue(p)]));
+  return Object.fromEntries([...props, ...TRANSITION_LONGHANDS].filter((p) => !skip.includes(p)).map((p) => [p, cs.getPropertyValue(p)]));
 };
 const anims = (el: Element | null) =>
   el

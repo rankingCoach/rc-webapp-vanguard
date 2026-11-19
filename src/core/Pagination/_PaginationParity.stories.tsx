@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
@@ -28,6 +29,7 @@ for (const size of ['small', 'medium', 'large'] as const)
 CASES.edgeFirst = { count: 5, defaultPage: 1, showFirstButton: true, showLastButton: true };
 
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'flex-wrap',
   'align-items',

@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
@@ -35,6 +36,7 @@ for (const type of [
       CASES[`${type}-${size}-${cfg}`] = { type, size, ...extra } as ButtonProps;
 
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'position',
   'box-sizing',

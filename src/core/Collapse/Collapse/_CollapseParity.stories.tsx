@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { Collapse as MuiCollapse } from '@mui/material';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { StoryObj } from '@storybook/react';
@@ -10,7 +11,7 @@ import { OwnCollapse } from './own-collapse';
  * Track g differential in Chromium: live MUI 9.5 Collapse (as Vanguard calls it) vs the own Collapse, side by side,
  * same content. Settled states: computed styles of root / wrapper / wrapperInner and the root's rendered box.
  */
-const PROPS = ['height', 'width', 'min-height', 'min-width', 'overflow', 'visibility', 'display', 'transition', 'position'];
+const PROPS = [...TRANSITION_LONGHANDS, 'height', 'width', 'min-height', 'min-width', 'overflow', 'visibility', 'display', 'transition', 'position'];
 
 const Pair = ({ open, orientation }: { open: boolean; orientation: 'vertical' | 'horizontal' }) => (
   <div style={{ display: 'flex', gap: 24 }}>

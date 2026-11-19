@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { VanguardThemeProvider } from '@vanguard/VanguardThemeProvider/VanguardThemeProvider';
@@ -38,6 +39,7 @@ const SCENARIOS: Scenario[] = [
 ];
 
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'position',
   'z-index',

@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
@@ -51,7 +52,13 @@ const geometry = (host: Element) =>
     } catch {
       /* non-graphics element */
     }
-    return { tag: el.tagName, width: cs.width, height: cs.height, bbox };
+    return {
+      tag: el.tagName,
+      width: cs.width,
+      height: cs.height,
+      bbox,
+      transition: TRANSITION_LONGHANDS.map((property) => cs.getPropertyValue(property)),
+    };
   });
 
 export const DescendantGeometry: StoryObj = {

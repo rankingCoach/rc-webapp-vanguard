@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
@@ -20,6 +21,7 @@ const CASES: Record<string, { p: Partial<BreadcrumbsProps>; n: number }> = {
   wrapping: { p: {}, n: 8 },
 };
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'flex-wrap',
   'align-items',

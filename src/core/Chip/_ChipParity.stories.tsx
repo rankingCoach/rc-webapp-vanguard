@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
@@ -47,6 +48,7 @@ CASES.longLabel = {
 };
 
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'position',
   'box-sizing',

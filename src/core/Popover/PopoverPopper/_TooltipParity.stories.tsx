@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { Tooltip as MuiTooltip } from '@mui/material';
 import { createPopper } from '@popperjs/core';
 import { StoryObj } from '@storybook/react';
@@ -24,6 +25,7 @@ const CASES: Case[] = ['top', 'bottom', 'left', 'right', 'top-start', 'bottom-en
 );
 
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'position',
   'z-index',
   'pointer-events',

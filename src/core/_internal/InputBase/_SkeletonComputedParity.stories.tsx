@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { Skeleton as MuiSkeleton } from '@mui/material';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
@@ -11,6 +12,7 @@ export default { ...SbDecorator({ title: 'Vanguard/InputBase/Skeleton Computed P
 type Story = StoryObj<typeof Skeleton>;
 
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'background-color',
   'margin-top',
