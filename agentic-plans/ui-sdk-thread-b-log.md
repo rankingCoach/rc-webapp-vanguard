@@ -288,6 +288,13 @@ Evidence: new specs 13 files; red 22/24 with the implementation removed (the 2 p
 4. SKILL.md: save button is Vanguard `Button htmlType="submit"` (+ `isLoading`), with the useFormStatus child pattern; line added: string labels are already rendered through Text and translated.
 5. generate-exports-props.js CLI (`node scripts/generate-exports-props.js`): base 13dfd71 vs now, 267 = 267 files, 0 differences beyond the two additive prop fields.
 
+### Track 2 regeneration on 026d342
+
+1. `node scripts/generate-agent-docs.mjs` regenerated 298 export pages and `llms.txt`. A recursive byte comparison with the pre-run `docs/` snapshot found 0 additions, 0 removals, and 0 changed files.
+2. Counting headings and markers on the generated pages found 56 pages with examples, 107 with a `Slots:` line, 59 marked WordPress-compatible, and 28 with the standard `Internals pending rebuild:` note. These counts describe the generated text.
+3. Summing file lengths gave 299,931 raw bytes for `docs/` and 305,034 with `skills/vanguard/SKILL.md`. A sorted tar stream of those 300 files with normalized metadata was 73,914 bytes after gzip level 9. This measures the docs and skill together as a separate archive.
+4. `vitest run --maxWorkers=2 --project scripts scripts/_agent-docs.spec.ts` passed 1 file / 8 tests. The spec checks fresh output, including byte-identical generation across two runs. Build-time generation and gitignored output are the existing `decided-by-watchdog` workflow. The local snapshot comparison supplies the staleness evidence for this refresh.
+
 ### Batch 3: Gallery, Header, TreeView, gauges, loaders and small own components
 Drafted by Codex (medium), read line by line; fixes by me: CircularGauge bare slot moved to the styled ComponentContainer (`circular-gauge` + `data-loading`; arc = `circular-gauge-value`), dropped a non-ComponentContainer `gallery-media-item-action-container` slot, spec key fix.
 | Component | Attributes |
@@ -740,6 +747,29 @@ Cannot see: consumer tree-shaking inside a file (only file granularity), CSS (si
 4. Base64 assets > 4 KB inlined in JS: 11, 882 KB decoded (rocket.gif 497 KB, loading_cloud.gif 75 KB, error.gif 73 KB, an mp2t video 68 KB, thumbnail_loader.gif 46 KB, …). All are LAZY (reached only through `use-dynamic-import`'s `import()`), none in any export's static closure; cost = +33 % base64 overhead and no image cache/streaming decode when they do load.
 5. WordPress bundle: 2.58 MB raw / 643 KB gzip single file; contains lottie and the MUI/emotion runtime; none of apexcharts, video.js, xlsx/jszip, lexical, moment, google-maps, imask, cropperjs; no base64 > 4 KB (asset cleanup). Of the 59 WordPress value exports, only LottieAnimationLoader pulls lottie. "Bundled but never rendered" cannot be measured without knowing what WordPress hosts render.
 
+### (e) D10 refresh on 5ec56d8
+
+1. Fresh default and WordPress builds from `5ec56d8`, the merge of A’s `da4685d` with B’s `f94d932` and `d4cdc1d`. The build ran `pnpm run build` with outbound networking denied. These numbers identify that snapshot and precede later H20 changes on A’s branch.
+2. `node agentic-plans/uisdk-tools-b/measure-exports.mjs` scanned 2,779 ESM JS files and resolved 299 exports. It walked only static relative ESM imports for each export. The root barrel’s closure was 1,704 files and 1,778,021 gzip bytes. The table sums independently gzipped level-9 JS files with each library’s content signature. Sizes are in KiB (1,024 bytes), and exported callers are the signature hits reached by their static graphs. This estimates a file-level closure and excludes CSS, internal tree-shaking, and cross-file gzip savings.
+
+| Library signature | Matching output files | gzip KiB | Eager callers |
+|---|---:|---:|---|
+| video.js | 2 | 154.5 | `VideoPlayer`, `videoPlayerService` |
+| apexcharts | 8 | 143.7 | `AreaChart`, `BarChart`, `DonutChart`, `DonutChartDirectories`, `DonutChartStatistics`, `HSBChart`, `LineChartBase` |
+| xlsx / jszip / file-saver | 3 | 203.1 | `ExportXLS`, `useExportXLS` match their `saveAs(` call. Rollup module IDs confirm zero eager xlsx, jszip, or file-saver modules for any export. |
+| lexical | 38 | 86.9 | `RichTextEditor` |
+| lottie | 9 | 66.8 | `AIAssistant`, `LottieAnimationLoader`, `LottieBase`, `RichTextEditor`, `getContainerCursorPosition`, `getContainerVisibility`, `useInitInteractivity`, `useLottie`, `useLottieInteractivity` |
+| google-maps | 7 | 42.9 | `AdvancedMarker`, `AdvancedMarkerF`, `GoogleMaps`, `GoogleMapsAdvancedMarker`, `GoogleMapsCircle`, `GoogleMapsMarker`, `GoogleMapsMarkerDefault`, `MarkerF`, `panToOffset` |
+| moment | 3 | 22.1 | 24: `DatePicker`, `DateRangeInput`, `DateRangeModal`, `DateRangePicker`, `DateTimePicker`, `GALLERY_PHOTO_SCOPE`, `Gallery`, `GalleryMediaItem`, `GallerySummary`, `LineChartBase`, `RelativeTime`, `TimePicker`, `areDatesEqual`, `createDatePickerRange`, `ensureIsRealDate`, `formatDateForComparison`, `isBackendDateAfterNow`, `isDateTimePickerAfterNow`, `mapBackendDateToDateTimePicker`, `mapDateTimePickerToBackendDate`, `mapDateTimePickerToBackendDatePlusOneDay`, `mapDateTimePickerToUnix`, `mapToBackendDate`, `maskInput` |
+| react-date-range | 1 | 0.6 | `DateRangeInput`, `DateRangeModal`, `DateRangePicker` |
+| imask | 6 | 10.2 | `DateRangePicker`, `IMaskInput`, `PhoneNumber`, `maskInput` |
+| cropperjs | 1 | 14.8 | `GALLERY_PHOTO_SCOPE`, `Gallery`, `ImageCropperTransformer` |
+| MUI/emotion runtime | 5 | 10.2 | 27: `AIAssistant`, `AppBar`, `Autocomplete`, `ColorPicker`, `DatePicker`, `DateRangeInput`, `DateRangePicker`, `DateTimePicker`, `DrawerRoot`, `DrawerService`, `Input`, `InputBase`, `Menu`, `PhoneNumber`, `RichTextEditor`, `SearchableSelect`, `Select`, `Snackbar`, `SnackbarRoot`, `Table`, `TableBody`, `TableFooter`, `TableHeader`, `TextEditDrawer`, `Textarea`, `TimePicker`, `VanguardThemeProvider` |
+
+3. The emotion signature moved from the last measured 37/299 to **27/299**. The independent B.3 gate, `node scripts/check-eager-mui.mjs`, found **23/298** with eager `@mui/*` module IDs, plus one allow-listed RTL context. The export counts differ because the gate’s parser leaves out the namespace import `VanguardStyle`, which the closure tool includes. The gate excludes the allow-list and measures MUI module IDs, while the D10 table detects emotion by file content.
+4. Selected static closure weights in gzip KiB: `Text` 60.5, `Icon` 36.6, `Button` 104.9, `Table` 433.4, `Gallery` 343.7, `RichTextEditor` 610.7, `ExportXLS` / `useExportXLS` 106.2 each, `ProgressBar` 2.2. The `ProgressBar` graph has one dynamic target and no eager `@mui/*`. Rollup module IDs also confirm that `Text` reaches no react-spring, `Gallery` reaches no jszip, and `Table` still reaches libphonenumber-js.
+5. The 11 inlined base64 assets above 4 KiB total 881,919 estimated decoded bytes. None appear in the barrel’s static Rollup graph. WordPress `index.js` is 2,600,551 bytes on disk and 647,148 bytes at gzip level 9. The same signature scan saw lottie and emotion and found zero base64 assets above 4 KiB. `check-wordpress-dynamic-imports.mjs` reached 336 files with zero missing targets. These measurements cover the shipped static graph and file sizes.
+
 ### (b) correction from verifier 2's render check of fc6c898/df8567a (40/42 render)
 `TogglerWithText` stories reverted to un-collected (original file restored): `toggler-with-node` passes the vitest smoke run but shows the Storybook error overlay when served ("Objects are not valid as a React child (found: object with keys {br, b, em, link, span})", light + dark). Pre-existing story (never collected before); stays on the stale list. TogglerWithText keeps its specs.
 
@@ -1154,3 +1184,47 @@ Reply to the watchdog after step 1's grep result.
    6.1 Cold cache, 6 files: 5 failed at the 10 s hook, setup 52.5 s.
    6.2 Full project on A's tip without my change: 20 files failed + 3 tests.
    6.3 The watchdog ruled the cause gets fixed (A moves preload into the specs that need it, with an allow-list), not the timeout. So a green full spec run on this tree waits for A's fix. The targeted runs are green.
+
+### ProgressBar combined call-site reachability (decided-by-watchdog)
+
+1. The watchdog accepted this as the reachability evidence for `f94d9323861c4f0a0c582e54a64b43aa9546a5b6`. The original packed tarball had SHA-256 `12c28012780971db864ca1d9698ba47ff0bfb5e6a545b9cc5337c372b2089644`.
+2. Import-aware AST scan corrected the earlier 35 rc-webapp sites to **33 production + 1 story fixture** in 28 files. Of the 34, 17 omit `variant` and 17 pass it. Nine of the 17 use a ternary with two literal outcomes. There is **one** production Vanguard invocation at the split SHA, `RatingStarsAndProgressBar.tsx:36`, with no `variant`. Its caller `RatingDistribution` is internal. The earlier 20-internal-sites count included non-production examples. No consumer or production Vanguard spread, unresolved routing value, or indirect value use was found. `props` spreads in `_ProgressBarParity.stories.tsx` and `_progress-bar-parity.spec.tsx` are test evidence. WordPress has zero default shapes because its source entry and the 65 named exports of the packed JS entry exclude ProgressBar. Neither ProgressBar nor RatingStarsAndProgressBar DOM markers occur in that bundle.
+3. The 22 unique shapes below use exact explicit prop keys. Counts are occurrences per listed literal, so a two-branch ternary can contribute to two shapes.
+
+| Explicit prop keys | `variant` | rc-webapp production | rc-webapp fixture | Vanguard production |
+|---|---|---:|---:|---:|
+| `color, height, progressValue` | omitted | 7 | 0 | 0 |
+| `color, progressValue, variant` | determinate and indeterminate, each | 2 | 0 | 0 |
+| `className, color, height, progressValue` | omitted | 1 | 0 | 0 |
+| `color, height, progressValue, variant` | determinate and indeterminate, each | 2 | 0 | 0 |
+| `color, isBlurred, progressValue` | omitted | 4 | 0 | 0 |
+| `height, progressValue, variant, width` | determinate and indeterminate, each | 3 | 0 | 0 |
+| `bgColor, color, height, progressValue` | omitted | 1 | 0 | 0 |
+| `color, height, variant, width` | indeterminate | 2 | 0 | 0 |
+| `progressValue` | omitted | 1 | 0 | 0 |
+| `progressValue, variant` | determinate and indeterminate, each | 1 | 0 | 0 |
+| `className, color, height, progressValue, variant` | determinate and indeterminate, each | 1 | 0 | 0 |
+| `height, variant` | indeterminate | 4 | 0 | 0 |
+| `bgColor, color, height, progressValue, variant` | determinate and indeterminate, each | 1 | 0 | 0 |
+| `height, progressValue, width` | omitted | 0 | 1 | 0 |
+| `className, color, height, progressValue, width` | omitted | 1 | 0 | 1 |
+| `height, progressValue` | omitted | 1 | 0 | 0 |
+
+4. Packed same-tick result is **48/48**. The runner expanded the 35 sites by nine extra ternary branches and four extra `isBlurred` branches, yielding 32 determinate and 16 indeterminate renders. The checked-in fixture keeps static values and supplies synthetic values for dynamic color, class, and progress. React `flushSync` committed the actual router from the packed `dist/index.js`, with ESM splitting on and no preload or Vitest setup. The fixture asserted the role, `data-vg-core`, variant, number of bars, and `aria-valuenow` before the next tick. The cold `buffer` and `query` controls rendered empty on that same tick. Zero React and jsdom errors. This tests routing and first DOM presence, with style and geometry covered separately in Storybook.
+5. Reproduction from the Vanguard worktree, using the exact tarball and the read-only rc-webapp source root.
+
+   ```sh
+   node agentic-plans/uisdk-tools-b/shape-audit/scan.cjs \
+     --component ProgressBar --routing-props variant --sha f94d932 \
+     --consumer-root /Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src \
+     > /tmp/progressbar-sites.json
+
+   /usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-outbound)' \
+     node agentic-plans/uisdk-tools-b/shape-audit/render.cjs \
+     --component ProgressBar --routing-props variant --pack "$VG_PACK" \
+     --sites /tmp/progressbar-sites.json \
+     --fixture agentic-plans/uisdk-tools-b/shape-audit/progress-bar.fixture.cjs
+   ```
+
+6. Other components use the same commands with their export, routing keys, SHA, tarball, and a component fixture. The scanner records explicit JSX and `createElement` props, literal alternatives, imported value references outside direct sites, and spreads. Literal conditions across different props are expanded conservatively as a Cartesian product. Dynamic routing values and spreads need a site-specific `resolveSite` in the fixture or remain named gaps. Dynamic values on non-routing props need synthetic fixture defaults. The fixture may supply a wrapper, extra non-routing variations, negative controls, or WordPress default cases for exported components. The runner reports dynamic decisions separately from literal cases. Imported aliases that flow through local wrappers, re-exports, or runtime-generated props need manual review. The packed evidence stops at the first DOM commit and does not measure pixels or later interactions.
+7. Red/green for generalization. The one-component scanner returned no `MenuItem` identity when invoked with `--component MenuItem --routing-props component,href`. The generalized CLI returned that identity and 45 direct MenuItem sites across production and evidence files. A synthetic AST probe also passed for renamed and namespace imports, nested literal options with `undefined`, a spread with an unresolved route, `createElement`, and an indirect `memo` reference. The generalized packed runner reproduced all 48 ProgressBar renders and the two cold controls against the original pack.

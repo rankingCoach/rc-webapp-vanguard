@@ -15,6 +15,7 @@
   "src/core/Menu/_MenuWrappedChildren.spec.tsx": "passes transitionDuration={0} (unmodelled), so the Menu takes the MUI route",
   "src/core/MenuItem/_MenuItem.mui.spec.tsx": "standalone MenuItem outside an own option host renders MUI MenuItem by design",
   "src/core/MenuItem/_MenuItem.stories.tsx": "standalone MenuItem inside MUI MenuList intentionally exercises the fallback",
+  "src/core/ProgressBar/_ProgressBar.mui.spec.tsx": "buffer / query cases deliberately render the lazy MUI LinearProgress route (unmodelled variants, unreachable from rc-webapp and Vanguard)",
   "src/core/Snackbar/_Snackbar.mui.spec.tsx": "ContentProps, ClickAwayListenerProps, TransitionComponent/Props (unmodelled) keep MUI Snackbar",
   "src/core/Snackbar/_SnackbarCompatibility.mui.spec.tsx": "themed transition selection and slot precedence via slots/slotProps (unmodelled) keep MUI Snackbar",
   "src/core/Snackbar/_SnackbarRemaining.spec.tsx": "legacy transition callbacks via TransitionProps (unmodelled) keep MUI Snackbar",
