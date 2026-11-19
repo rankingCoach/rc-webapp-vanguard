@@ -1161,3 +1161,47 @@ Reply to the watchdog after step 1's grep result.
    6.1 Cold cache, 6 files: 5 failed at the 10 s hook, setup 52.5 s.
    6.2 Full project on A's tip without my change: 20 files failed + 3 tests.
    6.3 The watchdog ruled the cause gets fixed (A moves preload into the specs that need it, with an allow-list), not the timeout. So a green full spec run on this tree waits for A's fix. The targeted runs are green.
+
+### ProgressBar combined call-site reachability (decided-by-watchdog)
+
+1. The watchdog accepted this as the reachability evidence for `f94d9323861c4f0a0c582e54a64b43aa9546a5b6`. The original packed tarball had SHA-256 `12c28012780971db864ca1d9698ba47ff0bfb5e6a545b9cc5337c372b2089644`.
+2. Import-aware AST scan corrected the earlier 35 rc-webapp sites to **33 production + 1 story fixture** in 28 files. Of the 34, 17 omit `variant` and 17 pass it. Nine of the 17 use a ternary with two literal outcomes. There is **one** production Vanguard invocation at the split SHA, `RatingStarsAndProgressBar.tsx:36`, with no `variant`. Its caller `RatingDistribution` is internal. The earlier 20-internal-sites count included non-production examples. No consumer or production Vanguard spread, unresolved routing value, or indirect value use was found. `props` spreads in `_ProgressBarParity.stories.tsx` and `_progress-bar-parity.spec.tsx` are test evidence. WordPress has zero default shapes because its source entry and the 65 named exports of the packed JS entry exclude ProgressBar. Neither ProgressBar nor RatingStarsAndProgressBar DOM markers occur in that bundle.
+3. The 22 unique shapes below use exact explicit prop keys. Counts are occurrences per listed literal, so a two-branch ternary can contribute to two shapes.
+
+| Explicit prop keys | `variant` | rc-webapp production | rc-webapp fixture | Vanguard production |
+|---|---|---:|---:|---:|
+| `color, height, progressValue` | omitted | 7 | 0 | 0 |
+| `color, progressValue, variant` | determinate and indeterminate, each | 2 | 0 | 0 |
+| `className, color, height, progressValue` | omitted | 1 | 0 | 0 |
+| `color, height, progressValue, variant` | determinate and indeterminate, each | 2 | 0 | 0 |
+| `color, isBlurred, progressValue` | omitted | 4 | 0 | 0 |
+| `height, progressValue, variant, width` | determinate and indeterminate, each | 3 | 0 | 0 |
+| `bgColor, color, height, progressValue` | omitted | 1 | 0 | 0 |
+| `color, height, variant, width` | indeterminate | 2 | 0 | 0 |
+| `progressValue` | omitted | 1 | 0 | 0 |
+| `progressValue, variant` | determinate and indeterminate, each | 1 | 0 | 0 |
+| `className, color, height, progressValue, variant` | determinate and indeterminate, each | 1 | 0 | 0 |
+| `height, variant` | indeterminate | 4 | 0 | 0 |
+| `bgColor, color, height, progressValue, variant` | determinate and indeterminate, each | 1 | 0 | 0 |
+| `height, progressValue, width` | omitted | 0 | 1 | 0 |
+| `className, color, height, progressValue, width` | omitted | 1 | 0 | 1 |
+| `height, progressValue` | omitted | 1 | 0 | 0 |
+
+4. Packed same-tick result is **48/48**. The runner expanded the 35 sites by nine extra ternary branches and four extra `isBlurred` branches, yielding 32 determinate and 16 indeterminate renders. The checked-in fixture keeps static values and supplies synthetic values for dynamic color, class, and progress. React `flushSync` committed the actual router from the packed `dist/index.js`, with ESM splitting on and no preload or Vitest setup. The fixture asserted the role, `data-vg-core`, variant, number of bars, and `aria-valuenow` before the next tick. The cold `buffer` and `query` controls rendered empty on that same tick. Zero React and jsdom errors. This tests routing and first DOM presence, with style and geometry covered separately in Storybook.
+5. Reproduction from the Vanguard worktree, using the exact tarball and the read-only rc-webapp source root.
+
+   ```sh
+   node agentic-plans/uisdk-tools-b/shape-audit/scan.cjs \
+     --component ProgressBar --routing-props variant --sha f94d932 \
+     --consumer-root /Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src \
+     > /tmp/progressbar-sites.json
+
+   /usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-outbound)' \
+     node agentic-plans/uisdk-tools-b/shape-audit/render.cjs \
+     --component ProgressBar --routing-props variant --pack "$VG_PACK" \
+     --sites /tmp/progressbar-sites.json \
+     --fixture agentic-plans/uisdk-tools-b/shape-audit/progress-bar.fixture.cjs
+   ```
+
+6. Other components use the same commands with their export, routing keys, SHA, tarball, and a component fixture. The scanner records explicit JSX and `createElement` props, literal alternatives, imported value references outside direct sites, and spreads. Literal conditions across different props are expanded conservatively as a Cartesian product. Dynamic routing values and spreads need a site-specific `resolveSite` in the fixture or remain named gaps. Dynamic values on non-routing props need synthetic fixture defaults. The fixture may supply a wrapper, extra non-routing variations, negative controls, or WordPress default cases for exported components. The runner reports dynamic decisions separately from literal cases. Imported aliases that flow through local wrappers, re-exports, or runtime-generated props need manual review. The packed evidence stops at the first DOM commit and does not measure pixels or later interactions.
+7. Red/green for generalization. The one-component scanner returned no `MenuItem` identity when invoked with `--component MenuItem --routing-props component,href`. The generalized CLI returned that identity and 45 direct MenuItem sites across production and evidence files. A synthetic AST probe also passed for renamed and namespace imports, nested literal options with `undefined`, a spread with an unresolved route, `createElement`, and an indirect `memo` reference. The generalized packed runner reproduced all 48 ProgressBar renders and the two cold controls against the original pack.
