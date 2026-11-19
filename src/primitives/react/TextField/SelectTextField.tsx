@@ -111,6 +111,8 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
   const id = idProp ?? autoId;
   const inputSlot = slotProps?.input ?? {};
   const htmlInput = slotProps?.htmlInput ?? {};
+  // MUI SelectInput takes aria-label / aria-describedby for the display; the rest lands on the native input.
+  const { 'aria-label': _nativeAriaLabel, 'aria-describedby': _nativeDescribedby, ...nativeInputRest } = htmlInput;
   const labelSlot = slotProps?.inputLabel ?? {};
   const selectSlot = slotProps?.select ?? {};
   const helperSlot = slotProps?.formHelperText ?? {};
@@ -543,6 +545,9 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
           onClose={rootOnClose ?? menuOnClose ?? closeMenu}
           marginThreshold={marginThreshold}
           disableScrollLock={disableScrollLock}
+          // MUI Select spreads MenuProps into Menu: `autoFocus: false` turns off the menu's own initial focus too
+          // (no list focus), so a child that autofocuses (SearchableSelect's search field) keeps it.
+          autoFocus={menuAutoFocus ?? true}
           autoFocusItem={(menuAutoFocus ?? true) && !disableAutoFocusItem}
           anchorOrigin={anchorOrigin ?? { vertical: 'bottom', horizontal: 'center' }}
           transformOrigin={transformOrigin ?? { vertical: 'top', horizontal: 'center' }}
@@ -598,21 +603,25 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         data-vg-core=""
         data-open={open ? '' : undefined}
         data-disabled={disabled ? '' : undefined}
+        // MUI SelectInput buttonId: SelectDisplayProps.id (TextField / Select put `id` there), else the name fallback.
+        // Placed before the SelectDisplayProps spread, where MUI's `{ id, ...SelectDisplayProps }` puts the key.
+        id={SelectDisplayProps.id ?? id ?? (name ? `mui-component-select-${name}` : undefined)}
         {...SelectDisplayProps}
         ref={(node: HTMLDivElement | null) => {
           displayRef.current = node;
           if (node) setDisplayNode(node);
         }}
-        className={classNames(
+        // MUI: clsx(SelectDisplayProps.className, classes.select, className).
+        className={[
+          SelectDisplayProps.className,
           'MuiSelect-select',
           'MuiSelect-outlined',
           'MuiInputBase-input',
           'MuiOutlinedInput-input',
           disabled ? 'Mui-disabled' : '',
-          SelectDisplayProps.className ?? '',
-        )}
-        // MUI SelectInput buttonId: SelectDisplayProps.id (TextField / Select put `id` there), else the name fallback.
-        id={SelectDisplayProps.id ?? id ?? (name ? `mui-component-select-${name}` : undefined)}
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {isEmptyDisplay(display) ? (
           <span className="notranslate" aria-hidden="true">
@@ -642,16 +651,18 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         required={required}
         data-slot="select-native-input"
         data-vg-core=""
-        {...htmlInput}
+        {...nativeInputRest}
         id={htmlInput.id ?? nativeInputId}
       />
       <IconComponent
-        className={classNames(
+        className={[
           IconComponent === ArrowDropDown ? 'MuiSvgIcon-root MuiSvgIcon-fontSizeMedium' : '',
           'MuiSelect-icon',
           open ? 'MuiSelect-iconOpen' : '',
           disabled ? 'Mui-disabled' : '',
-        )}
+        ]
+          .filter(Boolean)
+          .join(' ')}
       />
     </TextFieldFrame>
   );

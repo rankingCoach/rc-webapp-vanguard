@@ -1,7 +1,9 @@
 import { MenuItem as MuiMenuItem, TextField } from '@mui/material';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
+import { MenuOption } from '../Menu/MenuOption';
 import { SelectTextField } from './SelectTextField';
 
 /**
@@ -40,5 +42,47 @@ describe('select display aria ids equal MUI', () => {
     const own = read(b.container);
     b.unmount();
     expect(own).toEqual(mui);
+  });
+
+  it('htmlInput aria-label labels the display only, not the native input', () => {
+    const go = (C: React.ElementType, props: Record<string, unknown>) => {
+      const v = render(
+        <C select value="a" id="f" {...props}>
+          {item}
+        </C>,
+      );
+      const native = v.container.querySelector('input[aria-hidden="true"]') as HTMLElement;
+      const display = v.container.querySelector('[role="combobox"]') as HTMLElement;
+      const out = { native: native.getAttribute('aria-label'), display: display.getAttribute('aria-label') };
+      v.unmount();
+      return out;
+    };
+    expect(go(SelectTextField, { slotProps: { htmlInput: { 'aria-label': 'Fruit' } } })).toEqual(
+      go(TextField, { slotProps: { htmlInput: { 'aria-label': 'Fruit' } } }),
+    );
+  });
+
+  it('MenuProps.autoFocus false: an autofocusing child in the menu keeps focus', async () => {
+    const go = async (C: React.ElementType) => {
+      const user = userEvent.setup();
+      const v = render(
+        <C select value="a" id="f" slotProps={{ select: { MenuProps: { autoFocus: false } } }}>
+          <div>
+            <input aria-label="search" autoFocus />
+          </div>
+          {C === TextField ? item : <MenuOption value="a">{'A'}</MenuOption>}
+        </C>,
+      );
+      await user.click(v.container.querySelector('[role="combobox"]') as HTMLElement);
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 20));
+      });
+      const out = (document.activeElement as HTMLElement).getAttribute('aria-label');
+      v.unmount();
+      return out;
+    };
+    const mui = await go(TextField);
+    expect(mui).toBe('search');
+    expect(await go(SelectTextField)).toBe(mui);
   });
 });
