@@ -1288,6 +1288,13 @@ Pending full run: 501d8cb (styled-components dropped, package.json).
    arrow rects, clipping ancestors, viewport, offset parent, body padding and scrollbar gutter. The rebuilt light
    pilot gave x506 with the arrow centred in 9/9 rendered `.472` samples (one capture missing), same x and arrow
    offset as 10/10 on `32a6b93`. The paired verifier verdict determines H16c.
+9. **H16c PASS (decided-by-watchdog).** The guarded fresh pair used `32a6b93` against `.472`, both on committed
+   rc-webapp `73673465091`. All 39 measurable primary runs settled at x506 / width 171.1 px / arrow offset 74 px
+   with zero centre error after fonts loaded. On both builds the first visible x and the +1 s x were 506 in every
+   measurable cold-context run. The live probe measured anchor and arrow centres at x592 with a 1280×900 viewport
+   and 0 px scrollbar width. Drawer Page matched 4/4. Neither side reproduced historical x514 from the lost shadow.
+   The cause of the old difference remains unexplained. [H16c verdict](/Users/a.kott/vanguard-verify/v1/logs/H16c-verdict.md).
+   H16b closes and Drawer brings the running tally to **29/31**. DatePicker and FormControl remain.
 
 ## 36. DatePicker off @mui/x-date-pickers (staged, 2026-11-19)
 
@@ -1527,7 +1534,7 @@ passed, with zero blocked destinations during the probes. [Reference capture](/U
 [candidate capture](/Users/a.kott/vanguard-verify/v2/out/h19b-adornment-32a6b93.json).
 D15 tie #13 was accepted at `73d25d7` for the customer app entry.
 
-The running MUI verification tally is **28/31**. H19 adds AppBar, Toolbar, FocusTrap and the DateRangePicker
+H19 brought the running MUI verification tally to **28/31**, before the H16c verdict. It adds AppBar, Toolbar, FocusTrap and the DateRangePicker
 dropdown. Drawer (H16c), DatePicker and FormControl remain on that tally. VanguardThemeProvider remains a separate
 MUI-exit task. H19 also covers the DateRangeInput/adornment work, the AIAssistant panel and Documents rows within
 the exercised scenarios. The AIAssistant generate and tone actions remain undriven, Documents has no rc-webapp
@@ -1592,18 +1599,27 @@ prop keys and resolved routing combinations used by the source and packed runtim
 use synthetic fixture data. The old `c8e69a2` pack is red for the two centered-portal checks and the same pack's
 WordPress smoke is green.
 
-| Component | Shapes | Own | Fallback | Evidence scope |
-| --- | ---: | ---: | ---: | --- |
-| Autocomplete | 24 | 24 | 0 | 26 rc-webapp calls produce 22 shapes, plus the WordPress default and one private source wrapper |
-| Menu | 6 | 6 | 0 | Items, JSX children, size, origins and the media menu's class-only `PaperProps` |
-| MenuItem | 13 | 13 | 0 | Account route spread present/absent, SearchableSelect, TableToolbar and `Menu.items` item props |
-| Snackbar | 2 | 2 | 0 | AiVisibility and SnackbarRoot, which adds `TransitionComponent` |
-| AppBar | 1 | 1 | 0 | Navbar ref, class, fixed position, style and children |
-| Toolbar | 1 | 1 | 0 | Navbar class and children |
-| PopoverPopper | 1 | 1 | 0 | Source-only path through private AutocompleteWithAnchor |
-| FormControl | 0 | 0 | 0 | No production caller or WordPress export |
-| PopoverModal | 2 | 1 | 1 eager | Event details and centered create-event portal |
-| ProgressBar | 22 | 22 | 0 | B's separate exact `f94d932` pack, 48 same-tick checks and cold buffer/query controls |
+| Component | rc-webapp / Vanguard JSX sites | Shapes | Own | Fallback | Evidence scope |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Autocomplete | 26 / 1 | 24 | 24 | 0 | 27 packed default replays plus the WordPress default |
+| Menu | 14 / 2 | 6 | 6 | 0 | 16 packed replays. Items, JSX children, size, origins and the media menu's class-only `PaperProps` |
+| MenuItem | 3 / 3 | 13 | 13 | 0 | 15 packed replays. Account route spread present/absent, SearchableSelect, TableToolbar and `Menu.items` item props |
+| Snackbar | 1 / 1 | 2 | 2 | 0 | Two packed replays. AiVisibility and SnackbarRoot, which adds `TransitionComponent` |
+| AppBar | 1 / 0 | 1 | 1 | 0 | One packed replay. Navbar ref, class, fixed position, style and children |
+| Toolbar | 1 / 0 | 1 | 1 | 0 | One packed replay. Navbar class and children |
+| PopoverPopper | 0 / 1 | 1 | 1 | 0 | Private AutocompleteWithAnchor source replay. Absent from both packed public entries |
+| FormControl | 0 / 0 | 0 | 0 | 0 | No production caller or WordPress export. Default pack cold control has no first-commit FormControl root |
+| PopoverModal | — | 2 | 1 | 1 eager | Event details and centered create-event portal |
+| ProgressBar | 34 / 1 | 22 | 22 | 0 | B's verified `f94d932`, 48 same-tick checks and cold buffer/query controls |
+
+Independent replay used `scan.cjs` and `render.cjs` from `72a8633`, exact `32a6b93` packed modules, and read-only
+rc-webapp source exported from `73673465091`. The durable `h20-shapes-32a6b93` log directory contains the raw site
+scans and first-commit results. All 62 default replays, one WordPress replay and seven opt-out controls were green.
+The renderer adapter supplies jsdom's missing canvas/visual APIs and imports Menu and SearchableSelect from the
+same packed module as MenuItem to exercise its true context. It does not preload or wait for fallbacks. Opaque
+Menu open values are exercised open so a cold empty route can fail the check. The scan includes the Vanguard demo
+Menu site in `src/App.tsx`. No unresolved site or indirect use remains in the public replay reports. The other
+routes are unchanged across B's merge, and ProgressBar has its own exact-source verifier evidence.
 
 The AccountNavMenu conditional adds only `selected` and `useActiveIcon`. The internal `Menu.items` spread drops the
 React key and forwards each config's fields. The configured items were checked for `component` and `href`. The
@@ -1611,6 +1627,22 @@ media menu's `MENU_PAPER_PROPS` contains only `className`. AutocompleteWithAncho
 caller. Its spread has source coverage in the real wrapper. PopoverPopper has source coverage and no public packed
 entry. Icon and StatusBadgeIcon's WordPress tests assert their existing empty first commit and then the local SVG
 load separately.
+
+#### Proposed own TextField port (for watchdog review)
+
+1. Keep the legacy slot mapping and theme-default precedence. Address the two reachable outlined-text fallback
+   keys separately in the differential. Route `slotProps.input.ref` to the outlined InputBase root. The TextField
+   root and native input keep their separate ref contracts. Use Autocomplete's real render-input parameters and
+   compare anchor identity, popup width and position at all three consumer sizes and with wrapped multiple chips.
+2. Allow `slotProps.input.inputComponent` to provide the native control. Pass the same input props, handlers and
+   merged native input refs as the frozen route. MUI's styled boundary filters `ownerState`, `theme`, `sx` and `as`.
+   Preserve the native textarea autosize branch and the custom component's behavior when `multiline` is set.
+   Compare the actual PhoneNumber and DateRangePicker IMask paths for typing, caret, paste, change callbacks,
+   controlled reset and focus. Add the focus/hover/disabled/error browser comparison before switching routes.
+3. After the differential, remove only `ref` and `inputComponent` from the outlined-text route restrictions and
+   restore the own calendar adornment inside the newly own masked picker frame in the same change. Keep the
+   remaining MUI props and routes available. Validate first paint of packed Autocomplete and Input in WordPress
+   and rerun the combined shape audit before proposing any change to fallback loading.
 
 **Autocomplete Clear icon (decided-by-watchdog).** The keyboard differential sampled the own side before the
 shared asset cache was warm and the frozen MUI side afterwards. Resetting the dynamic-import module before each
