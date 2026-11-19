@@ -17,6 +17,11 @@ export interface SelectTextFieldProps extends AnyProps {
   id?: string;
   select: true;
   children?: React.ReactNode;
+  /**
+   * MUI `<FormControl fullWidth?><Select>` instead of `<TextField select>`: no `MuiTextField-root`, the input root
+   * not full width (FormControl's fullWidth only), InputBase's class order. `slotProps.input` lands on the input root.
+   */
+  bare?: boolean;
   slots?: { inputLabel?: React.ElementType } & AnyProps;
   slotProps?: {
     input?: AnyProps;
@@ -103,12 +108,13 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
     style,
     focused: focusedProp,
     margin: _margin,
+    bare = false,
     ...rootRest
   } = props;
   const vgType = useVanguardTypography() === 'vanguard' ? 'vg-typography-vanguard' : '';
-  // MUI TextField always has an id (useId when none is given).
+  // MUI TextField always has an id (useId when none is given); a bare Select does not.
   const autoId = useId();
-  const id = idProp ?? autoId;
+  const id = bare ? idProp : (idProp ?? autoId);
   const inputSlot = slotProps?.input ?? {};
   const htmlInput = slotProps?.htmlInput ?? {};
   // MUI SelectInput takes aria-label / aria-describedby for the display; the rest lands on the native input.
@@ -532,6 +538,28 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
       inputRootRest={inputRest}
       inputRootClassName={inputClassName}
       inputRootExtraClasses="MuiSelect-root"
+      textFieldRoot={!bare}
+      inputRootClasses={
+        bare
+          ? [
+              'MuiInputBase-root',
+              'MuiOutlinedInput-root',
+              `MuiInputBase-color${color.charAt(0).toUpperCase()}${color.slice(1)}`,
+              disabled ? 'Mui-disabled' : '',
+              error ? 'Mui-error' : '',
+              focused ? 'Mui-focused' : '',
+              'MuiInputBase-formControl',
+              size === 'small' ? 'MuiInputBase-sizeSmall' : '',
+              startAdornment ? 'MuiInputBase-adornedStart' : '',
+              endAdornment ? 'MuiInputBase-adornedEnd' : '',
+              'MuiSelect-root',
+              vgType,
+              inputClassName ?? '',
+            ]
+              .filter(Boolean)
+              .join(' ')
+          : undefined
+      }
       startAdornment={startAdornment}
       endAdornment={endAdornment}
       helperText={helperText}

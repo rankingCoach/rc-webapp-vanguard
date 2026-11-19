@@ -711,3 +711,46 @@ svg.MuiSvgIcon-root:where([data-vg-core]) {
 .MuiFormHelperText-root:where([data-vg-core]):where(.vg-typography-vanguard) {
   font-size: unquote("0.8571428571428571rem");
 }
+
+// ---------------------------------------------------------------- InputAdornment (own, MUI 9.5 InputAdornmentRoot)
+// Emotion `.css-x` = (0,1,0); the filled start rule is `&.positionStart&:not(.hiddenLabel)` = (0,3,0).
+.MuiInputAdornment-root:where([data-vg-core]) {
+  display: flex;
+  max-height: 2em;
+  align-items: center;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.54);
+
+  &:where(.MuiInputAdornment-positionStart) {
+    margin-right: 8px;
+  }
+
+  &:where(.MuiInputAdornment-positionEnd) {
+    margin-left: 8px;
+  }
+
+  &:where(.MuiInputAdornment-disablePointerEvents) {
+    pointer-events: none;
+  }
+}
+
+.MuiInputAdornment-root:where([data-vg-core].MuiInputAdornment-filled).MuiInputAdornment-positionStart:not(
+    .MuiInputAdornment-hiddenLabel
+  ) {
+  margin-top: 16px;
+}
+
+// String children: MUI Typography body1, color textSecondary (default theme / VanguardThemeProvider).
+.MuiTypography-root:where([data-vg-core]):where(.MuiTypography-body1) {
+  margin: 0;
+  font-family: $font;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.MuiTypography-root:where([data-vg-core]):where(.MuiTypography-body1.vg-typography-vanguard) {
+  font-size: unquote("1.1428571428571428rem");
+}

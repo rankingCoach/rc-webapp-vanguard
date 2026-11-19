@@ -1,5 +1,6 @@
 import { classNames } from '@helpers/classNames';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { OwnFormControlContext } from './form-control-context';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyProps = Record<string, any>;
@@ -24,6 +25,8 @@ export interface TextFieldFrameProps {
   sx?: unknown;
   style?: React.CSSProperties;
   rootProps?: AnyProps;
+  /** false: a bare MUI `FormControl` (+ Select), without the `MuiTextField-root` class. Default true. */
+  textFieldRoot?: boolean;
   fullWidth: boolean;
 
   label?: React.ReactNode;
@@ -78,6 +81,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
     style,
     rootProps,
     fullWidth,
+    textFieldRoot = true,
     label,
     labelId,
     labelSlotComponent,
@@ -115,126 +119,135 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
   } = labelSlot;
   const LabelHost: React.ElementType = labelSlotComponent ?? labelComponent ?? vanguardComponent ?? 'label';
 
+  // MUI FormControl context, as own children read it (InputAdornment variant/size classes).
+  const formControlState = useMemo(
+    () => ({ variant: 'outlined' as const, size: size === 'small' ? ('small' as const) : ('medium' as const) }),
+    [size],
+  );
   return (
-    <div
-      className={classNames(
-        'MuiFormControl-root',
-        fullWidth ? 'MuiFormControl-fullWidth' : '',
-        'MuiTextField-root',
-        className ?? '',
-      )}
-      data-slot="text-field"
-      data-vg-core=""
-      style={{ ...(sx && typeof sx === 'object' && !Array.isArray(sx) ? sx : {}), ...style }}
-      {...rootProps}
-    >
-      {hasLabel ? (
-        <LabelHost
-          data-shrink={shrink ? 'true' : 'false'}
-          data-slot="text-field-label"
-          data-vg-core=""
-          htmlFor={id}
-          id={labelId}
-          {...labelRest}
-          className={classNames(
-            'MuiFormLabel-root',
-            'MuiInputLabel-root',
-            'MuiInputLabel-formControl',
-            'MuiInputLabel-animated',
-            shrink ? 'MuiInputLabel-shrink' : '',
-            size === 'small' ? 'MuiInputLabel-sizeSmall' : '',
-            'MuiInputLabel-outlined',
-            `MuiFormLabel-color${capitalize(color)}`,
-            textFieldStateClasses(state, filled ? 'MuiFormLabel-filled' : ''),
-            required ? 'Mui-required' : '',
-            vgType,
-            labelClassName ?? '',
-          )}
-        >
-          {label}
-          {required ? (
-            <span
-              data-vg-core=""
-              aria-hidden
-              className={classNames('MuiFormLabel-asterisk', 'MuiInputLabel-asterisk', error ? 'Mui-error' : '')}
-            >
-              {' *'}
-            </span>
-          ) : null}
-        </LabelHost>
-      ) : null}
+    <OwnFormControlContext.Provider value={formControlState}>
       <div
-        data-slot="text-field-input"
+        className={[
+          'MuiFormControl-root',
+          fullWidth ? 'MuiFormControl-fullWidth' : '',
+          textFieldRoot ? 'MuiTextField-root' : '',
+          className ?? '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        data-slot="text-field"
         data-vg-core=""
-        {...inputRootRest}
-        onFocus={undefined}
-        onBlur={undefined}
-        {...inputRootHandlers}
-        className={
-          inputRootClasses ??
-          classNames(
-            'MuiInputBase-root',
-            'MuiOutlinedInput-root',
-            `MuiInputBase-color${capitalize(color)}`,
-            fullWidth ? 'MuiInputBase-fullWidth' : '',
-            startAdornment ? 'MuiInputBase-adornedStart' : '',
-            endAdornment ? 'MuiInputBase-adornedEnd' : '',
-            'MuiInputBase-formControl',
-            size === 'small' ? 'MuiInputBase-sizeSmall' : '',
-            inputRootExtraClasses ?? '',
-            textFieldStateClasses(state),
-            vgType,
-            inputRootClassName ?? '',
-          )
-        }
+        style={{ ...(sx && typeof sx === 'object' && !Array.isArray(sx) ? sx : {}), ...style }}
+        {...rootProps}
       >
-        {startAdornment}
-        {children}
-        {endAdornment}
-        <fieldset
-          aria-hidden="true"
-          className="MuiOutlinedInput-notchedOutline"
-          data-slot="text-field-outline"
-          data-vg-core=""
-        >
-          <legend
-            className="vg-notched-legend"
-            data-with-label={hasLabel ? '' : undefined}
-            data-notched={hasLabel && shrink ? '' : undefined}
-          >
-            {hasLabel ? (
-              <span>
-                {label}
-                {required ? ' *' : null}
-              </span>
-            ) : (
-              <span className="notranslate" aria-hidden="true">
-                {'​'}
-              </span>
+        {hasLabel ? (
+          <LabelHost
+            data-shrink={shrink ? 'true' : 'false'}
+            data-slot="text-field-label"
+            data-vg-core=""
+            htmlFor={id}
+            id={labelId}
+            {...labelRest}
+            className={classNames(
+              'MuiFormLabel-root',
+              'MuiInputLabel-root',
+              'MuiInputLabel-formControl',
+              'MuiInputLabel-animated',
+              shrink ? 'MuiInputLabel-shrink' : '',
+              size === 'small' ? 'MuiInputLabel-sizeSmall' : '',
+              'MuiInputLabel-outlined',
+              `MuiFormLabel-color${capitalize(color)}`,
+              textFieldStateClasses(state, filled ? 'MuiFormLabel-filled' : ''),
+              required ? 'Mui-required' : '',
+              vgType,
+              labelClassName ?? '',
             )}
-          </legend>
-        </fieldset>
-      </div>
-      {helperText != null ? (
-        <p
-          id={helperId}
-          data-slot="text-field-helper"
+          >
+            {label}
+            {required ? (
+              <span
+                data-vg-core=""
+                aria-hidden
+                className={classNames('MuiFormLabel-asterisk', 'MuiInputLabel-asterisk', error ? 'Mui-error' : '')}
+              >
+                {' *'}
+              </span>
+            ) : null}
+          </LabelHost>
+        ) : null}
+        <div
+          data-slot="text-field-input"
           data-vg-core=""
-          {...helperSlot}
-          className={classNames(
-            'MuiFormHelperText-root',
-            size === 'small' ? 'MuiFormHelperText-sizeSmall' : 'MuiFormHelperText-sizeMedium',
-            'MuiFormHelperText-contained',
-            textFieldStateClasses(state, filled ? 'MuiFormHelperText-filled' : ''),
-            required ? 'Mui-required' : '',
-            vgType,
-            helperSlot.className ?? '',
-          )}
+          {...inputRootRest}
+          onFocus={undefined}
+          onBlur={undefined}
+          {...inputRootHandlers}
+          className={
+            inputRootClasses ??
+            classNames(
+              'MuiInputBase-root',
+              'MuiOutlinedInput-root',
+              `MuiInputBase-color${capitalize(color)}`,
+              fullWidth ? 'MuiInputBase-fullWidth' : '',
+              startAdornment ? 'MuiInputBase-adornedStart' : '',
+              endAdornment ? 'MuiInputBase-adornedEnd' : '',
+              'MuiInputBase-formControl',
+              size === 'small' ? 'MuiInputBase-sizeSmall' : '',
+              inputRootExtraClasses ?? '',
+              textFieldStateClasses(state),
+              vgType,
+              inputRootClassName ?? '',
+            )
+          }
         >
-          {helperText}
-        </p>
-      ) : null}
-      {after}
-    </div>
+          {startAdornment}
+          {children}
+          {endAdornment}
+          <fieldset
+            aria-hidden="true"
+            className="MuiOutlinedInput-notchedOutline"
+            data-slot="text-field-outline"
+            data-vg-core=""
+          >
+            <legend
+              className="vg-notched-legend"
+              data-with-label={hasLabel ? '' : undefined}
+              data-notched={hasLabel && shrink ? '' : undefined}
+            >
+              {hasLabel ? (
+                <span>
+                  {label}
+                  {required ? ' *' : null}
+                </span>
+              ) : (
+                <span className="notranslate" aria-hidden="true">
+                  {'​'}
+                </span>
+              )}
+            </legend>
+          </fieldset>
+        </div>
+        {helperText != null ? (
+          <p
+            id={helperId}
+            data-slot="text-field-helper"
+            data-vg-core=""
+            {...helperSlot}
+            className={classNames(
+              'MuiFormHelperText-root',
+              size === 'small' ? 'MuiFormHelperText-sizeSmall' : 'MuiFormHelperText-sizeMedium',
+              'MuiFormHelperText-contained',
+              textFieldStateClasses(state, filled ? 'MuiFormHelperText-filled' : ''),
+              required ? 'Mui-required' : '',
+              vgType,
+              helperSlot.className ?? '',
+            )}
+          >
+            {helperText}
+          </p>
+        ) : null}
+        {after}
+      </div>
+    </OwnFormControlContext.Provider>
   );
 };

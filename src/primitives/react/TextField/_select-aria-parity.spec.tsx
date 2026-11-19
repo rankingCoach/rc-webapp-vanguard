@@ -1,4 +1,4 @@
-import { MenuItem as MuiMenuItem, TextField } from '@mui/material';
+import { FormControl as MuiFormControl, MenuItem as MuiMenuItem, Select as MuiSelect, TextField } from '@mui/material';
 import { act, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -84,5 +84,24 @@ describe('select display aria ids equal MUI', () => {
     const mui = await go(TextField);
     expect(mui).toBe('search');
     expect(await go(SelectTextField)).toBe(mui);
+  });
+  it('bare FormControl + Select with id', () => {
+    const a = render(
+      <MuiFormControl fullWidth>
+        <MuiSelect id="search-select" value="a">
+          {item}
+        </MuiSelect>
+      </MuiFormControl>,
+    );
+    const mui = read(a.container);
+    a.unmount();
+    const b = render(
+      <SelectTextField bare select fullWidth id="search-select" value="a">
+        {item}
+      </SelectTextField>,
+    );
+    const own = read(b.container);
+    b.unmount();
+    expect(own).toEqual(mui);
   });
 });
