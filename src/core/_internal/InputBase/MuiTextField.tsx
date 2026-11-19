@@ -1,19 +1,13 @@
-import { InputLabel, InputLabelProps, TextField } from '@mui/material';
-import { useThemeProps } from '@mui/material/styles';
 import React from 'react';
 import { InputTextField } from '../../../primitives/react/TextField/InputTextField';
 import { SelectTextField } from '../../../primitives/react/TextField/SelectTextField';
+import { lazyFallback } from '../lazy-fallback';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { mapLegacyComponentAliases, mapLegacyModalAliases, mapLegacySlots } from '../mui-slot-compat';
+import { useThemeDefaultProps } from '../theme-default-props';
 
-type CompatibleInputLabelProps = InputLabelProps & { vanguardComponent?: React.ElementType };
-
-// TextField v9's slot component prop becomes `as`, which would bypass FormLabel.
-// Forward the legacy component at InputLabel's public component boundary instead.
-const CompatibleInputLabel = React.forwardRef<HTMLLabelElement, CompatibleInputLabelProps>(
-  ({ vanguardComponent, ...props }, ref) => <InputLabel {...props} component={vanguardComponent} ref={ref} />,
-);
-CompatibleInputLabel.displayName = 'CompatibleInputLabel';
+// MUI's TextField route behind a lazy boundary (plan §36.2 B.3): the eager graph stays free of @mui/*.
+const MuiTextFieldFallback = lazyFallback(() => import('./MuiTextFieldFallback'));
 
 /** InputBase-root props only MUI models: their presence keeps a text field on MUI. */
 const OWN_TEXT_FALLBACK_INPUT_KEYS = [
@@ -33,9 +27,10 @@ const OWN_TEXT_FALLBACK_SLOT_PROPS = ['root', 'select'];
 
 /** Resolve theme defaults before removing the legacy public TextField aliases. */
 export const MuiTextField = (inProps: VanguardTextFieldProps) => {
-  const props = useThemeProps({ props: inProps, name: 'MuiTextField' });
+  // MUI's useThemeProps semantics without importing MUI (src/core/_internal/theme-default-props.ts, option 5.3).
+  const props = useThemeDefaultProps(inProps as Record<string, unknown>, 'MuiTextField') as VanguardTextFieldProps;
   // Theme defaults for the label (consumer MUI ThemeProvider), honoured on the own-core select path too.
-  const labelThemeDefaults = useThemeProps({ props: {}, name: 'MuiInputLabel' }) as { component?: React.ElementType };
+  const labelThemeDefaults = useThemeDefaultProps({}, 'MuiInputLabel') as { component?: React.ElementType };
   const generatedId = React.useId();
   const id = props.id ?? generatedId;
   const mapped = mapLegacySlots(
@@ -137,9 +132,8 @@ export const MuiTextField = (inProps: VanguardTextFieldProps) => {
     );
   }
   return (
-    <TextField
-      {...mapped}
-      slots={{ ...mapped.slots, inputLabel: mapped.slots?.inputLabel ?? CompatibleInputLabel }}
+    <MuiTextFieldFallback
+      {...(mapped as object)}
       slotProps={{
         ...mapped.slotProps,
         input: typeof input === 'function' ? (state) => mapInput(input(state)) : mapInput(input),
