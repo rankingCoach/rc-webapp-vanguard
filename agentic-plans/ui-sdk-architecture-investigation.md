@@ -2125,8 +2125,8 @@ The guarded mounted form type-and-clear scenario retained one native Text node p
 (+100/+200/+400 at 100/200/400 cycles), .472 (+200 at 200, also measured on H21) and a bare native textarea
 (+40 at 40 cycles in two runs per input path). Attached nodes, listeners and Documents had zero per-cycle
 slope. The linear increment retired on unmount. Programmatic input plus React updates stayed flat. The bare
-native+redo control, `textarea-retention-control.cjs` in verifier 2's Storybook scratch checkout, uses
-`TEXTAREA_CONTROLS=native-fill TEXTAREA_UNDO_CONTROL=1`. A trusted edit after Undo discarded the redo branch,
+native+redo [reproducer](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/v2/textarea-retention-control.cjs)
+in verifier 2's Storybook scratch checkout uses `TEXTAREA_CONTROLS=native-fill TEXTAREA_UNDO_CONTROL=1`. A trusted edit after Undo discarded the redo branch,
 dropping native node count 1362 → 1318 while the textarea stayed mounted. V2's snapshots observed 40–41 extra
 native Text nodes between cycles 5 and 45 and a predominantly native Window/internal retainer path. Both
 autosizers reuse the same visible and hidden measuring textarea over value changes. This is reachable Chromium
