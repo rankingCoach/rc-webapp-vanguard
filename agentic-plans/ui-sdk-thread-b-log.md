@@ -657,3 +657,32 @@ Track 1 status: every (a) component in src/core and src/common now has its DOM c
 4. Next (d): leak-hygiene specs for B-slotted non-MUI components that register listeners/timers/rAF/observers/portals/body mutations: mount → unmount → nothing left. Inventory table to the watchdog before fixing anything non-trivial; real leaks fixed with a reproducing spec, minimal diff, listed for verifier 2's Tier P.
 5. Handoffs combine small batches while verifier 2 is busy (one paired run base = last PASS vs tip).
 Tools copied to `agentic-plans/uisdk-tools-b/` (collision-check.sh, attr-only-check.py).
+
+### (b) Enable never-run tests: Table group
+1. Specs enabled (renamed `_*.spec.tsx`), 10: TableBody, TableBodyRenderer, TableCell, TableFooter, FooterPagination, FooterShowLess, FooterShowMore, TableHeader, CtaWithIcon, TablePlaceholder. Setup-only edit in each: `import { describe, test } from 'vitest';` (they relied on globals; failed with `describe is not defined`). Assertions untouched. Table specs 14 files / 33 green.
+2. NOT enabled, stale test: `Table/Table.spec.tsx` — imports `TableData` from `Table.mock.tsx`, which is entirely commented out (`TypeError: Cannot read properties of undefined (reading 'columns')`). Stale fixture, not a component bug.
+3. Stories enabled, 9: TableBody, TableBodyRenderer, TableCell, TableFooter, FooterPagination, FooterShowLess, FooterShowMore, CtaWithIcon, TablePlaceholder. Setup-only: object-literal default export. Table stories 12 files / 27 green.
+4. NOT enabled: `Table/Table.stories.tsx` (would collide with the existing `_Table.stories.tsx`, and uses the commented-out `TableData`), `TableHeader/TableHeader.stories.tsx` (uses `TableData`).
+
+### (b) Enable never-run tests: B-slotted folders, second group
+1. Specs enabled (18): ActionCardBody, ActionCardHeader, Avatar, StatusBadge (as `_StatusBadge.legacy.spec.tsx`, the `_StatusBadge.spec.tsx` name was taken), ClipboardText, FrostedGlass, ImgLoader, ImgWithLoader, SmallLoader, ProgressCircle, Rating, RatingDistribution, TogglerWithText, DragAndDropFile, Render, SocialMediaLink `utils`, ElementsBeforeAfter, TextWrapBalancer. Setup-only: `vitest` import (globals) and, where jest-dom matchers are used, `import '@testing-library/jest-dom/vitest'`. 18 files / 35 tests green.
+2. Stories enabled (11): ActionCardActions, ActionCardBody, ActionCardHeader, ElementsBeforeAfter, ListItem, Notification, NotificationAction, ProgressCircle, Render, TogglerWithText, TextWrapBalancer. Setup-only: object-literal default export. 11 files / 12 green.
+3. Kept off (assertion fails against current behaviour; not edited, component not changed):
+   1. `LineAlert/LineAlert.spec.tsx`: `getByTestId('line-alert-icon-svg')` right after the icon span appears; StyledSVG injects the inline SVG and its testid asynchronously → stale/timing test (sync query), not a bug.
+   2. `ListItem/ListItem.spec.tsx`: `expect(iconList.innerHTML).toBe('1')` but the number renders inside a Text `<span>` (also on 2e33fd7, before the Text slot) → stale test.
+   3. `ListItems/ListItems.spec.tsx`, `ListItems/ListItem/ListItem.spec.tsx`: `TypeError: ListItemsMock is not a function` → stale mock.
+   4. `ListItems/ListItems.stories.tsx`, `ListItems/ListItem/ListItem.stories.tsx`: fail to import (named import missing from the module) → stale.
+   5. `FadeCarouselAuto/FadeCarouselAuto.stories.tsx`: its play query fails (TestingLibraryElementError on the scroll container) → stale/timing, needs a look by whoever owns the story.
+   6. `GlobalStateComponent/GlobalStateComponent.stories.tsx`, `InfoBox/InfoBox.stories.tsx`: an `_`-prefixed story with the same name exists; renaming would collide.
+No real-bug candidates in this group.
+
+## (d) Leak hygiene of B-slotted non-MUI components (watchdog APPROVED: spec per row, red first, minimal fixes)
+| # | component | finding | commit | spec (red → green) |
+|---|---|---|---|---|
+| 1 | ListItems | scroll listener added on every `items` change, never removed (stale `sticky` closures pile up) | c2d9e07 | `_ListItems.hygiene.spec.tsx`: 3 listeners after 2 updates → 1; 1 left after unmount → 0; updated+scroll innerHTML == fresh mount+scroll (also true on the old code in jsdom, so no visible-state change) |
+| 2 | FadedCarousel (center mode) | rAF loop never cancelled on unmount / [mode, items] change | ca27407 | `_FadedCarousel.hygiene.spec.tsx`: 2 pending frames after an items change → 1; unmount → 0 |
+| 3 | StarRating | 2 s hover re-enable timer outlives unmount; one more per click | 311dbca | `_StarRating.hygiene.spec.tsx`: timer left after unmount → 0; 3 clicks → 1 pending timer |
+| 4–10 | ActionBar resize, AnimatedNumber timeout+rAF, FadeCarouselAuto interval, FadedCarousel scroll listener, Tabs observers/resize/rAF, Tabs setTimeout(0) ref reset, saveCsvFile link | already clean | 66c42e1 | spec-only, all green (FadedCarousel's count excludes React's own root listener on the RTL container) |
+
+### Behaviour deltas for the user
+1. StarRating (311dbca): after a rating change hover is disabled for 2 s. Before: each click armed its own timer, so hover came back 2 s after the FIRST of several quick clicks (and timers fired after unmount). After: 2 s after the LAST click; nothing fires after unmount. Accepted by the watchdog as a bug fix.

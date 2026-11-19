@@ -151,6 +151,7 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
 
     let prevWidth = -1;
     let stableChecks = 0;
+    let frame = 0;
 
     const check = () => {
       const w = container.scrollWidth;
@@ -166,11 +167,12 @@ export const FadedCarousel = (props: FadedCarouselProps) => {
         // do the center scroll
         container.scrollLeft = (w - container.clientWidth) / 2;
       } else {
-        requestAnimationFrame(check);
+        frame = requestAnimationFrame(check);
       }
     };
 
-    requestAnimationFrame(check);
+    frame = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(frame);
   }, [mode, items]);
 
   /**
