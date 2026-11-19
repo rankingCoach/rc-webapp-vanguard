@@ -833,6 +833,19 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    exports); generic theme rules on elements (0,0,1) or `input[type=text]` (0,1,1) resolve as before. Mitigation if
    wanted: enqueue `vanguard.css` with the theme stylesheet as a dependency (or at a later priority). RISK LOGGED.
 
+4. **DatePicker date format per locale (watchdog decision A, 2026-11-19; pre-existing, not changed).**
+   rc-webapp passes dash locales (`localeFormatted`), but `getDatePatternFromLocale` is keyed by underscores, so
+   every DatePicker shows DD.MM.YYYY and logs a console.error. Fixing the lookup (accepting `-`) would show:
+
+   | locale | today | after a fix |
+   | --- | --- | --- |
+   | de-DE, de-AT | DD.MM.YYYY | DD.MM.YYYY |
+   | en-GB, es-ES | DD.MM.YYYY | DD/MM/YYYY |
+   | en-US | DD.MM.YYYY | MM/DD/YYYY |
+   | en-IE, en (no entry) | DD.MM.YYYY | DD.MM.YYYY (fallback, still an error) |
+
+   Locked by `src/helpers/_locale-date-pattern.bug-lock.spec.ts`. The DatePicker port keeps the lookup byte-for-byte.
+
 ## 22. Group A: Input and Textarea on the own-core text field (handoff 6)
 
 1. `TextFieldFrame` (FormControl root, label, notched outline, helper text) is shared by `SelectTextField` and the
@@ -1348,3 +1361,32 @@ fallback routes are the "MUI-exit step". Their props are part of the public type
 implementing each prop or narrowing the types (a breaking change for a next major). That needs a decision before
 MUI can leave `dependencies` (§24). Proposed: (a) types step (vendored, no API change); (b) exit step per fallback,
 implement what has any usage evidence and keep MUI as an optional dependency for the rest until the next major.
+
+### 36.2 Watchdog decisions on the locale finding and the MUI-exit step (2026-11-19)
+
+**A. Locale finding: user decision, do NOT fix.**
+1. The port keeps `getDatePatternFromLocale` byte-for-byte, including the console.error.
+2. Bug-lock spec: `_locale-date-pattern.bug-lock.spec.ts`.
+3. The per-locale before/after table is on the user's list.
+
+**B. MUI-exit step, interim rule for this major (identical API is a hard limit; narrowing is not granted).**
+1. Types are vendored, no API change.
+2. Fallback props get implemented on the own core when either:
+   1. they have reachability evidence (rc-webapp, service paths, other Vanguard components), or
+   2. they are cheap and exact (`className`, `classes` keys already emitted, `style`, flat `sx` as on ToggleButton).
+
+   Each component declares what remains.
+3. The remainder keeps a working MUI fallback, isolated in its own module behind a lazy boundary. The eager import
+   graph of every public export (ESM build) must contain zero `@mui/*`; a gate script over the built graph asserts
+   this per export and states the count. `@mui/material` stays a regular dependency in this major. Removing it and
+   those props goes on a logged list for the next major (user decision).
+4. Lazy consequence: a fallback route renders async on first use. That is acceptable only because it is unreachable
+   in rc-webapp. Once loaded the fallback renders the same DOM, and the MUI contract specs keep running against it,
+   awaiting the chunk.
+5. WordPress is a single file, so there are no lazy chunks and nothing is stripped. Deliverable: a table of the WP
+   exports that still pull `@mui/*` into dist-wordpress through a fallback route, with the byte cost of each. It goes
+   to the user with the question "does the plugin pass any of these props?". Until answered, WP keeps them.
+6. FormControl and VanguardThemeProvider go last. VanguardThemeProvider needs a separate proposal to the watchdog
+   first, since it is where consumers may theme.
+
+**C. S1.** Refactor onto the adapter interface before the parity spec goes green, so the green proves what ships.
