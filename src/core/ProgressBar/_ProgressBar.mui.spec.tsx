@@ -1,8 +1,9 @@
 import { ProgressBar } from '@vanguard/ProgressBar/ProgressBar';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { render, screen } from '../../../test-utils/test-utils';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
 
 /**
  * MUI contract for ProgressBar (wraps MUI v5 `LinearProgress`).
@@ -13,6 +14,9 @@ import { render, screen } from '../../../test-utils/test-utils';
 // Vanguard's sx targets `.MuiLinearProgress-bar` to colour the bar (src/core/ProgressBar/ProgressBar.tsx:39), so the
 // class is part of the contract. Other MUI LinearProgress classes have no Vanguard dependency and are not asserted.
 const getBars = (root: HTMLElement) => Array.from(root.querySelectorAll<HTMLElement>('.MuiLinearProgress-bar'));
+
+// Setup only: the buffer/query cases deliberately render the lazy MUI LinearProgress route (plan §36.2 B.3).
+beforeAll(() => preloadMuiFallbacks());
 
 describe('ProgressBar (MUI LinearProgress contract)', () => {
   describe('determinate (default variant)', () => {

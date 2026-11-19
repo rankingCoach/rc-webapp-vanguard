@@ -1128,3 +1128,29 @@ Reply to the watchdog after step 1's grep result.
    7.2 Parity stories (8 files / 14): green in 3 consecutive runs. The very first run had 1 failure (517 ms) that did not reproduce; logged as a cold-start flake.
    7.3 FULL spec project on the merged tree: 367 files / 2659 tests, 0 failures.
 8. Open for A (not my file): tsc lib error `src/helpers/hex-to-rgba.ts(8,41)` TS2741 (RegExpMatchArray) from A's eb0df11.
+
+### ProgressBar MUI route behind a lazy boundary (plan §36.2 B.3; watchdog's three-check rule for "unreachable")
+1. Change:
+   1.1 `ProgressBarMuiFallback.tsx` re-exports the MUI LinearProgress route (buffer / query) as its default. The `…Fallback` name lets the WordPress inliner match it.
+   1.2 `ProgressBar.tsx` loads it with A's `lazyFallback`. Determinate/indeterminate (own core) are unchanged.
+   1.3 `_ProgressBar.mui.spec.tsx` (A's file): setup-only edit, a local `beforeAll(() => preloadMuiFallbacks())`, because its buffer/query cases deliberately render the lazy route. Allow-list entry to be added when A's fallback-audit-allowlist.json lands.
+2. Gate:
+   2.1 `node scripts/check-eager-mui.mjs`: ProgressBar was listed (192,042 B of @mui in its eager graph) and is no longer listed.
+   2.2 Eager closure 70.1 → 2.2 KB gzip, 1 lazy chunk.
+   2.3 `check-wordpress-dynamic-imports.mjs`: 0 missing; the buffer route is inlined in dist-wordpress.
+3. Check 1, site scan (rc-webapp + Vanguard + WordPress):
+   3.1 rc-webapp has 35 `<ProgressBar>` sites. 21 have no variant; 14 pass only "determinate"/"indeterminate" (literals or conditionals between those two). No spreads. No `buffer`/`query` in props objects or service paths.
+   3.2 Vanguard production code: 20 sites, none passing a variant or spread. The only internal consumer is RatingStarsAndProgressBar (no variant), which no public export renders (RatingDistribution is not exported).
+   3.3 buffer/query appear only in A's `_ProgressBar.mui.spec` and one story (`_ProgressBar.stories` buffer).
+   3.4 Not a WordPress export, and no WordPress export wraps it.
+4. Check 2, audit mode `VG_NO_FALLBACK_PRELOAD=1`:
+   4.1 Full spec project: the only ProgressBar-related failures are `_ProgressBar.mui.spec` "buffer: …" and "query: …", which deliberately render the lazy route. The other failures are A's lazy routes (AppBar/Snackbar/Menu/MenuItem/FormControl/Autocomplete), for A's allow-list.
+   4.2 Targeted audit over ProgressBar + Rating: green with the local preload (6 files / 33).
+5. Check 3, packed build (npm pack → extracted tarball, esbuild page on `package/dist/index.js`, Chromium, no spec setup, no preload). First render via `flushSync`, read on the same tick:
+   5.1 default, determinate 40, fractional 33.3, indeterminate (2 bars), custom colours/size, blurred: role=progressbar present, own core (`data-vg-core`), aria-valuenow as expected, on the FIRST render.
+   5.2 `buffer` (document-only, unreachable): empty first render, rendered after the chunk loads (1 s).
+   5.3 0 page errors.
+6. A's preload hook timeout, in writing to A, with numbers:
+   6.1 Cold cache, 6 files: 5 failed at the 10 s hook, setup 52.5 s.
+   6.2 Full project on A's tip without my change: 20 files failed + 3 tests.
+   6.3 The watchdog ruled the cause gets fixed (A moves preload into the specs that need it, with an allow-list), not the timeout. So a green full spec run on this tree waits for A's fix. The targeted runs are green.
