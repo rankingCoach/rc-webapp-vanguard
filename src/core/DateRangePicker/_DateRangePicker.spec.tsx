@@ -178,18 +178,12 @@ describe('DateRangePicker component tests', () => {
     const user = userEvent.setup();
     await user.click(leftOnCLick);
 
-    await act(async () => {
-      /**
-       * Check if datePicket is open
-       */
-      await waitFor(async () => {
-        await appScreen.getByTestId('datepicker-reference');
-
-        const tooltip = await appScreen.getByRole('tooltip');
-        const datePicker = tooltip.getElementsByClassName('date-range-picker-dropdown');
-        expect(isElementVisible(tooltip)).toBe(true);
-        await expect(datePicker.length).toBe(1);
-      });
+    await waitFor(() => {
+      appScreen.getByTestId('datepicker-reference');
+      const tooltip = appScreen.getByRole('tooltip');
+      const datePicker = tooltip.getElementsByClassName('date-range-picker-dropdown');
+      expect(isElementVisible(tooltip)).toBe(true);
+      expect(datePicker).toHaveLength(1);
     });
 
     /**
@@ -197,16 +191,11 @@ describe('DateRangePicker component tests', () => {
      */
     await user.click(rightOnClick);
 
-    await act(async () => {
-      /**
-       * Check if rangeSelector is open
-       */
-      await waitFor(async () => {
-        const tooltip = await appScreen.getByRole('tooltip');
-        const rangeSelector = tooltip.getElementsByClassName('date-range-picker-dropdown-predefined');
-        expect(isElementVisible(tooltip)).toBe(true);
-        await expect(rangeSelector.length).toBe(1);
-      });
+    await waitFor(() => {
+      const tooltip = appScreen.getByRole('tooltip');
+      const rangeSelector = tooltip.getElementsByClassName('date-range-picker-dropdown-predefined');
+      expect(isElementVisible(tooltip)).toBe(true);
+      expect(rangeSelector).toHaveLength(1);
     });
   });
   //
