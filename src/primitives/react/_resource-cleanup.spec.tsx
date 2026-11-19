@@ -426,10 +426,14 @@ describe('own-core resources are released', () => {
   it('InputTextField multiline (TextareaAutosize resize listener, ResizeObserver, rAF)', () => {
     const before = baseline();
     const view = render(<InputTextField id="t" multiline minRows={2} maxRows={4} defaultValue={'a\nb\nc'} />);
+    const shadow = view.container.querySelector<HTMLTextAreaElement>('textarea[data-slot="text-field-control-shadow"]');
+    expect(shadow?.isConnected).toBe(true);
     settle();
     fireEvent.change(view.container.querySelector('textarea') as HTMLTextAreaElement, { target: { value: 'x' } });
+    expect(view.container.querySelector('textarea[data-slot="text-field-control-shadow"]')).toBe(shadow);
     done(view);
     settle();
+    expect(shadow?.isConnected).toBe(false);
     expect(leftovers(before)).toEqual(CLEAN);
   });
 
