@@ -1,13 +1,271 @@
-import { screen, fireEvent, waitFor, within } from '@testing-library/react';
+import * as Vanguard from '@rankingcoach/vanguard';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { Accordion, Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
-import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { useState } from 'react';
+import { type ReactElement, useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { entryFile, installedBundle, isFromNodeModules } from './installed-package';
 import { renderWithProviders } from './providers';
+import { packedRoutes, replayRouteShapes } from './replay-route-shapes';
+
+const fixtureOptions = [
+  { key: 'apple', value: 'apple', title: 'Apple' },
+  { key: 'plum', value: 'plum', title: 'Plum' },
+];
+const noop = () => {};
+
+// Immediate queries deliberately run in the same turn as render or the opening event.
+// Waiting for a selector here would let a reachable lazy route resolve and hide the regression.
+describe('first render from the installed bundle', () => {
+  const wordpress = process.env.BUNDLE === 'wp';
+  it.each(wordpress ? ['Autocomplete'] as const : packedRoutes)('replays audited %s shapes without preloading', (name) => {
+    replayRouteShapes(name, Vanguard, renderWithProviders, wordpress);
+  });
+
+  it('mounts ModalRoot and provides the modal context', () => {
+    const ContextProbe = () => {
+      const { modalRootState } = Vanguard.useModalContext();
+      return <output>{modalRootState.growModals.length} queued modals</output>;
+    };
+    renderWithProviders(
+      <Vanguard.ModalProvider>
+        <Vanguard.ModalRoot />
+        <ContextProbe />
+      </Vanguard.ModalProvider>,
+    );
+    expect(screen.getByTestId('modal-root')).toBeDefined();
+    expect(screen.getByText('0 queued modals')).toBeDefined();
+  });
+
+  it('mounts controlled multiple Autocomplete with its selected chip and combobox', () => {
+    renderWithProviders(
+      <Autocomplete id="fruit-multiple" options={fixtureOptions} optionKey="title" controlled multiple value={[fixtureOptions[0]]} />,
+    );
+    expect(screen.getByText('Apple')).toBeDefined();
+    expect(screen.getByRole('combobox').getAttribute('id')).toBe('fruit-multiple');
+  });
+});
+
+if (process.env.BUNDLE === 'wp') {
+  describe('WordPress first render', () => {
+    type RenderCase = readonly [ReactElement, string | { selector: string }];
+    const cases = {
+      AIOrb: [<Vanguard.AIOrb />, { selector: '[data-slot="ai-orb"]' }],
+      CheckBox: [<Vanguard.CheckBox checked label="Fixture checkbox" />, 'Fixture checkbox'],
+      ComponentContainer: [<Vanguard.ComponentContainer>Fixture container</Vanguard.ComponentContainer>, 'Fixture container'],
+      EditModal: [
+        <Vanguard.EditModal title="Fixture editor" savingInProgress={false} savable close={noop} saveCallback={noop} cancelCallback={noop}>
+          Fixture editor body
+        </Vanguard.EditModal>,
+        'Fixture editor body',
+      ],
+      EditableCard: [<Vanguard.EditableCard title="Fixture card" editCallback={noop}>Fixture card body</Vanguard.EditableCard>, 'Fixture card body'],
+      FormElement: [
+        <Vanguard.FormElement childConfig={{}} formConfig={{}} onChange={noop} onBlur={noop}>Fixture form element</Vanguard.FormElement>,
+        'Fixture form element',
+      ],
+      GeneratedWithAIPill: [<Vanguard.GeneratedWithAIPill text="Fixture AI pill" />, 'Fixture AI pill'],
+      Link: [<Vanguard.Link href="#fixture-link">Fixture link</Vanguard.Link>, { selector: 'a[href="#fixture-link"]' }],
+      LottieAnimationLoader: [
+        <Vanguard.LottieAnimationLoader src={{ v: '5.7.0', fr: 30, ip: 0, op: 1, w: 1, h: 1, layers: [] }} renderer="svg" />,
+        { selector: 'svg[viewBox="0 0 1 1"]' },
+      ],
+      PageSection: [<Vanguard.PageSection title="Fixture section">Fixture section body</Vanguard.PageSection>, 'Fixture section body'],
+      PageSectionLoading: [<Vanguard.PageSectionLoading title="Fixture loading" description="Fixture loading description" />, 'Fixture loading description'],
+      Render: [<Vanguard.Render if>Fixture conditional</Vanguard.Render>, 'Fixture conditional'],
+      Skeleton: [<Vanguard.Skeleton noAnimation>Fixture skeleton</Vanguard.Skeleton>, 'Fixture skeleton'],
+      SlideTransition: [<Vanguard.SlideTransition><span key="first">Fixture first slide</span><span key="second">Fixture second slide</span></Vanguard.SlideTransition>, 'Fixture first slide'],
+      StatusBadge: [<Vanguard.StatusBadge status="success" text="Fixture badge" />, 'Fixture badge'],
+      Switch: [<Vanguard.Switch value={false}>Fixture switch</Vanguard.Switch>, 'Fixture switch'],
+      Tabs: [<Vanguard.Tabs tabs={[{ label: 'Fixture first tab', component: <div>Fixture tab content</div> }]} value={0} />, 'Fixture tab content'],
+      Tag: [<Vanguard.Tag text="Fixture tag" />, 'Fixture tag'],
+      TagList: [<Vanguard.TagList tags={[{ id: 'first', text: 'Fixture tag list item' }]} />, 'Fixture tag list item'],
+      Text: [<Vanguard.Text>Fixture text</Vanguard.Text>, 'Fixture text'],
+      TextHighlighted: [<Vanguard.TextHighlighted highlightWords={['fixture']}>Highlighted fixture</Vanguard.TextHighlighted>, 'Highlighted fixture'],
+      TextIcon: [<Vanguard.TextIcon icon={Vanguard.IconNames.save}>Fixture text icon</Vanguard.TextIcon>, 'Fixture text icon'],
+      TextWrapBalancer: [<Vanguard.TextWrapBalancer balanced>Fixture balanced text</Vanguard.TextWrapBalancer>, 'Fixture balanced text'],
+      TogglerWithText: [<Vanguard.TogglerWithText left="Fixture left" right="Fixture right" togglerState="left" />, 'Fixture left'],
+    } satisfies Record<string, RenderCase>;
+
+    it.each(Object.entries(cases))('renders %s synchronously', (_name, [view, content]) => {
+      const { container } = renderWithProviders(view);
+      if (typeof content === 'string') {
+        expect(container.textContent).toContain(content);
+      } else {
+        expect(container.querySelector(content.selector)).not.toBeNull();
+      }
+    });
+
+    it.each([
+      ['Icon', <Vanguard.Icon key="icon">{Vanguard.IconNames.save}</Vanguard.Icon>],
+      ['StatusBadgeIcon', <Vanguard.StatusBadgeIcon key="badge" status="success" />],
+    ] as const)('keeps %s empty until its packaged SVG loads', async (_name, view) => {
+      const { container } = renderWithProviders(view);
+      expect(container.firstChild).toBeNull();
+      await waitFor(() => expect(container.querySelector('[data-slot="icon"]')).not.toBeNull());
+    });
+
+    it('accounts for every runtime export in the installed WordPress entry', () => {
+      // Other components are covered by the shared smoke cases. Services, hooks, constants and helpers have no UI.
+      expect(Object.keys(Vanguard).sort()).toEqual([
+        ...Object.keys(cases),
+        'Accordion', 'Autocomplete', 'Button', 'Form', 'InfoBox', 'Input', 'ModalProvider', 'ModalRoot',
+        'Popover', 'Select', 'Textarea', 'Icon', 'StatusBadgeIcon',
+        'AIOrbSize', 'AIOrbStatus', 'ButtonSizes', 'ButtonTextColors', 'ButtonTypes', 'FontWeights', 'IconNames',
+        'IconSize', 'ModalService', 'OVERLAY_BASE_Z_INDEX', 'OverlayStackingService', 'PageSectionBackground',
+        'PageSectionRoundedEdges', 'SkeletonTypes', 'TagType', 'TextTypes', 'VanguardStyle', 'applyWordAnimation',
+        'childToString', 'childrenAsText', 'classNames', 'extractErrorScopes', 'extractSetErrorsFromConfig',
+        'parseFullLinks', 'setVanguardErrorLogger', 'useFormConfig', 'useFormStore', 'useModalContext',
+      ].sort());
+    });
+
+    it('renders the retained inline MUI Autocomplete route on its first render', () => {
+      renderWithProviders(<Autocomplete id="wp-mui-fruit" options={fixtureOptions} optionKey="title" sx={{ maxWidth: 280 }} />);
+      const input = screen.getByRole('combobox');
+      expect(input.closest('.MuiAutocomplete-root')?.hasAttribute('data-vg-core')).toBe(false);
+    });
+
+    it('renders retained inline MUI TextField routes from Input, Select and Textarea', () => {
+      const { container } = renderWithProviders(
+        <>
+          <Input value="Fixture filled input" textFieldProps={{ variant: 'filled' }} />
+          <Select options={fixtureOptions} value="apple" textFieldProps={{ variant: 'filled' }} />
+          <Textarea value="Fixture filled textarea" textFieldProps={{ variant: 'filled' }} />
+        </>,
+      );
+      expect(screen.getByDisplayValue('Fixture filled input').closest('.MuiFilledInput-root')).not.toBeNull();
+      expect(screen.getByRole('combobox').closest('.MuiFilledInput-root')).not.toBeNull();
+      expect(screen.getByDisplayValue('Fixture filled textarea').closest('.MuiFilledInput-root')).not.toBeNull();
+      expect(container.querySelectorAll('.MuiFilledInput-root')).toHaveLength(3);
+    });
+  });
+} else {
+  describe('default bundle first render', () => {
+    it.each(['temporary', 'persistent', 'permanent'] as const)('renders the open %s Drawer', (variant) => {
+      renderWithProviders(
+        <Vanguard.ModalProvider>
+          <Vanguard.ModalRoot />
+          <Vanguard.Drawer open variant={variant}>Fixture drawer body</Vanguard.Drawer>
+        </Vanguard.ModalProvider>,
+      );
+      expect(screen.getByText('Fixture drawer body').closest('.MuiDrawer-paper')).not.toBeNull();
+      if (variant === 'temporary') expect(document.body.style.overflow).toBe('hidden');
+    });
+
+    it.each([false, true])('renders centered PopoverModal with renderInPortal=%s', (renderInPortal) => {
+      const { unmount } = render(<button type="button">Fixture popover anchor</button>);
+      try {
+        const anchor = screen.getByRole('button', { name: 'Fixture popover anchor' });
+        renderWithProviders(
+          <Vanguard.PopoverModal
+            anchorEl={anchor}
+            isOpen
+            centerPopover
+            renderInPortal={renderInPortal}
+            disableBackdropClick
+            content={<p>Fixture popover card</p>}
+            onClose={noop}
+            zIndex={7}
+          />,
+        );
+        const card = screen.getByText('Fixture popover card').closest('[role="tooltip"]');
+        expect(card).not.toBeNull();
+        if (renderInPortal) expect(card?.parentElement).toBe(document.body);
+      } finally {
+        unmount();
+      }
+    });
+
+    it('renders the controlled single Autocomplete value synchronously', () => {
+      renderWithProviders(
+        <Autocomplete controlled id="single-fruit" options={fixtureOptions} optionKey="title" value={fixtureOptions[0]} />,
+      );
+      const input = screen.getByRole('combobox') as HTMLInputElement;
+      expect(input.id).toBe('single-fruit');
+      expect(input.value).toBe('Apple');
+    });
+
+    it('opens AccountNavMenu-shaped JSX items on the own menu route', () => {
+      const AccountMenu = () => {
+        const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+        return (
+          <>
+            <button type="button" onClick={(event) => setAnchor(event.currentTarget)}>Fixture account</button>
+            <Vanguard.Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)} height={420} width={280}>
+              <Vanguard.Render if><Vanguard.MenuItem>Fixture settings</Vanguard.MenuItem></Vanguard.Render>
+              <Vanguard.Render if={false}><Vanguard.MenuItem>Fixture hidden setting</Vanguard.MenuItem></Vanguard.Render>
+            </Vanguard.Menu>
+          </>
+        );
+      };
+      renderWithProviders(<AccountMenu />);
+      fireEvent.click(screen.getByRole('button', { name: 'Fixture account' }));
+      const menu = screen.getByRole('menu');
+      expect(menu.closest('[data-vg-core]')).not.toBeNull();
+      expect(within(menu).getByRole('menuitem', { name: 'Fixture settings' })).toBeDefined();
+      expect(within(menu).queryByText('Fixture hidden setting')).toBeNull();
+    });
+
+    it('opens the item-config Menu and SearchableSelect on their own routes', () => {
+      const view = renderWithProviders(<button type="button">Fixture menu anchor</button>);
+      const anchor = screen.getByRole('button', { name: 'Fixture menu anchor' });
+      const menu = renderWithProviders(<Vanguard.Menu anchorEl={anchor} open items={[{ key: 'fixture', children: 'Fixture item' }]} />);
+      expect(screen.getByRole('menuitem', { name: 'Fixture item' })).toBeDefined();
+      menu.unmount();
+      view.rerender(<Vanguard.SearchableSelect options={fixtureOptions} value="apple" />);
+      fireEvent.mouseDown(screen.getByRole('combobox'), { button: 0 });
+      expect(within(screen.getByRole('listbox')).getByRole('option', { name: 'Plum' })).toBeDefined();
+    });
+
+    it('renders PhoneNumber and DateRangePicker masked inputs', () => {
+      const { container } = renderWithProviders(
+        <>
+          <Vanguard.PhoneNumber countryCode="GB" />
+          <Vanguard.DateRangePicker testId="fixture-range" startDate={new Date(2025, 0, 1)} endDate={new Date(2025, 0, 15)} />
+        </>,
+      );
+      expect(within(screen.getByTestId('phoneNumberComponent')).getByPlaceholderText('##-####-####').tagName).toBe('INPUT');
+      expect(container.querySelector('[data-testid="fixture-range-left-reference-container"] input')).not.toBeNull();
+    });
+
+    it('renders the Navbar AppBar and Toolbar shapes', () => {
+      renderWithProviders(
+        <Vanguard.AppBar className="fixture-navbar" position="fixed" style={{ top: 10 }}>
+          <Vanguard.Toolbar className="fixture-toolbar">Fixture toolbar</Vanguard.Toolbar>
+        </Vanguard.AppBar>,
+      );
+      expect(screen.getByRole('banner').classList.contains('fixture-navbar')).toBe(true);
+      expect(screen.getByText('Fixture toolbar').classList.contains('fixture-toolbar')).toBe(true);
+    });
+
+    it('renders Snackbar message and children shapes synchronously', () => {
+      renderWithProviders(
+        <>
+          <Vanguard.Snackbar open message="Fixture message snackbar" />
+          <Vanguard.Snackbar open><span>Fixture children snackbar</span></Vanguard.Snackbar>
+        </>,
+      );
+      expect(screen.getByText('Fixture message snackbar').closest('.MuiSnackbar-root')).not.toBeNull();
+      expect(screen.getByText('Fixture children snackbar').closest('.MuiSnackbar-root')).not.toBeNull();
+    });
+
+    it('renders SnackbarRoot on the service open tick without waiting for a chunk', () => {
+      vi.useFakeTimers();
+      try {
+        renderWithProviders(<Vanguard.SnackbarRoot />);
+        act(() => {
+          Vanguard.snackbarService.openSuccessSnackbar('Fixture service snackbar');
+        });
+        act(() => vi.advanceTimersByTime(0));
+        expect(screen.getByText('Fixture service snackbar').closest('.MuiSnackbar-root')).not.toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+}
 
 describe('installed Vanguard bundle', () => {
   it('resolves the expected packed entry', () => {

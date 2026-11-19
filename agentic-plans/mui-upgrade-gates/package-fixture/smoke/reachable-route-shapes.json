@@ -1,0 +1,75 @@
+{
+  "Autocomplete": [
+    {"keys": ["autoSelect", "blurOnSelect", "className", "filterOptions", "formconfig", "hideCaret", "hideClearButton", "label", "onChange", "onInputChange", "optionKey", "options", "required", "restrictToOptions", "testId", "value"], "values": {"restrictToOptions": false}},
+    {"keys": ["className", "controlled", "getOptionLabel", "id", "inputAriaLabel", "isOptionEqualToValue", "loading", "loadingText", "noOptionsText", "onChange", "options", "placeholder", "renderOption", "testId", "value"], "values": {"controlled": true}},
+    {"keys": ["blurOnSelect", "clearOnBlur", "controlled", "disabled", "getOptionLabel", "id", "inputAriaLabel", "noOptionsText", "onChange", "options", "placeholder", "renderOption", "testId", "value"], "values": {"controlled": true}},
+    {"keys": ["className", "controlled", "filterOptions", "getOptionLabel", "id", "inputAriaLabel", "isOptionEqualToValue", "loading", "loadingText", "multiple", "noOptionsText", "onChange", "options", "placeholder", "renderOption", "testId", "value"], "values": {"multiple": true, "controlled": true}},
+    {"keys": ["label", "onChange", "optionKey", "options", "testId"]},
+    {"keys": ["chipSize", "className", "clearText", "closeText", "controlled", "disableCloseOnSelect", "disabled", "filterOptions", "getOptionLabel", "isOptionEqualToValue", "multiple", "noOptionsText", "onChange", "openText", "options", "placeholder", "renderOption", "size", "testId", "value"], "values": {"multiple": true, "controlled": true, "size": "small"}},
+    {"keys": ["className", "disabled", "formconfig", "id", "label", "options", "placeholder", "popoverMessage", "popoverPosition"]},
+    {"keys": ["className", "disabled", "filterOptions", "formconfig", "id", "label", "onInputChange", "optionKey", "options", "placeholder", "popoverMessage", "popoverPosition", "splitCommaTag"]},
+    {"keys": ["className", "formconfig", "id", "label", "options", "placeholder"]},
+    {"keys": ["autoHighlight", "className", "disabled", "filterOptions", "formconfig", "id", "label", "multiple", "onInputChange", "optionKey", "options", "placeholder", "popoverMessage", "popoverPosition", "splitCommaTag"], "values": {"multiple": true}},
+    {"keys": ["className", "filterOptions", "formconfig", "id", "label", "multiple", "onInputChange", "optionKey", "options", "placeholder", "splitCommaTag"], "values": {"multiple": true}},
+    {"keys": ["className", "disabled", "filterOptions", "formconfig", "id", "label", "multiple", "onInputChange", "optionKey", "options", "placeholder", "popoverMessage", "popoverPosition", "splitCommaTag"], "values": {"multiple": true}},
+    {"keys": ["autoHighlight", "className", "controlled", "disabled", "fullWidth", "inputRef", "inputValue", "onChange", "onInputChange", "openOnFocus", "options", "placeholder", "restrictToOptions", "size", "testId", "value"], "values": {"controlled": true, "restrictToOptions": false, "size": "small"}},
+    {"keys": ["clearText", "closeText", "controlled", "disabled", "fullWidth", "getOptionLabel", "isOptionEqualToValue", "multiple", "noOptionsText", "onChange", "openText", "options", "placeholder", "renderOption", "size", "testId", "value"], "values": {"multiple": true, "controlled": true, "size": "small"}},
+    {"keys": ["blurOnSelect", "disabled", "hideCaret", "hideClearButton", "label", "noOptionsText", "onChange", "onInputChange", "optionKey", "options", "replacements", "required", "restrictToOptions", "testId"], "values": {"restrictToOptions": true}},
+    {"keys": ["blurOnSelect", "disabled", "hideCaret", "hideClearButton", "infoText", "key", "label", "onChange", "onInputChange", "optionKey", "options", "replacements", "restrictToOptions", "testId", "value"], "values": {"restrictToOptions": true}},
+    {"keys": ["autoSelect", "blurOnSelect", "filterOptions", "formconfig", "hideCaret", "hideClearButton", "label", "onChange", "onInputChange", "optionKey", "options", "restrictToOptions", "testId", "value"], "values": {"restrictToOptions": false}},
+    {"keys": ["autoSelect", "blurOnSelect", "className", "filterOptions", "formconfig", "hideCaret", "hideClearButton", "label", "onChange", "onInputChange", "optionKey", "options", "restrictToOptions", "testId", "value"], "values": {"restrictToOptions": false}},
+    {"keys": ["blurOnSelect", "filterOptions", "hideCaret", "hideClearButton", "infoText", "label", "noOptionsText", "onChange", "onInputChange", "optionKey", "options", "placeholder", "replacements", "required", "restrictToOptions", "testId", "value"], "values": {"restrictToOptions": true}},
+    {"keys": ["blurOnSelect", "disabled", "formconfig", "hideCaret", "hideClearButton", "infoText", "onChange", "onInputChange", "optionKey", "options", "placeholder", "replacements", "restrictToOptions", "value"], "values": {"restrictToOptions": true}},
+    {"keys": ["adornment", "autoSelect", "className", "formconfig", "hideCaret", "hideClearButton", "label", "labelType", "noOptionsText", "onBlur", "onChange", "onKeyDown", "optionKey", "options", "required", "restrictToOptions", "testId"], "values": {"restrictToOptions": true}},
+    {"keys": ["adornment", "autoSelect", "blurOnSelect", "className", "filterOptions", "formconfig", "hideCaret", "hideClearButton", "label", "onChange", "onInputChange", "optionKey", "options", "placeholder", "required", "restrictToOptions", "value"], "values": {"restrictToOptions": true}}
+  ],
+
+  "Menu": [
+    {"keys": ["anchorEl", "anchorOrigin", "items", "onClose", "open", "transformOrigin"]},
+    {"keys": ["anchorEl", "children", "height", "onClose", "open", "width"]},
+    {"keys": ["anchorEl", "items", "onClose", "open"]},
+    {"keys": ["anchorEl", "anchorOrigin", "children", "onClose", "open", "testId", "transformOrigin"]},
+    {"keys": ["PaperProps", "anchorEl", "anchorOrigin", "items", "onClose", "open", "transformOrigin"]},
+    {"keys": ["anchorEl", "children", "onClose", "open", "testId"]}
+  ],
+
+  "MenuItem": [
+    {"keys": ["children", "icon", "id", "key", "onClick"]},
+    {"keys": ["children", "icon", "id", "key", "onClick", "selected", "useActiveIcon"]},
+    {"keys": ["children", "icon", "id", "onClick"]},
+    {"keys": ["children", "key", "value"], "host": "SearchableSelect"},
+    {"keys": ["aria-checked", "children", "className", "disabled", "key", "onClick", "role", "testId"]},
+    {"keys": ["children", "icon", "iconProps", "key", "onClick"], "host": "Menu items"},
+    {"keys": ["children", "disabled", "icon", "iconProps", "key", "onClick"], "host": "Menu items"},
+    {"keys": ["children", "icon", "iconProps", "key", "onClick", "testId"], "host": "Menu items"},
+    {"keys": ["children", "disabled", "icon", "iconProps", "key", "onClick", "testId"], "host": "Menu items"},
+    {"keys": ["children", "disabled", "icon", "iconProps", "key"], "host": "Menu items"},
+    {"keys": ["children", "icon", "iconPosition", "key", "onClick", "selected"], "host": "Menu items"},
+    {"keys": ["children", "icon", "iconPosition", "key", "onClick", "selected", "useActiveIcon"], "host": "Menu items"},
+    {"keys": ["children", "disabled", "icon", "iconPosition", "key", "onClick", "selected"], "host": "Menu items"}
+  ],
+
+  "Snackbar": [
+    {"keys": ["anchorOrigin", "autoHideDuration", "children", "onClose", "open"]},
+    {"keys": ["TransitionComponent", "anchorOrigin", "autoHideDuration", "children", "onClose", "open"]}
+  ],
+
+  "AppBar": [
+    {"keys": ["children", "className", "position", "ref", "style"], "values": {"position": "fixed"}}
+  ],
+
+  "Toolbar": [
+    {"keys": ["children", "className"]}
+  ],
+
+  "PopoverModal": [
+    {"keys": ["anchorEl", "centerPopover", "content", "disableBackdropClick", "isOpen", "onClose", "renderInPortal", "zIndex"], "values": {"renderInPortal": true, "centerPopover": true}},
+    {"keys": ["anchorEl", "content", "dimRestOfPage", "isOpen", "onClose", "placement", "renderInPortal", "zIndex"], "values": {"renderInPortal": true, "dimRestOfPage": true, "placement": "auto"}}
+  ],
+
+  "PopoverPopper": [
+    {"keys": ["anchorEl", "children", "className", "open", "style"]}
+  ],
+
+  "FormControl": []
+}

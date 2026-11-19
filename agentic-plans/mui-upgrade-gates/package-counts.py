@@ -3,7 +3,7 @@ import json
 import re
 import sys
 from pathlib import Path
-EXPECTED = {'default-declared': 13, 'default-mui': 13, 'wp-declared': 12, 'wp-mui': 12}
+EXPECTED = {'default-declared': 34, 'default-mui': 34, 'wp-declared': 44, 'wp-mui': 44}
 
 def validate(root):
     counts = {}
@@ -20,9 +20,10 @@ def validate(root):
             raise ValueError(f'{key}: expected {expected} passed ({expected}), got {summaries[0]!r}')
         counts[key] = int(match[1])
     aggregate = sum(counts.values())
-    if aggregate != 50:
-        raise ValueError(f'aggregate: expected 50, got {aggregate}')
-    return {'consumers': counts, 'aggregate': aggregate, 'expected_aggregate': 50}
+    expected_aggregate = sum(EXPECTED.values())
+    if aggregate != expected_aggregate:
+        raise ValueError(f'aggregate: expected {expected_aggregate}, got {aggregate}')
+    return {'consumers': counts, 'aggregate': aggregate, 'expected_aggregate': expected_aggregate}
 
 if __name__ == '__main__':
     result = validate(Path(sys.argv[1]))
