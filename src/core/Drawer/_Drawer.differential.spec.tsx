@@ -47,7 +47,10 @@ const canonical = (html: string) => {
   return host.innerHTML;
 };
 
-const snapshot = () => canonical(normalize(document.body.innerHTML));
+// Body state belongs to every overlay differential (H16): the body's own inline style (scroll lock, scrollbar gap)
+// next to its children (sibling aria-hidden is in the markup).
+const snapshot = () =>
+  `<body style="${document.body.getAttribute('style') ?? ''}">${canonical(normalize(document.body.innerHTML))}`;
 
 type Step = ['open'] | ['close'] | ['advance', number] | ['backdrop'] | ['escape'];
 
@@ -87,6 +90,7 @@ const go = (impl: Impl, props: Partial<DrawerProps>, steps: Step[]) => {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  document.body.removeAttribute('style');
 });
 
 const TIMELINE: Step[] = [['open'], ['advance', 100], ['advance', 500], ['close'], ['advance', 100], ['advance', 500]];

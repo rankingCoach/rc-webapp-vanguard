@@ -64,6 +64,8 @@ export const MenuPopup = (props: MenuPopupProps) => {
     children,
   } = props;
   const paperRef = useRef<HTMLDivElement | null>(null);
+  // ModalHost portals its content one commit after `open` (MUI Portal timing): the enter effect waits for the paper.
+  const [paperNode, setPaperNode] = useState<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const [exiting, setExiting] = useState(false);
   const wasOpen = useRef(open);
@@ -98,7 +100,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
     paper.style.transition = growTransition('enter', paper.clientHeight);
     paper.style.opacity = '1';
     paper.style.transform = 'none';
-  }, [open, position]);
+  }, [open, position, paperNode]);
 
   // Exit: reverse Grow, unmount when done.
   useLayoutEffect(() => {
@@ -132,11 +134,15 @@ export const MenuPopup = (props: MenuPopupProps) => {
   const { className: paperClass, style: paperStyle, ref: paperRefProp, ...paperRest } = paperProps ?? {};
   const { className: listClass, style: listStyle, onKeyDown: _ok, ...listRest } = listProps ?? {};
 
-  const setPaperRef = (node: HTMLDivElement | null) => {
-    paperRef.current = node;
-    if (typeof paperRefProp === 'function') paperRefProp(node);
-    else if (paperRefProp) (paperRefProp as React.RefObject<HTMLDivElement | null>).current = node;
-  };
+  const setPaperRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      paperRef.current = node;
+      setPaperNode(node);
+      if (typeof paperRefProp === 'function') paperRefProp(node);
+      else if (paperRefProp) (paperRefProp as React.RefObject<HTMLDivElement | null>).current = node;
+    },
+    [paperRefProp],
+  );
 
   return (
     <ModalHost

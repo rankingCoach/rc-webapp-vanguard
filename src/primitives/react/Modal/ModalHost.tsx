@@ -1,6 +1,6 @@
 // Ported from @mui/material@9.5.0 Modal/Modal.js, Unstable_TrapFocus/FocusTrap.js (MIT)
 import { classNames } from '@helpers/classNames';
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { defaultLayerStack } from '../../core/layer-stack';
 import { defaultModalManager, ManagedModal } from '../../core/modal-manager';
@@ -94,34 +94,58 @@ export const ModalHost = (props: ModalHostProps) => {
   }
   wasOpen.current = open;
   const mounted = open || exiting;
+  // MUI Portal is two-phase: it renders nothing in the commit that mounts it and portals the content in the next one
+  // (its mount node is set in a layout effect), so MUI Modal registers, locks the scroll and hides siblings one commit
+  // later, after the first commit's passive effects (e.g. Vanguard's ModalRoot resetting body overflow on mount).
+  // Locking in the first commit let that reset undo the lock (H16 FAIL: drawer open on page mount, page scrolls).
+  const [portalReady, setPortalReady] = useState(false);
+  useLayoutEffect(() => {
+    if (mounted !== portalReady) setPortalReady(mounted);
+  }, [mounted, portalReady]);
   const ariaHiddenOnClose = !(rest['aria-hidden'] === false || rest['aria-hidden'] === 'false');
 
-  const registered = open || (closeAfterTransition && exiting);
+  // MUI useModal: `handleOpen` (manager.add → sibling aria-hidden) runs in a passive effect when `open` turns on,
+  // `handleMounted` (manager.mount → scroll lock) once the Portal has attached the root, and `handleClose`
+  // (manager.remove) in a passive effect after the FocusTrap restored focus (or on exit with closeAfterTransition).
+  const wantRegistered = open || (closeAfterTransition && exiting);
+  const registered = portalReady && wantRegistered;
+  // Focus restore / trap / auto-focus act once the content is portaled (MUI FocusTrap lives inside the Portal).
+  const active = open && portalReady;
   useLayoutEffect(() => {
     if (!registered) return undefined;
     modal.current.modalRef = rootRef.current;
+    // Idempotent: normally added in the open effect below (a commit earlier); a reopen during the exit transition
+    // keeps the portal, so mount can run first.
     defaultModalManager.add(modal.current, document.body);
     defaultModalManager.mount(modal.current, { disableScrollLock });
     // Layer order for click-away hosts below this modal (core/layer-stack.ts).
     const layer = defaultLayerStack.push(() => rootRef.current, restoreTo.current);
     return () => {
-      // MUI useModal: the root stays aria-hidden while it exits unless the caller passes aria-hidden={false}.
-      defaultModalManager.remove(modal.current, ariaHiddenOnClose);
       defaultLayerStack.remove(layer);
     };
-  }, [registered, disableScrollLock, ariaHiddenOnClose]);
+  }, [registered, disableScrollLock]);
 
   // Restore focus in a passive cleanup (like MUI FocusTrap): a layout cleanup runs inside React's commit, whose
   // selection restore would immediately re-focus the element that was focused in the popup.
   useEffect(() => {
-    if (!open) return undefined;
+    if (!active) return undefined;
     return () => {
       if (!disableRestoreFocus && restoreTo.current?.isConnected) {
         ignoreNextEnforce.current = true;
         restoreTo.current.focus();
       }
     };
-  }, [open, disableRestoreFocus]);
+  }, [active, disableRestoreFocus]);
+
+  // Declared after the focus-restore effect: on close MUI restores focus, then unlocks and un-hides (cleanup order).
+  useEffect(() => {
+    if (!wantRegistered) return undefined;
+    defaultModalManager.add(modal.current, document.body);
+    return () => {
+      // MUI useModal: the root stays aria-hidden while it exits unless the caller passes aria-hidden={false}.
+      defaultModalManager.remove(modal.current, ariaHiddenOnClose);
+    };
+  }, [wantRegistered, ariaHiddenOnClose]);
 
   // MUI FocusTrap enforcement: focus that leaves the content (focusin elsewhere, or falls to <body>) is pulled back
   // while this is the top modal; skipped once right after focus is restored on close.
@@ -134,10 +158,10 @@ export const ModalHost = (props: ModalHostProps) => {
   // MUI's menu takes its first focus in a later commit (Grow onEntering), after this runs; ours focuses in the opening
   // commit, so focus already inside counts as entered (same outcome as MUI's order).
   useEffect(() => {
-    if (open) activated.current = !disableAutoFocus || Boolean(rootRef.current?.contains(document.activeElement));
-  }, [open, disableAutoFocus]);
+    if (active) activated.current = !disableAutoFocus || Boolean(rootRef.current?.contains(document.activeElement));
+  }, [active, disableAutoFocus]);
   useEffect(() => {
-    if (!open || disableEnforceFocus) return undefined;
+    if (!active || disableEnforceFocus) return undefined;
     const doc = document;
     // While MUI still renders some modals (migration), its ModalManager is invisible to the own one: an open MUI modal
     // root mounted after this one (portals mount in order) is on top, and this trap stands down (Codex review, 2.5).
@@ -164,11 +188,11 @@ export const ModalHost = (props: ModalHostProps) => {
         ignoreNextEnforce.current = false;
         return;
       }
-      const active = doc.activeElement;
-      if (content.contains(active)) return;
+      const focused = doc.activeElement;
+      if (content.contains(focused)) return;
       // The sentinels move focus themselves (trap()); disableAutoFocus = not activated, like MUI.
-      if (active instanceof HTMLElement && active.dataset.testid?.startsWith('sentinel')) return;
-      if (active !== reactFocusTarget.current) reactFocusTarget.current = null;
+      if (focused instanceof HTMLElement && focused.dataset.testid?.startsWith('sentinel')) return;
+      if (focused !== reactFocusTarget.current) reactFocusTarget.current = null;
       else if (reactFocusTarget.current !== null) return;
       if (!activated.current) return;
       content.focus();
@@ -181,16 +205,16 @@ export const ModalHost = (props: ModalHostProps) => {
       doc.removeEventListener('focusin', contain);
       clearInterval(interval);
     };
-  }, [open, disableEnforceFocus]);
+  }, [active, disableEnforceFocus]);
 
   useEffect(() => {
-    if (!open || disableAutoFocus) return;
+    if (!active || disableAutoFocus) return;
     const content = contentRef.current?.nextElementSibling as HTMLElement | null;
     if (content && !content.contains(document.activeElement)) content.focus();
-  }, [open, disableAutoFocus]);
+  }, [active, disableAutoFocus]);
 
   // MUI Portal renders nothing on the server (its mount node is set in an effect).
-  if (!mounted || typeof document === 'undefined') return null;
+  if (!mounted || !portalReady || typeof document === 'undefined') return null;
 
   const trap = (edge: 'start' | 'end') => () => {
     const content = contentRef.current?.nextElementSibling as HTMLElement | null;

@@ -1,5 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react';
-import React, { useRef, useState } from 'react';
+import React, { StrictMode, useRef, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultLayerStack } from '../core/layer-stack';
 import { defaultModalManager } from '../core/modal-manager';
@@ -527,6 +527,47 @@ describe('own-core resources are released', () => {
     act(() => {
       vi.advanceTimersByTime(100);
     });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  // StrictMode double-runs every effect: a registration that un-registers in the first cleanup must re-register, and
+  // nothing may be left after close/unmount (ModalManager users: MenuPopup → Menu/Select/SearchableSelect, Drawer).
+  it('StrictMode: MenuPopup (ModalHost two-phase mount) open, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <StrictMode>
+        <MenuPopupHarness open={open} />
+      </StrictMode>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    settle();
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(defaultModalManager.modalCount()).toBe(1);
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('StrictMode: temporary Drawer open on mount, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <StrictMode>
+        <Drawer open={open} anchor="right" variant="temporary" transitionDuration={400} onClose={() => undefined}>
+          {'drawer'}
+        </Drawer>
+      </StrictMode>
+    );
+    const view = render(tree(true));
+    settle();
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(defaultModalManager.modalCount()).toBe(1);
+    view.rerender(tree(false));
+    settle();
     done(view);
     settle();
     expect(leftovers(before)).toEqual(CLEAN);

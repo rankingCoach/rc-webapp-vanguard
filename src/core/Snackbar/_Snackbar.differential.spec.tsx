@@ -46,7 +46,10 @@ const canonical = (html: string) => {
   return host.innerHTML;
 };
 
-const snapshot = () => canonical(normalize(document.body.innerHTML));
+// Body state belongs to every overlay differential (H16): the body's own inline style (scroll lock, scrollbar gap)
+// next to its children (sibling aria-hidden is in the markup).
+const snapshot = () =>
+  `<body style="${document.body.getAttribute('style') ?? ''}">${canonical(normalize(document.body.innerHTML))}`;
 
 type Step =
   | ['open']
