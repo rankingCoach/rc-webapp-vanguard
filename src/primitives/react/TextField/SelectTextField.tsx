@@ -141,7 +141,9 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
 
   // ---- value (useControlled semantics: controlled iff `value` was defined at mount)
   const isControlled = useRef(valueProp !== undefined).current;
-  const [valueState, setValueState] = useState(defaultValue ?? (multiple ? [] : ''));
+  // MUI useControlled: the uncontrolled value starts at defaultValue (undefined when none is given), so the first pick
+  // of an empty-value option still changes it. `multiple` needs an array.
+  const [valueState, setValueState] = useState<unknown>(defaultValue ?? (multiple ? [] : undefined));
   const value = isControlled ? valueProp : valueState;
 
   // ---- open state
@@ -465,6 +467,11 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
     });
   });
   hasSelectedItem.current = foundMatch;
+  // MUI SelectInput: closed, single-select, the value no longer matches an option → the closed typeahead buffer resets
+  // (the next key starts a new search instead of extending a stale prefix).
+  useEffect(() => {
+    if (!open && !multiple && !foundMatch) resetTypeahead();
+  }, [foundMatch, multiple, open, resetTypeahead]);
   if (computeDisplay) {
     display = multiple
       ? displayMultiple.length === 0

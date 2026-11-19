@@ -64,6 +64,7 @@ export const ModalHost = (props: ModalHostProps) => {
   }
   wasOpen.current = open;
   const mounted = open || exiting;
+  const ariaHiddenOnClose = !(rest['aria-hidden'] === false || rest['aria-hidden'] === 'false');
 
   useLayoutEffect(() => {
     if (!open) return undefined;
@@ -73,10 +74,11 @@ export const ModalHost = (props: ModalHostProps) => {
     // Layer order for click-away hosts below this modal (core/layer-stack.ts).
     const layer = defaultLayerStack.push(() => rootRef.current, restoreTo.current);
     return () => {
-      defaultModalManager.remove(modal.current, false);
+      // MUI useModal: the root stays aria-hidden while it exits unless the caller passes aria-hidden={false}.
+      defaultModalManager.remove(modal.current, ariaHiddenOnClose);
       defaultLayerStack.remove(layer);
     };
-  }, [open, disableScrollLock]);
+  }, [open, disableScrollLock, ariaHiddenOnClose]);
 
   // Restore focus in a passive cleanup (like MUI FocusTrap): a layout cleanup runs inside React's commit, whose
   // selection restore would immediately re-focus the element that was focused in the popup.
@@ -106,10 +108,28 @@ export const ModalHost = (props: ModalHostProps) => {
   useEffect(() => {
     if (!open || disableEnforceFocus) return undefined;
     const doc = document;
+    // While MUI still renders some modals (migration), its ModalManager is invisible to the own one: an open MUI modal
+    // root mounted after this one (portals mount in order) is on top, and this trap stands down (Codex review, 2.5).
+    const newerForeignModal = () => {
+      const root = rootRef.current;
+      if (!root) return false;
+      return Array.from(doc.querySelectorAll('.MuiModal-root:not(.MuiModal-hidden)')).some(
+        (el) =>
+          el !== root &&
+          !root.contains(el) &&
+          !defaultModalManager.isRegisteredRoot(el) &&
+          Boolean(root.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING),
+      );
+    };
     const contain = () => {
       const content = contentRef.current?.nextElementSibling as HTMLElement | null;
       if (!content || !rootRef.current) return;
-      if (!doc.hasFocus() || !defaultModalManager.isTopModal(modal.current) || ignoreNextEnforce.current) {
+      if (
+        !doc.hasFocus() ||
+        !defaultModalManager.isTopModal(modal.current) ||
+        newerForeignModal() ||
+        ignoreNextEnforce.current
+      ) {
         ignoreNextEnforce.current = false;
         return;
       }
@@ -144,7 +164,10 @@ export const ModalHost = (props: ModalHostProps) => {
     const content = contentRef.current?.nextElementSibling as HTMLElement | null;
     if (!content) return;
     const list = Array.from(content.querySelectorAll<HTMLElement>(focusableSelector));
-    (edge === 'start' ? list[list.length - 1] : list[0])?.focus() ?? content.focus();
+    // focus() returns undefined, so `target?.focus() ?? content.focus()` always fell through to the content.
+    const target = edge === 'start' ? list[list.length - 1] : list[0];
+    if (target) target.focus();
+    else content.focus();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {

@@ -50,6 +50,12 @@ export const MenuList = (props: MenuListProps) => {
   const typeahead = useRef(createListTypeahead());
 
   const itemCount = React.Children.count(children);
+  // MUI roving tab index: until the user moves (arrows, focusing an item), the tab stop is the default item, recomputed
+  // when the items or their selection change (a controlled value change while open).
+  const selectionKey = React.Children.toArray(children)
+    .map((c) => (React.isValidElement<{ selected?: boolean }>(c) && c.props.selected ? '1' : '0'))
+    .join('');
+  const userMoved = useRef(false);
   const focusPending = useRef(false);
   const listFocused = useRef(false);
 
@@ -61,7 +67,7 @@ export const MenuList = (props: MenuListProps) => {
     const list = items(listRef.current);
     const holder = list.find((el) => el.getAttribute('tabindex') === '0' && !itemInfo(el).disabled);
     const active =
-      holder !== undefined && !focusPending.current
+      holder !== undefined && !focusPending.current && userMoved.current
         ? list.indexOf(holder)
         : (() => {
             const selected = list.findIndex(
@@ -90,10 +96,11 @@ export const MenuList = (props: MenuListProps) => {
       listRef.current?.focus();
     }
     if (!autoFocus) listFocused.current = false;
-  }, [autoFocusItem, autoFocus, focusSource, itemCount]);
+  }, [autoFocusItem, autoFocus, focusSource, itemCount, selectionKey]);
 
   const moveTo = (list: HTMLElement[], index: number | null) => {
     if (index === null || !list[index]) return;
+    userMoved.current = true;
     for (const el of list) el.setAttribute('tabindex', '-1');
     list[index].setAttribute('tabindex', '0');
     list[index].focus();
@@ -133,6 +140,7 @@ export const MenuList = (props: MenuListProps) => {
     const list = items(listRef.current);
     const index = list.indexOf(event.target as HTMLElement);
     if (index === -1) return;
+    userMoved.current = true;
     list.forEach((el, i) => {
       el.setAttribute('tabindex', i === index ? '0' : '-1');
     });

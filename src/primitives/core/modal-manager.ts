@@ -169,6 +169,11 @@ export class ModalManager {
     return index;
   }
 
+  /** Whether `el` is the root of a modal registered here (own-core host), as opposed to a MUI-managed one. */
+  isRegisteredRoot(el: Element): boolean {
+    return this.modals.some((m) => m.modalRef === el);
+  }
+
   /** Registered modals (leak checks: 0 once everything is closed). */
   modalCount(): number {
     return this.modals.length;
