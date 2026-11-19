@@ -15,6 +15,7 @@
 > 13. Shared host memory budget (2026-11-19, **decided-by-watchdog**). Run no wide gate or full spec project while the one-minute load exceeds 40. Cap Vitest at `--maxWorkers=4` and keep targeted runs at `--maxWorkers=2` by default. Run at most one Storybook. Ask the watchdog to reserve a wide slot and keep it clear of verifier Storybook swaps.
 > 14. Durable verification evidence (2026-11-19, **decided-by-watchdog**). Put packs in `/Users/a.kott/vanguard-verify/packs/<sha>-<label>.tgz` and record each exact file's SHA-256 in `SHA256SUMS` there. Keep logs and traces used for decisions under `agentic-plans/` or `/Users/a.kott/vanguard-verify/`. The reboot removed pkg-16d and both verifier shadows. Close the `277bc04` sweep as partial and restart the broad consumer sweep on the shared H19b / H16c pack.
 
+> 15. Mandatory release checks (2026-11-19, **decided-by-watchdog**). The canonical release gate runs both the `spec` and `scripts` Vitest projects with global fallback preload disabled. The `scripts` project runs serially after the pack fixtures so its export check sees the installed tarball. A failed project blocks handoff.
 
 Date: 2026-11-18 · Branch: `feature/ui-sdk-architecture-investigation` (from `feature/file-manager-variants`)
 
@@ -349,8 +350,10 @@ Source: `/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-s
    3. `dist/index-es.js` (widget-image stub).
    4. The `dist/index-<File>.js` naming used by rc-webapp's unregistered codesplit plugin.
 2. Any efficiency change to entry layout or chunk names (D10) keeps these names as aliases or is announced to the verifier first.
-3. **For the user's pre-release list:** old wildcard deep exports (`core/*`, `common/*`, `helpers/*`) are gone since
-   `04fca13`. Confirm intended. WordPress plugin deep imports are outside the source available for this audit.
+3. **User-confirmed on 2026-11-19.** The `./core/*`, `./common/*`, `./components/*` and `./helpers/*` wildcard
+   subpaths stay removed as in `04fca13`. This differs from the master 2.11.0 manifest, which still lists them
+   because master predates the MUI update. The merge takes master's version only. WordPress plugin deep imports
+   are outside the available consumer source. The scripts project asserts the four keys are absent.
 
 ### 11.6 Updated Redux end state
 1. Root entry: **no** `redux`/`@reduxjs/toolkit`/`redux-persist` in production. `react-redux` only in `use-legacy-dispatch.ts` until rc-webapp's fork binds dispatch, then optional.
@@ -815,6 +818,12 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
    body `<style>`), pixel check `agentic-plans/uisdk-tools/pixel-diff.mjs` (snaps each element to whole pixels).
 
 ### Decisions for the user
+
+**Confirmed on 2026-11-19.** D12 keeps all four removed wildcard subpaths absent. This differs from the master
+2.11.0 manifest. WordPress plugin deep imports remain outside the available source.
+
+**For information.** Typing and clearing text in Chromium retains native Undo/Redo history for the mounted
+Textarea. The same curve occurs in a bare browser textarea. Undo/Redo behavior is preserved.
 
 1. Before release, open the built rc-webapp once (not authorised inside this work) and read `<head>`: expected entry
    CSS link, then the vanguard CSS link, then (no emotion tag for migrated components), then route CSS links as you
@@ -1513,6 +1522,8 @@ popper.js differential across placement, boundary, portal mode and scroll offset
 includes the restored planner fallback. WordPress reports 4 of 64. The shared H19b / H16c pack's 4,231 dist files match the build
 and its WordPress graph reaches 336 files with zero missing targets. The eager reports are in
 `/Users/a.kott/vanguard-verify/logs/32a6b93a2683ea766d4406fae4693e918dbd3a93-h19b-h16c/`.
+The corrective source spec evidence was green on its scoped checks. The `scripts` project was not run. The
+package export scan had two JSDoc false failures since `764a089`, found at the master merge (§36.13).
 
 **ProgressBar integration (decided-by-watchdog).** `f94d932` passed against evidence from the original pack and a
 verified rebuild of the same source. The attempted `d4cdc1d`-only follow-up placed the ProgressBar spec at the same
@@ -1720,7 +1731,8 @@ with identical interactions, assertions and condition waits. The differential st
 
 The H20 pack at `153233cf08baccdb6a290c58f62711e7bef15c4a` has SHA-256
 `bc76c32b0eb04808bb300ef01c47b89f79f0001e07fcd956520f1466b1efae89`. Its full source audit was green
-(378 files, 2,725 tests), both bundles matched 4,233 on-disk build files, and all 156 packed runtime tests were
+(spec project only, 378 files and 2,725 tests). The `scripts` project was not run. The package export scan
+had two JSDoc false failures since `764a089`, found at the master merge (§36.13). Both bundles matched 4,233 on-disk build files, and all 156 packed runtime tests were
 green. The built eager graph reports **24/298** plus one allowed context module. WordPress reaches 336 files with
 zero missing targets. The allow-list has 17 specs and five stories. The original canonical package command exited
 1 because the default declaration gate was red. The separate measured declaration diagnostics do not set its exit status.
@@ -1803,7 +1815,8 @@ wrapper spreads and separates frozen references. [rc-webapp locations](/Users/a.
 [Vanguard locations](/Users/a.kott/vanguard-verify/logs/h21-text-field-handler-sites/vanguard.json).
 
 **H21 packed gate.** `8f76287e35e258976afcd19ea922c206d935ad72` passed 2,770 tests in 380 files with no global
-fallback preload and three workers. The exact [H21 tarball](/Users/a.kott/vanguard-verify/packs/8f76287e35e258976afcd19ea922c206d935ad72-h21.tgz)
+fallback preload and three workers in the spec project. The `scripts` project was not run. The package export
+scan had two JSDoc false failures since `764a089`, found at the master merge (§36.13). The exact [H21 tarball](/Users/a.kott/vanguard-verify/packs/8f76287e35e258976afcd19ea922c206d935ad72-h21.tgz)
 has SHA-256 `63a28ba8dccf058dd3c4f91631411d0b191c44593c49879d371d91192a771e6b`. All 4,233 packed dist files matched
 the build on disk. The canonical replay exited zero, with 34/34/44/44 runtime tests and clean gated declarations.
 The fallback audit found 22 allow-listed files with zero unexpected or stale entries. The eager graph reached
@@ -1906,6 +1919,20 @@ on the S3 portal frame, `.MuiPickersDay-root` on the day, and `.MuiPickersDay-hi
 on the relevant day states. No production selector for those prefixes was found. The existing `MuiCalendarPicker-root`
 alias remains pinned by Vanguard's compatibility contract. [Committed consumer selectors](/Users/a.kott/vanguard-verify/logs/date-picker-s1/consumer-calendar-class-uses.txt).
 
+**S1 complete on the internal route, `5a5d855`.** The frozen differential was red before production code in
+UTC and Europe/Bucharest, then passed 8/8 in each. The adapter samples both Bucharest DST transitions at 23/25
+hours, Jan 31 → Feb 29 and Feb 29 → Feb 28 in a non-leap year. An inverted PageUp mutation made the navigation
+timeline red. The selected day emits a new Moment carrying the source time down to milliseconds and the active
+calendar locale, followed by `finish` and `day`. Year selection emits `partial` with an undefined view argument,
+then changes view, month and year in that order. The day state aliases and calendar root stay at the consumer
+selector positions. The popper selector remains on the existing shell until S3. All DatePicker specs pass
+167/167. The guarded replay passed five Chromium stories for settled default/Vanguard theme styles, both slide
+orders and reduced motion. Both active directions use 375 ms with
+`cubic-bezier(0.35, 0.8, 0.4, 1)`. The plan retains the MUI X reference, public picker route and existing locale
+behavior. The derived MUI X MIT notice is recorded in `c07f089`.
+[Source evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s1/) ·
+[Guarded exact replay](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/chromium.log).
+
 ### 36.10 PROPOSED FormControl, VanguardThemeProvider and MuiTextField lazy boundary
 
 **FormControl reachability at H21.** Re-running the import-bound scan at `8f76287` on rc-webapp `73673465091`
@@ -1937,6 +1964,33 @@ Also cover internal fallback typography and default-props behavior with and with
 RTL, first render and SSR. A fallback-local MUI theme bridge is worth proposing only if these probes show it
 preserves the observed consumer contract. Keep the provider eager if a direct descendant still needs its global
 MUI context. The source `useTheme` test remains a requirement. [H21 eager report](/Users/a.kott/vanguard-verify/logs/8f76287e35e258976afcd19ea922c206d935ad72-h21/eager-mui.txt).
+
+**Measured packed boundary.** The committed rc-webapp scan found zero direct `@mui/*` imports. Synthetic
+Node/jsdom probes used the read-only installed .472 package and the exact H21 tarball. Both probes loaded
+the emitted Input and VanguardThemeProvider chunks, which the package entries re-export. In each build the
+five controls (bare, host, Vanguard, host+Vanguard and nested RTL) rendered on the first synchronous commit.
+The host Material field saw its own ThemeProvider's input autocomplete and root title markers. Neither the
+Vanguard default field nor the forced MUI fallback saw those markers. A host Material descendant read the
+default `14|16|uppercase` under the Vanguard provider and `19|17|lowercase` with its own host provider. Nested
+Vanguard roots preserved the host's RTL context and DOM direction. The frozen fallback emitted a 1 rem
+InputBase font rule without VanguardThemeProvider and 1.1428571428571428 rem with it in both packages.
+The H21 default field used the own route. Provider-only server rendering matched all five host witnesses.
+Importing the full Input graph in a windowless Node process hits the existing window store on both packages.
+The package root client import also hits ApexCharts' SVG initialization in jsdom, so these measurements
+use the exact exported chunks. They do not measure Chromium layout or server-rendering of the full package.
+[Probe and fingerprints](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/) ·
+[.472 first-render results](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/base-client.json) ·
+[H21 first-render results](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/h21-client.json).
+
+**PROPOSED bridge disposition.** Keep the public provider eager this major. Although the packed host and
+bundled MUI copies are isolated, the direct source `useTheme()` descendant is an explicit contract, and the
+measurements show that eager MUI fallbacks consume the bundled theme on first render. A fallback-local
+prototype can consume the existing Vanguard typography context and supply the exact bundled MUI theme
+before each fallback mounts. Only prototype it after the DatePicker and FormControl routing is settled.
+Require the source `16|16|none` descendant, both packed isolation directions, nested LTR/RTL, same-tick fallback
+and provider SSR to pass, plus a measured decrease in the eager graph. A provider change requires an explicit
+decision if retaining synchronous source MUI context consumes the same eager dependencies. No provider
+production or public API change is made here.
 
 **MuiTextField proposal.** H21 models the Autocomplete anchor ref and the reachable masks. Remaining eager
 branches include non-outlined variants, native Select, unmodeled slots or classes and unsupported InputBase
@@ -2003,7 +2057,9 @@ ESM resolution-only control, and replays the same H22 bytes. [Exact module graph
 
 Exact pack source `3d078f3a317e0860176690386f7b85895bcad2e4`, SHA-256
 `339f74bd68e070f519d1ff0ff5bbcf850e443f0adf6e9e2cea351418a95d2d72`. Full no-preload source spec 381 files and
-2,778 tests, three workers. Canonical replay exit zero with 34/34/44/44 passing tests and clean gated declarations.
+2,778 tests, three workers. The `scripts` project was not run. The package export scan had two JSDoc false
+failures since `764a089`, found at the master merge (§36.13). The separate canonical package replay exited zero
+with 34/34/44/44 passing tests and clean gated declarations.
 All 4,232 distribution files matched the build. WordPress reached 336 files with zero missing targets, 4/64 eager
 MUI exports and 4/4 same-tick fixture cases. The default packed planner rendered its own body portal on the first
 tick. Default eager MUI is **23 of 298** plus the one allowed `RtlProvider` context, down one export from H21.
@@ -2012,4 +2068,70 @@ The fallback preload audit is 22 listed, zero stale and zero unexpected. [H22 ta
 
 Verifier 1 checks the real invoice native box first, then planner first-visible absolute geometry and scroll/resize.
 Verifier 2 checks the centered portal's first visible content and fallback request count. The wide slot was released
-after both handoffs. H22 independent paired verdicts remain pending.
+after both handoffs.
+
+**H22 focused PASS (decided-by-watchdog).** H21 FAIL is superseded by H22 PASS for the TextField port +
+dual-boundary PopoverModal. V1 focused consumer PASS (invoice PhoneNumber 617×47 with byte-identical PNGs,
+real 5/6-digit PIN, planner absolute rect x452/y659/w252.5625/h48 incl. inner/outer scroll + resize, direct body
+parent, own Popper). H22-V2 PASS (planner first frame, 10 opens per build, all portaled). Broad sweep chunks
+continue on H22 outside this pass. Count stays **29/31**. [V1 focused consumer evidence](/Users/a.kott/vanguard-verify/v1/logs/h22-focused-rc-webapp.md) ·
+[V2 guarded planner evidence](/Users/a.kott/vanguard-verify/v2/out/h22-planner-comparison.json).
+
+
+### 36.13 Master 2.11.0 integration and scripts gate audit (2026-11-19)
+
+Plain merge `55199a37acb04f4e43d3c4b4e6eac06147c32950` integrates master `d4a9116` and VAN-91. The
+only conflict was `package.json`. The first-parent manifest diff is one line, `2.10.0` → `2.11.0`. The
+other seven merged files take master's changes. H23 declares "from master 2.11.0: Gallery/FileSelect items carry
+`originalFile`". The add is beyond the .472 baseline. Browser stories Default and ExposesThePickedFile passed,
+with four remote placeholder requests rejected by the loopback guard and zero forwarded. The four file-identity
+specs cover cropper, compressor, both in sequence, and the transformed-file fallback for a custom transformer.
+All four fail if conversion drops `originalFile`. With real conversion restored, Gallery identity 4/4, Gallery
+data slots 5/5 and FileSelect data slots 1/1 passed. [Tests and manifest evidence](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/).
+
+The original H19b/H16c, H20, H21 and H22 reports did not include the `scripts` project. Since `764a089`,
+`_package-exports.spec.ts` reported two false failures because its lexical pattern interpreted the JSDoc example
+`import('./XFallback')` as a real module dependency in both builds. The TypeScript scanner in `2acd189` keeps
+the package checks and adds controls for real declaration imports and the four removed keys. It passed **7/7**
+on both the current tree's output and the extracted exact H22 pack, with zero unresolved declaration imports
+and all four keys absent. H22's SHA is unchanged. [Current tree check](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/package-exports-current-green.log) ·
+[Exact H22 check](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/package-exports-h22-green.log).
+
+The all-scripts baseline at `55199a3` was 70/75 tests in 8/12 green files. In addition to the JSDoc result:
+
+- The notice gate fixture lagged `5d71452` and failed on H20/H21/H22. All six actual ESM and WordPress
+  `THIRD_PARTY_NOTICES.txt` files already show `@mui/system@9.5.0 (MIT)`, Call-Em-All copyright and the
+  MIT permission text. The fixture now includes that line in the positive and negative examples.
+  [Archived notices](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/released-notice-witnesses.txt).
+- The browser optimizer check first went red with the form-control/adornment reference at `4106a21`. Other
+  missing reference entries arrived at `a0a8f56`, `2ad3b3a`, `f1924b5`, `80ed0d2` and `5a5d855`. It was
+  red on H19b/H16c and H20 through H22. `206f614` adds all eight referenced entries to Vanguard's Vitest
+  browser optimizer. This affects test-runner prebundling and mid-run reloads there. It preserves the production
+  bundles and the separate rc-webapp Storybook optimizer configuration.
+- The codemod's first type-only test hit 6.557 s against 5 s in the two-worker audit. It passed in 1.376 s
+  alone on the same tip and 1.236 s in the serial scripts run. The single case was added at `b69cce8`.
+  There is no evidence of a deterministic failure in H20/H21/H22. Its timeout and assertions are unchanged.
+
+The corrected no-preload scripts project passed **77/77 tests, 12/12 files** at one worker. The mandatory
+release gate (`8a036eb`, decided-by-watchdog) runs the no-preload spec project, isolated package fixtures,
+and then the no-preload serial scripts project against the installed tarball. Its shell controls show red
+source and red scripts exits both stop the gate. No H23 package was cut in this audit.
+[Initial scripts results](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/scripts-before.json) ·
+[Corrected scripts results](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/scripts-after.json).
+
+### 36.14 Tier P Textarea native history (decided-by-watchdog)
+
+The guarded mounted form type-and-clear scenario retained one native Text node per trusted cycle on H22
+(+100/+200/+400 at 100/200/400 cycles), .472 (+200 at 200, also measured on H21) and a bare native textarea
+(+40 at 40 cycles in two runs per input path). Attached nodes, listeners and Documents had zero per-cycle
+slope. The linear increment retired on unmount. Programmatic input plus React updates stayed flat. The bare
+native+redo control, `textarea-retention-control.cjs` in verifier 2's Storybook scratch checkout, uses
+`TEXTAREA_CONTROLS=native-fill TEXTAREA_UNDO_CONTROL=1`. A trusted edit after Undo discarded the redo branch,
+dropping native node count 1362 → 1318 while the textarea stayed mounted. V2's snapshots observed 40–41 extra
+native Text nodes between cycles 5 and 45 and a predominantly native Window/internal retainer path. Both
+autosizers reuse the same visible and hidden measuring textarea over value changes. This is reachable Chromium
+Undo/Redo state, bounded by mount lifetime and by the browser's undo stack; not fixed by design. The existing
+`_resource-cleanup.spec.tsx` now pins shadow node identity across an edit and removal on unmount.
+[Paired retention](/Users/a.kott/vanguard-verify/v2/out/perf/h22-textarea-retention-comparison.json) ·
+[Native controls](/Users/a.kott/vanguard-verify/v2/out/perf/h22-textarea-native-controls.json) ·
+[Redo reproducer evidence](/Users/a.kott/vanguard-verify/v2/out/perf/h22-textarea-undo-control.json).
