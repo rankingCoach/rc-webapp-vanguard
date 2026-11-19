@@ -39,8 +39,11 @@ const CASES: Case[] = [
   { name: 'string child, disableTypography', props: { position: 'end', disableTypography: true, children: 'kg' } },
 ];
 
+const AnyMuiAdornment = MuiInputAdornment as React.ElementType;
+const AnyAdornment = InputAdornment as React.ElementType;
+
 const mui = (c: Case) => {
-  const el = <MuiInputAdornment {...(c.props as never)} />;
+  const el = <AnyMuiAdornment {...c.props} />;
   const view = render(
     c.ctx ? (
       <MuiFormControl variant="outlined" size={c.ctx.size} hiddenLabel={c.ctx.hiddenLabel}>
@@ -56,7 +59,7 @@ const mui = (c: Case) => {
 };
 
 const own = (c: Case) => {
-  const el = <InputAdornment {...(c.props as never)} />;
+  const el = <AnyAdornment {...c.props} />;
   const view = render(
     c.ctx ? (
       <OwnFormControlContext.Provider

@@ -21,11 +21,14 @@ const normalize = (html: string) =>
     // The own z-index is inline (MUI: an sx emotion class); its computed value is checked by PopoverModal's specs.
     .replace(/ ?z-index: \d+;/g, '');
 
+const AnyMuiBackdrop = MuiBackdrop as React.ElementType;
+const AnyBackdrop = Backdrop as React.ElementType;
+
 const Subject = ({ impl, zIndex, ...props }: { impl: Impl } & Record<string, unknown>) =>
   impl === 'mui' ? (
-    <MuiBackdrop {...(props as never)} sx={zIndex !== undefined ? { zIndex: zIndex as number } : undefined} />
+    <AnyMuiBackdrop {...props} sx={zIndex !== undefined ? { zIndex: zIndex as number } : undefined} />
   ) : (
-    <Backdrop {...(props as never)} zIndex={zIndex as number | undefined} />
+    <AnyBackdrop {...props} zIndex={zIndex as number | undefined} />
   );
 
 const timeline = (impl: Impl, steps: { props: Record<string, unknown>; advance: number }[]) => {
