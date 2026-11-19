@@ -802,3 +802,8 @@ Merged A's tip e002abc (edf9c0d; mui-compat.scss conflict: both appended lines k
 
 ### Paths still on MUI (for A's §23)
 1. ProgressBar `variant="buffer"` and `variant="query"` → `ProgressBarMui.tsx` (MUI LinearProgress). Removed when a consumer needs them (port buffer's dashed track + query's rotation) or at the MUI-exit step.
+
+### Licence headers (A's convention, e86a665)
+1. Header added: own-collapse.tsx + _Collapse.compat.scss (Collapse/Collapse.js), own-progress-bar.tsx + _ProgressBar.compat.scss (LinearProgress/LinearProgress.js); compat partials carry `(emotion styles)`.
+2. No header: Fade.tsx (renders A's Fade primitive, no ported code), StyledSVG.compat.scss (our own former styled-components rules). Parity specs/stories are tests, not ported code.
+3. Every future leaf port gets the header in the same commit. Non-MUI sources (e.g. react-spring for the motion group) → package@version + licence to A for config/derived-notices.txt.

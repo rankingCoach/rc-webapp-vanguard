@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Collapse/Collapse.js (emotion styles) (MIT)
 // MUI 9.5 Collapse emotion styles (CollapseRoot / CollapseWrapper / CollapseWrapperInner) for the own-core Collapse, at
 // emotion's specificity (D15): `.css-x` = (0,1,0) → `.MuiCollapse-*:where([data-vg-core]…)`. Emotion emits one class
 // per ownerState combination with the variants merged after the base; here the variants are later rules of the same

@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 LinearProgress/LinearProgress.js (emotion styles) (MIT)
 // MUI 9.5 LinearProgress emotion styles as ProgressBar renders it (determinate / indeterminate; colour primary,
 // default palette in both MUI's default theme and VanguardThemeProvider), at emotion's specificity (D15): root/bars
 // `.css-x` = (0,1,0) → `.MuiLinearProgress-*:where([data-vg-core]…)`. Vanguard's sx values (filter, background,

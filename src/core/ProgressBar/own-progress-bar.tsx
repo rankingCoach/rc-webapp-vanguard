@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 LinearProgress/LinearProgress.js (MIT)
 import { classNames } from '@helpers/classNames';
 import { parseCssVariable } from '@helpers/css-variables-parser';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
