@@ -1,4 +1,7 @@
+import { setTimeout as sleep } from 'node:timers/promises';
+import { cleanupOverlaySpec } from '@test-utils/cleanup-overlay-spec';
 import { act, render } from '@test-utils/test-utils';
+import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DrawerMuiReference } from '@vanguard/Drawer/_Drawer.mui-reference';
 import { Drawer } from '@vanguard/Drawer/Drawer';
@@ -15,7 +18,7 @@ import { afterEach, describe, expect, it } from 'vitest';
  */
 type Impl = 'mui' | 'own';
 
-const record = () => {
+const record = (signal: AbortSignal) => {
   const log: string[] = [];
   const push = (t: string) => {
     if (log[log.length - 1] !== t) log.push(t);
@@ -48,27 +51,25 @@ const record = () => {
     push(`focus:${inModal ? 'modal' : 'page'}`);
   };
   document.addEventListener('focusin', onFocus);
-  return {
-    log,
-    stop: () => {
-      flush(observer.takeRecords());
-      observer.disconnect();
-      document.removeEventListener('focusin', onFocus);
-    },
+  const stop = () => {
+    flush(observer.takeRecords());
+    observer.disconnect();
+    document.removeEventListener('focusin', onFocus);
+    signal.removeEventListener('abort', stop);
   };
+  signal.addEventListener('abort', stop, { once: true });
+  return { log, stop };
 };
 
-afterEach(() => {
-  document.body.innerHTML = '';
-  document.body.removeAttribute('style');
-});
+afterEach(cleanupOverlaySpec);
 
-const settle = () =>
+const settle = (signal: AbortSignal) =>
   act(async () => {
-    await new Promise((r) => setTimeout(r, 700));
+    await sleep(700, undefined, { signal });
   });
 
-const drawer = async (impl: Impl, strict: boolean, closeBeforeReady: boolean) => {
+const drawer = async (impl: Impl, strict: boolean, closeBeforeReady: boolean, signal: AbortSignal) => {
+  signal.throwIfAborted();
   const D = (impl === 'mui' ? DrawerMuiReference : Drawer) as React.ElementType;
   let commits = 0;
   const tree = (open: boolean) => {
@@ -83,7 +84,7 @@ const drawer = async (impl: Impl, strict: boolean, closeBeforeReady: boolean) =>
     return strict ? <StrictMode>{el}</StrictMode> : el;
   };
   const view = render(tree(false));
-  const rec = record();
+  const rec = record(signal);
   commits = 0;
   if (closeBeforeReady) {
     // open → close in one batch: nothing may stay locked or steal focus
@@ -97,16 +98,17 @@ const drawer = async (impl: Impl, strict: boolean, closeBeforeReady: boolean) =>
     });
   }
   const openCommits = commits;
-  await settle();
+  await settle(signal);
   view.rerender(tree(false));
-  await settle();
+  await settle(signal);
   rec.stop();
   const body = document.body.getAttribute('style') ?? '';
   view.unmount();
   return { order: rec.log, openCommits, body };
 };
 
-const select = async (impl: Impl, strict: boolean) => {
+const select = async (impl: Impl, strict: boolean, signal: AbortSignal) => {
+  signal.throwIfAborted();
   const S = (impl === 'mui' ? SearchableSelectMuiReference : SearchableSelect) as React.ElementType;
   const user = userEvent.setup();
   let commits = 0;
@@ -117,14 +119,20 @@ const select = async (impl: Impl, strict: boolean) => {
     </Profiler>
   );
   const view = render(strict ? <StrictMode>{el}</StrictMode> : el);
-  await settle();
-  const rec = record();
+  const trigger = view.getByRole('combobox');
+  await waitFor(() => expect(trigger.textContent).toBe('Title 1'));
+  signal.throwIfAborted();
+  const rec = record(signal);
   commits = 0;
-  await user.click(view.getByRole('combobox'));
+  await user.click(trigger);
   const openCommits = commits;
-  await settle();
+  const list = await view.findByRole('listbox');
+  const popup = list.closest('.MuiModal-root');
+  await waitFor(() => expect(popup?.contains(document.activeElement)).toBe(true));
+  signal.throwIfAborted();
   await user.keyboard('{Escape}');
-  await settle();
+  await waitFor(() => expect(list.isConnected).toBe(false));
+  signal.throwIfAborted();
   rec.stop();
   view.unmount();
   return { order: rec.log, openCommits };
@@ -132,21 +140,22 @@ const select = async (impl: Impl, strict: boolean) => {
 
 for (const strict of [false, true]) {
   describe(`ModalHost order and commits equal MUI${strict ? ' (StrictMode)' : ''}`, () => {
-    it('temporary Drawer: open, close', async () => {
-      expect(await drawer('own', strict, false)).toEqual(await drawer('mui', strict, false));
+    // Both timelines observe the original 700 ms window for each of open and close.
+    it('temporary Drawer: open, close', { timeout: 15_000 }, async ({ signal }) => {
+      expect(await drawer('own', strict, false, signal)).toEqual(await drawer('mui', strict, false, signal));
     });
-    it('temporary Drawer: open → close before the portal is ready', async () => {
-      expect(await drawer('own', strict, true)).toEqual(await drawer('mui', strict, true));
+    it('temporary Drawer: open → close before the portal is ready', { timeout: 15_000 }, async ({ signal }) => {
+      expect(await drawer('own', strict, true, signal)).toEqual(await drawer('mui', strict, true, signal));
     });
-    it('SearchableSelect menu: open, Escape', async () => {
+    it('SearchableSelect menu: open, Escape', { timeout: 15_000 }, async ({ signal }) => {
       // MUI's Select bounces focus modal → page → modal while opening (Menu autoFocus, then the trap pulls it back),
       // all inside the opening task, so no frame shows it; the own core focuses the list once. Collapsed here.
       const collapse = (order: string[]) =>
         order
           .filter((t, i) => !(t === 'focus:page' && order[i - 1] === 'focus:modal' && order[i + 1] === 'focus:modal'))
           .filter((t, i, arr) => arr[i - 1] !== t);
-      const own = await select('own', strict);
-      const mui = await select('mui', strict);
+      const own = await select('own', strict, signal);
+      const mui = await select('mui', strict, signal);
       expect(collapse(own.order)).toEqual(collapse(mui.order));
       // Two-phase mount: at most one commit more than MUI per open (Tier P rule: +2 or 1.5x fails).
       expect(own.openCommits).toBeLessThanOrEqual(mui.openCommits + 1);
