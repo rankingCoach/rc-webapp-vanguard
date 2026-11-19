@@ -712,3 +712,30 @@ The generator also reads the component folder's own `_*.stories.tsx` story objec
 ## Dead-code candidates for the user (no removal)
 1. DiscountBadge, FeatureBox, HoverableCard, IncentiveBox, InvoiceAddress, PageSectionRecommended (+ RecommendationBadge), StatisticsBoard (+ StatisticsBoardItem), UpsellingTrigger, ListingServiceConnectionStatus: exported from neither `src/index.ts` nor `src/index-wordpress.ts`, imported by nothing outside their own pair, and their stylesheets could never compile until this fix. Kept and now buildable; user decides.
 2. Earlier entry: local `GoogleMapsMarker/Marker.tsx` (see "Candidates for removal").
+
+## (e) D10 efficiency measurement (no code change)
+Tool: `agentic-plans/uisdk-tools-b/measure-exports.mjs` (run after `pnpm run build`; dist of 0c74d28's tree). Method: static `import`/`export … from` closure over the flat preserveModules `dist/*.js` from each public export of `dist/index.js` (299 exports); bytes = per-file gzip -9 summed (upper bound: real bundlers gzip whole chunks; ranking is the point); "unique" = files reached by exactly one export; heavy libraries detected by content signature (MUI by the emotion runtime marker, since own-core code carries Mui* alias strings); `import()` targets counted as lazy, not in the closure.
+Cannot see: consumer tree-shaking inside a file (only file granularity), CSS (single vanguard.css), runtime-only `require`, what a WordPress host actually renders, and gzip of real chunks.
+
+1. Root barrel: static closure of `dist/index.js` = 1748 files, 1.97 MB gzip (summed). A consumer that does not tree-shake pays all of it; with `sideEffects:false` + tree-shaking it pays per-export closures below.
+2. Heavy libraries (own gzip; exports that pull them EAGERLY):
+| library | files | gzip | eager from |
+|---|---|---|---|
+| video.js | 2 | 158 KB | videoPlayerService, VideoPlayer |
+| apexcharts | 8 | 147 KB | LineChartBase, HSBChart, BarChart, DonutChart(+Directories, Statistics), AreaChart |
+| xlsx / jszip / file-saver | 3 | 146 KB | ExportXLS, useExportXLS (xlsx); Gallery, GALLERY_PHOTO_SCOPE, DocumentUpload, DocumentDisplay (jszip) |
+| lexical | 38 | 89 KB | RichTextEditor |
+| lottie | 9 | 68 KB | LottieAnimationLoader/LottieBase/useLottie* (expected) + RichTextEditor and AIAssistant (via AIAssistantPanel → LottieAnimationLoader) |
+| google-maps | 7 | 44 KB | GoogleMaps family (9 exports) |
+| moment | 3 | 23 KB | 24 exports: pickers, LineChartBase, Gallery, GallerySummary, GalleryMediaItem, RelativeTime, … |
+| cropperjs | 1 | 15 KB | Gallery, GALLERY_PHOTO_SCOPE (via ImageCropperTransformer → Cropper) |
+| MUI/emotion runtime | 6 | 13 KB (+ MUI component files) | 94 exports |
+3. Chains worth a decision (closure gzip):
+   1. Text (6895 sites) 87 KB: html-react-parser entities 18 KB + react-spring core/shared 19 KB via `text-animate-words-style` (only needed with `animateWords`).
+   2. Icon 56 KB: `use-dynamic-import` 8.7 KB gzip (107 KB raw: the import map of every icon/asset) + styled-components 9 KB via StyledSVG.
+   3. Button 204 KB: MUI/emotion via `Grow` → `useTheme`.
+   4. Table 485 KB: TableToolbar → Input → InputBase → Skeleton → emotion; TableToolbar → CheckBox → FormElement → valid-input → isValidPhoneNumber → libphonenumber metadata (19 KB gzip) — every Table pays for phone validation.
+   5. Gallery 501 KB: cropperjs + jszip + moment eagerly.
+   6. RichTextEditor 691 KB (157 KB unique): lexical + lottie via the AI panel.
+4. Base64 assets > 4 KB inlined in JS: 11, 882 KB decoded (rocket.gif 497 KB, loading_cloud.gif 75 KB, error.gif 73 KB, an mp2t video 68 KB, thumbnail_loader.gif 46 KB, …). All are LAZY (reached only through `use-dynamic-import`'s `import()`), none in any export's static closure; cost = +33 % base64 overhead and no image cache/streaming decode when they do load.
+5. WordPress bundle: 2.58 MB raw / 643 KB gzip single file; contains lottie and the MUI/emotion runtime; none of apexcharts, video.js, xlsx/jszip, lexical, moment, google-maps, imask, cropperjs; no base64 > 4 KB (asset cleanup). Of the 59 WordPress value exports, only LottieAnimationLoader pulls lottie. "Bundled but never rendered" cannot be measured without knowing what WordPress hosts render.
