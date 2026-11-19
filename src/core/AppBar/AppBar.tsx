@@ -1,11 +1,14 @@
 import './AppBar.scss';
 
-import { AppBar as AppBarBase } from '@mui/material';
-import { AppBarProps } from '@mui/material/AppBar';
-import { useThemeProps } from '@mui/material/styles';
+import type { AppBarProps } from '@mui/material/AppBar';
 import React from 'react';
 import { OwnAppBar } from '../../primitives/react/AppBar/AppBar';
+import { lazyFallback } from '../_internal/lazy-fallback';
+import { useThemeDefaultProps } from '../_internal/theme-default-props';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
+
+// MUI's AppBar route behind a lazy boundary (plan §36.2 B.3).
+const AppBarBase = lazyFallback(() => import('./AppBarMuiFallback') as never) as React.ComponentType<AppBarProps>;
 
 type Props = {} & AppBarProps;
 
@@ -27,21 +30,12 @@ const isOwn = (props: object) =>
   );
 
 export const AppBar = (inProps: Props) => {
-  const props = useThemeProps({ props: inProps, name: 'MuiAppBar' });
+  // MUI's useThemeProps semantics without importing MUI (src/core/_internal/theme-default-props.ts, option 5.3).
+  const props = useThemeDefaultProps(inProps as Record<string, unknown>, 'MuiAppBar') as Props;
 
   return (
     <ComponentContainer className={'AppBar-container'}>
-      {isOwn(props) ? (
-        <OwnAppBar {...(props as React.ComponentProps<typeof OwnAppBar>)} />
-      ) : (
-        <AppBarBase
-          {...props}
-          sx={[
-            ...(props.color === 'inherit' ? [{ color: 'inherit' }] : []),
-            ...(Array.isArray(props.sx) ? props.sx : [props.sx]),
-          ]}
-        />
-      )}
+      {isOwn(props) ? <OwnAppBar {...(props as React.ComponentProps<typeof OwnAppBar>)} /> : <AppBarBase {...props} />}
     </ComponentContainer>
   );
 };
