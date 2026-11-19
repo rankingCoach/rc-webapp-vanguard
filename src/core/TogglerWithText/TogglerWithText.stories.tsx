@@ -7,8 +7,7 @@ import { alignItemsCenter, dFlex, gap1 } from "@globalStyles";
 import { FontWeights, Text, TextTypes } from "@vanguard/Text/Text";
 
 
-export default {
-  ...SbDecorator({
+export default SbDecorator({
   title: "Vanguard/TogglerWithText",
   component: TogglerWithText,
   extra: {
@@ -22,8 +21,7 @@ export default {
       },
     },
   },
-}),
-};
+});
 
 export const TogglerWithTextStory = (props: TogglerWithTextProps) => {
   return (
