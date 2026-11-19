@@ -11,6 +11,12 @@ export type FilePriority = 'primary' | 'secondary';
 export type InternalFile = {
   file: File | Blob;
   filePriority: FilePriority;
+  /**
+   * The file exactly as the user picked it, before any transformer ran. Set by the input; a
+   * transformer that returns a new file (a crop, a compression) carries it over, so the consumer
+   * can still read what the transformer's canvas export drops, such as the file's metadata.
+   */
+  originalFile?: File | Blob;
 };
 
 type Props = {
@@ -60,6 +66,7 @@ export const MediaItemSelectInput = (props: Props) => {
       return {
         file: file,
         filePriority: 'primary',
+        originalFile: file,
       };
     };
 
@@ -112,10 +119,12 @@ export const MediaItemSelectInput = (props: Props) => {
 
   const convertToMediaItemFile = (files: InternalFile[]): MediaItemFile[] => {
     const mediaItems = files.map((internalFile) => {
-      const { file, filePriority } = internalFile;
+      const { file, filePriority, originalFile } = internalFile;
 
       return {
         file: file,
+        // A custom transformer that does not carry the picked file over leaves its own result here.
+        originalFile: originalFile ?? file,
         filePriority: filePriority,
         fileType: file.type,
         name: file instanceof File ? file.name : 'blob',
