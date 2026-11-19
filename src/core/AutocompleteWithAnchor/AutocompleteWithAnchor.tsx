@@ -1,13 +1,12 @@
+import styles from './AutocompleteWithAnchor.module.scss';
 import { p1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { uuidv4 } from '@helpers/generate-uid';
-import { ClickAwayListener } from '@mui/material';
 import { Autocomplete, AutocompleteProps } from '@vanguard/Autocomplete/Autocomplete';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { PopoverPopper } from '@vanguard/Popover/PopoverPopper/PopoverPopper';
 import React, { useEffect, useRef, useState } from 'react';
-
-import styles from './AutocompleteWithAnchor.module.scss';
+import { ClickAway } from '../../primitives/react/ClickAway/ClickAway';
 
 export interface AutocompleteWithAnchorProps {
   children: React.ReactNode;
@@ -74,11 +73,12 @@ export const AutocompleteWithAnchor = (props: AutocompleteWithAnchorProps) => {
         open={open}
         anchorEl={anchorEl}
       >
-        <ClickAwayListener onClickAway={handleClose}>
+        {/* MUI ClickAwayListener semantics: no own-core higher-layer exception. */}
+        <ClickAway onClickAway={handleClose} ignoreHigherLayers={false}>
           <div>
             <Autocomplete inputRef={inputRef} {...autocompleteProps} />
           </div>
-        </ClickAwayListener>
+        </ClickAway>
       </PopoverPopper>
     </div>
   );
