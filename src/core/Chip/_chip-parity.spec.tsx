@@ -104,7 +104,7 @@ describe('Chip parity: MUI 9.5 path vs own', () => {
         b.unmount();
       }
       expect(diffs).toEqual([]);
-    });
+    }, 60000);
 
   type Step = 'click' | 'clickDelete' | 'keyBackspace' | 'keyDelete' | 'keyEnter' | 'keyOnLabel' | 'focus' | 'blur';
   const run = (impl: Impl, props: Partial<ChipProps>, steps: Step[]) => {

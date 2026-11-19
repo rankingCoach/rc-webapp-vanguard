@@ -34,6 +34,23 @@ const describeTree = (el: Element): Node => ({
 });
 const C = (impl: Impl) => (impl === 'mui' ? PaginationMui : Pagination);
 
+/** Test host: holds the page like a parent when `controlled`; logs every onChange page. */
+const Host = (props: { impl: Impl; p: PaginationProps; controlled: boolean; calls: number[] }) => {
+  const { impl, p, controlled, calls } = props;
+  const Comp = C(impl);
+  const [page, setPage] = useState(p.page ?? 1);
+  return (
+    <Comp
+      {...p}
+      page={controlled ? page : p.page}
+      onChange={(_e, v) => {
+        calls.push(v);
+        if (controlled) setPage(v);
+      }}
+    />
+  );
+};
+
 const matrix: { name: string; p: PaginationProps }[] = [];
 for (const count of [0, 1, 2, 5, 7, 10, 20])
   for (const page of [undefined, 1, 4, 7, 20])
@@ -95,23 +112,9 @@ describe('Pagination parity: MUI 9.5 path vs own', () => {
   };
   const run = (impl: Impl, p: PaginationProps, controlled: boolean, steps: Step[]) => {
     const calls: number[] = [];
-    const Comp = C(impl);
-    const Host = () => {
-      const [page, setPage] = useState(p.page ?? 1);
-      return (
-        <Comp
-          {...p}
-          page={controlled ? page : p.page}
-          onChange={(_e, v) => {
-            calls.push(v);
-            if (controlled) setPage(v);
-          }}
-        />
-      );
-    };
     const view = render(
       <div data-host="">
-        <Host />
+        <Host impl={impl} p={p} controlled={controlled} calls={calls} />
       </div>,
     );
     const host = view.container.querySelector('[data-host]') as Element;
