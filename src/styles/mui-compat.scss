@@ -12,4 +12,6 @@
 @use '../primitives/react/TextField/TextField';
 @use '../primitives/react/Tooltip/Tooltip';
 @use '../primitives/react/Autocomplete/Autocomplete.compat';
+@use '../core/Collapse/Collapse/Collapse.compat';
+@use '../core/ProgressBar/ProgressBar.compat';
 @use '../core/StyledSVG/StyledSVG.compat';

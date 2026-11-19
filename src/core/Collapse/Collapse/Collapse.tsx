@@ -1,5 +1,6 @@
-import { Collapse as BaseCollapse } from '@mui/material';
 import React from 'react';
+
+import { OwnCollapse } from './own-collapse';
 
 type Props = {
   isOpen: boolean;
@@ -12,8 +13,8 @@ export const Collapse = (props: Props) => {
   const { isOpen, children, className, orientation } = props;
 
   return (
-    <BaseCollapse in={isOpen} className={className} orientation={orientation}>
+    <OwnCollapse in={isOpen} className={className} orientation={orientation}>
       {children}
-    </BaseCollapse>
+    </OwnCollapse>
   );
 };
