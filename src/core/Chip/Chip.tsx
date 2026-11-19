@@ -1,9 +1,10 @@
 // Ported from @mui/material@9.5.0 Chip/Chip.js, internal/svg-icons/Cancel.js, SvgIcon/SvgIcon.js (MIT)
 
 import styles from './Chip.module.scss';
-import { classNames } from '@helpers/classNames';
 import React from 'react';
 import { ButtonBase } from '../../primitives/react/ButtonBase/ButtonBase';
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+import { cx } from '../../primitives/react/class-names';
 import { useVanguardTypography } from '../../primitives/react/typography-context';
 
 export interface ChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick' | 'color' | 'children'> {
@@ -69,12 +70,12 @@ export const Chip = (props: ChipProps) => {
 
   const icon =
     iconProp && React.isValidElement<{ className?: string; color?: string }>(iconProp)
-      ? React.cloneElement(iconProp, { className: classNames('MuiChip-icon', iconProp.props.className) })
+      ? React.cloneElement(iconProp, { className: cx('MuiChip-icon', iconProp.props.className) })
       : null;
   // MUI's `iconColor === color` variant (icon colour #616161): true unless the icon element brings its own colour.
   const iconColorDefault = !!icon && ((icon.props as { color?: string }).color ?? 'default') === 'default';
 
-  const chipClasses = classNames(
+  const chipClasses = cx(
     'MuiChip-root',
     `MuiChip-${variant}`,
     disabled ? 'Mui-disabled' : undefined,

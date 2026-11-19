@@ -1,50 +1,67 @@
-// Test-only reference: StyledSVG as it was before 817bf04 (styled-components), verbatim apart from this header.
-// Used by _StyledSVGLegacyParity.stories.tsx to lock descendant geometry parity; not exported from the package.
-import { SVGProps } from 'react';
-import styled from 'styled-components';
+// Test-only reference: StyledSVG as it rendered before 817bf04, when it was `styled(InlineSvg)` (styled-components,
+// since removed from the dependencies). Reproduces what styled-components did at runtime: one generated class per
+// instance and the former template's CSS, interpolated the styled-components way (a falsy interpolation renders as
+// '', so e.g. `width: px` / `fill: ;` are invalid and dropped by the browser), injected as a <style> at the END of
+// <head> (where styled-components inserted). Used by _StyledSVGLegacyParity.stories.tsx; not exported.
+import React, { SVGProps, useId, useLayoutEffect } from 'react';
 import SVG from './InlineSvg.tsx';
 
-export type RcSvgProps = SVGProps<unknown> & {
+type RcSvgProps = SVGProps<unknown> & {
   hovercolor?: string;
   testid?: string;
   src?: string;
   fillOpacity?: string;
   backgroundcolor?: string;
   backgroundrepeat?: string;
-  // filter?: number;
 };
 
-export const StyledSVGLegacy = styled(SVG).attrs<RcSvgProps>(({ testid }) => ({
-  'data-testid': testid,
-}))<RcSvgProps>`
-  width: ${({ width }) => width}px;
-  filter: (${({ filter }) => filter}px);
-  height: ${({ width }) => width}px;
+/** styled-components interpolation: false / null / undefined / '' render as '' (0 renders as 0). */
+const i = (v: unknown) => (v === undefined || v === null || v === false || v === '' ? '' : String(v));
+
+/** The former template (817bf04^ StyledSVG.tsx), verbatim apart from `&` → the instance class. */
+const template = (c: string, p: RcSvgProps) => `
+.${c} {
+  width: ${i(p.width)}px;
+  filter: (${i(p.filter)}px);
+  height: ${i(p.width)}px;
   vertical-align: baseline;
-  background-repeat: ${({ backgroundrepeat }) => backgroundrepeat};
-
-  & path {
-    width: ${({ width }) => width}px;
-    height: ${({ width }) => width}px;
-    fill: ${({ color }) => color};
-    fill-opacity: ${({ fillOpacity }) => fillOpacity};
-    background-repeat: ${({ backgroundrepeat }) => backgroundrepeat};
-  }
-
-  & rect {
-    fill: ${({ backgroundcolor }) => backgroundcolor};
-    background-repeat: ${({ backgroundrepeat }) => backgroundrepeat};
-  }
-
-  &:hover {
-    & path {
-      fill: ${({ hovercolor }) => hovercolor};
-    }
-  }
-
-  &.hover {
-    & path {
-      fill: ${({ hovercolor }) => hovercolor};
-    }
-  }
+  background-repeat: ${i(p.backgroundrepeat)};
+}
+.${c} path {
+  width: ${i(p.width)}px;
+  height: ${i(p.width)}px;
+  fill: ${i(p.color)};
+  fill-opacity: ${i(p.fillOpacity)};
+  background-repeat: ${i(p.backgroundrepeat)};
+}
+.${c} rect {
+  fill: ${i(p.backgroundcolor)};
+  background-repeat: ${i(p.backgroundrepeat)};
+}
+.${c}:hover path {
+  fill: ${i(p.hovercolor)};
+}
+.${c}.hover path {
+  fill: ${i(p.hovercolor)};
+}
 `;
+
+export const StyledSVGLegacy = (props: RcSvgProps & React.ComponentProps<typeof SVG>) => {
+  const cls = `sc-legacy-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const css = template(cls, props);
+  useLayoutEffect(() => {
+    const style = document.createElement('style');
+    style.setAttribute('data-styled-legacy', cls);
+    style.textContent = css;
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, [cls, css]);
+  const { testid, className } = props;
+  return (
+    <SVG
+      {...(props as unknown as React.ComponentProps<typeof SVG>)}
+      data-testid={testid}
+      className={[cls, className].filter(Boolean).join(' ')}
+    />
+  );
+};

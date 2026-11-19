@@ -1115,3 +1115,16 @@ Reply to the watchdog after step 1's grep result.
    9.4 After the per-site fixes, the shipped-site residue is 0.
 10. ProgressCircle: `size` and `progress` are REQUIRED by type, so this is a story-only fix: args plus a play asserting finite svg geometry. Without the args the play fails on NaN.
 11. Full spec project: 342 files / 2497 tests, 0 failures.
+
+### Track (h) follow-up: own-core markup on A's internal `cx` (watchdog split)
+1. Merged A's tip (incl. e04a23c `cx`) as 3e75f4c. The mui-compat conflict was resolved keeping both lines: Slider, then StyledSVG last.
+2. A removed `styled-components` from the dependencies. `_StyledSVGLegacy.reference.tsx` now reproduces what styled-components did at runtime: per-instance class; the former template interpolated the styled-components way, falsy → '', so invalid declarations drop; `<style>` at the end of <head>. The lock story still passes, and deleting `.vg-styled-svg--size path` still fails it.
+3. My own-core files now build classes with `cx`: Accordion, OwnCollapse, Chip, Breadcrumbs, Pagination, Slider, own-progress-bar. The local `cls` helpers in Pagination and Slider are removed, leaving one internal builder. Each import carries a one-line header comment.
+4. Public helper: one-line contract note.
+5. New `_class-builders-contract.spec`: `classNames('a  b','c')` keeps the double space, `cx` collapses it; both drop junk; neither package entry exports `cx`.
+6. A's `_class-junk-scan.spec`: the Accordion/own-Collapse case flipped from `it.fails` to `it` (passes).
+7. Gates:
+   7.1 Specs of the 7 components + helpers + junk-scan: 40 files / 348.
+   7.2 Parity stories (8 files / 14): green in 3 consecutive runs. The very first run had 1 failure (517 ms) that did not reproduce; logged as a cold-start flake.
+   7.3 FULL spec project on the merged tree: 367 files / 2659 tests, 0 failures.
+8. Open for A (not my file): tsc lib error `src/helpers/hex-to-rgba.ts(8,41)` TS2741 (RegExpMatchArray) from A's eb0df11.

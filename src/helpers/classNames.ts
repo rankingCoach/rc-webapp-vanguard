@@ -1,3 +1,4 @@
+// Public API (rc-webapp imports it): all-string output byte-identical to a plain join; own-core uses internal `cx`.
 /**
  * Joins class names with single spaces. Entries that are not strings (`false`, `true`, `undefined`, `null`, numbers)
  * or are empty / whitespace-only are dropped, so `cond && 'cls'` and unset props never render as `false` /

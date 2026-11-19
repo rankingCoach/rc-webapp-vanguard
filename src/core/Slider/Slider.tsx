@@ -1,4 +1,6 @@
 // Ported from @mui/material@9.5.0 Slider/Slider.js, Slider/SliderValueLabel.js (MIT)
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+import { cx } from '../../primitives/react/class-names';
 import './Slider.scss';
 
 import { FormConfigElement } from '@custom-hooks/useFormConfig';
@@ -137,9 +139,6 @@ export const Slider = (props: SliderProps) => {
   );
 };
 
-/** Only real tokens (@helpers/classNames-free join): no junk/duplicate spacing. */
-const cls = (...c: Array<string | false | undefined>) => c.filter(Boolean).join(' ');
-
 interface OwnSliderProps {
   rootRef?: MutableRefObject<HTMLInputElement | null>;
   min: number;
@@ -181,7 +180,7 @@ const OwnSlider = (props: OwnSliderProps) => {
       data-slot={'slider'}
       data-disabled={disabled ? '' : undefined}
       data-dragging={s.dragging ? '' : undefined}
-      className={cls(
+      className={cx(
         'MuiSlider-root',
         disabled && 'Mui-disabled',
         s.dragging && 'MuiSlider-dragging',
@@ -213,7 +212,7 @@ const OwnSlider = (props: OwnSliderProps) => {
                 data-vg-core=""
                 data-slot={'slider-mark'}
                 style={{ left: `${percent}%` }}
-                className={cls('MuiSlider-mark', markActive && 'MuiSlider-markActive')}
+                className={cx('MuiSlider-mark', markActive && 'MuiSlider-markActive')}
               />
               {mark.label != null ? (
                 <span
@@ -222,7 +221,7 @@ const OwnSlider = (props: OwnSliderProps) => {
                   data-vg-core=""
                   data-slot={'slider-mark-label'}
                   style={{ left: `${percent}%` }}
-                  className={cls(
+                  className={cx(
                     'MuiSlider-markLabel',
                     'MuiSlider-markLabel',
                     markActive && 'MuiSlider-markLabelActive',
@@ -244,7 +243,7 @@ const OwnSlider = (props: OwnSliderProps) => {
             data-vg-core=""
             data-slot={'slider-thumb'}
             {...s.thumbHandlers}
-            className={cls(
+            className={cx(
               'MuiSlider-thumb',
               disabled && 'Mui-disabled',
               'MuiSlider-thumb',
@@ -273,7 +272,7 @@ const OwnSlider = (props: OwnSliderProps) => {
               <span
                 data-vg-core=""
                 data-slot={'slider-value-label'}
-                className={cls(open && 'MuiSlider-valueLabelOpen', 'MuiSlider-valueLabel')}
+                className={cx(open && 'MuiSlider-valueLabelOpen', 'MuiSlider-valueLabel')}
                 aria-hidden={true}
               >
                 <span className={'MuiSlider-valueLabelCircle'}>

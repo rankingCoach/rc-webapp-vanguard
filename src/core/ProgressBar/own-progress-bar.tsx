@@ -1,11 +1,12 @@
 // Ported from @mui/material@9.5.0 LinearProgress/LinearProgress.js (MIT)
-import { classNames } from '@helpers/classNames';
+// Own-core MUI markup: internal `cx` (clsx semantics, as MUI emits), not the public classNames helper (track h).
+
+import styles from './ProgressBar.module.scss';
 import { parseCssVariable } from '@helpers/css-variables-parser';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { CSSProperties } from 'react';
-
+import { cx } from '../../primitives/react/class-names';
 import type { ProgressBarProps } from './ProgressBar';
-import styles from './ProgressBar.module.scss';
 
 /**
  * ProgressBar's determinate / indeterminate paths on own markup: MUI 9.5 LinearProgress DOM (root span + bar spans,
@@ -30,7 +31,8 @@ export const OwnProgressBar = (props: ProgressBarProps & { variant: 'determinate
     aria['aria-valuemin'] = 0;
     aria['aria-valuemax'] = 100;
   }
-  aria['aria-valuenow'] = determinate && progressValue !== undefined ? Math.round(isBlurred ? 100 : progressValue) : undefined;
+  aria['aria-valuenow'] =
+    determinate && progressValue !== undefined ? Math.round(isBlurred ? 100 : progressValue) : undefined;
   // Vanguard's sx values. Inline (not custom properties): the MUI-contract spec reads them through jsdom's
   // getComputedStyle, which does not resolve var(). Delta: inline outranks consumer class rules for these four
   // properties; no rc-webapp or Vanguard consumer sets them through className (checked).
@@ -47,7 +49,7 @@ export const OwnProgressBar = (props: ProgressBarProps & { variant: 'determinate
         data-vg-core=""
         data-slot={'progress-bar'}
         data-variant={variant}
-        className={classNames(
+        className={cx(
           'MuiLinearProgress-root',
           'MuiLinearProgress-colorPrimary',
           `MuiLinearProgress-${variant}`,
@@ -62,10 +64,17 @@ export const OwnProgressBar = (props: ProgressBarProps & { variant: 'determinate
           data-vg-core=""
           data-slot={'progress-bar-indicator'}
           className="MuiLinearProgress-bar MuiLinearProgress-bar1"
-          style={{ ...(hasValue ? { transform: `translateX(${(value as number) - 100}%)` } : {}), backgroundColor: barColor }}
+          style={{
+            ...(hasValue ? { transform: `translateX(${(value as number) - 100}%)` } : {}),
+            backgroundColor: barColor,
+          }}
         />
         {determinate ? null : (
-          <span data-vg-core="" className="MuiLinearProgress-bar MuiLinearProgress-bar2" style={{ backgroundColor: barColor }} />
+          <span
+            data-vg-core=""
+            className="MuiLinearProgress-bar MuiLinearProgress-bar2"
+            style={{ backgroundColor: barColor }}
+          />
         )}
       </span>
     </ComponentContainer>
