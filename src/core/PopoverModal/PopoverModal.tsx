@@ -1,12 +1,17 @@
 import styles from './PopoverModal.module.scss';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Popper as MuiPopper } from '@mui/material';
 import { OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { useEffect, useRef, useState } from 'react';
 import { Backdrop } from '../../primitives/react/Backdrop/Backdrop';
 import { OwnPopper } from '../../primitives/react/Popper/Popper';
 import { resolvePopperOptions } from '../../primitives/react/Popper/popper-options';
 import { Portal } from '../../primitives/react/Portal/Portal';
+import { lazyFallback } from '../_internal/lazy-fallback';
+
+// MUI's Popper route behind a lazy boundary (plan §36.2 B.3), shared with PopoverPopper.
+const MuiPopper = lazyFallback(
+  () => import('../Popover/PopoverPopper/MuiPopperFallback') as never,
+) as React.ElementType;
 
 /**
  * Top navigation has 1030 so we need at least that
