@@ -47,10 +47,12 @@ export default defineConfig({
       },
       {
         extends: true,
-        // Prebundle the dev JSX runtime before tests: discovering it mid-run reloads the browser runner.
+        // Prebundle these dependencies before the first story: mid-run discovery reloads the browser runner.
         optimizeDeps: {
           include: [
             'react/jsx-dev-runtime',
+            '@emotion/react',
+            '@mui/system/RtlProvider',
             '@mui/x-date-pickers/PickersLayout',
             '@mui/x-date-pickers/DateField',
             '@mui/x-date-pickers/dateViewRenderers',

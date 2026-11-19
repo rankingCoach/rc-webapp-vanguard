@@ -1,4 +1,5 @@
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
+import { preloadMuiFallbacks } from "../_internal/lazy-fallback";
 import { AppBar } from "./AppBar";
 import { Story } from "./stories/_AppBar.default";
 import { Default as _Default } from "./stories/Default.story";
@@ -23,6 +24,9 @@ export default {
       },
     },
   }),
+  beforeEach: async () => {
+    await preloadMuiFallbacks();
+  },
 };
 
 export const Default: Story = { ..._Default };

@@ -11,6 +11,7 @@ import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
 import { AppBar } from './AppBar';
 
 type Story = StoryObj<typeof AppBar>;
@@ -143,4 +144,7 @@ export default {
     title: 'Vanguard/AppBar/MUI Contract',
     component: AppBar,
   }),
+  beforeEach: async () => {
+    await preloadMuiFallbacks();
+  },
 };
