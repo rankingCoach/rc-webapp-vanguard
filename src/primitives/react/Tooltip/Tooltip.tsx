@@ -150,7 +150,8 @@ export const Tooltip = (props: TooltipProps) => {
   const touchTimer = useTimer();
   const reactId = useId();
   const vgType = useVanguardTypography() === 'vanguard' ? 'vg-typography-vanguard' : '';
-  const id = idProp ?? `mui-${reactId}`;
+  // MUI useId(idProp) on React >= 18: React's id as is (`mui-` is only its pre-useId fallback).
+  const id = idProp ?? reactId;
 
   const stopTouchInteraction = () => {
     if (prevUserSelect.current !== undefined) {
