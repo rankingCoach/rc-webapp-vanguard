@@ -1,6 +1,7 @@
 import type { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
-import React from 'react';
+import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { expect, userEvent, waitFor } from 'storybook/test';
 import { DateRangePickerMuiReference } from './_DateRangePicker.mui-reference';
 import { DateRangePicker } from './DateRangePicker';
@@ -126,5 +127,93 @@ export const DisabledCalendarEndAdornment: Story = {
   play: async ({ canvasElement }) => {
     await document.fonts.ready;
     await checkRestingFrame(canvasElement, true);
+  },
+};
+
+type Implementation = 'reference' | 'candidate';
+
+function referenceFields(canvas: HTMLElement, implementation: Implementation) {
+  const left = canvas.querySelector<HTMLElement>(`[data-testid="${implementation}-left-reference-container"]`);
+  const right = canvas.querySelector<HTMLElement>(`[data-testid="${implementation}-right-reference-container"]`);
+  const input = left?.querySelector<HTMLInputElement>('[data-testid="datepicker-reference"]');
+  if (!left || !right || !input) throw new Error(`Missing ${implementation} reference fields`);
+  const read = (ms: number) => ({
+    ms,
+    left: left.getBoundingClientRect().width,
+    right: right.getBoundingClientRect().width,
+  });
+  return { implementation, input, read, frames: [read(0)] };
+}
+
+async function sampleReferenceSlides(canvas: HTMLElement, order: [Implementation, Implementation]) {
+  const pair = order.map((implementation) => referenceFields(canvas, implementation));
+  const started = performance.now();
+  // Open both in one React commit and read them on the same browser frames. Reverse the event order in the replay.
+  flushSync(() => pair.forEach(({ input }) => input.click()));
+  let elapsed = 0;
+  let settled = false;
+  do {
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    elapsed = performance.now() - started;
+    settled = pair
+      .map(({ read, frames }) => {
+        const sample = read(elapsed);
+        frames.push(sample);
+        return sample.left === 185 && sample.right === 52;
+      })
+      .every(Boolean);
+  } while (elapsed < 2500 && (elapsed < 600 || !settled));
+
+  const results = pair.map(({ implementation, frames }) => {
+    const start = frames[0];
+    const end = frames[frames.length - 1];
+    expect([start.left, start.right]).toEqual([52, 185]);
+    expect([end.left, end.right]).toEqual([185, 52]);
+    expect(frames.some(({ left }) => left > 53 && left < 184)).toBe(true);
+    return {
+      implementation,
+      samples: [0, 100, 300, 600].map((ms) => ({ requestedMs: ms, ...frames.find((frame) => frame.ms >= ms) })),
+      firstMovementFrame: frames.findIndex(({ left }) => left > 53),
+      halfwayFrame: frames.findIndex(({ left }) => left >= (185 + 52) / 2),
+      settledFrame: frames.findIndex(({ left, right }) => left === 185 && right === 52),
+    };
+  });
+  const [first, second] = results;
+  const report = JSON.stringify(results);
+  console.info('DateRangePicker reference-width samples', report);
+  expect(
+    Math.abs(first.firstMovementFrame - second.firstMovementFrame),
+    `First movement ${report}`,
+  ).toBeLessThanOrEqual(2);
+  expect(Math.abs(first.halfwayFrame - second.halfwayFrame), `Halfway ${report}`).toBeLessThanOrEqual(2);
+  expect(Math.abs(first.settledFrame - second.settledFrame), `Settled ${report}`).toBeLessThanOrEqual(2);
+}
+
+async function resetSlidePair(canvas: HTMLElement) {
+  const previous = canvas.querySelector('[data-testid="picker-reference"]');
+  const reset = canvas.querySelector<HTMLButtonElement>('[data-testid="reset-slide-pair"]');
+  if (!reset) throw new Error('Missing slide fixture reset');
+  reset.click();
+  await waitFor(() => expect(canvas.querySelector('[data-testid="picker-reference"]')).not.toBe(previous));
+}
+
+function SlidePair() {
+  const [id, setId] = useState(0);
+  return (
+    <>
+      <button type="button" data-testid="reset-slide-pair" onClick={() => setId((previous) => previous + 1)}>
+        {'Reset preview'}
+      </button>
+      <PickerPair key={id} disabled={false} />
+    </>
+  );
+}
+
+export const ReferenceSlideInBothOrders: Story = {
+  render: () => <SlidePair />,
+  play: async ({ canvasElement }) => {
+    await sampleReferenceSlides(canvasElement, ['reference', 'candidate']);
+    await resetSlidePair(canvasElement);
+    await sampleReferenceSlides(canvasElement, ['candidate', 'reference']);
   },
 };

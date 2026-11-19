@@ -49,8 +49,20 @@ const canonical = (html: string) => {
   return host.innerHTML;
 };
 
-const snapshot = () =>
-  `<body style="${document.body.getAttribute('style') ?? ''}">${canonical(normalize(document.body.innerHTML))}`;
+const snapshot = async (signal: AbortSignal) => {
+  await waitFor(
+    () => {
+      signal.throwIfAborted();
+      for (const side of ['left', 'right']) {
+        const reference = screen.getByTestId(`drp-${side}-reference-container`);
+        const width = reference.classList.contains('input-closed') ? '52px' : '185px';
+        expect(reference.style.width, `${side} reference spring width`).toBe(width);
+      }
+    },
+    { timeout: 2500 },
+  );
+  return `<body style="${document.body.getAttribute('style') ?? ''}">${canonical(normalize(document.body.innerHTML))}`;
+};
 
 // These snapshots include both the popup transition styles and the date-range view transition.
 const settle = (signal: AbortSignal) =>
@@ -75,21 +87,21 @@ const go = async (impl: Impl, signal: AbortSignal) => {
   const legend = calendarInput.closest('.MuiOutlinedInput-root')?.querySelector('legend');
   expect(legend).not.toBeNull();
   expect(legend?.classList.contains('vg-notched-legend')).toBe(impl === 'own');
-  const trace = [snapshot()];
+  const trace = [await snapshot(signal)];
   await user.click(screen.getByTestId('datepicker-reference'));
   await settle(signal);
-  trace.push(snapshot());
+  trace.push(await snapshot(signal));
   await user.click(screen.getByTestId('rangeselector-reference-input'));
   await settle(signal);
-  trace.push(snapshot());
+  trace.push(await snapshot(signal));
   const preset = screen.queryByRole('button', { name: 'Last 30 days' });
   if (preset) await user.click(preset);
   await settle(signal);
-  trace.push(snapshot());
+  trace.push(await snapshot(signal));
   await user.click(screen.getByRole('button', { name: 'outside' }));
   await waitFor(() => expect(document.querySelector('.date-range-picker-dropdown')).toBeNull(), { timeout: 2500 });
   signal.throwIfAborted();
-  trace.push(snapshot());
+  trace.push(await snapshot(signal));
   view.unmount();
   view.container.remove();
   return trace;
