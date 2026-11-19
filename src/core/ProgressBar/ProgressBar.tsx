@@ -1,7 +1,6 @@
 import React from 'react';
-
+import { lazyFallback } from '../_internal/lazy-fallback';
 import { OwnProgressBar } from './own-progress-bar';
-import { ProgressBarMui } from './ProgressBarMui';
 
 export interface ProgressBarProps {
   progressValue?: number;
@@ -13,6 +12,11 @@ export interface ProgressBarProps {
   isBlurred?: boolean;
   variant?: 'determinate' | 'indeterminate' | 'buffer' | 'query';
 }
+
+/** MUI LinearProgress route (buffer / query) behind a lazy boundary (plan §36.2 B.3): no @mui/* in the eager graph. */
+const ProgressBarMui = lazyFallback(
+  () => import('./ProgressBarMuiFallback') as never,
+) as React.ComponentType<ProgressBarProps>;
 
 /** determinate (default) and indeterminate render on the own core; buffer and query keep the MUI LinearProgress path. */
 export const ProgressBar = (props: ProgressBarProps) => {
