@@ -32,3 +32,19 @@ describe('resolvePopperOptions altBoundary', () => {
     expect(r.supported).toBe(true);
   });
 });
+
+describe('resolvePopperOptions fallback', () => {
+  it('rejects a custom write modifier instead of silently skipping it', () => {
+    const result = resolvePopperOptions({
+      modifiers: [{ name: 'observePlacement', phase: 'write', fn: () => {} }],
+    });
+    expect(result).toMatchObject({ supported: false, unsupported: ['observePlacement'] });
+  });
+
+  it('rejects the document root boundary, which the own DOM geometry does not measure', () => {
+    const result = resolvePopperOptions({
+      modifiers: [{ name: 'flip', options: { rootBoundary: 'document' } }],
+    });
+    expect(result).toMatchObject({ supported: false, unsupported: ['flip.rootBoundary'] });
+  });
+});
