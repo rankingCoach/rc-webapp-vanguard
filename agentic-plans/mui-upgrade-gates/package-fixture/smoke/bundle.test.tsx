@@ -14,20 +14,24 @@ const muiPopperRequests = await vi.hoisted(async () => {
   if (process.env.BUNDLE === 'wp') return undefined;
   const { createRequire, registerHooks } = await import('node:module');
   const { pathToFileURL } = await import('node:url');
-  const fallback = createRequire(`${process.cwd()}/package.json`).resolve('@rankingcoach/vanguard/dist/index-MuiPopperFallback.js');
+  const entry = createRequire(`${process.cwd()}/package.json`).resolve('@rankingcoach/vanguard/dist/index.js');
+  const controlUrl = new URL('./index-MuiPopperFallback.js', pathToFileURL(entry));
   // Run import.meta.resolve in the native ESM loader. Vitest rewrites its own import.meta, while require.resolve
   // does not traverse the ESM hook on Node 22.
   const nativeResolver = await import('data:text/javascript,export const resolve = url => import.meta.resolve(url)');
   const requests: string[] = [];
+  const isFallback = (id: string) => /(?:^|\/)index-MuiPopperFallback\d*\.js(?:$|[?#])/.test(id);
   const hook = registerHooks({
     resolve(specifier, context, nextResolve) {
+      const requestedFallback = isFallback(specifier);
+      if (requestedFallback) requests.push(specifier);
       const result = nextResolve(specifier, context);
-      if (result.url.endsWith('/index-MuiPopperFallback.js')) requests.push(result.url);
+      if (!requestedFallback && isFallback(result.url)) requests.push(result.url);
       return result;
     },
   });
-  // A resolution-only control verifies the observer before the installed bundle is imported. No module is evaluated.
-  nativeResolver.resolve(pathToFileURL(fallback).href);
+  // Resolving a file URL verifies the observer even when the build prunes the private fallback chunk.
+  nativeResolver.resolve(controlUrl.href);
   const sawControl = requests.length === 1;
   requests.length = 0;
   return { requests, sawControl, stop: () => hook.deregister() };
