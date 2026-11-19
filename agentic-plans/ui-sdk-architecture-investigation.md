@@ -1480,8 +1480,8 @@ anchor) and so always routed its text field to MUI's TextField. That covers rc-w
 WordPress. IMask inputs passing `inputComponent` take the same route. With the lazy boundary, the packed Autocomplete
 rendered no input on first use (smoke: no combobox).
 
-**Corrected packed count at c8e69a2: 24 of 298 eager exports, plus one allow-listed context module.** The ProgressBar
-split is expected to reduce this to 23 after its exact-SHA verification and merge. WordPress remains at 4 of 64.
+**Packed count at c8e69a2: 24 of 298 eager exports, plus one allow-listed context module.** This count predates the
+planner correction below.
 
 **Planner correction (decided-by-watchdog).** The create-event popover passes `centerPopover` and `renderInPortal`
 together at `EngagementPlannerCalendar.tsx:298`. The centered flip modifier uses the anchor clipping boundary and the
@@ -1489,6 +1489,12 @@ portaled overflow modifier uses the popper clipping boundary. The own resolver d
 combination. The c8e69a2 pack omitted the card on first render. `9a0dece` keeps the reachable PopoverModal fallback
 eager. After the text-field port and before DatePicker S1, port separate flip and overflow boundaries, with a
 popper.js differential across placement, boundary, portal mode and scroll offsets and a paired planner check.
+
+**Corrected packed count at `32a6b93`: 25 of 298 eager exports, plus one allow-listed context module.** This build
+includes the restored planner fallback. The ProgressBar split is expected to reduce this to 24 after its exact-SHA
+verification and merge. WordPress reports 4 of 64. The shared H19b / H16c pack's 4,231 dist files match the build
+and its WordPress graph reaches 336 files with zero missing targets. The eager reports are in
+`/Users/a.kott/vanguard-verify/logs/32a6b93a2683ea766d4406fae4693e918dbd3a93-h19b-h16c/`.
 
 **H19 masked field correction (decided-by-watchdog).** `4d88e97` uses MUI InputAdornment inside DateRangePicker's
 masked MUI TextField. The real-picker differential pins its full class attribute. The preset field, DateRangeInput
@@ -1579,7 +1585,8 @@ side and running both orders gave the same eight samples. Popup and Clear SVGs w
 sample and present after settling. Both were present immediately on warm replays. The `Icon.tsx` difference from
 merge-base `99ee34c` is limited to data attributes. H15 remains PASS. The settled differential gives both sides the
 same warm asset state and waits for both indicators. The replay used jsdom. Chromium first-frame checks remain part
-of H20.
+of H20. The eight original rows were recovered from the saved run output after the reboot and are stored at
+`/Users/a.kott/vanguard-verify/logs/autocomplete-cold-icon-traces.jsonl`.
 
 ### 36.5 Preload timing samples (2026-11-19)
 
@@ -1595,3 +1602,25 @@ The 12:25 host reboot interrupted the warm `f703205` run. That sample is void. T
 test failures and the load reached roughly 100 during the run. The five completed samples have different host
 conditions and cannot establish a preload speedup or regression. Rule 13 applies to any further wide measurements.
 The original scratch timing logs were lost in the reboot. This table preserves the readings recorded before it.
+
+#### Case budgets after the reboot
+
+One Vitest worker at `32a6b93`, one-minute load 25.14–30.22 during the two targeted runs. All nine unique cases
+below were green. The timings are Vitest case runtimes, excluding worker setup and transforms. Logs are
+`h20-case-budgets-32a6b93*.log` under `/Users/a.kott/vanguard-verify/logs/`.
+
+| Case | Measured runtime | Case timeout |
+| --- | ---: | ---: |
+| Autocomplete open, type, select by keyboard | 952 ms | 15 s |
+| Autocomplete click option, then clear | 777 ms | 5 s |
+| Autocomplete multiple: two chips, Backspace | 997 ms | 5 s |
+| Autocomplete restrictToOptions, no match text | 734 ms | 5 s |
+| Autocomplete loading | 949 ms | 5 s |
+| Autocomplete highlightOptions | 671 ms | 5 s |
+| DateRangePicker click on start & end date | 2,675 ms, 1,435 ms replay | 5 s → 10 s |
+| DateRangePicker should render with some checks | 1,104 ms | 5 s |
+| DateRangePicker open calendar, presets, pick, close differential | 9,210 ms | 45 s |
+
+The calendar click case already waits on the actual day buttons before sending the real pointer interactions. Its
+first sample exceeded half the default budget. The case now has its own 10 s timeout, over three times that sample,
+with identical interactions, assertions and condition waits. The differential stayed below half its existing budget.

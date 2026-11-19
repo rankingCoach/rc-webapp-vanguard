@@ -75,7 +75,7 @@ Storybook on the host.
    caused by the old preload.
 4. **Package gate:** `PACKAGE_FIXTURE_OUT=<dir> bash agentic-plans/mui-upgrade-gates/package.sh`.
    1. The script exits 1 by design (measured diagnostics). Judge it by its outputs:
-      1. `runtime-counts.json` = 13/13/12/12 = 50.
+      1. H20 `runtime-counts.json` expected 34/34/44/44 = 156.
       2. "package contents … present".
       3. "dist identity: N packed dist files equal the build on disk".
       4. "wordpress dynamic imports: … 0 missing targets".
@@ -202,17 +202,16 @@ Pending from B: f94d932 (ProgressBar lazy split, at a verifier). Merge after its
 | H14 SearchableSelect | a0936b1 | PASS; the DropdownMenu arrow OPEN item was closed with 92abeba |
 | H15 Autocomplete | 01bcea8, fix 13077d6 (+ ca3fefb Tooltip ids) | FAIL (id prefix), then PASS at 277bc04 (verifier 2) |
 | H16 Drawer | cef8535 | FAIL (scroll lock, tooltip arrow) |
-| H16b | 277bc04 (pack pkg-16d, sha256 a25a4ac4c256198b43947c789a41b5dffcb8ddfad15cebb9b16d98ccba38d79c) | at verifier 1, verdict pending; H17 and H18 are judged at the same SHA |
-| H17 Snackbar | e56293b | at verifier 1, judged at 277bc04 |
-| H18 small items (FlagAdornment, hexToRgb, useMediaQuery, AutocompleteWithAnchor, Skeleton, notices) | 76817e8…72f20f2 + 277bc04 | at verifier 1, judged at 277bc04 |
-| d51c135 delta re-judge (ButtonBase spacing) | fixed in e04a23c | re-judged at 277bc04 by verifier 1 |
-| H19 AppBar/Toolbar, FocusTrap, DateRangePicker, adornments, AIAssistant, Documents | cac6a6b (pack pkg-19, sha256 53942ac5a9111625ceb3848387fbceecf6c9d31bf4ef21d12a421f388d5cf02a) | at verifier 2, verdict pending |
-| 601b392 popper font-resize fix | after 277bc04 | UNVERIFIED. Verifier 1's tooltip finding (settled x 506 vs 514) is exactly this cause; it goes into H16b's fix round |
+| H16b | 277bc04 (pkg-16d, lost at reboot) | FAIL for the BusinessProfile tooltip, scroll lock and readiness PASS. Broad sweep closed as partial |
+| H17 Snackbar | e56293b | PASS at 277bc04, unsubscribe fix committed separately in 452359b |
+| H18 small items (FlagAdornment, hexToRgb, useMediaQuery, AutocompleteWithAnchor, Skeleton, notices) | 76817e8…72f20f2 + 277bc04 | PASS at 277bc04 |
+| d51c135 delta re-judge (ButtonBase spacing) | fixed in e04a23c | PASS at 277bc04 |
+| H19 AppBar/Toolbar, FocusTrap, DateRangePicker, adornments, AIAssistant, Documents | cac6a6b (pkg-19, lost at reboot) | FAIL for the masked DateRangePicker adornment. Navbar D15 tie #13 accepted at 73d25d7 |
+| H19b / H16c shared corrective pack | 32a6b93a2683ea766d4406fae4693e918dbd3a93, SHA-256 bd4cc895eb200808677f95d5a28dd644173b59c997f284e1e4a7d6281d2ab6b0 | Sent to both verifiers. V1 rechecks 601b392 and restarts the broad consumer sweep, V2 rechecks 4d88e97 in the actual masked picker |
 | H20 B.3 work (lazy splits, gates, theme reader, preload fix, WP inline fix) | 0f71f7f … 803051f | NOT SENT |
 
-Packs live in this session's scratchpad: `/private/tmp/claude-501/-Users-a-kott-WebstormProjects-rc-webapp-vanguard-git/
-e440731d-5136-4d79-a28f-b08f6dcbdf45/scratchpad/pkg-*`. A reboot may clear that directory; if so, rebuild with
-package.sh.
+Packs and `SHA256SUMS` live at `/Users/a.kott/vanguard-verify/packs/`. The 12:25 reboot removed the old scratchpad
+packs. The watchdog closed the `277bc04` sweep as partial and directed the broad sweep to restart on H19b / H16c.
 
 ## 9. Running or parked at handover
 
@@ -228,7 +227,8 @@ package.sh.
    `scratchpad/s1-parked/DateCalendar/`. The spec compares against MUI X 9.17 DateCalendar with a pinned date. MUI X
    calendar CSS is extracted in `scratchpad/cal-emotion-0.json` / `-1.json` (both themes; they differ only in font
    size). Restart S1 only after the text-field port, with `< /dev/null`.
-3. No gate is running from this thread besides the timing script.
+3. The reboot stopped the timing script. The five finished samples and the void sixth sample are recorded in
+   plan §36.5. The three benchmark worktree registrations have been removed.
 
 ## 10. OWED, in order, with the next commands
 
@@ -239,8 +239,8 @@ package.sh.
 2. **Storybook global preload (7072a25).** Remove it. Add explicit preloads via meta-level `beforeEach` in the
    stories that render MUI routes. Find them by running `--project storybook` for the affected dirs without the
    preload.
-3. **Corrected eager-@mui number in §36.3.** It is 24 of 298 at c8e69a2 (+1 allow-listed); 23 once B's f94d932 is
-   merged. Say explicitly that the earlier "4 of 298" was never shippable.
+3. **Corrected eager-@mui number in §36.3.** The packed 32a6b93 build has 25 of 298 (+1 allow-listed), including
+   the restored planner fallback. Expect 24 once B's f94d932 is merged. The earlier "4 of 298" was never shippable.
 4. **No-preload first-render packed smoke (§36.4.3.2).** In `package-fixture/smoke/bundle.test.tsx`, render every
    WordPress export and the ModalHost/Autocomplete/Menu/Snackbar/AppBar shapes without preload, and assert content on
    the FIRST render (not waitFor). Raise the counts.
