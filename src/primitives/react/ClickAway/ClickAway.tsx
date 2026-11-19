@@ -11,6 +11,12 @@ export interface ClickAwayProps {
   disableReactTree?: boolean;
   mouseEvent?: MouseEventProp;
   touchEvent?: TouchEventProp;
+  /**
+   * Own-core extension (watchdog MINOR 4): ignore events that start inside a layer opened above this one. Default on
+   * (menus, popovers); `false` keeps MUI's plain ClickAwayListener behaviour (Snackbar: a click inside a modal opened
+   * from the snackbar is a click-away, as with MUI).
+   */
+  ignoreHigherLayers?: boolean;
 }
 
 const domEventName = (prop: string) => prop.substring(2).toLowerCase();
@@ -26,7 +32,14 @@ const setRef = (ref: unknown, value: Element | null) => {
  * (watchdog MINOR 4), ignores events that start inside a layer opened above this one (ModalHost registers layers).
  */
 export const ClickAway = (props: ClickAwayProps) => {
-  const { children, onClickAway, disableReactTree = false, mouseEvent = 'onClick', touchEvent = 'onTouchEnd' } = props;
+  const {
+    children,
+    onClickAway,
+    disableReactTree = false,
+    mouseEvent = 'onClick',
+    touchEvent = 'onTouchEnd',
+    ignoreHigherLayers = true,
+  } = props;
   const nodeRef = useRef<Element | null>(null);
   const activated = useRef(false);
   const moved = useRef(false);
@@ -64,13 +77,15 @@ export const ClickAway = (props: ClickAwayProps) => {
           : !doc.documentElement.contains(target) || node.contains(target)
         : false;
       const above = layer.current ? defaultLayerStack.above(layer.current) : [];
-      const insideHigherLayer = above.some(
-        (l) =>
-          l.origin !== null &&
-          node !== null &&
-          node.contains(l.origin) &&
-          (path ? path.includes(l.element) : l.element.contains(target)),
-      );
+      const insideHigherLayer =
+        ignoreHigherLayers &&
+        above.some(
+          (l) =>
+            l.origin !== null &&
+            node !== null &&
+            node.contains(l.origin) &&
+            (path ? path.includes(l.element) : l.element.contains(target)),
+        );
       const wasMoved = moved.current;
       moved.current = false;
       if (
@@ -90,7 +105,7 @@ export const ClickAway = (props: ClickAwayProps) => {
         onClickAwayRef.current(event);
       }
     },
-    [disableReactTree],
+    [disableReactTree, ignoreHigherLayers],
   );
 
   useEffect(() => {
@@ -116,12 +131,22 @@ export const ClickAway = (props: ClickAwayProps) => {
     return () => doc.removeEventListener(name, handle as EventListener);
   }, [handle, mouseEvent]);
 
-  const childProps: Record<string, unknown> = {
-    ref: (node: Element | null) => {
+  // MUI useForkRef: one stable callback per child ref; a React 19 cleanup returned by the child's callback ref is kept
+  // and run on detach (instead of a null call), and a new callback each render no longer detaches/re-attaches.
+  const childRef = (children.props as { ref?: unknown }).ref ?? (children as { ref?: unknown }).ref;
+  const handleRef = useCallback(
+    (node: Element | null) => {
       nodeRef.current = node;
-      setRef((children.props as { ref?: unknown }).ref ?? (children as { ref?: unknown }).ref, node);
+      const cleanup = typeof childRef === 'function' ? childRef(node) : (setRef(childRef, node), undefined);
+      return () => {
+        nodeRef.current = null;
+        if (typeof cleanup === 'function') cleanup();
+        else setRef(childRef, null);
+      };
     },
-  };
+    [childRef],
+  );
+  const childProps: Record<string, unknown> = { ref: handleRef };
   const synth = (name: string) => (event: React.SyntheticEvent) => {
     synthetic.current = true;
     const own = (children.props as Record<string, unknown>)[name];
