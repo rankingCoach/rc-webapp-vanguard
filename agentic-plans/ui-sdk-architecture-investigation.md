@@ -1487,3 +1487,31 @@ Consequence: the Input family (Input, InputBase, Select, Textarea, SearchableSel
 RichTextEditor, TextEditDrawer, TimePicker, ColorPicker, DateRange*, DrawerRoot/Service, AIAssistant, Autocomplete)
 stays eager on @mui through MuiTextField until the own text field models `InputProps.ref` and `inputComponent`. That
 is the next B.2 item ("implement every prop with reachability evidence"), not a lazy split.
+
+### 36.4 Watchdog decision on the B.3 correction (2026-11-19, decided-by-watchdog)
+
+1. **Order.** The own text field modelling `InputProps.ref` (anchor ref on the InputBase root) and `inputComponent`
+   (IMask) goes FIRST, before S1–S3. It is reachable: rc-webapp's 26 Autocomplete sites and WordPress render MUI's
+   TextField today. DatePicker waits. S1's Codex draft may continue unwired.
+2. **Evidence for that port.**
+   1. Differential vs MUI TextField for the two shapes.
+      1. Autocomplete's renderInput params: `InputProps.ref`, className, start/endAdornment, `inputProps` with the
+         combobox ARIA and ref.
+      2. IMask via `inputComponent`: inputRef forwarding, value/caret on typing, paste, controlled reset.
+   2. Popper anchor rect identical: listbox width and position vs MUI at 3 sizes, plus multiple-with-chips wrapping.
+   3. Focus/hover/disabled/error computed styles.
+   4. WordPress smoke for Autocomplete and Input.
+
+   Then the MuiTextField route can become lazy for real.
+3. **Gate hardening, mandatory before H20.**
+   1. An audit-mode run (`VG_NO_FALLBACK_PRELOAD=1`, full spec project) is part of the handoff gate. The
+      expected-failure list is checked in as an explicit allow-list with reasons. Any other failure is a reachable
+      lazy route.
+   2. The packed smoke renders every WordPress export and every ModalHost/Autocomplete/Menu/Snackbar/AppBar shape
+      without preload, and asserts first-render content (not "eventually").
+   3. The corrected eager-@mui number is stated. The earlier "4 of 298" was never true for a shippable build: it was
+      measured on the build with the MuiTextField route lazy, which broke Autocomplete.
+4. **H20 handoff.** The verifier checks first render (first-paint capture, no settle wait) on the fingerprinted pack,
+   on both builds, for: Autocomplete (26 sites), IMask inputs, AccountNavMenu and every lazy-split component.
+5. **Rule.** A future "unreachable" claim for a lazy route needs all three: site scan, audit-mode spec run and packed
+   smoke. A site scan alone is not accepted.
