@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultLayerStack } from '../core/layer-stack';
 import { defaultModalManager } from '../core/modal-manager';
+import { useAutocomplete } from './Autocomplete/useAutocomplete';
 import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
 import { ClickAway } from './ClickAway/ClickAway';
@@ -140,6 +141,27 @@ const settle = () =>
   act(() => {
     vi.advanceTimersByTime(2000);
   });
+
+const AutocompleteHarness = () => {
+  const ac = useAutocomplete({ id: 'leak', options: ['Apple', 'Banana', 'Cherry'], openOnFocus: true });
+  return (
+    <div {...ac.getRootProps()} ref={ac.setAnchorEl as never}>
+      <input {...(ac.getInputProps() as React.InputHTMLAttributes<HTMLInputElement>)} />
+      {ac.popupOpen ? (
+        <ul {...(ac.getListboxProps() as React.HTMLAttributes<HTMLUListElement>)}>
+          {(ac.groupedOptions as string[]).map((option, index) => {
+            const { key, ...p } = ac.getOptionProps({ option, index } as never) as unknown as Record<string, unknown>;
+            return (
+              <li key={String(key)} {...p}>
+                {option}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+};
 
 const TooltipHarness = ({ open }: { open: boolean }) => (
   <Tooltip open={open} title={<b>{'tip'}</b>} arrow placement="top">
@@ -303,6 +325,22 @@ describe('own-core resources are released', () => {
     settle();
     done(view);
     settle();
+  });
+
+  it('useAutocomplete (open, type, highlight, close, unmount)', () => {
+    const before = baseline();
+    const view = render(<AutocompleteHarness />);
+    const input = view.container.querySelector('input') as HTMLInputElement;
+    act(() => {
+      input.focus();
+    });
+    fireEvent.change(input, { target: { value: 'a' } });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'Escape' });
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
   });
 
   it('Backdrop in a Portal (Fade timers, portal node), closed mid-exit then unmounted', () => {
