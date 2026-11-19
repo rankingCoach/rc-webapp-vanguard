@@ -1,7 +1,6 @@
 // Ported from @mui/material@9.5.0 ButtonBase/ButtonBase.js (MIT)
 import './ButtonBase.scss';
 
-import { classNames } from '@helpers/classNames';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { hasNativeActivation, isFocusVisible, pressAttrs, pressKeyDown, pressKeyUp } from '../../core/press';
 import { TouchRippleActions, TouchRippleProps, useRipple } from './use-ripple';
@@ -175,13 +174,19 @@ export const ButtonBase = (props: ButtonBaseProps) => {
 
   return (
     <Host
-      className={classNames(
+      // clsx semantics (MUI): only real tokens, single spaces; the shared classNames helper joins empty entries too.
+      className={[
         'MuiButtonBase-root',
-        classes?.root ?? '',
-        disabled ? classNames('Mui-disabled', classes?.disabled ?? '') : '',
-        focusVisible ? classNames('Mui-focusVisible', classes?.focusVisible ?? '', focusVisibleClassName ?? '') : '',
+        classes?.root,
+        disabled && 'Mui-disabled',
+        disabled && classes?.disabled,
+        focusVisible && 'Mui-focusVisible',
+        focusVisible && classes?.focusVisible,
+        focusVisible && focusVisibleClassName,
         className,
-      )}
+      ]
+        .filter((token): token is string => typeof token === 'string' && token !== '')
+        .join(' ')}
       ref={handleRef}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
