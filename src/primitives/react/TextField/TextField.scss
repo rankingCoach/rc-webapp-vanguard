@@ -255,7 +255,9 @@ $error: rgb(211, 47, 47);
   }
 }
 
-$control: '[data-vg-core][data-slot^="text-field-control"]';
+// Custom native controls can relay the input class while consuming the slot attributes, as the phone mask does.
+// Scope those controls to the own InputBase frame so they do not need an extra class or attribute.
+$control: '[data-vg-core][data-slot^="text-field-control"], [data-vg-core][data-slot="text-field-input"] > :is(input, textarea)';
 
 .MuiInputBase-input:where(#{$control}) {
   font: inherit;
