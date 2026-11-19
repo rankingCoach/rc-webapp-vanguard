@@ -192,6 +192,33 @@ describe('installed Vanguard bundle', () => {
       { timeout: 2000 },
     );
   });
+
+  // Button's hover icon swap (iconLargeOnHover) runs on Vanguard's own Grow in both bundles (no MUI Grow). Real timers:
+  // the WordPress bundle's transition timers are not reached by vi fake timers.
+  it('swaps the enlarged hover icon of an installed Button on the own Grow', async () => {
+    renderWithProviders(
+      <Button icon={'caret-down' as never} iconLargeOnHover>
+        Fixture grow
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: /Fixture grow/ });
+    const wrappers = () =>
+      [...button.querySelectorAll('div > div > span')].filter(
+        (s) => s.parentElement?.parentElement?.children.length === 2,
+      ) as HTMLElement[];
+    const [small, large] = wrappers();
+    expect(small.style.opacity).toBe('1');
+    expect(large.style.opacity).toBe('0');
+    fireEvent.mouseOver(button.parentElement as HTMLElement);
+    await waitFor(
+      () => {
+        expect(small.style.opacity).toBe('0');
+        expect(large.style.opacity).toBe('1');
+      },
+      { timeout: 2000 },
+    );
+    expect(button.getAttribute('class')?.split(' ')).not.toContain('false');
+  });
 });
 
 // WordPress intentionally has no DatePicker export; verify the default installed implementation.

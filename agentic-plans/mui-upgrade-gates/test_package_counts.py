@@ -12,13 +12,13 @@ class Counts(unittest.TestCase):
     def test_summaries(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            expected = {'default-declared':12, 'default-mui':12, 'wp-declared':11, 'wp-mui':11}
+            expected = {'default-declared':13, 'default-mui':13, 'wp-declared':12, 'wp-mui':12}
             def reset():
                 for key, n in expected.items():
                     (root/key).mkdir(exist_ok=True)
                     (root/key/'smoke.log').write_text(f' Test Files  1 passed (1)\n      Tests  {n} passed ({n})\n')
             reset()
-            self.assertEqual(m.validate(root)['aggregate'],46)
+            self.assertEqual(m.validate(root)['aggregate'],50)
             for key,n in expected.items():
                 for bad in [f'Tests  {n-1} passed ({n-1})', f'Tests  {n+1} passed ({n+1})', f'Tests  1 failed | {n} passed ({n+1})', f'Tests  {n} passed | 1 skipped ({n+1})', f'Tests  {n} passed (99)', 'Tests  nonsense', f'Tests  {n} passed ({n})\nTests  {n} passed ({n})']:
                     reset()
