@@ -1257,3 +1257,18 @@ Pending full run: 501d8cb (styled-components dropped, package.json).
    1. Its snapshots covered `body.innerHTML` (sibling aria-hidden) but not body's own inline style. That applied to
       Drawer, SearchableSelect, Autocomplete and Snackbar; all four now include it.
    2. The harness had no app root (ModalRoot). `_Drawer.body-lock.spec.tsx` now reproduces the story condition.
+
+## 36. DatePicker off @mui/x-date-pickers (staged, 2026-11-19)
+
+DatePicker (8 rc-webapp sites) is the last user of `@mui/x-date-pickers`. It uses DatePicker (desktop popper / mobile
+dialog via `(pointer: fine)`), DateField (sectioned keyboard editing, the accessible section DOM), the day/year calendar
+views (`renderDateViewCalendar`), PickersLayout, DatePickerToolbar with the keyboard-view toggle, and AdapterMoment.
+Existing contract: 13 spec files + 2 MUI contract stories. Staged so nothing is wired before it is proven against the
+MUI X component it replaces:
+1. S1 DateCalendar primitive (day grid, month switch header, year view, keyboard navigation, min/max/disablePast,
+   focus) vs MUI X DateCalendar: DOM + keyboard timelines, Chromium computed styles. Not wired.
+2. S2 DateField primitive (sections: format parsing, typing, arrows, Backspace, paste, clear, invalid states, the
+   accessible section DOM) vs MUI X DateField. Not wired.
+3. S3 picker shell on OwnPopper (desktop) / ModalHost dialog (mobile), toolbar + keyboard-view toggle, layout; then
+   the DatePicker switch, judged by the 13 existing specs + the frozen-reference differential + Chromium parity.
+Each stage is its own commit; S3 is the handoff. `@mui/x-date-pickers` leaves `dependencies` only after S3 passes.
