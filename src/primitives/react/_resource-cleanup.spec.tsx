@@ -13,6 +13,7 @@ import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
 import { Portal } from './Portal/Portal';
+import { Snackbar } from './Snackbar/Snackbar';
 import { InputTextField } from './TextField/InputTextField';
 import { Tooltip } from './Tooltip/Tooltip';
 import { Fade } from './Transitions/Fade';
@@ -493,6 +494,38 @@ describe('own-core resources are released', () => {
     view.rerender(tree(true));
     act(() => {
       vi.advanceTimersByTime(50);
+    });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Snackbar (auto-hide timer, document keydown, window blur/focus, ClickAway, Grow): open, time out, close, unmount', () => {
+    const before = baseline();
+    const onClose = vi.fn();
+    const tree = (open: boolean) => <Snackbar open={open} autoHideDuration={3000} onClose={onClose} message="Saved" />;
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    act(() => {
+      vi.advanceTimersByTime(3100);
+    });
+    expect(onClose).toHaveBeenCalledWith(null, 'timeout');
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Snackbar paused by hover and window blur, then unmounted while open', () => {
+    const before = baseline();
+    const view = render(<Snackbar open autoHideDuration={3000} onClose={() => undefined} message="Saved" />);
+    const root = document.querySelector('.MuiSnackbar-root') as HTMLElement;
+    fireEvent.mouseEnter(root);
+    act(() => void window.dispatchEvent(new Event('blur')));
+    fireEvent.mouseLeave(root);
+    act(() => {
+      vi.advanceTimersByTime(100);
     });
     done(view);
     settle();
