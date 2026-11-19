@@ -817,3 +817,26 @@ Merged A's tip e002abc (edf9c0d; mui-compat.scss conflict: both appended lines k
 6. Size: Accordion eager closure 133.8 → 48.3 KB gzip, no emotion runtime.
 7. Consumers: rc-webapp 11 files; consumer CSS (WhatIsCard, AiVisibilitySearchesAndAnswersCard) targets `.MuiAccordion-root.Accordion-container .MuiAccordionSummary-root .MuiAccordionSummary-content` — kept. Collision: rc-webapp `[data-open="true"]` (ChronicleEntry.module) is on its own module class, not Accordion. WordPress export → smoke patch sent to A.
 8. Biome: 2 kept patterns (fragment fallback `?? <></>`, effect deps) are verbatim from the former code; changing them would change behaviour.
+
+### StarRating remount growth: classified NOT a leak (browser bookkeeping of in-flight animations)
+Probe (watchdog brief; Chromium 1148 headless via Playwright, `--expose-gc`, no Storybook): esbuild bundle of the built `dist/index-StarRating.js` (+ dist/vanguard.css) in a bare page; remount = re-render with a new key (as forceRemount); metrics via CDP `Performance.getMetrics` after 2× `HeapProfiler.collectGarbage`; `document.getAnimations().length`. Control = plain `<div>` of 5 `<svg><path>` animated by the same `fillup .8s ease`. Scripts: scratchpad `starprobe/` (entry.tsx, run.mjs).
+
+| run (React build) | cycles × wait | nodes base → mounted mid → end | after clear | after 10 s idle + GC | anims mounted / after clear | listeners |
+|---|---|---|---|---|---|---|
+| A StarRating, prod | 200 × 0 | 16 → 67 → 67 | 16 | 16 | 15 / 0 | 154 → 161 → 154 |
+| B StarRating, prod | 60 × 1 s | 16 → 67 → 67 | 16 | 16 | 0 / 0 | 154 → 161 → 154 |
+| C plain div, prod | 200 × 0 | 16 → 38 → 38 | 27 | 16 | 5 / 0 | 154 flat |
+| D plain div, prod | 60 × 1 s | 16 → 27 → 27 | 16 | 16 | 0 / 0 | 154 flat |
+| A StarRating, dev | 200 × 0 | 29 → 275 → 275 | 80 | 29 | 15 / 0 | 154 → 161 → 154 |
+| B StarRating, dev | 40 × 1 s | 29 → 262 → 262 | 29 | 29 | 0 / 0 | 154 → 161 → 154 |
+| C plain div, dev | 200 × 0 | 16 → 27 → 27 | 16 | 16 | 5 / 0 | 154 flat |
+
+Answers:
+1. Per cycle: no growth. The count is the same at cycle 100 and cycle 200, in prod and in dev, with or without a 1 s wait.
+2. Idle: after 200 cycles plus 10 s idle and GC, nodes and listeners are back at baseline exactly.
+3. `document.getAnimations()`: never grows. It holds only the live instance's 15 animations (5 stars × 3 paths) and drops to 0 on clear.
+4. Transient retention: unmounting mid-animation leaves one instance's worth of detached nodes (+51 dev, +11 for the plain div). These are released once the animation timeline moves past them. The plain div with the same keyframes shows the same effect.
+
+Conclusion: this is Blink holding detached elements that have in-flight CSS animations until the next animation tick. It is bounded at one instance and does not accumulate, so it is not a leak. No code change.
+
+Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, not even per cycle. The difference is the harness: Storybook dev instrumentation (actions/interactions, the DevTools hook) can keep the args and fibers of earlier renders. I've asked for a post-idle sample (10 s idle + forced GC) of the Storybook scenario.
