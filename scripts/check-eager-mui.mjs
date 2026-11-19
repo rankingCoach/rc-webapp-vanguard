@@ -15,6 +15,22 @@ import path from 'node:path';
 const root = process.cwd();
 const graph = JSON.parse(fs.readFileSync(path.join(root, '.vg-build/module-graph.dist.json'), 'utf8'));
 const isMui = (id) => /[\\/]node_modules[\\/](\.pnpm[\\/][^\\/]+[\\/]node_modules[\\/])?@mui[\\/]/.test(id);
+const isMuiOrEmotion = (id) => isMui(id) || /[\\/]node_modules[\\/](\.pnpm[\\/][^\\/]+[\\/]node_modules[\\/])?@emotion[\\/]/.test(id);
+
+/**
+ * Context-only @mui modules allowed in an eager graph (watchdog decision, plan §36.3): a React context works by object
+ * identity, so MUI's own context module is kept instead of a copy that would silently stop honouring MUI's provider.
+ * Each entry: exact module path inside node_modules, byte cap, one-line reason. On the next-major removal list.
+ */
+const ALLOW_LIST = [
+  {
+    module: '@mui/system/RtlProvider/index',
+    capBytes: 2048,
+    reason: "MUI's RtlContext (Menu routes RTL to MUI; _MenuOwnRouting uses RtlProvider directly)",
+  },
+];
+const allowEntry = (id) =>
+  ALLOW_LIST.find((a) => id.replace(/\\/g, '/').replace(/\.[cm]?js$/, '').endsWith(`/node_modules/${a.module}`));
 
 const eagerClosure = (start) => {
   const seen = new Set();
@@ -56,7 +72,7 @@ const muiBytes = (files) => {
   const pkgs = new Set();
   for (const f of files)
     for (const [id, n] of Object.entries(graph[f]?.modules ?? {}))
-      if (isMui(id)) {
+      if (isMui(id) && !allowEntry(id)) {
         bytes += n;
         pkgs.add(id.match(/@mui[\\/][^\\/]+/)[0].replace('\\', '/'));
       }
@@ -68,6 +84,22 @@ const rows = [...exportsToFile.entries()]
   .filter((r) => r.bytes > 0)
   .sort((a, b) => b.bytes - a.bytes || a.name.localeCompare(b.name));
 
+// Allow-list guards: each allow-listed module stays under its cap and its own eager graph pulls no further
+// @mui/* or @emotion/* module (so the entry cannot quietly grow).
+const allowProblems = [];
+const allowSeen = new Set();
+for (const [file, info] of Object.entries(graph))
+  for (const [id, n] of Object.entries(info.modules)) {
+    const entry = allowEntry(id);
+    if (!entry) continue;
+    allowSeen.add(entry.module);
+    if (n > entry.capBytes) allowProblems.push(`${entry.module}: ${n} B > cap ${entry.capBytes} B`);
+    for (const dep of eagerClosure(file))
+      for (const other of Object.keys(graph[dep]?.modules ?? {}))
+        if (other !== id && isMuiOrEmotion(other) && !allowEntry(other))
+          allowProblems.push(`${entry.module}: its graph pulls ${other.replace(/.*node_modules[\\/]/, '')}`);
+  }
+
 const args = new Set(process.argv.slice(2));
 if (args.has('--wordpress-table')) {
   const wpSrc = fs.readFileSync(path.join(root, 'src/index-wordpress.ts'), 'utf8');
@@ -78,7 +110,11 @@ if (args.has('--wordpress-table')) {
   console.log(`WordPress exports with @mui code in their graph: ${wpRows.length} of ${wpNames.size}`);
   for (const r of wpRows) console.log(`  ${r.name}\t${r.bytes} B\t${r.pkgs.join(', ')}`);
 } else {
-  console.log(`eager @mui: ${rows.length} of ${exportsToFile.size} public exports`);
+  console.log(
+    `eager @mui: ${rows.length} of ${exportsToFile.size} public exports (+${allowSeen.size} allow-listed context modules)`,
+  );
   for (const r of rows) console.log(`  ${r.name}\t${r.bytes} B\t${r.pkgs.join(', ')}`);
 }
+for (const p of allowProblems) console.log(`ALLOW-LIST VIOLATION: ${p}`);
+if (allowProblems.length > 0) process.exit(1);
 if (args.has('--assert-zero') && rows.length > 0) process.exit(1);
