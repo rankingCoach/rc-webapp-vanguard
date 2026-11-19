@@ -1,5 +1,6 @@
-import { Fade as MuiFade } from '@mui/material';
 import React from 'react';
+
+import { Fade as OwnFade } from '../../primitives/react/Transitions/Fade';
 
 export interface FadeProps {
   /** Fades the child in while true, out while false. */
@@ -20,12 +21,12 @@ export interface FadeProps {
 
 /**
  * Opacity transition that keeps its child mounted (unlike AnimatedConditional, which unmounts),
- * so refs and listeners on the child survive while it is hidden.
+ * so refs and listeners on the child survive while it is hidden. Runs on the own Fade primitive (MUI 9.5 parity).
  */
 export const Fade = (props: FadeProps) => {
   const { in: isIn, children, timeout, appear, mountOnEnter, unmountOnExit, onEntered, onExited } = props;
   return (
-    <MuiFade
+    <OwnFade
       in={isIn}
       timeout={timeout}
       appear={appear}
@@ -35,6 +36,6 @@ export const Fade = (props: FadeProps) => {
       onExited={onExited}
     >
       {children}
-    </MuiFade>
+    </OwnFade>
   );
 };
