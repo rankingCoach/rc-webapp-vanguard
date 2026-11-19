@@ -1501,10 +1501,18 @@ eager. After the text-field port and before DatePicker S1, port separate flip an
 popper.js differential across placement, boundary, portal mode and scroll offsets and a paired planner check.
 
 **Corrected packed count at `32a6b93`: 25 of 298 eager exports, plus one allow-listed context module.** This build
-includes the restored planner fallback. The ProgressBar split is expected to reduce this to 24 after its exact-SHA
-verification and merge. WordPress reports 4 of 64. The shared H19b / H16c pack's 4,231 dist files match the build
+includes the restored planner fallback. WordPress reports 4 of 64. The shared H19b / H16c pack's 4,231 dist files match the build
 and its WordPress graph reaches 336 files with zero missing targets. The eager reports are in
 `/Users/a.kott/vanguard-verify/logs/32a6b93a2683ea766d4406fae4693e918dbd3a93-h19b-h16c/`.
+
+**ProgressBar integration (decided-by-watchdog).** `f94d932` passed against evidence from the original pack and a
+verified rebuild of the same source. The attempted `d4cdc1d`-only follow-up placed the ProgressBar spec at the same
+insertion point as the MenuItem story entry. The watchdog approved aborting that attempt, merging `9015f5c` and
+retaining both entries. The branch merge at `5405cff` included both entries cleanly. The preload audit found 22
+allow-listed files (17 specs, five Storybook files), with zero unexpected or stale entries. Targeted ProgressBar and
+MenuItem specs were green, 38/38. The expected post-merge eager count is **24 of 298**, plus the same context module:
+the pre-merge list has ProgressBar, and its MUI route is now lazy. The graph on disk still belongs to `32a6b93`;
+the H20 package gate will measure the merged graph.
 
 **H19 masked field correction (decided-by-watchdog).** `4d88e97` uses MUI InputAdornment inside DateRangePicker's
 masked MUI TextField. The real-picker differential pins its full class attribute. The preset field, DateRangeInput
