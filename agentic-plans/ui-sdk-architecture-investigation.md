@@ -1276,8 +1276,18 @@ Pending full run: 501d8cb (styled-components dropped, package.json).
 7. **Verifier 1 at 277bc04.** H16b passed scroll lock, the other ModalHost callers and first-render readiness.
    It failed on the BusinessProfile edit-drawer tooltip alone: x506 after fonts loaded (10/10 per theme) vs
    baseline x514 (light 10/10, dark 9/10). The tooltip's width increased from 163.6 to 171.1 px while the anchor
-   stayed the same size. Popper now updates on a font event when its own layout size changes. The targeted
-   recheck is with verifier 1 on `c8e69a2`, pack `pkg-20b`, against `.472`.
+   stayed the same size. Popper now updates on a font event when its own layout size changes. Verifier 1 is
+   rechecking `32a6b93` against the rebuilt `.472` shadow.
+8. **H16c geometry diagnostic.** With the same settled 171.1 px tooltip and an unconstrained top placement, the
+   MUI/own DOM differential gives x514 for an anchor centre at 599.8 px and x506 for one at 591.8 px. Reducing the
+   viewport from 1280 to 1265 px with the first anchor fixed leaves x514 on both. These anchor centres are inputs,
+   not measured story values. An 8 px anchor movement translates the popper and arrow together. Body scroll-lock
+   padding can move a centred layout by about half the scrollbar gutter. A boundary/padding change can shift a
+   clipped popper despite an unchanged anchor; compare the effective placement and popper's residual from its
+   centred left edge. The [guarded-page probe](./mui-upgrade-gates/h16c-tooltip-geometry.cjs) records the anchor and
+   arrow rects, clipping ancestors, viewport, offset parent, body padding and scrollbar gutter. The rebuilt light
+   pilot gave x506 with the arrow centred in 9/9 rendered `.472` samples (one capture missing), same x and arrow
+   offset as 10/10 on `32a6b93`. The paired verifier verdict determines H16c.
 
 ## 36. DatePicker off @mui/x-date-pickers (staged, 2026-11-19)
 

@@ -72,6 +72,51 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+it('centres the settled BusinessProfile tooltip on the same reference as MUI', async () => {
+  const floatingWidth = 171.1;
+  const html = document.documentElement;
+  const width = vi.spyOn(html, 'clientWidth', 'get');
+  vi.spyOn(html, 'clientHeight', 'get').mockReturnValue(900);
+  const getRect = HTMLElement.prototype.getBoundingClientRect;
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+    if (this.dataset.testid === 'business-profile-popper') return rect(0, 40, 0, floatingWidth);
+    return getRect.call(this);
+  });
+  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function (this: HTMLElement) {
+    return this.dataset.testid === 'business-profile-popper' ? 171 : 0;
+  });
+  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
+    return this.dataset.testid === 'business-profile-popper' ? 40 : 0;
+  });
+
+  const horizontalOrigin = async (Popper: React.ElementType, center: number, viewport: number) => {
+    width.mockReturnValue(viewport);
+    const anchor = document.createElement('button');
+    document.body.append(anchor);
+    anchor.getBoundingClientRect = () => rect(300, 24, center - 12, 24);
+    const view = render(
+      <Popper open anchorEl={anchor} placement="top" data-testid="business-profile-popper">
+        <span>{'Edit business details'}</span>
+      </Popper>,
+    );
+    try {
+      await act(async () => {});
+      const popper = view.getByTestId('business-profile-popper');
+      expect(popper.getAttribute('data-popper-placement')).toBe('top');
+      return popper.style.transform.match(/^translate(?:3d)?\(([-\d.]+)px,/)?.[1];
+    } finally {
+      view.unmount();
+      anchor.remove();
+    }
+  };
+
+  // The centres are diagnostic inputs. The two browser builds still need to report their actual anchor rects.
+  for (const [center, viewport, expected] of [[599.8, 1280, '514'], [599.8, 1265, '514'], [591.8, 1280, '506']] as const) {
+    expect(await horizontalOrigin(MuiPopper, center, viewport)).toBe(expected);
+    expect(await horizontalOrigin(OwnPopper, center, viewport)).toBe(expected);
+  }
+});
+
 describe('OwnPopper update timing equals MUI Popper', () => {
   it('positions after the commit, so a later layout effect in the same commit is picked up', async () => {
     const mui = await run(MuiPopper);
