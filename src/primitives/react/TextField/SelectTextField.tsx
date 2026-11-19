@@ -14,7 +14,7 @@ const UNSELECTED_MOUSE_UP_DELAY = 200;
 
 /** Props as MUI v9 TextField receives them after Vanguard's legacy-slot mapping (MuiTextField.tsx). */
 export interface SelectTextFieldProps extends AnyProps {
-  id: string;
+  id?: string;
   select: true;
   children?: React.ReactNode;
   slots?: { inputLabel?: React.ElementType } & AnyProps;
@@ -70,7 +70,7 @@ const ArrowDropDown = (props: { className?: string }) => (
  */
 export const SelectTextField = (props: SelectTextFieldProps) => {
   const {
-    id,
+    id: idProp,
     autoFocus,
     children,
     className,
@@ -106,6 +106,9 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
     ...rootRest
   } = props;
   const vgType = useVanguardTypography() === 'vanguard' ? 'vg-typography-vanguard' : '';
+  // MUI TextField always has an id (useId when none is given).
+  const autoId = useId();
+  const id = idProp ?? autoId;
   const inputSlot = slotProps?.input ?? {};
   const htmlInput = slotProps?.htmlInput ?? {};
   const labelSlot = slotProps?.inputLabel ?? {};
@@ -155,7 +158,7 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
   const shrink = labelSlot.shrink ?? (focused || filled || adornedStart);
   const hasLabel = label != null && label !== '';
   const labelId = labelIdProp ?? (hasLabel ? `${id}-label` : undefined);
-  const helperId = helperText != null ? `${id}-helper-text` : undefined;
+  const helperId = helperText != null && id ? `${id}-helper-text` : undefined;
   const nativeInputId = useId();
   const listboxId = useId();
 
@@ -582,7 +585,8 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         aria-haspopup="listbox"
         aria-readonly={readOnly ? 'true' : undefined}
         aria-label={htmlInput['aria-label']}
-        aria-labelledby={[labelId, SelectDisplayProps.id ?? id].filter(Boolean).join(' ')}
+        // MUI 9.5 SelectInput: the label id only (v5 joined the button id).
+        aria-labelledby={labelId}
         aria-describedby={helperId}
         aria-required={required ? 'true' : undefined}
         aria-invalid={error ? 'true' : undefined}
@@ -607,7 +611,8 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
           disabled ? 'Mui-disabled' : '',
           SelectDisplayProps.className ?? '',
         )}
-        id={SelectDisplayProps.id ?? id}
+        // MUI SelectInput buttonId: SelectDisplayProps.id (TextField / Select put `id` there), else the name fallback.
+        id={SelectDisplayProps.id ?? id ?? (name ? `mui-component-select-${name}` : undefined)}
       >
         {isEmptyDisplay(display) ? (
           <span className="notranslate" aria-hidden="true">
