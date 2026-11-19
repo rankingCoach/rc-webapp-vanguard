@@ -6,12 +6,9 @@ import { Backdrop } from '../../primitives/react/Backdrop/Backdrop';
 import { OwnPopper } from '../../primitives/react/Popper/Popper';
 import { resolvePopperOptions } from '../../primitives/react/Popper/popper-options';
 import { Portal } from '../../primitives/react/Portal/Portal';
-import { lazyFallback } from '../_internal/lazy-fallback';
-
-// MUI's Popper route behind a lazy boundary (plan §36.2 B.3), shared with PopoverPopper.
-const MuiPopper = lazyFallback(
-  () => import('../Popover/PopoverPopper/MuiPopperFallback') as never,
-) as React.ElementType;
+// EngagementPlanner centers a portaled PopoverModal. Its flip and overflow boundaries differ, so the MUI route
+// must render synchronously until the own placement primitive models them independently (plan §36.3).
+import MuiPopper from '../Popover/PopoverPopper/MuiPopperFallback';
 
 /**
  * Top navigation has 1030 so we need at least that
