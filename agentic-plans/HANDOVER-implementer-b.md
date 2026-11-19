@@ -180,7 +180,8 @@ Verify any row with `git merge-base --is-ancestor <sha> feature/ui-sdk-architect
 ## 7. OPEN: exact next steps
 
 1. **f94d932: ProgressBar MUI buffer/query route behind a lazy boundary.**
-   1.1 Handed to verifier 2 (queued after their H19) with all three reachability results. The evidence is in the log,
+   1.1 Handed to verifier 2. Verifier 2 confirmed it is queued immediately after H19 and will verify that exact SHA.
+       All three reachability results went with it. The evidence is in the log,
        last section.
    1.2 On PASS: tell A "READY TO MERGE f94d932". A merges only that exact SHA.
 2. **Allow-list follow-up for f94d932: COMMITTED as `d4cdc1d`.**
@@ -218,9 +219,10 @@ Verify any row with `git merge-base --is-ancestor <sha> feature/ui-sdk-architect
        1.2.2 last block not loaded;
        1.2.3 a consumer rule winning (the watchdog wants 1.2.2/1.2.3 logged as a D15 order data point).
    1.3 No rendering effect: CSS width/height do nothing on `<path>`.
-2. **`slider-slidermuicontract--drag-in-real-browser`** (A's story) never completes under a plain story load, on
-   both sides. Verifier 2 is to say whether it completes in their runner. Otherwise A needs a `!test`-style tag
-   with a reason, or a fix.
+2. **`slider-slidermuicontract--drag-in-real-browser`** (A's story): RESOLVED as a scan artefact.
+   2.1 It never completes under B's plain static-story load (no play runner).
+   2.2 Verifier 2's saved G10 story-runner result shows it PASSED at 0cac8bd (`v2/out/par/g10-stories.json`).
+   2.3 Not re-run at the current tip. Only act if a story-runner run fails it.
 3. **tsc error in `src/helpers/hex-to-rgba.ts(8,41)` TS2741** (A's eb0df11). Reported to A; check whether it is
    fixed after the next merge.
 4. **A's preload `beforeAll` hook timeout** (cold cache: 5/6 files at the 10 s hook, setup 52.5 s; full project
