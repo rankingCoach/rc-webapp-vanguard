@@ -2,12 +2,12 @@ import './PopoverPopper/PopoverPopper.scss';
 
 import { useWindowResize } from '@custom-hooks/use-window.resize';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Tooltip } from '@mui/material';
-import { TooltipClasses } from '@mui/material/Tooltip';
+import type { TooltipClasses } from '@mui/material/Tooltip';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
 import React, { useEffect, useRef, useState } from 'react';
+import { Tooltip } from '../../primitives/react/Tooltip/Tooltip';
 
 export type PopoverTheme = 'default' | 'dark';
 export type PopoverPosition = 'bottom' | 'top' | 'left' | 'right';
@@ -133,7 +133,11 @@ export const Popover = (props: PopoverProps) => {
    */
   function renderChildren() {
     if (wrapChildren) {
-      return <span key={1}>{children}</span>;
+      return (
+        <span key={1} data-slot="popover-trigger">
+          {children}
+        </span>
+      );
     }
     return children;
   }
@@ -184,7 +188,7 @@ export const Popover = (props: PopoverProps) => {
         },
       }}
     >
-      {renderChildren()}
+      {renderChildren() as React.ReactElement<Record<string, unknown>>}
     </Tooltip>
   );
 };

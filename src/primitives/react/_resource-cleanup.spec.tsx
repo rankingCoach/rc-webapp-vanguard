@@ -3,12 +3,15 @@ import React, { useRef, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultLayerStack } from '../core/layer-stack';
 import { defaultModalManager } from '../core/modal-manager';
+import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
 import { ClickAway } from './ClickAway/ClickAway';
 import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
+import { Portal } from './Portal/Portal';
 import { InputTextField } from './TextField/InputTextField';
+import { Tooltip } from './Tooltip/Tooltip';
 import { Fade } from './Transitions/Fade';
 
 /**
@@ -138,6 +141,12 @@ const settle = () =>
     vi.advanceTimersByTime(2000);
   });
 
+const TooltipHarness = ({ open }: { open: boolean }) => (
+  <Tooltip open={open} title={<b>{'tip'}</b>} arrow placement="top">
+    <span>{'trigger'}</span>
+  </Tooltip>
+);
+
 const MenuPopupHarness = ({ open }: { open: boolean }) => {
   const anchor = useRef<HTMLButtonElement>(null);
   return (
@@ -230,6 +239,85 @@ describe('own-core resources are released', () => {
     settle();
     view.rerender(<FadePopperHarness open={false} />);
     settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Tooltip (popper listeners and observer, Grow exit, touch timers, body user-select)', () => {
+    const before = baseline();
+    const vendor = () => (document.body.style as unknown as { WebkitUserSelect?: string }).WebkitUserSelect;
+    // Browsers report '' for an unset style property; jsdom's vendor-prefixed expando starts undefined (MUI's
+    // restore logic, ported as-is, skips an undefined previous value).
+    (document.body.style as unknown as { WebkitUserSelect?: string }).WebkitUserSelect = '';
+    const userSelectBefore = vendor();
+    const view = render(<TooltipHarness open={false} />);
+    view.rerender(<TooltipHarness open />);
+    settle();
+    const trigger = view.getByText('trigger');
+    // Long press pending (700 ms timer, body user-select none), then unmount mid-press.
+    fireEvent.touchStart(trigger);
+    fireEvent.touchEnd(trigger);
+    fireEvent.touchStart(trigger);
+    view.rerender(<TooltipHarness open={false} />);
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+    expect(vendor()).toBe(userSelectBefore);
+  });
+
+  it('OwnPopper font-set listener: only while open, removed on close and unmount; absent font set is a no-op', () => {
+    const fonts = new EventTarget();
+    const live = new Set<unknown>();
+    const add = fonts.addEventListener.bind(fonts);
+    const remove = fonts.removeEventListener.bind(fonts);
+    fonts.addEventListener = ((type: string, fn: EventListener) => {
+      live.add(`${type}`);
+      add(type, fn);
+    }) as typeof fonts.addEventListener;
+    fonts.removeEventListener = ((type: string, fn: EventListener) => {
+      live.delete(`${type}`);
+      remove(type, fn);
+    }) as typeof fonts.removeEventListener;
+    Object.defineProperty(document, 'fonts', { configurable: true, value: fonts });
+    try {
+      const view = render(<PopperHarness open={false} />);
+      settle();
+      expect([...live]).toEqual([]);
+      view.rerender(<PopperHarness open />);
+      settle();
+      expect([...live]).toEqual(['loadingdone']);
+      view.rerender(<PopperHarness open={false} />);
+      settle();
+      expect([...live]).toEqual([]);
+      view.rerender(<PopperHarness open />);
+      settle();
+      done(view);
+      settle();
+      expect([...live]).toEqual([]);
+    } finally {
+      delete (document as unknown as { fonts?: unknown }).fonts;
+    }
+    // jsdom has no font set: opening a popper must not throw.
+    const view = render(<PopperHarness open />);
+    settle();
+    done(view);
+    settle();
+  });
+
+  it('Backdrop in a Portal (Fade timers, portal node), closed mid-exit then unmounted', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Portal>
+        <Backdrop open={open} zIndex={1031} onMouseDown={() => undefined} />
+      </Portal>
+    );
+    const view = render(tree(true));
+    settle();
+    view.rerender(tree(false));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     done(view);
     settle();
     expect(leftovers(before)).toEqual(CLEAN);

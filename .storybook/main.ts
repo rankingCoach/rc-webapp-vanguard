@@ -38,6 +38,21 @@ const config: StorybookConfig = {
     // "../src/common/**/_*.stories.@(js|jsx|mjs|ts|tsx)"
     // Opted-in common stories (VAN-82)
     "../src/common/SectionMissing/_SectionMissing.stories.tsx",
+    // Implementer B (26527b3): indexable common stories, explicit list (one un-indexable story breaks indexing for all).
+    "../src/common/DashboardCard/_DashboardCard.stories.tsx",
+    "../src/common/EditableCard/_EditableCard.stories.tsx",
+    "../src/common/ErrorText/_ErrorText.stories.tsx",
+    "../src/common/ExpandableItem/_ExpandableItem.stories.tsx",
+    "../src/common/GooglePartnerBadge/_GooglePartnerBadge.stories.tsx",
+    "../src/common/InfoText/_InfoText.stories.tsx",
+    "../src/common/PageSectionLoading/_PageSectionLoading.stories.tsx",
+    "../src/common/RecommendationCard/_RecommendationCard.stories.tsx",
+    "../src/common/StatisticsBoard/StatisticsBoardItem/_StatisticsBoardItem.stories.tsx",
+    "../src/common/TextIcon/_TextIcon.stories.tsx",
+    "../src/common/Tutorial/TutorialStep/_TutorialStep.stories.tsx",
+    "../src/common/Tutorial/_Tutorial.stories.tsx",
+    "../src/common/_Palette.stories.tsx",
+    "../src/common/_Spacing.stories.tsx",
   ],
 
   addons: [

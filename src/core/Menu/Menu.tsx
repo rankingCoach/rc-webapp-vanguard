@@ -1,13 +1,14 @@
+import styles from './Menu.module.scss';
 import { uuidv4 } from '@helpers/generate-uid';
 import { Menu as MuiMenu, MenuProps as MuiMenuProps } from '@mui/material';
 import { useThemeProps } from '@mui/material/styles';
+import { useRtl } from '@mui/system';
 import type { VanguardLegacyMenuProps } from '@vanguard/_internal/mui-legacy-props';
 import { mapLegacyModalAliases, mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { useEffect, useRef, useState } from 'react';
-
-import styles from './Menu.module.scss';
+import { MenuPopup } from '../../primitives/react/Menu/MenuPopup';
 
 export type MenuItemConfig = MenuItemProps & {
   key?: React.Key;
@@ -24,6 +25,37 @@ export type MenuProps = {
   VanguardLegacyMenuProps & {
     children?: React.ReactNode;
   };
+
+/** Props (after legacy-slot mapping) the own-core Menu models; any other key keeps MUI's Menu. */
+const OWN_MENU_PROPS = new Set([
+  'open',
+  'anchorEl',
+  'onClose',
+  'anchorOrigin',
+  'transformOrigin',
+  'id',
+  'slotProps',
+  'slots',
+  'autoFocus',
+  'disableAutoFocusItem',
+]);
+const OWN_MENU_SLOTS = new Set(['paper', 'root', 'list']);
+
+/** Slot-object keys the own popup renders like MUI; anything else (elevation, disablePadding, sx, ...) keeps MUI. */
+const isModelledSlotKey = (key: string) =>
+  key === 'className' ||
+  key === 'style' ||
+  key === 'ref' ||
+  key === 'id' ||
+  key.startsWith('data-') ||
+  key.startsWith('aria-') ||
+  /^on[A-Z]/.test(key);
+const isModelledSlot = (slot: unknown) =>
+  slot === undefined || (typeof slot === 'object' && slot !== null && Object.keys(slot).every(isModelledSlotKey));
+
+/** An item the own option renders like MUI: not another component (`component`, `href` → MUI renders that element). */
+const isModelledItem = (props: Record<string, unknown> | undefined) =>
+  !props || (props.component === undefined && props.href === undefined);
 
 export const Menu = (inProps: MenuProps) => {
   const { testId, items, children, width, height, maxWidth, maxHeight, disableEscapeKeyDown, ...rest } = useThemeProps({
@@ -83,6 +115,65 @@ export const Menu = (inProps: MenuProps) => {
     root: typeof root === 'function' ? (state: Parameters<typeof root>[0]) => stackRoot(root(state)) : stackRoot(root),
   };
 
+  const children_ = items
+    ? items.map(({ key, ...itemProps }, index) => <MenuItem key={key ?? index} {...itemProps} />)
+    : children;
+  const onCloseGuarded = (event: object, reason: 'escapeKeyDown' | 'backdropClick' | 'tabKeyDown') => {
+    if (disableEscapeKeyDown && reason === 'escapeKeyDown') return;
+    rest.onClose?.(event as never, reason);
+  };
+
+  // Group B: the own core renders Menu (MenuPopup = ModalHost + Paper + Grow + MenuList) for the props it models,
+  // which is every Menu call in rc-webapp (anchorEl/open/onClose/items/anchorOrigin/transformOrigin/PaperProps/size,
+  // plan §31). Anything else (function slots, slots/components, transitions, keepMounted, anchorReference, refs, ...)
+  // keeps MUI's Menu.
+  const ownPaper = slotProps.paper;
+  const ownList = mapped.slotProps?.list;
+  const ownRoot = slotProps.root;
+  const isRtl = useRtl();
+  const usesOnlyModelled =
+    !isRtl &&
+    Object.keys(mapped).every((k) => OWN_MENU_PROPS.has(k)) &&
+    // legacy-slot mapping always adds `slots`; only an empty one is modelled
+    Object.values((mapped.slots ?? {}) as Record<string, unknown>).every((v) => v === undefined) &&
+    typeof ownPaper !== 'function' &&
+    typeof ownList !== 'function' &&
+    typeof ownRoot !== 'function' &&
+    Object.keys(mapped.slotProps ?? {}).every((k) => OWN_MENU_SLOTS.has(k)) &&
+    // slot contents too: the caller's objects, before the size / stacking additions
+    isModelledSlot(paper) &&
+    isModelledSlot(ownList) &&
+    isModelledSlot(root) &&
+    (items ?? []).every((item) => isModelledItem(item as Record<string, unknown>)) &&
+    React.Children.toArray(children).every(
+      (child) => !React.isValidElement(child) || isModelledItem(child.props as Record<string, unknown>),
+    );
+  if (usesOnlyModelled && rest.open !== undefined) {
+    const { className: rootClass, ...rootRest } = (ownRoot ?? {}) as { className?: string } & Record<string, unknown>;
+    return (
+      <MenuPopup
+        open={Boolean(rest.open)}
+        anchorEl={(typeof rest.anchorEl === 'function' ? rest.anchorEl() : rest.anchorEl) as HTMLElement | null}
+        onClose={onCloseGuarded}
+        id={rest.id}
+        // MUI 9.5 Menu's own defaults (not Popover's): hang below the anchor, grow from the top-left corner.
+        anchorOrigin={(rest.anchorOrigin ?? { vertical: 'bottom', horizontal: 'left' }) as never}
+        transformOrigin={(rest.transformOrigin ?? { vertical: 'top', horizontal: 'left' }) as never}
+        autoFocus={rest.autoFocus !== false}
+        autoFocusItem={!rest.disableAutoFocusItem}
+        rootProps={{
+          'data-testid': testId,
+          ...rootRest,
+          className: [styles.menu, rootClass].filter(Boolean).join(' '),
+        }}
+        paperProps={ownPaper as never}
+        listProps={ownList as never}
+      >
+        {children_}
+      </MenuPopup>
+    );
+  }
+
   return (
     <MuiMenu
       data-testid={testId}
@@ -95,7 +186,7 @@ export const Menu = (inProps: MenuProps) => {
         rest.onClose?.(event, reason);
       }}
     >
-      {items ? items.map(({ key, ...itemProps }, index) => <MenuItem key={key ?? index} {...itemProps} />) : children}
+      {children_}
     </MuiMenu>
   );
 };

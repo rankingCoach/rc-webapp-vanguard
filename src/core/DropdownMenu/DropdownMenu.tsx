@@ -1,14 +1,17 @@
+import styles from './DropdownMenu.module.scss';
 import { classNames } from '@helpers/classNames';
 import { uuidv4 } from '@helpers/generate-uid';
-import { ClickAwayListener, Fade, MenuItem, MenuList, Popper as MuiPopper } from '@mui/material';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { Icon, IconProps } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import { Text } from '@vanguard/Text/Text';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
-
-import styles from './DropdownMenu.module.scss';
+import { ClickAway } from '../../primitives/react/ClickAway/ClickAway';
+import { MenuList } from '../../primitives/react/Menu/MenuList';
+import { MenuOption } from '../../primitives/react/Menu/MenuOption';
+import { OwnPopper } from '../../primitives/react/Popper/Popper';
+import { Fade } from '../../primitives/react/Transitions/Fade';
 
 export interface DropdownMenuItemProps {
   selected?: boolean;
@@ -100,7 +103,7 @@ export const DropdownMenu = (props: DropdownMenuProps) => {
    */
   return (
     <ComponentContainer>
-      <MuiPopper
+      <OwnPopper
         style={{
           zIndex,
         }}
@@ -129,11 +132,12 @@ export const DropdownMenu = (props: DropdownMenuProps) => {
           <Fade {...TransitionProps} timeout={250}>
             <div>
               <div className={classNames(styles.arrow)} ref={setArrowRef} />
-              <ClickAwayListener onClickAway={onClickAway}>
+              <ClickAway onClickAway={onClickAway}>
                 <MenuList autoFocusItem={isOpen} className={styles.menu} onKeyDown={handleListKeyDown}>
                   {items.map((item, index) => {
                     return (
-                      <MenuItem
+                      <MenuOption
+                        role="menuitem"
                         key={index}
                         className={styles.item}
                         onClick={() => onItemClick(item.onClick)}
@@ -141,15 +145,15 @@ export const DropdownMenu = (props: DropdownMenuProps) => {
                       >
                         {item.iconName && <Icon {...item.iconProps}>{item.iconName}</Icon>}
                         <Text>{item.title}</Text>
-                      </MenuItem>
+                      </MenuOption>
                     );
                   })}
                 </MenuList>
-              </ClickAwayListener>
+              </ClickAway>
             </div>
           </Fade>
         )}
-      </MuiPopper>
+      </OwnPopper>
     </ComponentContainer>
   );
 };

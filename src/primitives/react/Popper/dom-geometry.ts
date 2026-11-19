@@ -212,3 +212,15 @@ export const getCompositeRect = (
     height: rect.height,
   };
 };
+
+/**
+ * popper `getLayoutRect` size: the client-rect size when it is within 1px of offsetWidth/offsetHeight (fractional
+ * layout), else offsetWidth/offsetHeight (a transformed element).
+ */
+export const layoutSize = (el: HTMLElement) => {
+  const r = el.getBoundingClientRect();
+  return {
+    width: Math.abs(r.width - el.offsetWidth) <= 1 ? r.width : el.offsetWidth,
+    height: Math.abs(r.height - el.offsetHeight) <= 1 ? r.height : el.offsetHeight,
+  };
+};

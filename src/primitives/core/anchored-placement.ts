@@ -58,6 +58,12 @@ export interface AnchoredPlacementInput {
    * returns its offset. `clientWidth`/`clientHeight` = the arrow's offset parent client size (default: floating).
    */
   arrow?: Size & { padding?: number; clientWidth?: number; clientHeight?: number };
+  /**
+   * popper `hide` modifier (on by default in popper.js). `referenceBoundary` = the clipping rect of the reference's
+   * own clipping parents (default: `boundary`).
+   */
+  hide?: boolean;
+  referenceBoundary?: Rect;
 }
 
 export interface AnchoredPlacementResult {
@@ -66,6 +72,8 @@ export interface AnchoredPlacementResult {
   placement: Exclude<Placement, 'auto' | 'auto-start' | 'auto-end'>;
   /** popper `arrow` modifier data: the arrow's offset on the main axis and how far it was clamped from centre. */
   arrow?: { x?: number; y?: number; centerOffset: number };
+  /** popper `hide` modifier data (`data-popper-reference-hidden` / `data-popper-escaped`). */
+  hide?: { isReferenceHidden: boolean; hasPopperEscaped: boolean };
 }
 
 const BASES: BasePlacement[] = ['top', 'bottom', 'right', 'left'];
@@ -298,6 +306,30 @@ const arrowOffset = (input: AnchoredPlacementInput, placement: Placement, at: Po
   return { [axis]: offset, centerOffset: offset - center } as { x?: number; y?: number; centerOffset: number };
 };
 
+/** popper `hide` modifier: is the reference fully clipped, has the floating element escaped the reference's box. */
+const hideData = (input: AnchoredPlacementInput, placement: Placement, prevented: Point) => {
+  const b = input.referenceBoundary ?? input.boundary;
+  const ref = input.clientReference ?? input.reference;
+  const referenceOverflow: Sides = {
+    top: b.y - ref.y,
+    bottom: ref.y + ref.height - (b.y + b.height),
+    left: b.x - ref.x,
+    right: ref.x + ref.width - (b.x + b.width),
+  };
+  const popperOverflow = detectOverflow(input, placement, 0, b);
+  const sideOffsets = (o: Sides, size: Size, p: Point) => ({
+    top: o.top - size.height - p.y,
+    right: o.right - size.width + p.x,
+    bottom: o.bottom - size.height + p.y,
+    left: o.left - size.width - p.x,
+  });
+  const anyClipped = (o: Sides) => [o.top, o.right, o.bottom, o.left].some((v) => v >= 0);
+  return {
+    isReferenceHidden: anyClipped(sideOffsets(referenceOverflow, input.reference, { x: 0, y: 0 })),
+    hasPopperEscaped: anyClipped(sideOffsets(popperOverflow, input.floating, prevented)),
+  };
+};
+
 /** The floating element's top-left (viewport coordinates) and final placement, as popper.js computes them. */
 export const anchoredPlacement = (input: AnchoredPlacementInput): AnchoredPlacementResult => {
   let placement = input.placement ?? 'bottom';
@@ -306,6 +338,7 @@ export const anchoredPlacement = (input: AnchoredPlacementInput): AnchoredPlacem
   const base = computeOffsets(input.reference, input.floating, placement);
   const o = offsetFor(placement, input.offset);
   let at = { x: base.x + o.x, y: base.y + o.y };
+  const beforePrevent = at;
   if (input.preventOverflow !== false) at = preventOverflow(input, placement, at);
   const result: AnchoredPlacementResult = {
     x: at.x,
@@ -313,6 +346,8 @@ export const anchoredPlacement = (input: AnchoredPlacementInput): AnchoredPlacem
     placement: placement as AnchoredPlacementResult['placement'],
   };
   if (input.arrow) result.arrow = arrowOffset(input, placement, at);
+  if (input.hide !== false)
+    result.hide = hideData(input, placement, { x: at.x - beforePrevent.x, y: at.y - beforePrevent.y });
   return result;
 };
 

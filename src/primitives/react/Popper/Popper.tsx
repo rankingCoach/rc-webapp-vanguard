@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import type { Placement } from '../../core/anchored-placement';
+import { Portal } from '../Portal/Portal';
 import { AnchorLike, computeAnchored } from './compute-anchored';
-import { listScrollParents } from './dom-geometry';
+import { layoutSize, listScrollParents } from './dom-geometry';
 import { PopperModifierLike, resolvePopperOptions } from './popper-options';
 import { initialPopperStyles, mapToStyles } from './popper-styles';
 
@@ -55,8 +55,8 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
   const update = useCallback(() => {
     const node = nodeRef.current;
     if (!node || !anchor || !open) return;
-    const result = computeAnchored(anchor, node, { ...options, altBoundary: Boolean(disablePortal) });
-    const size = { width: node.offsetWidth, height: node.offsetHeight };
+    const result = computeAnchored(anchor, node, options);
+    const size = layoutSize(node);
     Object.assign(
       node.style,
       mapToStyles({
@@ -69,6 +69,15 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
         ...options.computeStyles,
       }),
     );
+    // popper applyStyles, in its attribute order (hide's main-phase attributes, then computeStyles' placement):
+    // true → present (""), false / disabled → absent.
+    for (const [name, on] of [
+      ['data-popper-reference-hidden', result.hide?.isReferenceHidden],
+      ['data-popper-escaped', result.hide?.hasPopperEscaped],
+    ] as const) {
+      if (on) node.setAttribute(name, '');
+      else node.removeAttribute(name);
+    }
     node.setAttribute('data-popper-placement', result.placement);
     const arrowEl = options.input.arrow?.element as HTMLElement | undefined;
     if (arrowEl && result.arrow) {
@@ -88,7 +97,7 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
       );
     }
     setPlacement((prev) => (prev === result.placement ? prev : result.placement));
-  }, [anchor, open, options, disablePortal]);
+  }, [anchor, open, options]);
 
   const updateRef = useRef(update);
   updateRef.current = update;
@@ -108,13 +117,36 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     updateRef.current();
     // popper's eventListeners modifier: scroll on every scroll parent of anchor and popper, resize on window.
     const targets = [...('nodeType' in anchor ? listScrollParents(anchor as Element) : []), ...listScrollParents(node)];
-    const onEvent = () => updateRef.current();
+    // popper.js `update` is debounced into a microtask: handlers later in the same event (or other listeners that
+    // move the anchor) run first, and several events in one task cost one measurement.
+    let pending = false;
+    let cancelled = false;
+    const onEvent = () => {
+      if (pending) return;
+      pending = true;
+      queueMicrotask(() => {
+        pending = false;
+        if (!cancelled) updateRef.current();
+      });
+    };
     for (const t of targets) t.addEventListener('scroll', onEvent, { passive: true });
     const win = node.ownerDocument.defaultView ?? window;
     win.addEventListener('resize', onEvent, { passive: true });
+    // Beyond popper.js: an anchor that changes size without a render reaching the popper (a lazily loaded Icon inside
+    // the trigger, verifier handoff 10) re-positions it. MUI's result in that case was the settled position.
+    const RO = (win as typeof window).ResizeObserver;
+    const observer = RO && 'nodeType' in anchor ? new RO(onEvent) : null;
+    observer?.observe(anchor as Element);
+    // ResizeObserver never reports non-replaced inline boxes (an inline text anchor); a web font swapping in after
+    // open changes their width (verifier handoff 12, describe-child-chip 63 vs 66). Re-position when fonts load.
+    const fonts = (node.ownerDocument as Document).fonts as (EventTarget & FontFaceSet) | undefined;
+    fonts?.addEventListener?.('loadingdone', onEvent);
     return () => {
+      cancelled = true;
       for (const t of targets) t.removeEventListener('scroll', onEvent);
       win.removeEventListener('resize', onEvent);
+      observer?.disconnect();
+      fonts?.removeEventListener?.('loadingdone', onEvent);
     };
   }, [anchor, open, options.strategy, disablePortal]);
 
@@ -185,6 +217,11 @@ export const OwnPopper = (props: OwnPopperProps) => {
       style={{ position: 'fixed', top: 0, left: 0, display, ...style }}
     />
   );
-  // MUI Portal: no container (no anchorEl, no container prop) renders into document.body.
-  return disablePortal ? tooltip : createPortal(tooltip, container ?? document.body);
+  // MUI Popper renders PopperTooltip through Portal: portaled content mounts one commit later (nested overlays register
+  // outer first); no container (no anchorEl, no container prop) renders into document.body.
+  return (
+    <Portal disablePortal={disablePortal} container={container ?? document.body}>
+      {tooltip}
+    </Portal>
+  );
 };

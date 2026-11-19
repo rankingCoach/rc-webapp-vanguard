@@ -20,6 +20,8 @@ export interface ResolvedPopperOptions {
   unsupported: string[];
   placement: Placement;
   strategy: 'absolute' | 'fixed';
+  /** The clipping boundary flip and preventOverflow share (popper `altBoundary`; MUI default: !portal). */
+  altBoundary: boolean;
   input: Omit<AnchoredPlacementInput, 'reference' | 'floating' | 'boundary' | 'arrow'> & {
     arrow?: { element: Element | null; padding?: number };
   };
@@ -61,6 +63,16 @@ export const resolvePopperOptions = (props: {
       unsupported.push(`${m.name}.rootBoundary`);
   }
   const opts = (name: string) => (merged.get(name)?.enabled === false ? false : (merged.get(name)?.options ?? {}));
+  // The core clips flip and preventOverflow against one boundary; popper.js lets each choose.
+  const altOf = (name: string) => {
+    const o = opts(name);
+    return o === false ? undefined : Boolean(o.altBoundary ?? props.disablePortal);
+  };
+  const flipAlt = altOf('flip');
+  const preventAlt = altOf('preventOverflow');
+  if (flipAlt !== undefined && preventAlt !== undefined && flipAlt !== preventAlt)
+    unsupported.push('altBoundary(flip≠preventOverflow)');
+  const altBoundary = flipAlt ?? preventAlt ?? Boolean(props.disablePortal);
   const flip = opts('flip');
   const prevent = opts('preventOverflow');
   const offset = opts('offset');
@@ -71,6 +83,7 @@ export const resolvePopperOptions = (props: {
     unsupported,
     placement: props.popperOptions?.placement ?? props.placement ?? 'bottom',
     strategy: props.popperOptions?.strategy ?? 'absolute',
+    altBoundary,
     input: {
       offset: offset && Array.isArray(offset.offset) ? (offset.offset as [number, number]) : undefined,
       flip:
@@ -92,6 +105,7 @@ export const resolvePopperOptions = (props: {
               tetherOffset: prevent.tetherOffset,
             },
       arrow: arrow && arrow.element ? { element: arrow.element as Element, padding: arrow.padding } : undefined,
+      hide: opts('hide') !== false,
     },
     computeStyles: {
       gpuAcceleration: cs.gpuAcceleration ?? true,

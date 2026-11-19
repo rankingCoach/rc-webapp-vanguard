@@ -8,6 +8,8 @@ export type FocusSource = 'keyboard' | 'pointer' | null;
 export interface MenuListProps extends Omit<React.HTMLAttributes<HTMLUListElement>, 'children'> {
   /** Focus the selected item (else the first enabled one) when mounted / when this turns on (MUI `selectedMenu`). */
   autoFocusItem?: boolean;
+  /** MUI MenuList `autoFocus`: focus the list itself when no item takes the initial focus. */
+  autoFocus?: boolean;
   /** How the menu was opened (focus-visible on the first item only for keyboard). */
   focusSource?: FocusSource;
   disableListWrap?: boolean;
@@ -16,8 +18,10 @@ export interface MenuListProps extends Omit<React.HTMLAttributes<HTMLUListElemen
   [dataAttr: `data-${string}`]: unknown;
 }
 
+// MUI 9.5 MenuList manages its MenuItems only (own MenuOption and MUI MenuItem both carry MuiMenuItem-root): plain
+// children Select clones with role="option" (a search bar, a footer) get no tab stop and are not navigated.
 const items = (list: HTMLElement | null) =>
-  list ? Array.from(list.querySelectorAll<HTMLElement>(':scope > [role="option"], :scope > [role="menuitem"]')) : [];
+  list ? Array.from(list.querySelectorAll<HTMLElement>(':scope > .MuiMenuItem-root')) : [];
 
 const itemInfo = (el: HTMLElement) => ({
   // biome-ignore lint/performance/useDomNodeTextContent: MUI MenuList typeahead matches the rendered text (innerText, textContent fallback)
@@ -33,6 +37,7 @@ const itemInfo = (el: HTMLElement) => ({
 export const MenuList = (props: MenuListProps) => {
   const {
     autoFocusItem = false,
+    autoFocus = false,
     focusSource = null,
     disableListWrap = false,
     className,
@@ -46,6 +51,7 @@ export const MenuList = (props: MenuListProps) => {
 
   const itemCount = React.Children.count(children);
   const focusPending = useRef(false);
+  const listFocused = useRef(false);
 
   // Initial tab stop + focus: the first focusable selected item, else the first focusable one (MUI MenuList). Re-run
   // when the items change, so items that arrive after mount still get the tab stop / pending auto-focus.
@@ -68,6 +74,8 @@ export const MenuList = (props: MenuListProps) => {
     list.forEach((el, i) => {
       el.setAttribute('tabindex', i === active && !itemInfo(el).disabled ? '0' : '-1');
     });
+    // MUI MenuList focusInitialTarget: the active item when item focus is on and one exists, else the list itself
+    // when `autoFocus` is on.
     if (autoFocusItem && focusPending.current && active !== -1) {
       focusPending.current = false;
       try {
@@ -77,8 +85,12 @@ export const MenuList = (props: MenuListProps) => {
       } catch {
         list[active].focus();
       }
+    } else if (autoFocus && !listFocused.current) {
+      listFocused.current = true;
+      listRef.current?.focus();
     }
-  }, [autoFocusItem, focusSource, itemCount]);
+    if (!autoFocus) listFocused.current = false;
+  }, [autoFocusItem, autoFocus, focusSource, itemCount]);
 
   const moveTo = (list: HTMLElement[], index: number | null) => {
     if (index === null || !list[index]) return;

@@ -56,7 +56,9 @@ describe.each([
 
   it.skipIf(!built)('has no compat rule in the import-order part before it', () => {
     const [before, compat] = readFileSync(path, 'utf8').split(MUI_COMPAT_MARKER);
-    const early = [...selectorsOf(compat)].filter((s) => selectorsOf(before).has(s));
+    // Build the import-order selector set once (per compat selector it was quadratic over ~340 KB and timed out).
+    const beforeSet = selectorsOf(before);
+    const early = [...selectorsOf(compat)].filter((s) => beforeSet.has(s));
     expect(early).toEqual([]);
   });
 });

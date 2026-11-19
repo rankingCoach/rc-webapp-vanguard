@@ -227,3 +227,121 @@ export const StylesMatchMuiPopper: Story = {
     await expect(muiDrift.filter((name) => name !== 'inline-center-modal')).toEqual([]);
   },
 };
+
+/** Grows from empty to a 16×16 box after `delay` ms through its own state (like Icon's lazy SVG import). */
+const LateIcon = ({ delay }: { delay: number }) => {
+  const [loaded, setLoaded] = useState(false);
+  React.useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+  return loaded ? <span style={{ display: 'inline-block', width: 16, height: 16 }} /> : <span />;
+};
+
+const LateAnchor = () => {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  return (
+    <div style={{ padding: 40 }}>
+      <span ref={setAnchor} data-late-anchor style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        <LateIcon delay={150} />
+        {'trigger'}
+      </span>
+      {anchor ? (
+        <OwnPopper
+          open
+          anchorEl={anchor}
+          placement="bottom"
+          modifiers={[{ name: 'offset', options: { offset: [0, 20] } }]}
+          data-testid="late"
+        >
+          <div style={{ width: 120, height: 60, background: '#eee' }}>{'floating'}</div>
+        </OwnPopper>
+      ) : null}
+    </div>
+  );
+};
+
+/**
+ * Verifier handoff 10 (DropdownMenu `default`, 4px): the anchor's content loads after the popper opened (lazy Icon) and
+ * re-renders only itself. The own Popper must end where a fresh popper.js run puts it; MUI reached the settled spot.
+ */
+export const FollowsAnchorResizeAfterOpen: Story = {
+  render: () => <LateAnchor />,
+  play: async () => {
+    const el = await waitFor(() => {
+      const node = document.querySelector<HTMLElement>('[data-testid="late"]');
+      if (!node?.getAttribute('data-popper-placement')) throw new Error('not placed yet');
+      return node;
+    });
+    const anchor = document.querySelector<HTMLElement>('[data-late-anchor]') as HTMLElement;
+    await waitFor(() => expect(anchor.querySelector('span[style*="width: 16px"]')).not.toBeNull());
+    await new Promise((r) => setTimeout(r, 100));
+    const clone = el.cloneNode(true) as HTMLElement;
+    clone.removeAttribute('style');
+    Object.assign(clone.style, { position: 'absolute', top: '0', left: '0', visibility: 'hidden' });
+    el.parentNode?.appendChild(clone);
+    const inst = createPopper(anchor, clone, {
+      placement: 'bottom',
+      modifiers: [
+        { name: 'offset', options: { offset: [0, 20] } },
+        { name: 'eventListeners', enabled: false },
+      ],
+    });
+    await inst.update();
+    const fresh = clone.style.transform;
+    inst.destroy();
+    clone.remove();
+    await expect(el.style.transform).toBe(fresh);
+  },
+};
+
+const InlineAnchor = () => {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  return (
+    <div style={{ padding: 60 }}>
+      <span ref={setAnchor} data-inline-anchor style={{ fontFamily: 'monospace', fontSize: 12 }}>
+        {'3 Accounts'}
+      </span>
+      {anchor ? (
+        <OwnPopper open anchorEl={anchor} placement="top" data-testid="inline-late">
+          <div style={{ width: 140, height: 30, background: '#eee' }}>{'1001, 1002, 1003'}</div>
+        </OwnPopper>
+      ) : null}
+    </div>
+  );
+};
+
+/**
+ * Handoff 12 (describe-child-chip, 63 vs 66): an inline text anchor changes width when a web font swaps in after the
+ * popper opened. ResizeObserver never reports non-replaced inline boxes, so the font set's `loadingdone` re-positions.
+ * Simulated: the anchor's font changes outside React, then the font set fires loadingdone.
+ */
+export const FollowsInlineAnchorAfterFontSwap: Story = {
+  render: () => <InlineAnchor />,
+  play: async () => {
+    const el = await waitFor(() => {
+      const node = document.querySelector<HTMLElement>('[data-testid="inline-late"]');
+      if (!node?.getAttribute('data-popper-placement')) throw new Error('not placed yet');
+      return node;
+    });
+    const anchor = document.querySelector<HTMLElement>('[data-inline-anchor]') as HTMLElement;
+    const before = anchor.getBoundingClientRect().width;
+    anchor.style.fontSize = '20px';
+    await expect(anchor.getBoundingClientRect().width).not.toBe(before);
+    document.fonts.dispatchEvent(new Event('loadingdone'));
+    await new Promise((r) => setTimeout(r, 50));
+    const clone = el.cloneNode(true) as HTMLElement;
+    clone.removeAttribute('style');
+    Object.assign(clone.style, { position: 'absolute', top: '0', left: '0', visibility: 'hidden' });
+    el.parentNode?.appendChild(clone);
+    const inst = createPopper(anchor, clone, {
+      placement: 'top',
+      modifiers: [{ name: 'eventListeners', enabled: false }],
+    });
+    await inst.update();
+    const fresh = clone.style.transform;
+    inst.destroy();
+    clone.remove();
+    await expect(el.style.transform).toBe(fresh);
+  },
+};

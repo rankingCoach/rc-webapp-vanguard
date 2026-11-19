@@ -3,7 +3,6 @@ import { IconNames } from '@vanguard/Icon';
 import { Icon, IconProps } from '@vanguard/Icon/Icon';
 import { Text, TextTypes } from '@vanguard/Text/Text';
 import React from 'react';
-
 import { MenuOption } from '../../primitives/react/Menu/MenuOption';
 import { useInOwnOptionHost } from '../../primitives/react/Menu/option-host-context';
 import { sxToStyle } from '../../primitives/react/sx-compat';
@@ -75,6 +74,7 @@ export const MenuItem = ({
       component: _component,
       sx,
       style,
+      role,
       ...optionProps
     } = rest as typeof rest & Record<string, unknown>;
     return (
@@ -83,6 +83,8 @@ export const MenuItem = ({
         className={className}
         style={sx || style ? { ...sxToStyle(sx as never, 'MenuItem'), ...(style as React.CSSProperties) } : undefined}
         {...(optionProps as Record<string, unknown>)}
+        // MUI MenuItem's default role (an explicit undefined still gets it); Select clones options with role="option".
+        role={(role as string | undefined) ?? 'menuitem'}
       >
         {content}
       </MenuOption>

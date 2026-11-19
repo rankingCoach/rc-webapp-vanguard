@@ -13,6 +13,8 @@ export interface TransitionProps {
   timeout?: TransitionTimeout;
   addEndListener?: ((done: () => void) => void) | ((node: HTMLElement, done: () => void) => void);
   nodeRef: React.RefObject<HTMLElement | null>;
+  /** MUI `getAutoTimeout` (Grow/Collapse timeout 'auto'): wins over `timeout` when it returns a value. */
+  getAutoTimeout?: () => number | null;
   onEnter?: (isAppearing: boolean) => void;
   onEntering?: (isAppearing: boolean) => void;
   onEntered?: (isAppearing: boolean) => void;
@@ -32,7 +34,13 @@ const resolveTimeouts = (timeout: TransitionTimeout | undefined) => {
   };
 };
 
-const completionTimeout = (status: TransitionStatus, isAppearing: boolean, timeout: TransitionTimeout | undefined) => {
+const completionTimeout = (
+  status: TransitionStatus,
+  isAppearing: boolean,
+  timeout: TransitionTimeout | undefined,
+  autoTimeout?: number | null,
+) => {
+  if (autoTimeout != null) return autoTimeout;
   const r = resolveTimeouts(timeout);
   if (status === 'entering') return isAppearing ? (r.appear ?? r.enter ?? null) : (r.enter ?? null);
   return r.exit ?? null;
@@ -122,7 +130,7 @@ export const Transition = (props: TransitionProps) => {
       };
       const p = propsRef.current;
       const node = p.nodeRef.current;
-      const authored = completionTimeout(current, isAppearing.current, p.timeout);
+      const authored = completionTimeout(current, isAppearing.current, p.timeout, p.getAutoTimeout?.());
       const schedule = (value: number) => {
         timer = setTimeout(done, value);
       };

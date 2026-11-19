@@ -170,7 +170,7 @@ export const MatchesPopperJs: Story = {
  */
 type Container = 'none' | 'scroll' | 'hidden' | 'transform' | 'scroll-in-transform';
 
-const buildDom = (container: Container, portal: boolean, anchorPos: { x: number; y: number }) => {
+const buildDom = (container: Container, portal: boolean, anchorPos: { x: number; y: number }, floatWidth = '160px') => {
   const host = document.createElement('div');
   Object.assign(host.style, { position: 'fixed', inset: '0', overflow: 'visible' });
   document.body.appendChild(host);
@@ -221,7 +221,7 @@ const buildDom = (container: Container, portal: boolean, anchorPos: { x: number;
     position: 'absolute',
     inset: '0 auto auto 0',
     margin: '0',
-    width: '160px',
+    width: floatWidth,
     height: '110px',
     boxSizing: 'border-box',
     border: '2px solid',
@@ -244,70 +244,91 @@ export const MatchesPopperJsInTheDom: Story = {
     const { resolvePopperOptions } = await import('../../../primitives/react/Popper/popper-options');
     const mismatches: string[] = [];
     let count = 0;
+    const hideSeen = { referenceHidden: 0, escaped: 0 };
     const containers: Container[] = ['none', 'scroll', 'hidden', 'transform', 'scroll-in-transform'];
     const anchors = [
       { x: 260, y: 200 },
       { x: 150, y: 95 },
       { x: 470, y: 330 },
       { x: 140, y: 380 },
+      { x: 640, y: 20 },
     ];
+    // A fractional width: popper's getLayoutRect takes the client-rect size when it is within 1px of offsetWidth.
     for (const container of containers)
       for (const portal of [true, false])
-        for (const strategy of ['absolute', 'fixed'] as const)
-          for (const anchorPos of anchors)
-            for (const placement of ['bottom', 'bottom-start', 'top-end', 'right', 'left-start', 'auto'] as Placement[])
-              for (const mods of [
-                [],
-                [{ name: 'offset', options: { offset: [0, 8] } }],
-                [{ name: 'preventOverflow', options: { altAxis: true, padding: 8 } }],
-              ]) {
-                count++;
-                const dom = buildDom(container, portal, anchorPos);
-                const resolved = resolvePopperOptions({
-                  placement,
-                  modifiers: mods,
-                  popperOptions: { strategy },
-                  disablePortal: !portal,
-                });
-                const instance = createPopper(dom.anchor, dom.floating, {
-                  placement: placement as PopperPlacement,
-                  strategy,
-                  modifiers: [
-                    { name: 'preventOverflow', options: { altBoundary: !portal } },
-                    { name: 'flip', options: { altBoundary: !portal } },
-                    { name: 'eventListeners', enabled: false },
-                    ...mods,
-                  ],
-                });
-                await instance.update();
-                const expected = instance.state.modifiersData.popperOffsets as { x: number; y: number };
-                const expectedPlacement = instance.state.placement;
-                instance.destroy();
-                dom.floating.removeAttribute('style');
-                Object.assign(dom.floating.style, {
-                  position: strategy,
-                  inset: '0 auto auto 0',
-                  margin: '0',
-                  width: '160px',
-                  height: '110px',
-                  boxSizing: 'border-box',
-                  border: '2px solid',
-                });
-                const actual = computeAnchored(dom.anchor, dom.floating, { ...resolved, altBoundary: !portal });
-                const ok =
-                  actual.placement === expectedPlacement &&
-                  Math.abs(actual.offsetX - expected.x) < 1e-6 &&
-                  Math.abs(actual.offsetY - expected.y) < 1e-6;
-                if (!ok)
-                  mismatches.push(
-                    `${container}/${portal ? 'portal' : 'inline'}/${strategy}/${anchorPos.x},${anchorPos.y}/${placement}/${mods[0]?.name ?? '-'}: popper ${JSON.stringify({ ...expected, p: expectedPlacement })} own ${JSON.stringify({ x: actual.offsetX, y: actual.offsetY, p: actual.placement })}`,
-                  );
-                dom.cleanup();
-              }
+        for (const floatWidth of ['160px', '159.6px'])
+          for (const strategy of ['absolute', 'fixed'] as const)
+            for (const anchorPos of anchors)
+              for (const placement of [
+                'bottom',
+                'bottom-start',
+                'top-end',
+                'right',
+                'left-start',
+                'auto',
+              ] as Placement[])
+                for (const mods of [
+                  [],
+                  [{ name: 'offset', options: { offset: [0, 8] } }],
+                  [{ name: 'preventOverflow', options: { altAxis: true, padding: 8 } }],
+                ]) {
+                  count++;
+                  const dom = buildDom(container, portal, anchorPos, floatWidth);
+                  const resolved = resolvePopperOptions({
+                    placement,
+                    modifiers: mods,
+                    popperOptions: { strategy },
+                    disablePortal: !portal,
+                  });
+                  const instance = createPopper(dom.anchor, dom.floating, {
+                    placement: placement as PopperPlacement,
+                    strategy,
+                    modifiers: [
+                      { name: 'preventOverflow', options: { altBoundary: !portal } },
+                      { name: 'flip', options: { altBoundary: !portal } },
+                      { name: 'eventListeners', enabled: false },
+                      ...mods,
+                    ],
+                  });
+                  await instance.update();
+                  const expected = instance.state.modifiersData.popperOffsets as { x: number; y: number };
+                  const expectedPlacement = instance.state.placement;
+                  const expectedHide = instance.state.modifiersData.hide as {
+                    isReferenceHidden: boolean;
+                    hasPopperEscaped: boolean;
+                  };
+                  if (expectedHide.isReferenceHidden) hideSeen.referenceHidden++;
+                  if (expectedHide.hasPopperEscaped) hideSeen.escaped++;
+                  instance.destroy();
+                  dom.floating.removeAttribute('style');
+                  Object.assign(dom.floating.style, {
+                    position: strategy,
+                    inset: '0 auto auto 0',
+                    margin: '0',
+                    width: floatWidth,
+                    height: '110px',
+                    boxSizing: 'border-box',
+                    border: '2px solid',
+                  });
+                  const actual = computeAnchored(dom.anchor, dom.floating, { ...resolved, altBoundary: !portal });
+                  const ok =
+                    actual.hide?.isReferenceHidden === expectedHide.isReferenceHidden &&
+                    actual.hide?.hasPopperEscaped === expectedHide.hasPopperEscaped &&
+                    actual.placement === expectedPlacement &&
+                    Math.abs(actual.offsetX - expected.x) < 1e-6 &&
+                    Math.abs(actual.offsetY - expected.y) < 1e-6;
+                  if (!ok)
+                    mismatches.push(
+                      `${container}/${floatWidth}/${portal ? 'portal' : 'inline'}/${strategy}/${anchorPos.x},${anchorPos.y}/${placement}/${mods[0]?.name ?? '-'}: popper ${JSON.stringify({ ...expected, p: expectedPlacement })} own ${JSON.stringify({ x: actual.offsetX, y: actual.offsetY, p: actual.placement })} hide ${JSON.stringify(expectedHide)} vs ${JSON.stringify(actual.hide)}`,
+                    );
+                  dom.cleanup();
+                }
     await expect({ count, mismatches: mismatches.slice(0, 10), n: mismatches.length }).toEqual({
       count,
       mismatches: [],
       n: 0,
     });
+    // The grid exercises both hide flags (popper.js's own verdicts), not only the all-visible case.
+    await expect(hideSeen.referenceHidden > 0 && hideSeen.escaped > 0).toBe(true);
   },
 };
