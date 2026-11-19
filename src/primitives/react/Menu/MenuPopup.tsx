@@ -148,22 +148,24 @@ export const MenuPopup = (props: MenuPopupProps) => {
       disableAutoFocus={autoFocus}
       className={classNames('MuiPopover-root', 'MuiMenu-root', rootClass ?? '')}
       style={rootStyle}
-      backdropStyle={{ opacity: open ? 1 : 0, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1)' }}
+      backdropStyle={{ opacity: open ? 1 : 0, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms' }}
       data-slot="menu-popup"
       data-vg-core=""
       data-open={open ? '' : undefined}
       {...rootRest}
     >
       <div
-        className={classNames(
+        className={[
           'MuiPaper-root',
           'MuiPaper-elevation',
           'MuiPaper-rounded',
           'MuiPaper-elevation8',
           'MuiPopover-paper',
           'MuiMenu-paper',
-          paperClass ?? '',
-        )}
+          paperClass,
+        ]
+          .filter(Boolean)
+          .join(' ')}
         tabIndex={-1}
         data-slot="menu-paper"
         data-vg-core=""
