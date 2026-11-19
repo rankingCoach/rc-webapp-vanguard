@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import ts from 'typescript5';
 import { describe, expect, test } from 'vitest';
 
 /**
@@ -7,9 +8,11 @@ import { describe, expect, test } from 'vitest';
  * fields and every relative module specifier inside the shipped declarations must resolve to a file that
  * `pnpm pack` would include (the `files` allow-list). Needs a prior `pnpm run build`; skipped without dist/.
  */
-const root = path.resolve(__dirname, '..');
+const installedPackage = process.env.VG_PACKAGE_EXPORTS_ROOT;
+const root = installedPackage ?? path.resolve(__dirname, '..');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-const built = fs.existsSync(path.join(root, 'dist/index.js')) && fs.existsSync(path.join(root, 'dist-wordpress/index.js'));
+const built =
+  fs.existsSync(path.join(root, 'dist/index.js')) && fs.existsSync(path.join(root, 'dist-wordpress/index.js'));
 
 // npm always drops these, whatever `files` says.
 const alwaysIgnored = /(^|\/)(\.DS_Store|node_modules|\.git|npm-debug\.log|\.npmrc|[^/]*\.orig)(\/|$)/;
@@ -42,7 +45,8 @@ function conditionTargets(target: Target): Record<string, string> {
   if (typeof target === 'string') return { default: target };
   const flat: Record<string, string> = {};
   for (const [condition, value] of Object.entries(target)) {
-    for (const [nested, file] of Object.entries(conditionTargets(value))) flat[nested === 'default' ? condition : `${condition}.${nested}`] = file;
+    for (const [nested, file] of Object.entries(conditionTargets(value)))
+      flat[nested === 'default' ? condition : `${condition}.${nested}`] = file;
   }
   return flat;
 }
@@ -66,17 +70,47 @@ function matches(target: string, packed: Set<string>): Map<string, string> {
   return found;
 }
 
-const specifierPattern = /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(["'])(\.{1,2}\/[^"'\n]+)\1/g;
+const relativeSpecifiers = (source: string) =>
+  ts
+    .preProcessFile(source, true)
+    .importedFiles.map(({ fileName }) => fileName)
+    .filter((specifier) => specifier.startsWith('./') || specifier.startsWith('../'));
+
+test('finds real declaration dependencies while ignoring example imports', () => {
+  const declaration = `
+    /** Example: import('./ExampleOnly') */
+    import './side-effect';
+    import type { T } from './type';
+    export type { U } from '../export';
+    export type V = typeof import('./query');
+    import W = require('./equals');
+    declare module './augmentation' {}
+  `;
+  const specifiers = relativeSpecifiers(declaration);
+  expect(specifiers).toEqual(['./side-effect', './type', '../export', './query', './equals', './augmentation']);
+  expect(specifiers.filter((specifier) => !resolvesDeclaration('dist/types/entry.d.ts', specifier, new Set()))).toEqual(
+    specifiers,
+  );
+});
+
+test('the four removed wildcard export keys stay absent', () => {
+  const removed = ['./core/*', './common/*', './components/*', './helpers/*'];
+  expect(removed.filter((key) => Object.hasOwn(pkg.exports, key))).toEqual([]);
+});
 
 /** A relative specifier in a .d.ts resolves like TS does: .d.ts sibling, explicit TS/JS extension, or index. */
 function resolvesDeclaration(fromFile: string, specifier: string, packed: Set<string>): boolean {
   const base = path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier));
   const stem = base.replace(/\.(d\.ts|tsx?|jsx?|mjs)$/, '');
-  return [`${stem}.d.ts`, `${base}`, `${stem}/index.d.ts`].some((candidate) => packed.has(candidate) && candidate.endsWith('.d.ts'))
-    || (/\.(s?css|svg|png|gif|json)$/.test(base) && packed.has(base));
+  return (
+    [`${stem}.d.ts`, `${base}`, `${stem}/index.d.ts`].some(
+      (candidate) => packed.has(candidate) && candidate.endsWith('.d.ts'),
+    ) ||
+    (/\.(s?css|svg|png|gif|json)$/.test(base) && packed.has(base))
+  );
 }
 
-describe.skipIf(!built)('published package contents (run `pnpm run build` first)', () => {
+describe.skipIf(!built && !installedPackage)('published package contents (run `pnpm run build` first)', () => {
   const packed = built ? packedFiles() : new Set<string>();
 
   test('main, module and types point at packed files', () => {
@@ -88,8 +122,11 @@ describe.skipIf(!built)('published package contents (run `pnpm run build` first)
     const problems: string[] = [];
     for (const [key, target] of Object.entries(pkg.exports as Record<string, Target>)) {
       const targets = conditionTargets(target);
-      const hasJs = Object.entries(targets).some(([condition, file]) => condition !== 'types' && /\.(c|m)?js$/.test(file));
-      if (hasJs && typeof target !== 'string' && !targets.types) problems.push(`${key}: JS target without a "types" condition`);
+      const hasJs = Object.entries(targets).some(
+        ([condition, file]) => condition !== 'types' && /\.(c|m)?js$/.test(file),
+      );
+      if (hasJs && typeof target !== 'string' && !targets.types)
+        problems.push(`${key}: JS target without a "types" condition`);
       for (const [condition, file] of Object.entries(targets)) {
         const found = matches(file, packed);
         if (found.size === 0) {
@@ -99,7 +136,8 @@ describe.skipIf(!built)('published package contents (run `pnpm run build` first)
         if (condition === 'types' || !targets.types) continue;
         for (const star of found.keys()) {
           const declaration = strip(targets.types).replace('*', star);
-          if (!packed.has(declaration)) problems.push(`${key} [${condition}] ${found.get(star)}: missing ${declaration}`);
+          if (!packed.has(declaration))
+            problems.push(`${key} [${condition}] ${found.get(star)}: missing ${declaration}`);
         }
       }
     }
@@ -111,15 +149,18 @@ describe.skipIf(!built)('published package contents (run `pnpm run build` first)
     expect(packed.has('dist-wordpress/types/index-wordpress.d.ts')).toBe(false);
   });
 
-  test.each(['dist/types', 'dist-wordpress/types'])('every relative import in %s resolves to a packed declaration', (typesRoot) => {
-    const unresolved: string[] = [];
-    for (const file of packed) {
-      if (!file.startsWith(`${typesRoot}/`) || !file.endsWith('.d.ts')) continue;
-      const source = fs.readFileSync(path.join(root, file), 'utf8');
-      for (const [, , specifier] of source.matchAll(specifierPattern)) {
-        if (!resolvesDeclaration(file, specifier, packed)) unresolved.push(`${file}: ${specifier}`);
+  test.each(['dist/types', 'dist-wordpress/types'])(
+    'every relative import in %s resolves to a packed declaration',
+    (typesRoot) => {
+      const unresolved: string[] = [];
+      for (const file of packed) {
+        if (!file.startsWith(`${typesRoot}/`) || !file.endsWith('.d.ts')) continue;
+        const source = fs.readFileSync(path.join(root, file), 'utf8');
+        for (const specifier of relativeSpecifiers(source)) {
+          if (!resolvesDeclaration(file, specifier, packed)) unresolved.push(`${file}: ${specifier}`);
+        }
       }
-    }
-    expect(unresolved.slice(0, 25)).toEqual([]);
-  });
+      expect(unresolved.slice(0, 25)).toEqual([]);
+    },
+  );
 });
