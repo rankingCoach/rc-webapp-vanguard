@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultLayerStack } from '../core/layer-stack';
 import { defaultModalManager } from '../core/modal-manager';
+import OwnAutocomplete from './Autocomplete/Autocomplete';
 import { useAutocomplete } from './Autocomplete/useAutocomplete';
 import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
@@ -330,6 +331,39 @@ describe('own-core resources are released', () => {
   it('useAutocomplete (open, type, highlight, close, unmount)', () => {
     const before = baseline();
     const view = render(<AutocompleteHarness />);
+    const input = view.container.querySelector('input') as HTMLInputElement;
+    act(() => {
+      input.focus();
+    });
+    fireEvent.change(input, { target: { value: 'a' } });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'Escape' });
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('own Autocomplete render (popper, listbox, indicators: open, type, highlight, close, unmount)', () => {
+    const before = baseline();
+    const view = render(
+      <OwnAutocomplete
+        options={['Apple', 'Banana', 'Cherry']}
+        renderInput={
+          ((params: Record<string, unknown>) => {
+            const { slotProps, ...rest } = params as {
+              slotProps: { input: Record<string, unknown>; htmlInput: Record<string, unknown> };
+            };
+            const { ref, ...inputRoot } = slotProps.input as { ref: React.Ref<HTMLDivElement> };
+            return (
+              <div ref={ref} {...(inputRoot as object)} {...(rest as object)}>
+                <input {...(slotProps.htmlInput as React.InputHTMLAttributes<HTMLInputElement>)} />
+              </div>
+            );
+          }) as never
+        }
+      />,
+    );
     const input = view.container.querySelector('input') as HTMLInputElement;
     act(() => {
       input.focus();
