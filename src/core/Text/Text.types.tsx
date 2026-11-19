@@ -1,5 +1,5 @@
 import { FontWeights, LinkReplacements, TextReplacements, TextTypes } from '@vanguard/Text/Text.tsx';
-import { TextAnimationProps } from '@vanguard/Text/text-animate-words-style';
+import type { TextAnimationProps } from '@vanguard/Text/text-animate-words-style';
 import React from 'react';
 
 export type { TextAnimationProps };

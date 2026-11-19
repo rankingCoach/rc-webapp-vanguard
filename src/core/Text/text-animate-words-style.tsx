@@ -28,6 +28,12 @@ const AnimatedWord = ({ word, delay, duration }: { word: string; delay: number; 
   return <animated.span style={{ marginRight: 4, ...props }}>{sanitizeHTMLToReactNode(word).children}</animated.span>;
 };
 
+/** Component form of applyWordAnimation: the default export Text loads lazily (text-animated-words-lazy.tsx). */
+const AnimatedWords = ({ text, animation }: { text: string; animation: TextAnimationProps }) => (
+  <>{applyWordAnimation(text, animation)}</>
+);
+export default AnimatedWords;
+
 export const applyWordAnimation = (text: React.ReactNode, animation?: TextAnimationProps) => {
   if (typeof text !== 'string' || !animation) {
     return text;
