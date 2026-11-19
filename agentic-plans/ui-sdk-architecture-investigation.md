@@ -1221,3 +1221,38 @@ verifier-capture noise. Per handoff: build + pack and the targeted checks for wh
 WordPress smoke test alone, the compat-order guard). Full package.sh: when package.json / build config / notices /
 exports change, every 3rd handoff (milestone), and before Tier C. Wide vitest runs keep --maxWorkers=4.
 Pending full run: 501d8cb (styled-components dropped, package.json).
+
+## 35. H16 scroll lock: ModalHost on MUI Portal's two-phase timing (2026-11-19)
+
+1. **Exact trigger.** A temporary Drawer whose `open` is true in the same commit in which Vanguard's `ModalRoot` mounts
+   (Vanguard `drawer--temporary` story: the Storybook decorator mounts ModalProvider > ModalRoot together with the
+   story). ModalRoot's `useEffect([hasBlockingModal])` runs on mount with no blocking modal and writes
+   `body.style.overflow = ''` / `marginRight = ''`. The own ModalHost had locked in that commit's layout effect, so the
+   passive reset ran after it and removed `overflow: hidden` (the scrollbar-gap `padding-right` stayed). In rc-webapp,
+   ModalRoot mounts with the app, long before a drawer opens, so the 6 rc-webapp drawer screens kept the lock
+   (verifier 1, fingerprinted pack). It also applied to an own MenuPopup or SearchableSelect open on page mount.
+2. **Why MUI survived.** MUI's Portal renders nothing in its first commit and sets its mount node in a layout effect.
+   The content is portaled in the next (synchronous) commit, after the first commit's passive effects (ModalRoot's
+   reset) have flushed. MUI then locks (`handleMounted` via the portal ref), and hides siblings earlier in a passive
+   effect (`handleOpen`).
+3. **Fix (f1924b5).** ModalHost follows MUI's sequence:
+   1. Portal attached in the second commit (`portalReady`).
+   2. `manager.add` (sibling aria-hidden) in a passive effect on open.
+   3. `manager.mount` (lock) once the root is attached.
+   4. Focus trap/auto-focus/restore keyed on content present.
+   5. On close, focus restore before `manager.remove`.
+   6. MenuPopup's enter effect waits for its paper node; that is the only consumer change. Per the watchdog rule
+      (revert if a second consumer needs patching) the rework stays.
+4. **Rejected.**
+   1. Lock in a later passive effect only: still runs before ModalRoot when ModalRoot is a later sibling, and it
+      diverges from MUI's order.
+   2. Re-asserting the lock (observer or retry): it fights consumer code and leaves a window where a frame paints
+      unlocked.
+   3. Changing ModalRoot: its baseline behaviour is part of the app and stays as is.
+5. **Cost.** At most +1 commit per open versus MUI (Drawer: equal; SearchableSelect: one fewer).
+   `_modal-host-order.spec.tsx` asserts order equality and commits <= MUI + 1. The rule is that +2 or more than
+   1.5x fails.
+6. **Why the H16 differential missed it.**
+   1. Its snapshots covered `body.innerHTML` (sibling aria-hidden) but not body's own inline style. That applied to
+      Drawer, SearchableSelect, Autocomplete and Snackbar; all four now include it.
+   2. The harness had no app root (ModalRoot). `_Drawer.body-lock.spec.tsx` now reproduces the story condition.
