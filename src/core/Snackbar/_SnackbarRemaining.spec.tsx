@@ -4,11 +4,15 @@ import { Grow, GrowProps } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi, beforeAll } from 'vitest';
 
 import { Snackbar } from './Snackbar';
 import { snackbarSlotProps } from './snackbar-slot-compat';
 import type { VanguardSnackbarProps } from '../_internal/mui-legacy-props';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 
 const TransitionObserverContext = React.createContext<Partial<Record<'observed' | 'themed' | 'local' | 'mounts' | 'mounted', ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>>>>({});

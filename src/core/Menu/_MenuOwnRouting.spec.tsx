@@ -3,8 +3,12 @@ import { RtlProvider } from '@mui/system';
 import { act, render } from '@testing-library/react';
 import { MenuItem } from '@vanguard/MenuItem/MenuItem';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { Menu } from './Menu';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 /**
  * Codex review (handoff 11): the own Menu path is taken only when every prop, slot content and item it would render is

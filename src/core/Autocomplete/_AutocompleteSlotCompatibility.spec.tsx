@@ -3,11 +3,15 @@ import '@testing-library/jest-dom/vitest';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi, beforeAll } from 'vitest';
 
 import { render, screen } from '../../../test-utils/test-utils';
 import { Autocomplete } from './Autocomplete';
 import type { ComponentsProps } from '@mui/material/styles';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 
 test('custom tags override consumer renderTags and slotProps, retaining wrapper and chip classes', async () => {

@@ -3,12 +3,16 @@ import '@testing-library/jest-dom/vitest';
 import { Grow, GrowProps } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import React from 'react';
-import { expect, test, vi } from 'vitest';
+import { expect, test, vi, beforeAll } from 'vitest';
 
 import { fireEvent, render, screen, waitFor } from '../../../test-utils/test-utils';
 import { AppBar } from '../AppBar/AppBar';
 import { Autocomplete } from '../Autocomplete/Autocomplete';
 import { Snackbar } from './Snackbar';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 const TransitionObserverContext = React.createContext<Partial<Record<'observed' | 'themed' | 'local' | 'mounts' | 'mounted', ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>>>>({});
 
