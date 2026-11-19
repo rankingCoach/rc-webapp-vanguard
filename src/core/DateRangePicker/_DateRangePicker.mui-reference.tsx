@@ -21,6 +21,7 @@ import {
 } from '@vanguard/DateRangePicker/DateRangePicker.formatter';
 import { DateRangePickerBase } from '@vanguard/DateRangePicker/DateRangePickerBase/DateRangePickerBase';
 import { DateRangePickerBaseInputAdornment } from '@vanguard/DateRangePicker/DateRangePickerBase/DateRangePickerBaseInputAdornment/DateRangePickerBaseInputAdornment';
+import { DateRangePickerBaseInputAdornmentMuiReference } from '@vanguard/DateRangePicker/DateRangePickerBase/DateRangePickerBaseInputAdornment/_DateRangePickerBaseInputAdornment.mui-reference';
 import { DateRangePickerIMaskInput } from '@vanguard/DateRangePicker/DateRangePickerIMaskInput';
 import {
   ensureIsRealDate,
@@ -584,7 +585,7 @@ export const DateRangePickerMuiReference = (props: DateRangePickerProps) => {
             }}
             className={classNames('input-left', selectedState === 'date-range-picker' ? 'input-closed' : '')}
             endAdornment={
-              <DateRangePickerBaseInputAdornment
+              <DateRangePickerBaseInputAdornmentMuiReference
                 onClick={() => {
                   if (!disabled) {
                     leftRef.current?.focus();
