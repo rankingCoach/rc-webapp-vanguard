@@ -814,7 +814,8 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
 
 1. Before release, open the built rc-webapp once (not authorised inside this work) and read `<head>`: expected entry
    CSS link, then the vanguard CSS link, then (no emotion tag for migrated components), then route CSS links as you
-   navigate. Eyeball the entry-chunk consumers whose rules tie with ported MUI rules (12 rules, 7 places):
+   navigate. The checklist covers 13 tie rules, including [Navbar transition](./consumer-overrides.md). Eyeball the
+   entry-chunk consumers whose rules tie with ported MUI rules:
    1. `root-components.scss`: `.MuiAutocomplete-paper`, `.MuiAutocomplete-listbox`, `.MuiMenu-root > .MuiPaper-root`.
    2. ComposedInputs slider track (`.MuiSlider-rail`).
    3. SetupKeywordChipsEditor add input (`.vanguard-input .MuiOutlinedInput-input`).
@@ -1270,6 +1271,11 @@ Pending full run: 501d8cb (styled-components dropped, package.json).
    1. Its snapshots covered `body.innerHTML` (sibling aria-hidden) but not body's own inline style. That applied to
       Drawer, SearchableSelect, Autocomplete and Snackbar; all four now include it.
    2. The harness had no app root (ModalRoot). `_Drawer.body-lock.spec.tsx` now reproduces the story condition.
+7. **Verifier 1 at 277bc04.** H16b passed scroll lock, the other ModalHost callers and first-render readiness.
+   It failed on the BusinessProfile edit-drawer tooltip alone: x506 after fonts loaded (10/10 per theme) vs
+   baseline x514 (light 10/10, dark 9/10). The tooltip's width increased from 163.6 to 171.1 px while the anchor
+   stayed the same size. Popper now updates on a font event when its own layout size changes. The targeted
+   recheck is with verifier 1 on `c8e69a2`, pack `pkg-20b`, against `.472`.
 
 ## 36. DatePicker off @mui/x-date-pickers (staged, 2026-11-19)
 
@@ -1445,16 +1451,16 @@ TableToolbar / SearchableSelect use it inside own hosts. The MUI MenuItem path i
 (Menu's MUI route or a standalone MenuItem): not in rc-webapp, and MenuItem is not a WordPress export. So it needs
 only the lazy split (done), no new route.
 
-**After the lazy splits (2026-11-19, local build at bfbe154 + WP fix 764a089): eager @mui 4 of 298 (+1 allow-listed
-context module).** What remains and why:
+**Intermediate build (bfbe154 + WP fix 764a089): eager @mui 4 of 298 (+1 allow-listed context module).** This
+count never described a shippable build. Autocomplete's input was missing on first render while its reachable MUI
+TextField loaded. These were the eager paths in that intermediate build:
 1. DatePicker / DateTimePicker: MUI X, §36 S1–S3.
 2. VanguardThemeProvider: separate proposal to the watchdog first.
 3. ProgressBar: B's buffer/query route on MUI LinearProgress; B's to split.
 
 Split into lazy fallback modules: MuiTextField (Input, Select, Textarea, SearchableSelect, Table*, …), Autocomplete,
 Menu, MenuItem, Snackbar, AppBar, Toolbar, PopoverPopper/PopoverModal (shared MUI Popper), FormControl. Theme
-defaults on the own routes come from `useThemeDefaultProps` (5.3). Spec and Storybook setups preload the fallbacks, so
-the existing MUI contract specs run unchanged.
+defaults on the own routes come from `useThemeDefaultProps` (5.3). The initial test setup preloaded the fallbacks.
 
 **WordPress.** The single file inlines the fallbacks. `config/inline-mui-fallbacks.ts` turns them into static imports
 for the WP build only. FINDING, fixed before any pack: the WordPress cleanup keeps only index.js and icon/loading
@@ -1472,8 +1478,24 @@ anchor) and so always routed its text field to MUI's TextField. That covers rc-w
 WordPress. IMask inputs passing `inputComponent` take the same route. With the lazy boundary, the packed Autocomplete
 rendered no input on first use (smoke: no combobox).
 
-My spec setup's preload had hidden this. It now has an audit switch: `VG_NO_FALLBACK_PRELOAD=1` runs the specs without
-preloading, so any Vanguard-internal path that reaches a lazy route renders empty and fails.
+**Corrected packed count at c8e69a2: 24 of 298 eager exports, plus one allow-listed context module.** The ProgressBar
+split is expected to reduce this to 23 after its exact-SHA verification and merge. WordPress remains at 4 of 64.
+
+**Planner correction (decided-by-watchdog).** The create-event popover passes `centerPopover` and `renderInPortal`
+together at `EngagementPlannerCalendar.tsx:298`. The centered flip modifier uses the anchor clipping boundary and the
+portaled overflow modifier uses the popper clipping boundary. The own resolver deliberately falls back for that
+combination. The c8e69a2 pack omitted the card on first render. `9a0dece` keeps the reachable PopoverModal fallback
+eager. After the text-field port and before DatePicker S1, port separate flip and overflow boundaries, with a
+popper.js differential across placement, boundary, portal mode and scroll offsets and a paired planner check.
+
+**H19 masked field correction (decided-by-watchdog).** `4d88e97` uses MUI InputAdornment inside DateRangePicker's
+masked MUI TextField. The real-picker differential pins its full class attribute. The preset field, DateRangeInput
+and FlagAdornment keep their own adornment. Restore the own calendar adornment in the same change as the own
+TextField `inputComponent` port.
+
+The initial global spec preload hid the first-render failure. `VG_NO_FALLBACK_PRELOAD=1` exposed it. Since `f703205`,
+the full spec project runs without global preload by default. The explicit, checked-in allow-list records the spec
+files that exercise an unmodelled prop and need a preload.
 
 Audit of the remaining lazy routes (Menu, MenuItem, Snackbar, AppBar, Toolbar, PopoverPopper/PopoverModal, FormControl,
 Autocomplete):
@@ -1515,3 +1537,7 @@ is the next B.2 item ("implement every prop with reachability evidence"), not a 
    on both builds, for: Autocomplete (26 sites), IMask inputs, AccountNavMenu and every lazy-split component.
 5. **Rule.** A future "unreachable" claim for a lazy route needs all three: site scan, audit-mode spec run and packed
    smoke. A site scan alone is not accepted.
+6. **Combined call-site audit (decided-by-watchdog).** Enumerate exact prop-key sets and routing-relevant literal
+   combinations from rc-webapp, internal Vanguard callers and WordPress export defaults. Review spreads and
+   indirect references. Verify the runtime route and synchronous packed content for every reachable combination.
+   The planner's centered portal required both props to trigger the fallback.

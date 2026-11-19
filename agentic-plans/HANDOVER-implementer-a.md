@@ -113,6 +113,8 @@ containing:
 6. Declared deltas. Anything else is expected identical to MUI.
 7. Parity files: the jsdom differential vs a frozen `_X.mui-reference.tsx`, the Chromium `_XComputedParity.stories.tsx`
    (both themes), cleanup/order specs.
+   1. For a migrated part, run parity inside the actual parent frame it ships in. A standalone check alone misses
+      context-dependent classes, as H19 found with the DateRangePicker end adornment in its masked MUI field.
 8. Suggested rc-webapp screens: Storybook/mocked data only, never a live call. If no mocked story exists, list it as
    a gap.
 9. What stays on MUI.
