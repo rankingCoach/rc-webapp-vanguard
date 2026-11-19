@@ -1044,3 +1044,35 @@ Reply to the watchdog after step 1's grep result.
    7.2 rc-webapp TaskTray `[data-dragging]` is on its own module class, so no collision.
    7.3 Internal: Cropper, AgeSlider, MUIComponentsShowcase, Form binding.
    7.4 Not a WordPress export.
+
+### Track (h) step 1 → watchdog decision (decided-by-watchdog)
+1. Grep result (rc-webapp + Vanguard):
+   1.1 No CSS or selectors on junk tokens.
+   1.2 No snapshot or fixture files with junk tokens; no cypress/e2e folders in rc-webapp.
+   1.3 rc-webapp class assertions are regex or self-comparisons.
+   1.4 Ten Vanguard exact-className `toBe` specs, all currently junk-free.
+   1.5 Button.module.scss `[class^="icon-"]`: no producer of `icon-*` classes found.
+   1.6 About 25 `[class*=…]` substring selectors, none on junk.
+   1.7 The one assertion on junk itself: `_FormCharacterization.spec` `'Form-container undefined'`.
+2. Approved:
+   2.1 Rewrite that bug-lock to `'Form-container'` in the same commit as the `classNames` fix; the commit message names the declared change.
+   2.2 Conditions:
+       2.2.1 A differential spec proves identical helper output for every junk-free input and that only non-string/empty tokens drop.
+       2.2.2 The 10 exact-className specs stay unchanged and green.
+       2.2.3 A before/after junk scan over all stories, with a count of changed elements in the log (regex and story count stated).
+       2.2.4 Template-literal sites fixed per site, token order kept.
+       2.2.5 A spec locks that Button does not start matching `[class^="icon-"]`.
+3. Chip matrix 60 s timeout accepted.
+4. G10 goes to verifier 2 after H15/G8/G9.
+5. Then ProgressCircle NaN, then verification support. No new components.
+
+### StyledSVG descendant width/height (verifier 2 on 817bf04): MAJOR withdrawn by the watchdog
+1. Old styled-components rule: `.sc-<hash> path { width/height: Npx }` (0,1,1). Rects got fill only; image/use/foreignObject/nested svg had no rule.
+2. The static rule keeps it: `.vg-styled-svg--size path { width/height: var(--vg-svg-size) }` (0,1,1), last block of vanguard.css.
+3. Enumeration (tags parsed):
+   3.1 Vanguard assets: 752 SVGs, 401 with SVG2-geometry children (397 rect, 2 image, 2 use).
+   3.2 rc-webapp StyledSVG consumers: 82 files → 36 SVGs, 28 with rect.
+4. Chromium legacy (817bf04^ verbatim) vs current, 882 pairs at 16/32 px: 0 descendant computed-width/height or bbox differences. Pixel diffs equal the A/A baseline (89/810 + 11/72 vs 90/810 + 10/72).
+5. Lock: `_StyledSVGLegacyParity.stories` (Icon-ado, Icon-maps, shield_secured, superpages). Deleting `.vg-styled-svg--size path` reproduces 16px → auto.
+6. Open MINOR: which of 6.1–6.3 explains rc-webapp's auto (pack-15 CSS without the block / last block not loaded / consumer rule winning). Waiting for verifier 2's matched-rules dump; 6.2/6.3 would be a D15 order data point.
+7. Watchdog also approved the TableFooter fixture regeneration (track h) and the ProgressCircle story-only fix.
