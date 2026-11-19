@@ -1981,3 +1981,35 @@ on a custom phone mask, an end-adornment sibling on the real DateRange mask, and
 The invoice's real flag is in the separate prefix input. The exact H21 packed WordPress Input control reran 3/3
 first-tick cases including default Input, and will be repeated on H22. [Guarded browser evidence](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/frame-selector.log) ·
 [WordPress control](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/h21-wordpress-input-control.json).
+
+### 36.12 H22 gate and handoff (decided-by-watchdog)
+
+H22 supersedes the H21 pack. Its runtime changes are the masked native-box correction and the independent flip
+and overflow boundaries for the centered planner. The DateRangePicker spring follow-up changed tests only.
+Both implementations use the same `react-spring` config and 52/185 px targets. The source differential checks both
+widths reach their exact targets before serializing, with a 2.5-second ceiling and the observed width in its failure.
+The existing five DOM snapshots and comparisons remain intact. The Chromium differential opens the pair on the
+same browser frames in each order, samples at 0/100/300/600 ms, and compares first motion, midpoint and exact rest
+within two frames. Both routes showed intermediate widths. Serial warm/cold probes had an order-dependent startup
+gap and remain archived. [Final guarded browser proof](/Users/a.kott/vanguard-verify/logs/h22-datepicker-spring/same-frames-chromium.log).
+
+Rollup pruned **both private runtime modules** `PopoverPopper.tsx` and `MuiPopperFallback.tsx` from the H22
+pack. The source retains that private fallback and its unsupported-option tests. Packed `PopoverModal` uses its
+own Popper synchronously for all the modifiers it constructs and has no dynamic import or runtime MUI Popper
+fallback. An unmodeled option added to PopoverModal later needs an implementation or a new routing decision.
+The first package replay's fallback observer assumed the old re-export filename existed. Fixture-only
+`3f82c7c94d514c7941193f97cc937575aab30e2b` checks resolution attempts even when the chunk is absent, via a native
+ESM resolution-only control, and replays the same H22 bytes. [Exact module graph extract](/Users/a.kott/vanguard-verify/logs/3d078f3a317e0860176690386f7b85895bcad2e4-h22/private-popper-module-graph.json).
+
+Exact pack source `3d078f3a317e0860176690386f7b85895bcad2e4`, SHA-256
+`339f74bd68e070f519d1ff0ff5bbcf850e443f0adf6e9e2cea351418a95d2d72`. Full no-preload source spec 381 files and
+2,778 tests, three workers. Canonical replay exit zero with 34/34/44/44 passing tests and clean gated declarations.
+All 4,232 distribution files matched the build. WordPress reached 336 files with zero missing targets, 4/64 eager
+MUI exports and 4/4 same-tick fixture cases. The default packed planner rendered its own body portal on the first
+tick. Default eager MUI is **23 of 298** plus the one allowed `RtlProvider` context, down one export from H21.
+The fallback preload audit is 22 listed, zero stale and zero unexpected. [H22 tarball](/Users/a.kott/vanguard-verify/packs/3d078f3a317e0860176690386f7b85895bcad2e4-h22.tgz) ·
+[Exact gate evidence](/Users/a.kott/vanguard-verify/logs/3d078f3a317e0860176690386f7b85895bcad2e4-h22/).
+
+Verifier 1 checks the real invoice native box first, then planner first-visible absolute geometry and scroll/resize.
+Verifier 2 checks the centered portal's first visible content and fallback request count. The wide slot was released
+after both handoffs. H22 independent paired verdicts remain pending.
