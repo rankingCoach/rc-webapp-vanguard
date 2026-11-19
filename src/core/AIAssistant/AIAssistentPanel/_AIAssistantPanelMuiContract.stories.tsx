@@ -10,7 +10,6 @@ import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-
 import { AIAssistantStatus } from '../AIAssistant';
 import { aiAssistantStore } from '../stories/bootstrap/aiassistant.test.slice';
 import { AIAssistantPanel } from './AIAssistantPanel';
