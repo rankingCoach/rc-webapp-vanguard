@@ -1,3 +1,4 @@
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { StoryObj } from '@storybook/react';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import React from 'react';
@@ -27,6 +28,7 @@ const CASES: Record<string, SliderProps> = {
   primary: { value: [10, 90], min: 0, max: 100, type: 'primary', marks: MARKS },
 };
 const PROPS = [
+  ...TRANSITION_LONGHANDS,
   'display',
   'position',
   'box-sizing',
@@ -47,6 +49,7 @@ const PROPS = [
   'font-family',
   'font-size',
   'font-weight',
+  'letter-spacing',
   'line-height',
   'white-space',
   'z-index',
@@ -96,6 +99,9 @@ const forcePseudo = () => {
 };
 const settle = async () => {
   await new Promise((r) => requestAnimationFrame(r));
+  // A keyboard step can reveal a value label and request a font that was unused in the resting frame.
+  void document.body.offsetWidth;
+  await document.fonts.ready;
   for (const a of document.getAnimations()) {
     if (a.effect?.getComputedTiming().endTime === Infinity) {
       a.pause();
