@@ -1501,6 +1501,21 @@ masked MUI TextField. The real-picker differential pins its full class attribute
 and FlagAdornment keep their own adornment. Restore the own calendar adornment in the same change as the own
 TextField `inputComponent` port.
 
+**H19 closed (decided-by-watchdog).** Verifier 2 passed H19b on exact `32a6b93a2683ea766d4406fae4693e918dbd3a93`
+against `9d3b75b`, pack SHA-256 `bd4cc895eb200808677f95d5a28dd644173b59c997f284e1e4a7d6281d2ab6b0`.
+In the default Vanguard story, the packed DateRangePicker module and CSS matched the reference's complete calendar
+end-adornment class list, flex and 38 px height on 2/2 isolated loads per side. Guard self-tests and fingerprints
+passed, with zero blocked destinations during the probes. [Reference capture](/Users/a.kott/vanguard-verify/v2/out/h19b-adornment-9d3b75b-final.json),
+[candidate capture](/Users/a.kott/vanguard-verify/v2/out/h19b-adornment-32a6b93.json).
+D15 tie #13 was accepted at `73d25d7` for the customer app entry.
+
+The running MUI verification tally is **28/31**. H19 adds AppBar, Toolbar, FocusTrap and the DateRangePicker
+dropdown. Drawer (H16c), DatePicker and FormControl remain on that tally. VanguardThemeProvider remains a separate
+MUI-exit task. H19 also covers the DateRangeInput/adornment work, the AIAssistant panel and Documents rows within
+the exercised scenarios. The AIAssistant generate and tone actions remain undriven, Documents has no rc-webapp
+story, and WordPress coverage for H19 is static. The FocusTrap fixture ended on the body on both builds, so it did
+not establish restore-to-trigger behavior.
+
 The initial global spec preload hid the first-render failure. `VG_NO_FALLBACK_PRELOAD=1` exposed it. Since `f703205`,
 the full spec project runs without global preload by default. The explicit, checked-in allow-list records the spec
 files that exercise an unmodelled prop and need a preload.
