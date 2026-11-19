@@ -889,3 +889,13 @@ Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, n
    4.5 `_mui-compat-order` 6/6, tsc lib 0.
 5. Size: Chip 88.9 → 5.6 KB gzip, no emotion. Autocomplete 436.6 → 441.5 KB (+4.9): it still bundles MUI for its own parts (A's) and now also the own Chip and ButtonBase; this goes away with A's Autocomplete port.
 6. Consumers: none in rc-webapp. rc-webapp's admin Quality `Chip` is its own component; no consumer CSS on MuiChip. Not a WordPress export.
+
+### fix: StyledSVG `false` class tokens (A's report on d282b41)
+1. The bug: `@helpers/classNames` is a plain `args.join(' ')`, so StyledSVG's `set(x) && 'cls'` entries rendered literal `false` tokens and a trailing space on every StyledSVG consumer. Introduced in 817bf04 (f3). Verifier 2 strips svg class, so its PASS did not see this.
+2. The fix: StyledSVG passes only real tokens (`cond ? 'cls' : undefined`, filtered). The shared helper is unchanged.
+3. Red/green: the new `_StyledSVG.classNames.spec` (Icon, plus every prop combination × className) failed 2/2 on the old StyledSVG and passes 2/2 now.
+4. Fixture `Table/TableFooter/__fixtures__/footer-controls.json` regenerated (FOOTER_FIXTURE_WRITE=1). This is an expected markup change from the approved StyledSVG decision (f3), not a weakened test.
+   4.1 A script proves 12 of 30 keys changed, every change confined to `<svg>` `class`/`style` attributes: old `sc-bgqQcB fLTcv` → `vg-styled-svg` modifiers + `--vg-svg-*` custom properties.
+   4.2 No `false` token remains. The characterization spec is unchanged and green.
+5. Full spec project (`--maxWorkers=4 --project spec src`): 332 files / 2445 tests, 0 failures.
+6. Other own-code `classNames` calls checked: Accordion, Chip, OwnCollapse and ProgressBar pass only strings, `''` or `undefined` (join renders undefined as empty), no booleans.
