@@ -9,7 +9,7 @@ Run from the repo root. Outputs go to `agentic-plans/mui-upgrade-gates/out/<labe
 | `coverage.sh <label>` | combined spec/browser V8 coverage over `coverage-files.json` | each file >=95% lines and >=85% branches; only the documented unreachable PopoverModal handlers are excluded |
 | `suite-selftest.sh` | bounds all three projects to one worker and retains raw failure exits | all assertions pass |
 | `selftest.sh` | compiler-crash rejection and healthy tool execution | all assertions pass |
-| `package.sh` | builds, packs and installs both bundle variants in isolated consumers | gated declarations and runtime smokes pass; baseline declaration defects measured separately |
+| `package.sh` | no-preload spec project, pack and isolated consumer fixtures, then the no-preload scripts project (including the exports check against the installed tarball) | both test projects and the package checks pass |
 | `tsc-contract.sh` | type-checks `_*.mui.spec.*`, `_*MuiContract.stories.tsx` with bundler resolution | 0 errors |
 
 Rules:
@@ -18,6 +18,9 @@ Rules:
    processes existed before it started, and the load average before and after each project.
 2. A red raw run is red. `suite.sh` reruns failing files alone only to diagnose (deterministic vs load-only), and
    prints both results. It never turns a run green.
+   The release gate runs both source projects without global fallback preload. `VG_PACKAGE_GATE_WORKERS` sets the
+   spec workers from 1 to 4 (default 3). The scripts project uses one worker. For a fixture-only replay of a
+   historical pack, use `PACKAGE_FIXTURE_TGZ=<tarball> bash package-fixture/run.sh`.
 3. Baselines in `baseline/` were taken on master 95ee244 (MUI 5.16.14, pickers 5.0.16). Re-baseline only if
    master changes, never to absorb errors from this branch.
 

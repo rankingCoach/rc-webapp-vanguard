@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Test-suite gate for the MUI upgrade. Runs the spec project, then the storybook project, ONE AT A TIME
+# Test-suite gate for the MUI upgrade. Runs spec, scripts and Storybook ONE AT A TIME
 # (never overlapping Chromium suites), and records the resource conditions next to the results.
 #
 # Usage (from the repo root): agentic-plans/mui-upgrade-gates/suite.sh <label> [runs=2]
@@ -8,6 +8,7 @@
 # Gate rule: every raw run must be fully green. Failures are listed as they happened.
 # The isolated rerun of a failing file is diagnosis ONLY ("does it also fail alone?"). It never turns a red run green.
 set -u
+export VG_NO_FALLBACK_PRELOAD=1
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 LABEL="${1:?usage: suite.sh <label> [runs]}"
