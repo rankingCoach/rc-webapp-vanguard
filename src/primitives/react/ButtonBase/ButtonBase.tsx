@@ -3,6 +3,7 @@ import './ButtonBase.scss';
 
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { hasNativeActivation, isFocusVisible, pressAttrs, pressKeyDown, pressKeyUp } from '../../core/press';
+import { cx } from '../class-names';
 import { TouchRippleActions, TouchRippleProps, useRipple } from './use-ripple';
 
 export type { TouchRippleActions, TouchRippleProps } from './use-ripple';
@@ -174,8 +175,8 @@ export const ButtonBase = (props: ButtonBaseProps) => {
 
   return (
     <Host
-      // clsx semantics (MUI): only real tokens, single spaces; the shared classNames helper joins empty entries too.
-      className={[
+      // clsx semantics (MUI): only real tokens, single spaces, also inside callers' className strings.
+      className={cx(
         'MuiButtonBase-root',
         classes?.root,
         disabled && 'Mui-disabled',
@@ -184,9 +185,7 @@ export const ButtonBase = (props: ButtonBaseProps) => {
         focusVisible && classes?.focusVisible,
         focusVisible && focusVisibleClassName,
         className,
-      ]
-        .filter((token): token is string => typeof token === 'string' && token !== '')
-        .join(' ')}
+      )}
       ref={handleRef}
       onClick={handleClick}
       onKeyDown={handleKeyDown}

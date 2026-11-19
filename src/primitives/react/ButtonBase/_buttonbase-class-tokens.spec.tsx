@@ -36,4 +36,9 @@ describe('ButtonBase class attribute', () => {
       expect(tokens(cls)).toEqual(tokens(mui.getAttribute('class') ?? ''));
     });
   }
+  it("callers' className with empty parts: single spaces, order kept (MenuItem/ToggleButton/Chip/AccordionSummary)", () => {
+    const own = render(<ButtonBase className=" MuiMenuItem-root   MuiMenuItem-gutters  extra ">{'x'}</ButtonBase>)
+      .container.firstElementChild as HTMLElement;
+    expect(own.getAttribute('class')).toBe('MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters extra');
+  });
 });

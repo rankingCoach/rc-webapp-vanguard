@@ -1,6 +1,7 @@
 // Ported from @mui/material@9.5.0 InputBase/InputBase.js, TextField/TextField.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { cx } from '../class-names';
 import { useVanguardTypography } from '../typography-context';
 import { TextareaAutosize } from './TextareaAutosize';
 import { TextFieldFrame } from './TextFieldFrame';
@@ -255,7 +256,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
     ...htmlRest,
     'data-slot': 'text-field-control',
     'data-vg-core': '',
-    className: classNames(
+    className: cx(
       'MuiInputBase-input',
       'MuiOutlinedInput-input',
       ibDisabled ? 'Mui-disabled' : '',
@@ -282,7 +283,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
 
   // MUI InputBase root class order: root, color, disabled, error, fullWidth, focused, formControl, size, multiline,
   // adornedStart, adornedEnd, readOnly (OutlinedInput adds its root class second).
-  const inputRootClasses = classNames(
+  const inputRootClasses = cx(
     'MuiInputBase-root',
     'MuiOutlinedInput-root',
     `MuiInputBase-color${ibColor.charAt(0).toUpperCase()}${ibColor.slice(1)}`,

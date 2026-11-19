@@ -1,5 +1,6 @@
 // Ported from @mui/material@9.5.0 Drawer/Drawer.js (MIT)
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { cx } from '../class-names';
 import { ModalHost, ModalHostProps } from '../Modal/ModalHost';
 import { Slide } from '../Transitions/Slide';
 import { TransitionTimeout } from '../Transitions/Transition';
@@ -36,7 +37,6 @@ const DEFAULT_DURATION = { enter: 225, exit: 195 };
 const OPPOSITE_DIRECTION = { left: 'right', right: 'left', top: 'down', bottom: 'up' } as const;
 const PAPER_SHADOW_16 =
   '0px 8px 10px -5px rgba(0,0,0,0.2),0px 16px 24px 2px rgba(0,0,0,0.14),0px 6px 30px 5px rgba(0,0,0,0.12)';
-const cx = (...parts: (string | undefined | false)[]) => parts.filter(Boolean).join(' ');
 
 /** MUI Drawer for Vanguard's prop surface. Structural styles live in the consumer's MUI compatibility CSS. */
 export const Drawer = (props: DrawerProps) => {

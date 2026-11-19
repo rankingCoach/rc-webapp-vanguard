@@ -1,6 +1,7 @@
 // Ported from @mui/material@9.5.0 Snackbar/Snackbar.js and SnackbarContent/SnackbarContent.js (MIT)
 import React, { useState } from 'react';
 import { ClickAway } from '../ClickAway/ClickAway';
+import { cx } from '../class-names';
 import { Grow } from '../Transitions/Grow';
 import type { TransitionTimeout } from '../Transitions/Transition';
 import { useVanguardTypography } from '../typography-context';
@@ -50,12 +51,10 @@ const SnackbarContent = ({
   return (
     <div
       role="alert"
-      className={[
+      className={cx(
         'MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation6 MuiSnackbarContent-root',
         typography === 'vanguard' && 'vg-typography-vanguard',
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
       data-vg-core=""
       ref={ref}
       {...other}
@@ -114,13 +113,11 @@ export const Snackbar = (props: SnackbarProps) => {
         data-vg-core=""
         {...getRootProps({
           ...other,
-          className: [
+          className: cx(
             'MuiSnackbar-root',
             `MuiSnackbar-anchorOrigin${capitalize(vertical)}${capitalize(horizontal)}`,
             className,
-          ]
-            .filter(Boolean)
-            .join(' '),
+          ),
         })}
       >
         <TransitionComponent

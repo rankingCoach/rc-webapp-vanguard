@@ -1,5 +1,6 @@
 // Ported from @mui/material@9.5.0 Backdrop/Backdrop.js (MIT)
 import React from 'react';
+import { cx } from '../class-names';
 import { Fade } from '../Transitions/Fade';
 import { TransitionTimeout } from '../Transitions/Transition';
 
@@ -17,8 +18,6 @@ export interface BackdropProps {
   /** Anything else lands on the backdrop element through Fade, like MUI (`...other` on the transition). */
   [extra: string]: unknown;
 }
-
-const cx = (...parts: unknown[]) => parts.filter((p) => typeof p === 'string' && p !== '').join(' ');
 
 /**
  * MUI 9.5 Backdrop on the own core: Fade (MUI's default 225/195 ms unless `transitionDuration`) around

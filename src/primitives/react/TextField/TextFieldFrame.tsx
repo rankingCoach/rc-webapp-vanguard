@@ -1,6 +1,7 @@
 // Ported from @mui/material@9.5.0 TextField/TextField.js, OutlinedInput/NotchedOutline.js, InputLabel, FormHelperText (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useMemo } from 'react';
+import { cx } from '../class-names';
 import { OwnFormControlContext } from './form-control-context';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -12,12 +13,7 @@ const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slic
 
 /** MUI's `Mui-focused/-disabled/-error` state classes, in MUI's order, before `base`. */
 export const textFieldStateClasses = (state: { focused: boolean; disabled: boolean; error: boolean }, base = '') =>
-  classNames(
-    state.focused ? 'Mui-focused' : '',
-    state.disabled ? 'Mui-disabled' : '',
-    state.error ? 'Mui-error' : '',
-    base,
-  );
+  cx(state.focused ? 'Mui-focused' : '', state.disabled ? 'Mui-disabled' : '', state.error ? 'Mui-error' : '', base);
 
 export interface TextFieldFrameProps {
   id: string;
@@ -128,14 +124,12 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
   return (
     <OwnFormControlContext.Provider value={formControlState}>
       <div
-        className={[
+        className={cx(
           'MuiFormControl-root',
           fullWidth ? 'MuiFormControl-fullWidth' : '',
           textFieldRoot ? 'MuiTextField-root' : '',
           className ?? '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        )}
         data-slot="text-field"
         data-vg-core=""
         style={{ ...(sx && typeof sx === 'object' && !Array.isArray(sx) ? sx : {}), ...style }}
@@ -149,7 +143,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
             htmlFor={id}
             id={labelId}
             {...labelRest}
-            className={classNames(
+            className={cx(
               'MuiFormLabel-root',
               'MuiInputLabel-root',
               'MuiInputLabel-formControl',
@@ -169,7 +163,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
               <span
                 data-vg-core=""
                 aria-hidden
-                className={classNames('MuiFormLabel-asterisk', 'MuiInputLabel-asterisk', error ? 'Mui-error' : '')}
+                className={cx('MuiFormLabel-asterisk', 'MuiInputLabel-asterisk', error ? 'Mui-error' : '')}
               >
                 {' *'}
               </span>
@@ -185,7 +179,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
           {...inputRootHandlers}
           className={
             inputRootClasses ??
-            classNames(
+            cx(
               'MuiInputBase-root',
               'MuiOutlinedInput-root',
               `MuiInputBase-color${capitalize(color)}`,
@@ -234,7 +228,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
             data-slot="text-field-helper"
             data-vg-core=""
             {...helperSlot}
-            className={classNames(
+            className={cx(
               'MuiFormHelperText-root',
               size === 'small' ? 'MuiFormHelperText-sizeSmall' : 'MuiFormHelperText-sizeMedium',
               'MuiFormHelperText-contained',

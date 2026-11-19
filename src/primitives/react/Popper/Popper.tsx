@@ -1,6 +1,7 @@
 // Ported from @mui/material@9.5.0 Popper/BasePopper.js (MIT)
 import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import type { Placement } from '../../core/anchored-placement';
+import { cx } from '../class-names';
 import { Portal } from '../Portal/Portal';
 import { AnchorLike, computeAnchored } from './compute-anchored';
 import { layoutSize, listScrollParents } from './dom-geometry';
@@ -225,7 +226,7 @@ export const OwnPopper = (props: OwnPopperProps) => {
       anchorEl={anchorEl}
       open={transition ? !exited : open}
       disablePortal={disablePortal}
-      className={['MuiPopper-root', className].filter(Boolean).join(' ')}
+      className={cx('MuiPopper-root', className)}
       data-slot="popper"
       TransitionProps={TransitionProps}
       style={{ position: 'fixed', top: 0, left: 0, display, ...style }}

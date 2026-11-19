@@ -1,7 +1,8 @@
 // Ported from @mui/material@9.5.0 MenuItem/MenuItem.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React from 'react';
 import { ButtonBase } from '../ButtonBase/ButtonBase';
+import { cx } from '../class-names';
 import { useVanguardTypography } from '../typography-context';
 
 export interface MenuOptionProps extends Omit<React.LiHTMLAttributes<HTMLLIElement>, 'value'> {
@@ -46,7 +47,7 @@ export const MenuOption = (props: MenuOptionProps) => {
       data-disabled={disabled ? '' : undefined}
       {...(rest as Record<string, unknown>)}
       aria-disabled={disabled ? true : undefined}
-      className={classNames(
+      className={cx(
         'MuiMenuItem-root',
         dense ? 'MuiMenuItem-dense' : '',
         divider ? 'MuiMenuItem-divider' : '',

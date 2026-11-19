@@ -1,8 +1,9 @@
 // Ported from @mui/material@9.5.0 Menu/Menu.js, Popover/Popover.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { OriginH, OriginV, popoverPosition } from '../../core/position';
 import { GROW_HIDDEN_TRANSFORM, growTransition } from '../../core/transition';
+import { cx } from '../class-names';
 import { ModalCloseReason, ModalHost } from '../Modal/ModalHost';
 import { FocusSource, MenuList } from './MenuList';
 
@@ -153,7 +154,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
       disableScrollLock={disableScrollLock}
       // MUI Menu: `disableAutoFocus={autoFocus}` on its Popover (the menu list moves focus itself).
       disableAutoFocus={autoFocus}
-      className={classNames('MuiPopover-root', 'MuiMenu-root', rootClass ?? '')}
+      className={cx('MuiPopover-root', 'MuiMenu-root', rootClass ?? '')}
       style={rootStyle}
       backdropStyle={{ opacity: open ? 1 : 0, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms' }}
       data-slot="menu-popup"
@@ -162,7 +163,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
       {...rootRest}
     >
       <div
-        className={[
+        className={cx(
           'MuiPaper-root',
           'MuiPaper-elevation',
           'MuiPaper-rounded',
@@ -170,9 +171,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
           'MuiPopover-paper',
           'MuiMenu-paper',
           paperClass,
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        )}
         tabIndex={-1}
         data-slot="menu-paper"
         data-vg-core=""
@@ -186,7 +185,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
         {...paperRest}
       >
         <MenuList
-          className={classNames('MuiMenu-list', listClass ?? '')}
+          className={cx('MuiMenu-list', listClass ?? '')}
           ref={listRef}
           style={listStyle}
           autoFocusItem={open && autoFocus && autoFocusItem}

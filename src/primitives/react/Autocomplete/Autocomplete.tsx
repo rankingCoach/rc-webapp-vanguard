@@ -3,6 +3,7 @@
 // Ported from @mui/material@9.5.0 Autocomplete/Autocomplete.js (MIT)
 import * as React from 'react';
 import { ButtonBase } from '../ButtonBase/ButtonBase';
+import { cx } from '../class-names';
 import { OwnPopper } from '../Popper/Popper';
 import { useVanguardTypography } from '../typography-context';
 import { zIndexClass } from '../z-index-class';
@@ -38,7 +39,6 @@ export interface OwnAutocompleteProps extends UseAutocompleteProps<any, boolean,
   slotProps?: Record<string, SlotProps>;
 }
 
-const join = (...values: any[]) => values.filter(Boolean).join(' ');
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 const useEnhancedEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 const paperShadow =
@@ -92,7 +92,7 @@ function useSlot(
   }, [internalRef, externalRef, ref]);
   const props = getProps ? { ...internal, ...additional, ...other } : { ...additional, ...forwarded, ...slot };
   // MUI `sx={{ zIndex }}` is an emotion class (runtime rule), not an inline style: zIndexClass mirrors that.
-  props.className = join(
+  props.className = cx(
     internal.className,
     additional.className,
     className,
@@ -124,7 +124,7 @@ function Paper({ component: Component = 'div', className, style, ownerState: _ow
     <Component
       {...props}
       data-vg-core=""
-      className={join('MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1', className)}
+      className={cx('MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1', className)}
       style={{ '--Paper-shadow': paperShadow, ...style }}
     />
   );
@@ -133,7 +133,7 @@ function Paper({ component: Component = 'div', className, style, ownerState: _ow
 function SvgIcon({ path, name, fontSize = 'medium', className, ...props }: AnyProps) {
   return (
     <svg
-      className={join('MuiSvgIcon-root', `MuiSvgIcon-fontSize${capitalize(fontSize)}`, className)}
+      className={cx('MuiSvgIcon-root', `MuiSvgIcon-fontSize${capitalize(fontSize)}`, className)}
       focusable="false"
       aria-hidden="true"
       viewBox="0 0 24 24"
@@ -154,7 +154,7 @@ function Indicator({ className, disabled, size = 'medium', ownerState: _ownerSta
       disabled={disabled}
       centerRipple
       focusRipple
-      className={join(
+      className={cx(
         'MuiIconButton-root',
         disabled && 'Mui-disabled',
         `MuiIconButton-size${capitalize(size)}`,
@@ -182,7 +182,7 @@ function DefaultChip({
     event.stopPropagation();
     onDelete?.(event);
   };
-  const classes = join(
+  const classes = cx(
     'MuiChip-root MuiChip-filled',
     disabled && 'Mui-disabled',
     `MuiChip-size${capitalize(size)}`,
@@ -381,7 +381,7 @@ export function OwnAutocomplete(props: OwnAutocompleteProps) {
     names
       .filter(Boolean)
       .map((name: string) =>
-        join(
+        cx(
           ['focused', 'expanded', 'focusVisible'].includes(name) ? `Mui-${name}` : `MuiAutocomplete-${name}`,
           classesProp[name],
         ),
@@ -394,7 +394,7 @@ export function OwnAutocomplete(props: OwnAutocompleteProps) {
     'root',
     component ?? 'div',
     ownerState,
-    join(
+    cx(
       utility(
         'root',
         expanded && 'expanded',
@@ -412,7 +412,7 @@ export function OwnAutocomplete(props: OwnAutocompleteProps) {
     ref,
   );
   const [Listbox, listboxProps] = useSlot('listbox', 'ul', ownerState, utility('listbox'), {}, getListboxProps);
-  const [PaperSlot, paperProps] = useSlot('paper', Paper, ownerState, join(utility('paper'), vgType));
+  const [PaperSlot, paperProps] = useSlot('paper', Paper, ownerState, cx(utility('paper'), vgType));
   const [Status, statusProps] = useSlot('status', 'div', ownerState, utility('status'), {
     role: 'status',
     'aria-live': 'polite',
@@ -435,7 +435,7 @@ export function OwnAutocomplete(props: OwnAutocompleteProps) {
     'clearIndicator',
     Indicator,
     ownerState,
-    join(utility('clearIndicator'), vgType),
+    cx(utility('clearIndicator'), vgType),
     {
       ...getClearProps(),
       'aria-label': clearText,
@@ -446,7 +446,7 @@ export function OwnAutocomplete(props: OwnAutocompleteProps) {
     'popupIndicator',
     Indicator,
     ownerState,
-    join(utility('popupIndicator', popupOpen && 'popupIndicatorOpen'), vgType),
+    cx(utility('popupIndicator', popupOpen && 'popupIndicatorOpen'), vgType),
     {
       ...getPopupIndicatorProps(),
       disabled,
@@ -511,9 +511,9 @@ export function OwnAutocomplete(props: OwnAutocompleteProps) {
     ((params: { key: number; group: string; children: React.ReactNode }) => (
       <li key={params.key} data-vg-core="">
         <div
-          className={join(
+          className={cx(
             'MuiListSubheader-root MuiListSubheader-gutters MuiListSubheader-sticky',
-            join(utility('groupLabel'), vgType),
+            cx(utility('groupLabel'), vgType),
           )}
           data-vg-core=""
         >

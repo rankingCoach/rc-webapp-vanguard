@@ -1,9 +1,10 @@
 // Ported from @mui/material@9.5.0 Modal/Modal.js, Unstable_TrapFocus/FocusTrap.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { defaultLayerStack } from '../../core/layer-stack';
 import { defaultModalManager, ManagedModal } from '../../core/modal-manager';
+import { cx } from '../class-names';
 import { Fade } from '../Transitions/Fade';
 import { TransitionTimeout } from '../Transitions/Transition';
 
@@ -241,14 +242,12 @@ export const ModalHost = (props: ModalHostProps) => {
       data-slot="modal-backdrop"
       data-vg-core=""
       // MUI Modal backdrop: class, the Fade style, then aria-hidden.
-      className={[
+      className={cx(
         'MuiBackdrop-root',
         backdropInvisible ? 'MuiBackdrop-invisible' : '',
         'MuiModal-backdrop',
         backdropClassName,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
       style={backdropStyle}
       aria-hidden="true"
       onClick={(event) => open && onClose?.(event, 'backdropClick')}
@@ -261,7 +260,7 @@ export const ModalHost = (props: ModalHostProps) => {
       id={id}
       style={style}
       // MUI Modal: clsx(className, classes.root, hidden) after the root props.
-      className={[className, 'MuiModal-root', !open && !exiting ? 'MuiModal-hidden' : ''].filter(Boolean).join(' ')}
+      className={cx(className, 'MuiModal-root', !open && !exiting ? 'MuiModal-hidden' : '')}
       ref={rootRef}
       onKeyDown={handleKeyDown}
       onFocus={(event) => {
