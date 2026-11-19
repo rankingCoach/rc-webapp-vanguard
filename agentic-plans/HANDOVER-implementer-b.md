@@ -195,8 +195,9 @@ Verify any row with `git merge-base --is-ancestor <sha> feature/ui-sdk-architect
    Note: since A's c8e69a2 made the InputBase route eager again, check-eager-mui reports 23 of 298; none of them is
    B's.
 4. **Agent surface (track 2) remaining items** (log "Track 2 …" sections):
-   4.1 Regenerate `docs/` after the component ports (`node scripts/generate-agent-docs.mjs`; the
-       `scripts/_agent-docs.spec.ts` staleness check fails until then).
+   4.1 Regenerate `docs/` after the component ports with `node scripts/generate-agent-docs.mjs`. The library build
+       also regenerates it. `scripts/_agent-docs.spec.ts` checks determinism and content of fresh output in temp
+       directories. The comparison against the previous local output is recorded in the log.
    4.2 Page coverage for the "Internals pending rebuild" exports as their ports land.
    4.3 Example coverage (lowest priority).
 5. **D10 measurement table refresh.** Re-run `measure-exports.mjs` on a fresh build after A's lazy splits and after

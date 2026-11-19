@@ -288,6 +288,13 @@ Evidence: new specs 13 files; red 22/24 with the implementation removed (the 2 p
 4. SKILL.md: save button is Vanguard `Button htmlType="submit"` (+ `isLoading`), with the useFormStatus child pattern; line added: string labels are already rendered through Text and translated.
 5. generate-exports-props.js CLI (`node scripts/generate-exports-props.js`): base 13dfd71 vs now, 267 = 267 files, 0 differences beyond the two additive prop fields.
 
+### Track 2 regeneration on 026d342
+
+1. `node scripts/generate-agent-docs.mjs` regenerated 298 export pages and `llms.txt`. A recursive byte comparison with the pre-run `docs/` snapshot found 0 additions, 0 removals, and 0 changed files.
+2. Counting headings and markers on the generated pages found 56 pages with examples, 107 with a `Slots:` line, 59 marked WordPress-compatible, and 28 with the standard `Internals pending rebuild:` note. These counts describe the generated text.
+3. Summing file lengths gave 299,931 raw bytes for `docs/` and 305,034 with `skills/vanguard/SKILL.md`. A sorted tar stream of those 300 files with normalized metadata was 73,914 bytes after gzip level 9. This measures the docs and skill together as a separate archive.
+4. `vitest run --maxWorkers=2 --project scripts scripts/_agent-docs.spec.ts` passed 1 file / 8 tests. The spec checks fresh output, including byte-identical generation across two runs. Build-time generation and gitignored output are the existing `decided-by-watchdog` workflow. The local snapshot comparison supplies the staleness evidence for this refresh.
+
 ### Batch 3: Gallery, Header, TreeView, gauges, loaders and small own components
 Drafted by Codex (medium), read line by line; fixes by me: CircularGauge bare slot moved to the styled ComponentContainer (`circular-gauge` + `data-loading`; arc = `circular-gauge-value`), dropped a non-ComponentContainer `gallery-media-item-action-container` slot, spec key fix.
 | Component | Attributes |
