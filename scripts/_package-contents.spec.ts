@@ -38,6 +38,7 @@ describe('package contents gate (agent docs, Track 2)', () => {
     const full = [
       'Portions derived from',
       '@mui/material@9.5.0 (MIT)',
+      '@mui/system@9.5.0 (MIT)',
       'Copyright (c) 2014 Call-Em-All',
       '@popperjs/core@2.11.8 (MIT)',
       'Copyright (c) 2019 Federico Zivolo',
@@ -47,6 +48,7 @@ describe('package contents gate (agent docs, Track 2)', () => {
     expect(missingDerivedNoticeLines('bundled only')).toEqual([
       'Portions derived from',
       '@mui/material@9.5.0 (MIT)',
+      '@mui/system@9.5.0 (MIT)',
       'Copyright (c) 2014 Call-Em-All',
       '@popperjs/core@2.11.8 (MIT)',
       'Copyright (c) 2019 Federico Zivolo',
