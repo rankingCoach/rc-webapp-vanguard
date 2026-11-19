@@ -40,4 +40,28 @@ describe('PopoverModal on the own core', () => {
     expect(document.querySelector('[role="tooltip"]')?.hasAttribute('data-vg-core')).toBe(true);
     view.unmount();
   });
+
+  it('renders the planner create-event card on first render with centering and a portal', () => {
+    const trigger = anchor();
+    const view = render(
+      <PopoverModal
+        anchorEl={trigger}
+        centerPopover
+        renderInPortal
+        disableBackdropClick
+        isOpen
+        content={<p>{'Create event'}</p>}
+        onClose={() => {}}
+        zIndex={7}
+      />,
+    );
+    try {
+      const card = view.getByText('Create event').closest('[role="tooltip"]');
+      expect(card?.parentElement).toBe(document.body);
+      expect(card?.hasAttribute('data-vg-core')).toBe(false);
+    } finally {
+      view.unmount();
+      trigger.remove();
+    }
+  });
 });

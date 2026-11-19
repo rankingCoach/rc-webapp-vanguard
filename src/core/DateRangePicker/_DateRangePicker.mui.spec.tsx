@@ -20,6 +20,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { act, render, screen, waitFor, within } from '../../../test-utils/test-utils';
 import { createDatePickerRange } from './date-range-picker-utils/date-range-picker-utils';
+import { DateRangePickerMuiReference } from './_DateRangePicker.mui-reference';
 import { DateRangePicker, DateRangePickerProps } from './DateRangePicker';
 
 // Each test opens the MUI calendar popper and drives real transitions (~1s isolated). In a full parallel
@@ -98,6 +99,19 @@ describe('DateRangePicker contract: initial render', () => {
       const icon = root.querySelector('svg') as SVGElement;
       expect(input.compareDocumentPosition(icon) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
+  });
+
+  test('the masked calendar field inherits its end adornment classes from the actual frame', () => {
+    const calendarAdornmentClasses = () =>
+      getLeftInput().parentElement?.querySelector('.MuiInputAdornment-positionEnd')?.getAttribute('class');
+
+    const reference = render(<DateRangePickerMuiReference testId={TEST_ID} />);
+    const expected = calendarAdornmentClasses();
+    expect(expected).toContain('MuiInputAdornment-outlined MuiInputAdornment-sizeMedium');
+    reference.unmount();
+
+    renderPicker();
+    expect(calendarAdornmentClasses()).toBe(expected);
   });
 
   test('emits onChange(AUTOMATIC) once on mount with the default preset range', async () => {
