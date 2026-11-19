@@ -18,8 +18,10 @@ export interface MenuListProps extends Omit<React.HTMLAttributes<HTMLUListElemen
   [dataAttr: `data-${string}`]: unknown;
 }
 
+// MUI 9.5 MenuList manages its MenuItems only (own MenuOption and MUI MenuItem both carry MuiMenuItem-root): plain
+// children Select clones with role="option" (a search bar, a footer) get no tab stop and are not navigated.
 const items = (list: HTMLElement | null) =>
-  list ? Array.from(list.querySelectorAll<HTMLElement>(':scope > [role="option"], :scope > [role="menuitem"]')) : [];
+  list ? Array.from(list.querySelectorAll<HTMLElement>(':scope > .MuiMenuItem-root')) : [];
 
 const itemInfo = (el: HTMLElement) => ({
   // biome-ignore lint/performance/useDomNodeTextContent: MUI MenuList typeahead matches the rendered text (innerText, textContent fallback)
