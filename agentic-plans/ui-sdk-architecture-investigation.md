@@ -1541,3 +1541,40 @@ is the next B.2 item ("implement every prop with reachability evidence"), not a 
    combinations from rc-webapp, internal Vanguard callers and WordPress export defaults. Review spreads and
    indirect references. Verify the runtime route and synchronous packed content for every reachable combination.
    The planner's centered portal required both props to trigger the fallback.
+
+#### H20 call-site shape inventory
+
+The import-aware TypeScript scan (`72a8633`, `agentic-plans/uisdk-tools-b/shape-audit/scan.cjs`) binds JSX and
+`createElement` calls to Vanguard imports. Run it with `--component`, `--routing-props`, `--sha` and `--consumer-root`.
+The checked-in [shape fixture](./mui-upgrade-gates/package-fixture/smoke/reachable-route-shapes.json) records the
+prop keys and resolved routing combinations used by the source and packed runtime tests. Dynamic non-routing values
+use synthetic fixture data. The old `c8e69a2` pack is red for the two centered-portal checks and the same pack's
+WordPress smoke is green.
+
+| Component | Shapes | Own | Fallback | Evidence scope |
+| --- | ---: | ---: | ---: | --- |
+| Autocomplete | 24 | 24 | 0 | 26 rc-webapp calls produce 22 shapes, plus the WordPress default and one private source wrapper |
+| Menu | 6 | 6 | 0 | Items, JSX children, size, origins and the media menu's class-only `PaperProps` |
+| MenuItem | 13 | 13 | 0 | Account route spread present/absent, SearchableSelect, TableToolbar and `Menu.items` item props |
+| Snackbar | 2 | 2 | 0 | AiVisibility and SnackbarRoot, which adds `TransitionComponent` |
+| AppBar | 1 | 1 | 0 | Navbar ref, class, fixed position, style and children |
+| Toolbar | 1 | 1 | 0 | Navbar class and children |
+| PopoverPopper | 1 | 1 | 0 | Source-only path through private AutocompleteWithAnchor |
+| FormControl | 0 | 0 | 0 | No production caller or WordPress export |
+| PopoverModal | 2 | 1 | 1 eager | Event details and centered create-event portal |
+| ProgressBar | 22 | 22 | 0 | B's separate exact `f94d932` pack, 48 same-tick checks and cold buffer/query controls |
+
+The AccountNavMenu conditional adds only `selected` and `useActiveIcon`. The internal `Menu.items` spread drops the
+React key and forwards each config's fields. The configured items were checked for `component` and `href`. The
+media menu's `MENU_PAPER_PROPS` contains only `className`. AutocompleteWithAnchor is private and has no production
+caller. Its spread has source coverage in the real wrapper. PopoverPopper has source coverage and no public packed
+entry. Icon and StatusBadgeIcon's WordPress tests assert their existing empty first commit and then the local SVG
+load separately.
+
+**Autocomplete Clear icon (decided-by-watchdog).** The keyboard differential sampled the own side before the
+shared asset cache was warm and the frozen MUI side afterwards. Resetting the dynamic-import module before each
+side and running both orders gave the same eight samples. Popup and Clear SVGs were absent at the cold synchronous
+sample and present after settling. Both were present immediately on warm replays. The `Icon.tsx` difference from
+merge-base `99ee34c` is limited to data attributes. H15 remains PASS. The settled differential gives both sides the
+same warm asset state and waits for both indicators. The replay used jsdom. Chromium first-frame checks remain part
+of H20.

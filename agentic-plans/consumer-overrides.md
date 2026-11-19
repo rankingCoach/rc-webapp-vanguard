@@ -36,6 +36,8 @@ stylesheet was found. `RenderRoot.tsx` has its own loader and sits outside this 
 [_AppBarComputedParity.stories.tsx](../src/core/AppBar/_AppBarComputedParity.stories.tsx) places the entry CSS
 before Vanguard. At rest and scrolled, both headers compute `box-shadow`, `0.3s`,
 `cubic-bezier(0.4, 0, 0.2, 1)` and `0s`. The fixture is green locally at `73d25d7`.
+Verifier 2 independently ran that exact SHA twice, 3/3 stories each time, and accepted tie #13 for the customer
+entry. The guarded raw results are `v2/out/par/h19-d15-73d25d7-port-{1,2}.json`.
 
 Before release, confirm the built customer app puts the entry CSS before Vanguard CSS in `<head>` and check
 that the bar changes background immediately on scroll. The built app itself was inspected as files.
