@@ -1272,3 +1272,48 @@ MUI X component it replaces:
 3. S3 picker shell on OwnPopper (desktop) / ModalHost dialog (mobile), toolbar + keyboard-view toggle, layout; then
    the DatePicker switch, judged by the 13 existing specs + the frozen-reference differential + Chromium parity.
 Each stage is its own commit; S3 is the handoff. `@mui/x-date-pickers` leaves `dependencies` only after S3 passes.
+
+### 36.0 Watchdog decision and reachable-surface inventory (2026-11-19)
+
+**Decision (decided-by-watchdog): APPROVED WITH CONDITIONS.**
+1. Inventory before S1 (below).
+2. The S2 parity matrix is locale × format plus paste, IME, Backspace across sections, invalid/partial input,
+   min/max clamp, readOnly/disabled, controlled change mid-edit and the section a11y DOM. Each case is a differential
+   vs MUI X, mutation-checked.
+3. AdapterMoment stays: the own code talks to one adapter seam, so a later moment swap is one change.
+4. S3 desktop/mobile switch on the ported useMediaQuery `(pointer: fine)` incl. the SSR/first-render value. The mobile
+   dialog goes on ModalHost only after H16b PASS. Scroll lock and focus restore asserted; Tier P open/close scenario.
+5. Stop rule: two behaviour FAILs at a verifier on S2 or S3 → DatePicker stays on MUI X as the one remaining user,
+   logged with the evidence.
+6. MUI X is MIT: derived-notices entry plus file headers.
+7. The cheaper, more reachable @mui/material leftovers go before S2/S3 (§36.1).
+
+**Public API.** `DatePickerProps` is a closed interface with no pass-through:
+`value, required, label, minDate, maxDate, disablePast, formconfig, field, index, closeOnCLickAway, onChange, locale`.
+Every one of these must be implemented; no MUI X prop is reachable from outside.
+
+**rc-webapp sites.** 8 sites in 4 files:
+1. GoogleAdsPerformanceDateRange (2): locale "en-GB", label, required, value, minDate, maxDate, onChange, key.
+2. BoostDuration (1): locale, disablePast, label, required, value, minDate, onChange.
+3. PostCount.step (2): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange.
+4. EventsSetupFormMain (2+): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange, label.
+
+No formconfig/field use was found at the sites.
+
+**Locales.**
+1. `localeFormatted` is the location's locale with `_` → `-` (de-DE, de-AT, en-GB, en-IE, en-US, es-ES, …).
+2. FINDING, pre-existing, not changed: `getDatePatternFromLocale` keys are `de_DE`-style. Every rc-webapp locale
+   misses, so all production sites use the fallback `DD.MM.YYYY` and log a console.error. Fixing it would change the
+   visible format per locale (en-US → MM/DD/YYYY). That is a behaviour change for the user to decide, not part of the
+   port.
+3. The port keeps the lookup as is. The S2 matrix still covers every format the map can produce: MM/DD/YYYY,
+   DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY, YYYY-MM-DD, YYYY/MM/DD.
+4. Week start: moment's global locale. Vanguard passes no adapterLocale and rc-webapp never calls `moment.locale()`,
+   so the reachable case is `en`, week starting Sunday.
+5. Digits: Latin only (no ar/fa/hi locales in the map).
+
+**WordPress.** DatePicker is not exported from index-wordpress.ts.
+
+**Reachable MUI X behaviour.** Only through the props above: the DatePicker shell (desktop popper / mobile dialog by
+`(pointer: fine)`), DateField sections in the locale pattern, the day/year calendar views, min/max/disablePast, the
+toolbar keyboard-view toggle (mobile) and closeOnClickAway (Vanguard's own outside callback).
