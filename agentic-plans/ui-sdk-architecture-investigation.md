@@ -1161,3 +1161,28 @@ the WordPress smoke, the 16 unreachable last (still migrated, user decision). Li
 4. Trigger slot: the wrapper span is `data-slot="popover-trigger"` (wrapChildren); with wrapChildren={false} the
    consumer's element is the trigger. rc-webapp Tier A screens: schedulecard `[class*="runTime"]`, InfoIcon story
    (`buildingblocks-infoicon--info-icon-story`, hover the popover-trigger span).
+
+## 34. D10 efficiency and watchdog decisions (2026-11-19)
+
+1. B's measurement (thread B log "(e) D10 efficiency measurement", tool agentic-plans/uisdk-tools-b/measure-exports.mjs,
+   1693d92): root barrel static closure 1.97 MB gz; eager heavy libs per export (video.js 158 KB, apexcharts 147 KB,
+   xlsx/jszip 146 KB [now lazy, b4ef33a/ec7b592], lexical 89 KB, lottie 68 KB, moment 23 KB in 24 exports); Text pays
+   37 KB (html-react-parser + react-spring, animateWords; B f4 768ca96 lazy, pending); Table pays libphonenumber
+   metadata via Toolbar → CheckBox → FormElement → valid-input; emotion still reached through Toolbar → Input →
+   Skeleton and Button → Grow/useTheme (goes with the Button/motion rebuilds).
+2. Decided by watchdog: package.json `sideEffects: ["*.css", "**/*.css"]` (false also marked style.css
+   side-effect-free; other bundlers may drop it). Own commit, red/green spec scripts/_package-side-effects.spec.ts,
+   package gate.
+3. Decided by watchdog: StyledSVG moves from styled-components to static rules (B, f3) in the compat last block
+   (runtime-injected styles won ties like emotion; D15 position keeps that); A drops styled-components from
+   package.json in its own commit after B10 passes.
+4. Decided by watchdog: B takes MUI-backed leaf components (no overlay/positioning/input-frame), same differential
+   method, one component = one commit = one pack, verifier 2 Tier A. Order agreed: Collapse → Fade → Button →
+   ProgressBar → Accordion → List/ListShowMore → Chip → Breadcrumbs → Pagination → Slider, then the react-spring motion
+   group. A keeps Autocomplete/SearchableSelect, Select variants, Modal/Drawer/Snackbar, pickers, Tooltip users,
+   FocusTrap/PopoverModal, AppBar/Toolbar; approves B's compat `@use` lines, applies B's WordPress smoke patches, takes
+   primitive requests.
+5. Standing rule (watchdog): the moment a pack goes to a verifier, its content is committed by path as its own SHA
+   ("handoff N, verdict pending"); a FAIL gets a fix commit on top.
+6. Differential canonical form (SearchableSelect): attribute, style-declaration and class-token order are sorted
+   before comparing (no observable meaning); values and structure must match.
