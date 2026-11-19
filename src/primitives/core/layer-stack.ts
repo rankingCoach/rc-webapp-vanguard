@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ClickAwayListener/ClickAwayListener.js (MIT)
 /**
  * Group B (watchdog MINOR 4): the order in which overlay layers opened. ModalHost and every click-away host register
  * their root; a click that starts inside a layer opened AFTER a click-away host (stacked above it, e.g. a Select menu

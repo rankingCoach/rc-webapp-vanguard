@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 MenuItem/MenuItem.js (MIT)
 import { classNames } from '@helpers/classNames';
 import React from 'react';
 import { ButtonBase } from '../ButtonBase/ButtonBase';

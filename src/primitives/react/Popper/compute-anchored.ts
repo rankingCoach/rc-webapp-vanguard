@@ -1,3 +1,4 @@
+// Ported from @popperjs/core@2.11.8 lib/utils/detectOverflow.js, lib/dom-utils/getCompositeRect.js (MIT)
 import { AnchoredPlacementResult, anchoredPlacement, Placement } from '../../core/anchored-placement';
 import { getClippingRect, getCompositeRect, getOffsetParent, layoutSize } from './dom-geometry';
 import type { ResolvedPopperOptions } from './popper-options';

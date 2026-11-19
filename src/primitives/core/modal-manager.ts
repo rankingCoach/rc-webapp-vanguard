@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Modal/ModalManager.js (MIT)
 /**
  * Modal manager (framework-free): port of the MUI ModalManager Vanguard shipped. While a modal (menu, popover,
  * dialog) is open it aria-hides the container's other children (except the top modal and forbidden tags), and locks

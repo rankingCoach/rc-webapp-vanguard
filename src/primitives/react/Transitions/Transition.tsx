@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 internal/Transition.js (MIT)
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 export type TransitionStatus = 'unmounted' | 'exited' | 'entering' | 'entered' | 'exiting';

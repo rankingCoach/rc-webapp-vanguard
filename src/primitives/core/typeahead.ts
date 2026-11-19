@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Select/SelectInput.js (MIT)
 /**
  * Typeahead behavior (framework-free), matching MUI Select's closed typeahead: lower-cased label prefix search that
  * starts after the previous match, cycles through equal first letters on a repeated key, and resets after a pause

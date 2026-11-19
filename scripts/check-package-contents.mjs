@@ -20,6 +20,18 @@ export const documentedExports = (entryFile) => {
   return names;
 };
 
+/** Lines the "Portions derived from" section of THIRD_PARTY_NOTICES.txt must contain (licence of ported code). */
+export const DERIVED_NOTICE_LINES = [
+  'Portions derived from',
+  '@mui/material@9.5.0 (MIT)',
+  'Copyright (c) 2014 Call-Em-All',
+  '@popperjs/core@2.11.8 (MIT)',
+  'Copyright (c) 2019 Federico Zivolo',
+  'Permission is hereby granted, free of charge',
+];
+
+export const missingDerivedNoticeLines = (text) => DERIVED_NOTICE_LINES.filter((line) => !text.includes(line));
+
 /** Required tarball entries that are absent, in a stable order (llms.txt, skill, then pages by export order). */
 export const missingPackageEntries = (entries, exportNames) => {
   const present = new Set(entries.map((e) => e.replace(/\/$/, '')));
@@ -42,9 +54,19 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     .filter(Boolean);
   const names = documentedExports(path.join(ROOT, 'src/index.ts'));
   const missing = missingPackageEntries(entries, names);
+  for (const notices of ['package/dist/THIRD_PARTY_NOTICES.txt', 'package/dist-wordpress/THIRD_PARTY_NOTICES.txt']) {
+    if (!entries.includes(notices)) {
+      missing.push(notices);
+      continue;
+    }
+    const text = execFileSync('tar', ['-xOzf', tgz, notices], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    for (const line of missingDerivedNoticeLines(text)) missing.push(`${notices}: ${line}`);
+  }
   if (missing.length > 0) {
     console.error(`package contents: ${missing.length} missing\n${missing.join('\n')}`);
     process.exit(1);
   }
-  console.log(`package contents: llms.txt, SKILL.md and ${names.size} component pages present`);
+  console.log(
+    `package contents: llms.txt, SKILL.md, ${names.size} component pages and the derived-code notices (both bundles) present`,
+  );
 }

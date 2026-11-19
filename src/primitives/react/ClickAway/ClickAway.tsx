@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ClickAwayListener/ClickAwayListener.js (MIT)
 import React, { useCallback, useEffect, useRef } from 'react';
 import { defaultLayerStack, isClickAway, LayerToken } from '../../core/layer-stack';
 

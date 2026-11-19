@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 styles/createTransitions.js (MIT)
 /**
  * Transition timing (framework-free), the MUI values Vanguard shipped: auto height-based duration and the Grow
  * (menu/popover) opacity + transform transition, as the exact inline strings MUI wrote.

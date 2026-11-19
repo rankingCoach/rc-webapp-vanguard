@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 InputBase/InputBase.js, TextField/TextField.js (MIT)
 import { classNames } from '@helpers/classNames';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useVanguardTypography } from '../typography-context';

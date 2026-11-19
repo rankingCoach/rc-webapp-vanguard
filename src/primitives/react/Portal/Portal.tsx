@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Portal/Portal.js (MIT)
 import React, { useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 

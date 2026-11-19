@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Modal/Modal.js, Unstable_TrapFocus/FocusTrap.js (MIT)
 import { classNames } from '@helpers/classNames';
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';

@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ButtonBase/ButtonBase.js (MIT)
 /**
  * Press behavior (framework-free): host attributes and keyboard activation for anything that acts as a button.
  * Native <button>/<a href> activate themselves; any other host gets role=button and a real click() from

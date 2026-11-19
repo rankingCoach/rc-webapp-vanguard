@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 InputBase, OutlinedInput, InputLabel, FormHelperText, Select, MenuItem, List, Modal, Backdrop, InputAdornment, Typography (emotion styles) (MIT)
 // Outlined TextField + Select + Menu base styles: the exact MUI 9.5 (default theme) emotion output Vanguard shipped,
 // extracted per element with agentic-plans/uisdk-tools/extract-emotion-rules.mjs and from MUI source for variants no
 // story triggered. Specificity rule (D15): each emotion `.css-hash` becomes ONE stable class at emotion's own

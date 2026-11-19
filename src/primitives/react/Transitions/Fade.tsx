@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Fade/Fade.js (MIT)
 import React, { useCallback, useRef } from 'react';
 import { EASE_IN_OUT } from '../../core/transition';
 import { reflow, Transition, TransitionStatus, TransitionTimeout } from './Transition';

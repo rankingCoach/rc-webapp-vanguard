@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Select/SelectInput.js, Select/Select.js (MIT)
 import { classNames } from '@helpers/classNames';
 import React, { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { isMouseEventInsideElement as inside } from '../../core/hit-test';

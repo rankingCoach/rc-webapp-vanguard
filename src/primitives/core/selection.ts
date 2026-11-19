@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ToggleButtonGroup/isValueSelected.js (MIT)
 /**
  * Selection behavior (framework-free). Value semantics match the ToggleButtonGroup contract Vanguard shipped:
  * exclusive groups hold one value or null; multiple groups hold an array.

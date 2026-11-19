@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ButtonBase/ButtonBase.js (MIT)
 import './ButtonBase.scss';
 
 import { classNames } from '@helpers/classNames';

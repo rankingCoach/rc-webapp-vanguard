@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 Backdrop/Backdrop.js (MIT)
 import React from 'react';
 import { Fade } from '../Transitions/Fade';
 import { TransitionTimeout } from '../Transitions/Transition';

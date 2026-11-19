@@ -1,3 +1,4 @@
+// Ported from @mui/material@9.5.0 ButtonBase/TouchRipple.js (MIT)
 import { classNames } from '@helpers/classNames';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { mergeRippleOrder, rippleGeometry } from '../../core/ripple';
