@@ -8,7 +8,11 @@ import { ButtonBase } from './ButtonBase';
  * Junk class tokens (B finding, track h): MUI's clsx emits only real tokens separated by single spaces. The own
  * ButtonBase must not emit empty entries (stray spaces) and must carry MUI's token set, per state.
  */
-const tokens = (cls: string) => cls.split(' ').filter((t) => t !== '' && !/^css-/.test(t)).sort();
+const tokens = (cls: string) =>
+  cls
+    .split(' ')
+    .filter((t) => t !== '' && !/^css-/.test(t))
+    .sort();
 
 describe('ButtonBase class attribute', () => {
   const cases: [string, Record<string, unknown>, boolean][] = [
