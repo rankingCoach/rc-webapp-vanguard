@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Canonical release gate; retain the frozen fixture's exact nonzero exit.
-# The fixture ends nonzero by design (measured diagnostics, not a full declaration pass), so the checks below run
-# regardless of its code and the script still exits with the fixture's code when they pass.
+# A gated declaration or runtime failure makes the fixture exit nonzero. Measurements run separately. The checks
+# below run regardless of the fixture status and preserve that status when they pass.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export PACKAGE_FIXTURE_OUT="${PACKAGE_FIXTURE_OUT:-$(mktemp -d /tmp/vanguard-package-gate.XXXXXX)}"

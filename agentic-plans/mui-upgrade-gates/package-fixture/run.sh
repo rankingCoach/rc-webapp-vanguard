@@ -57,11 +57,15 @@ JS
       # Reproduce Vanguard's normal install lifecycle with the consumer cwd and configuration.
       node node_modules/@rankingcoach/vanguard/scripts/clean-assets-based-on-vanguardrc.js > postinstall.log 2>&1 || exit $?
       result=0
+      if [ "$bundle" = default ]; then
+        # Assert the installed runtime artifacts that TypeScript sees through rc-webapp's ambient declarations.
+        node -e 'for (const path of ["style.css", "dist/index-OverlayStackingService.js"]) console.log(require.resolve(`@rankingcoach/vanguard/${path}`));' > d12-runtime-paths.log 2>&1 || result=1
+      fi
       node_modules/.bin/tsc -p "tsconfig.$bundle.gated.json" > types-gated.log 2>&1 || result=1
       if [ "$bundle-$peer" = default-mui ]; then
         node_modules/.bin/tsc -p tsconfig.default.mui-gated.json > types-mui-gated.log 2>&1 || result=1
       fi
-      BUNDLE="$bundle" node_modules/.bin/vitest run > smoke.log 2>&1 || result=1
+      BUNDLE="$bundle" node_modules/.bin/vitest run --maxWorkers=2 > smoke.log 2>&1 || result=1
       exit "$result"
     ) || {
       # The original v5 graph pins Emotion below MUI's optional-peer minimum. Never bypass resolution.

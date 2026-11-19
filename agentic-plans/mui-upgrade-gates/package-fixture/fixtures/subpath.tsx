@@ -1,17 +1,17 @@
 /**
- * GATED consumer fixture: Tier A items NOT exported from the package root, imported through the documented
- * subpath exports (`./core/*`, `./common/*`, `./helpers/*` in package.json `exports`).
- *
- * TYPES ONLY: the `types` targets (dist/types/**) exist, but the `import`/`require` targets (dist/core/*.js, ...)
- * do not, because the lib build flattens modules to dist/index-<Name>.js. run.sh probes that at runtime
- * (exports-probe) and reports it; it is not part of this type gate.
+ * GATED consumer declaration fixture. The installed package exposes these existing declarations through `./dist/*`.
+ * The explicit `.d.ts` paths and type imports make this a compile-time contract for the declarations.
  * AutocompleteWithAnchor (also subpath-only) is in realistic-usage.tsx: its autocompleteProps need MUI to compile.
  */
-import { AIAssistantPanel } from '@rankingcoach/vanguard/core/AIAssistant/AIAssistentPanel/AIAssistantPanel';
-import { VerificationPinInput } from '@rankingcoach/vanguard/common/VerificationPinInput/VerificationPinInput';
-import { hexToRgba } from '@rankingcoach/vanguard/helpers/hex-to-rgba';
+import type { AIAssistantPanel as AIAssistantPanelDeclaration } from '@rankingcoach/vanguard/dist/types/core/AIAssistant/AIAssistentPanel/AIAssistantPanel.d.ts';
+import type { VerificationPinInput as VerificationPinInputDeclaration } from '@rankingcoach/vanguard/dist/types/common/VerificationPinInput/VerificationPinInput.d.ts';
+import type { hexToRgba as hexToRgbaDeclaration } from '@rankingcoach/vanguard/dist/types/helpers/hex-to-rgba.d.ts';
 
 import type { Equal, Expect } from './_helpers';
+
+declare const AIAssistantPanel: typeof AIAssistantPanelDeclaration;
+declare const VerificationPinInput: typeof VerificationPinInputDeclaration;
+declare const hexToRgba: typeof hexToRgbaDeclaration;
 
 export type SubpathTypeChecks = [Expect<Equal<typeof hexToRgba, (hexColor: string, alpha: number) => string>>];
 

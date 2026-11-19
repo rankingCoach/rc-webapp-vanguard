@@ -1,1 +1,16 @@
-{ "extends": "./tsconfig.base.json", "files": ["fixtures/_helpers.ts", "fixtures/components.tsx", "fixtures/subpath.tsx"] }
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "vanguard/*": ["./node_modules/@rankingcoach/vanguard/*"]
+    }
+  },
+  "files": [
+    "fixtures/_helpers.ts",
+    "fixtures/components.tsx",
+    "fixtures/subpath.tsx",
+    "fixtures/d12-consumer-paths.d.ts",
+    "fixtures/d12-consumer-paths.ts"
+  ]
+}

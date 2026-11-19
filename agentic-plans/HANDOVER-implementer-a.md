@@ -74,7 +74,8 @@ Storybook on the host.
    timing gets re-run alone before it is called that. Until §36.5's timings are in, assume load failures may be
    caused by the old preload.
 4. **Package gate:** `PACKAGE_FIXTURE_OUT=<dir> bash agentic-plans/mui-upgrade-gates/package.sh`.
-   1. The script exits 1 by design (measured diagnostics). Judge it by its outputs:
+   1. The gated declaration, runtime and packaging checks must exit zero. The separate measured diagnostics
+      are informational. Check these outputs alongside the exit status:
       1. H20 `runtime-counts.json` expected 34/34/44/44 = 156.
       2. "package contents … present".
       3. "dist identity: N packed dist files equal the build on disk".
@@ -82,7 +83,7 @@ Storybook on the host.
       5. "fallback audit: … 0 unexpected, 0 stale".
       6. The first line of `eager-mui.txt`.
    2. `npm pack` runs `prepare` (the build) even with --ignore-scripts, so the pack IS the build and `--skip-build`
-      has no effect.
+      has no effect. Use `PACKAGE_FIXTURE_TGZ=<verified pack>` to replay the consumer fixture without a build.
    3. Cadence: per handoff, build + pack + targeted checks. The full package.sh runs when package.json, build config,
       notices or exports change, every 3rd handoff, and before Tier C.
 5. **Eager-@mui gate (§36.3):** after `pnpm build`, run `node scripts/check-eager-mui.mjs` and

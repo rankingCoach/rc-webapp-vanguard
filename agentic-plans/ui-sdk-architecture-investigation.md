@@ -349,6 +349,8 @@ Source: `/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-s
    3. `dist/index-es.js` (widget-image stub).
    4. The `dist/index-<File>.js` naming used by rc-webapp's unregistered codesplit plugin.
 2. Any efficiency change to entry layout or chunk names (D10) keeps these names as aliases or is announced to the verifier first.
+3. **For the user's pre-release list:** old wildcard deep exports (`core/*`, `common/*`, `helpers/*`) are gone since
+   `04fca13`. Confirm intended. WordPress plugin deep imports are outside the source available for this audit.
 
 ### 11.6 Updated Redux end state
 1. Root entry: **no** `redux`/`@reduxjs/toolkit`/`redux-persist` in production. `react-redux` only in `use-legacy-dispatch.ts` until rc-webapp's fork binds dispatch, then optional.
@@ -1689,3 +1691,30 @@ below were green. The timings are Vitest case runtimes, excluding worker setup a
 The calendar click case already waits on the actual day buttons before sending the real pointer interactions. Its
 first sample exceeded half the default budget. The case now has its own 10 s timeout, over three times that sample,
 with identical interactions, assertions and condition waits. The differential stayed below half its existing budget.
+
+### 36.6 H20 declaration fixture correction (decided-by-watchdog)
+
+The H20 pack at `153233cf08baccdb6a290c58f62711e7bef15c4a` has SHA-256
+`bc76c32b0eb04808bb300ef01c47b89f79f0001e07fcd956520f1466b1efae89`. Its full source audit was green
+(378 files, 2,725 tests), both bundles matched 4,233 on-disk build files, and all 156 packed runtime tests were
+green. The built eager graph reports **24/298** plus one allowed context module. WordPress reaches 336 files with
+zero missing targets. The allow-list has 17 specs and five stories. The original canonical package command exited
+1 because the default declaration gate was red. The separate measured declaration diagnostics do not set its exit status.
+
+The same default declaration fixture emitted six identical errors on exact H20, `32a6b93` and the read-only `.472`
+copy. `04fca13` deliberately removed the `core/*`, `common/*` and `helpers/*` package exports present at `99ee34c`.
+The fixture had been stale since that change. Its TS2307 values came from AIAssistantPanel, VerificationPinInput and
+hexToRgba imports using those old prefixes. The three TS2578 directives then saw unresolved error types. The
+corrected paths resolve actual declarations through `./dist/*`, preserving the existing checks for required
+`pinMask`, invalid `status="sleeping"` and numeric `alpha`.
+
+The committed rc-webapp `73673465091` import scan found four literal Vanguard deep imports, all resolved against
+H20 using its alias and ambient declarations. The default fixture now checks the stylesheet, the overlay chunk and
+its ambient typing, plus the OverlayStackingService and ModalSplitView declaration paths. It also resolves the two
+actual JS/CSS assets from the installed package. The watchdog approved the fixture-only correction. The package
+manifest, runtime, declaration files and H20 tarball retain the same bytes. [Baseline diagnostics and consumer scan](/Users/a.kott/vanguard-verify/logs/h20-types-baselines/).
+
+The corrected canonical replay on that same tarball exited **0**. The four consumer cells ran 34/34/44/44 runtime
+tests and every gated declaration log was empty. The corrected default declaration and runtime-artifact checks
+also exited 0 against a read-only copy of `.472`. One-minute load went from 14.02 to 22.99 during the replay and
+sampled free memory stayed at or above 57%. [Replay output](/Users/a.kott/vanguard-verify/logs/h20-types-baselines/replay-bc76c32b/package.log).
