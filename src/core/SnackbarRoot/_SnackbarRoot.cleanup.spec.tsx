@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * snackbarService is the consumer path (reachability map): service open → slide in → auto-hide → close → unmount,
- * and a second snackbar replacing an open one, leave no timer, document/window listener or DOM behind. The pub-sub
- * subscriptions themselves stay (characterised as a bug-lock in _SnackbarRoot.mui.spec.tsx; decision pending).
+ * and a second snackbar replacing an open one, leave no timer, document/window listener or DOM behind.
+ * The pub-sub observer lifecycle is covered in _SnackbarRoot.mui.spec.tsx.
  */
 type Key = string;
 const live = new Map<Key, number>();

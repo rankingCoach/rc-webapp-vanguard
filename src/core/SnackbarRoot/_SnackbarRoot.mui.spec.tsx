@@ -1,9 +1,8 @@
 import { PUB_SUB_EVENTS, pubSubService } from '@helpers/pub-sub';
-import { SnackbarRoot } from '@vanguard/SnackbarRoot/SnackbarRoot';
 import { snackbarService } from '@vanguard/SnackbarRoot/SnackBarService';
+import { SnackbarRoot } from '@vanguard/SnackbarRoot/SnackbarRoot';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { act, fireEvent, render, screen } from '../../../test-utils/test-utils';
 
 /**
@@ -17,7 +16,7 @@ import { act, fireEvent, render, screen } from '../../../test-utils/test-utils';
  * pubSubService (src/helpers/pub-sub.ts) keeps one ReplaySubject per event for the lifetime of the page and has no
  * public reset/unsubscribe-all API ($pub/$sub only), so without this every test would replay the previous tests'
  * messages into its SnackbarRoot. `reset()` drops the snackbar subjects (beforeEach and afterEach);
- * `openObserverCount()` reads the subscriber count for the unsubscribe test.
+ * `observerCount()` reads the subscriber count for the unsubscribe test.
  */
 const pubSubTestAccess = (() => {
   type Subjects = Record<string, { observers?: unknown[] } | undefined>;
@@ -27,7 +26,7 @@ const pubSubTestAccess = (() => {
       delete events()[PUB_SUB_EVENTS.reactSnackbarOpen];
       delete events()[PUB_SUB_EVENTS.reactSnackbarClose];
     },
-    openObserverCount: () => events()[PUB_SUB_EVENTS.reactSnackbarOpen]?.observers?.length ?? 0,
+    observerCount: (event: string) => events()[event]?.observers?.length ?? 0,
   };
 })();
 
@@ -254,16 +253,19 @@ describe('SnackbarRoot (MUI Snackbar + Slide contract)', () => {
       expect(getRoot()!.textContent).toContain('Old 2');
     });
 
-    // CURRENT BEHAVIOUR (suspected bug): the subscriptions are never unsubscribed on unmount.
-    it('[bug-lock] unmounting does not remove its pub-sub subscription', () => {
-      // Baseline characterization: not a promised contract.
-      const { unmount } = render(<SnackbarRoot />);
-      const mounted = pubSubTestAccess.openObserverCount();
-      expect(mounted).toBeGreaterThan(0);
+    it('removes both pub-sub subscriptions on every unmount', () => {
+      const observerCounts = () => [
+        pubSubTestAccess.observerCount(PUB_SUB_EVENTS.reactSnackbarOpen),
+        pubSubTestAccess.observerCount(PUB_SUB_EVENTS.reactSnackbarClose),
+      ];
+      expect(observerCounts()).toEqual([0, 0]);
 
-      unmount();
-
-      expect(pubSubTestAccess.openObserverCount()).toBe(mounted);
+      for (let mount = 0; mount < 5; mount++) {
+        const { unmount } = render(<SnackbarRoot />);
+        expect(observerCounts()).toEqual([1, 1]);
+        unmount();
+        expect(observerCounts()).toEqual([0, 0]);
+      }
     });
 
     it('[v5-quirk] messages published before any root subscribed are dropped', () => {

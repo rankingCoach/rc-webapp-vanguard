@@ -19,22 +19,30 @@ export const SnackbarRoot = (props: Props) => {
   const [type, setType] = useState<SnackbarType | undefined>(undefined);
 
   useEffect(() => {
-    pubSubService.$sub(PUB_SUB_EVENTS.reactSnackbarOpen, ({ type, message, title, onClose }) => {
-      //console.log("Snackbar: Open", type, message, title, onClose);
-      setIsOpen(false);
-      setMessage(message);
-      seOnClose(() => onClose);
-      setType(type);
+    const openSubscription = pubSubService.$sub(
+      PUB_SUB_EVENTS.reactSnackbarOpen,
+      ({ type, message, title, onClose }) => {
+        //console.log("Snackbar: Open", type, message, title, onClose);
+        setIsOpen(false);
+        setMessage(message);
+        seOnClose(() => onClose);
+        setType(type);
 
-      setTimeout(() => {
-        setIsOpen(true);
-      });
-    });
+        setTimeout(() => {
+          setIsOpen(true);
+        });
+      },
+    );
 
-    pubSubService.$sub(PUB_SUB_EVENTS.reactSnackbarClose, ({ id }) => {
+    const closeSubscription = pubSubService.$sub(PUB_SUB_EVENTS.reactSnackbarClose, ({ id }) => {
       //console.log("Snackbar: close", id);
       setIsOpen(false);
     });
+
+    return () => {
+      openSubscription.unsubscribe();
+      closeSubscription.unsubscribe();
+    };
   }, []);
 
   return (
