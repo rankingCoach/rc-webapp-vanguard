@@ -1,6 +1,5 @@
 import { classNames } from '@helpers/classNames';
 import React, { CSSProperties, SVGProps } from 'react';
-
 import SVG from './InlineSvg.tsx';
 
 export type RcSvgProps = SVGProps<unknown> & {
@@ -37,15 +36,18 @@ export const StyledSVG = (props: StyledSVGProps) => {
     <SVG
       {...(props as unknown as React.ComponentProps<typeof SVG>)}
       data-testid={testid}
+      // @helpers/classNames is a plain join: only real tokens may reach it (no `false`, no empty entries).
       className={classNames(
-        'vg-styled-svg',
-        set(width) && 'vg-styled-svg--size',
-        set(color) && 'vg-styled-svg--fill',
-        set(fillOpacity) && 'vg-styled-svg--fill-opacity',
-        set(backgroundcolor) && 'vg-styled-svg--rect-fill',
-        set(backgroundrepeat) && 'vg-styled-svg--repeat',
-        set(hovercolor) && 'vg-styled-svg--hover-fill',
-        className,
+        ...[
+          'vg-styled-svg',
+          set(width) ? 'vg-styled-svg--size' : undefined,
+          set(color) ? 'vg-styled-svg--fill' : undefined,
+          set(fillOpacity) ? 'vg-styled-svg--fill-opacity' : undefined,
+          set(backgroundcolor) ? 'vg-styled-svg--rect-fill' : undefined,
+          set(backgroundrepeat) ? 'vg-styled-svg--repeat' : undefined,
+          set(hovercolor) ? 'vg-styled-svg--hover-fill' : undefined,
+          className || undefined,
+        ].filter((c): c is string => !!c),
       )}
       style={{ ...(vars as CSSProperties), ...style }}
     />
