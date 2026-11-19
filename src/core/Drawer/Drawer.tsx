@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './Drawer.module.scss';
-import DrawerBase, { DrawerProps as DrawerBaseProps } from '@mui/material/Drawer';
+import { Drawer as DrawerBase, DrawerProps as DrawerBaseProps } from '../../primitives/react/Drawer/Drawer';
 import { ModalResponse } from '@vanguard/Modal/ModalResponse';
 import { DrawerCloseResponse } from './Drawer.types';
 import { Button, ButtonSizes, ButtonTypes } from '@vanguard/Button/Button';

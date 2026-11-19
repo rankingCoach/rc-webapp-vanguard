@@ -1,5 +1,6 @@
 // Ported from @mui/material@9.5.0 Tooltip/Tooltip.js (MIT)
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { cx } from '../class-names';
 import { OwnPopper } from '../Popper/Popper';
 import { Grow } from '../Transitions/Grow';
 import { useVanguardTypography } from '../typography-context';
@@ -92,7 +93,6 @@ const isFocusVisible = (element: Element) => {
 const bodyStyle = () => document.body.style as unknown as { WebkitUserSelect: string | undefined };
 
 /** clsx: truthy strings joined by one space. */
-const cx = (...parts: unknown[]) => parts.filter((p) => typeof p === 'string' && p !== '').join(' ');
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -150,7 +150,8 @@ export const Tooltip = (props: TooltipProps) => {
   const touchTimer = useTimer();
   const reactId = useId();
   const vgType = useVanguardTypography() === 'vanguard' ? 'vg-typography-vanguard' : '';
-  const id = idProp ?? `mui-${reactId}`;
+  // MUI useId(idProp) on React >= 18: React's id as is (`mui-` is only its pre-useId fallback).
+  const id = idProp ?? reactId;
 
   const stopTouchInteraction = () => {
     if (prevUserSelect.current !== undefined) {
@@ -285,21 +286,16 @@ export const Tooltip = (props: TooltipProps) => {
     : { onMouseOver: handleMouseOver, onMouseLeave: handleMouseLeave, onFocus: handleFocus, onBlur: handleBlur };
 
   // MUI composeClasses: per slot key, the utility class then the caller's override.
-  const c = (key: keyof TooltipClassesOverride, on = true) =>
-    on ? [`MuiTooltip-${key}`, classes?.[key]].filter(Boolean).join(' ') : '';
+  const c = (key: keyof TooltipClassesOverride, on = true) => (on ? cx(`MuiTooltip-${key}`, classes?.[key]) : '');
   const touch = ignoreNonTouchEvents.current;
-  const popperClass = [
+  const popperClass = cx(
     c('popper'),
     c('popperInteractive', !disableInteractive),
     c('popperArrow', arrow),
     c('popperClose', !open),
-  ]
-    .filter(Boolean)
-    .join(' ');
+  );
   const side = capitalize(placement.split('-')[0]) as 'Top' | 'Bottom' | 'Left' | 'Right';
-  const tooltipClass = [c('tooltip'), c('touch', touch), c('tooltipArrow', arrow), c(`tooltipPlacement${side}`)]
-    .filter(Boolean)
-    .join(' ');
+  const tooltipClass = cx(c('tooltip'), c('touch', touch), c('tooltipArrow', arrow), c(`tooltipPlacement${side}`));
 
   const { className: popperSlotClass, popperOptions: popperSlotOptions, ...popperSlotRest } = slotProps.popper ?? {};
   const popperOptions = useMemo(

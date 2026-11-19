@@ -11,11 +11,15 @@
 @use '../core/ToggleButtonGroup/ToggleButtonGroup.compat';
 @use '../primitives/react/TextField/TextField';
 @use '../primitives/react/Tooltip/Tooltip';
-@use '../core/StyledSVG/StyledSVG.compat';
+@use '../primitives/react/Autocomplete/Autocomplete.compat';
 @use '../core/Collapse/Collapse/Collapse.compat';
 @use '../core/ProgressBar/ProgressBar.compat';
 @use '../core/Accordion/Accordion.compat';
+@use '../primitives/react/Drawer/Drawer.compat';
 @use '../core/Chip/Chip.compat';
+@use '../primitives/react/Snackbar/Snackbar.compat';
+@use '../primitives/react/Skeleton/Skeleton.compat';
 @use '../core/Breadcrumbs/Breadcrumbs.compat';
 @use '../core/Pagination/Pagination.compat';
 @use '../core/Slider/Slider.compat';
+@use '../core/StyledSVG/StyledSVG.compat';

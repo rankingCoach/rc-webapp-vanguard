@@ -1,9 +1,9 @@
 // Ported from @mui/material@9.5.0 ButtonBase/ButtonBase.js (MIT)
 import './ButtonBase.scss';
 
-import { classNames } from '@helpers/classNames';
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { hasNativeActivation, isFocusVisible, pressAttrs, pressKeyDown, pressKeyUp } from '../../core/press';
+import { cx } from '../class-names';
 import { TouchRippleActions, TouchRippleProps, useRipple } from './use-ripple';
 
 export type { TouchRippleActions, TouchRippleProps } from './use-ripple';
@@ -175,11 +175,15 @@ export const ButtonBase = (props: ButtonBaseProps) => {
 
   return (
     <Host
-      className={classNames(
+      // clsx semantics (MUI): only real tokens, single spaces, also inside callers' className strings.
+      className={cx(
         'MuiButtonBase-root',
-        classes?.root ?? '',
-        disabled ? classNames('Mui-disabled', classes?.disabled ?? '') : '',
-        focusVisible ? classNames('Mui-focusVisible', classes?.focusVisible ?? '', focusVisibleClassName ?? '') : '',
+        classes?.root,
+        disabled && 'Mui-disabled',
+        disabled && classes?.disabled,
+        focusVisible && 'Mui-focusVisible',
+        focusVisible && classes?.focusVisible,
+        focusVisible && focusVisibleClassName,
         className,
       )}
       ref={handleRef}

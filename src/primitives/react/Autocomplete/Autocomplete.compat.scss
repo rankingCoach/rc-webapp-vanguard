@@ -1,0 +1,305 @@
+// Ported from @mui/material@9.5.0 Autocomplete/Autocomplete.js, IconButton/IconButton.js, Paper/Paper.js, ListSubheader/ListSubheader.js (emotion styles) (MIT)
+//
+// D15 compat partial (appended last to vanguard.css via src/styles/mui-compat.scss). Values extracted from MUI's
+// injected emotion CSS in Chromium (default theme and VanguardThemeProvider). Emotion's `.css-x` = (0,1,0) maps to
+// `.MuiAutocomplete-<slot>:where([data-vg-core])`, so every nested/compound selector keeps emotion's specificity;
+// ownerState variants are later rules keyed by MUI's state classes (or `data-multiple`, which MUI has no class for).
+// The own text field is outlined only: MUI's standard/filled input rules are not ported.
+
+$font: Roboto, Helvetica, Arial, sans-serif;
+
+// ---------------------------------------------------------------- Root
+.MuiAutocomplete-root:where([data-vg-core]).Mui-focused .MuiAutocomplete-clearIndicator {
+  visibility: visible;
+}
+
+@media (pointer: fine) {
+  .MuiAutocomplete-root:where([data-vg-core]):hover .MuiAutocomplete-clearIndicator {
+    visibility: visible;
+  }
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-tag {
+  margin: 3px;
+  max-width: calc(100% - 6px);
+}
+
+.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-inputRoot,
+.MuiAutocomplete-hasClearIcon.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-inputRoot {
+  padding-right: 30px;
+}
+
+.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon.MuiAutocomplete-root:where([data-vg-core])
+  .MuiAutocomplete-inputRoot {
+  padding-right: 56px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-inputRoot .MuiAutocomplete-input {
+  width: 0;
+  min-width: 30px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root {
+  padding: 9px;
+}
+
+.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root,
+.MuiAutocomplete-hasClearIcon.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root {
+  padding-right: 39px;
+}
+
+.MuiAutocomplete-hasPopupIcon.MuiAutocomplete-hasClearIcon.MuiAutocomplete-root:where([data-vg-core])
+  .MuiOutlinedInput-root {
+  padding-right: 65px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root .MuiAutocomplete-input {
+  padding: 7.5px 4px 7.5px 5px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root .MuiAutocomplete-endAdornment {
+  right: 9px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root.MuiInputBase-sizeSmall {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 6px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiOutlinedInput-root.MuiInputBase-sizeSmall .MuiAutocomplete-input {
+  padding: 2.5px 4px 2.5px 8px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiInputBase-hiddenLabel {
+  padding-top: 8px;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-input {
+  flex-grow: 1;
+  text-overflow: ellipsis;
+  opacity: 0;
+}
+
+// variants (same specificity, later)
+.MuiAutocomplete-root:where([data-vg-core].MuiAutocomplete-fullWidth) {
+  width: 100%;
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-tag:where(.MuiAutocomplete-tagSizeSmall) {
+  margin: 2px;
+  max-width: calc(100% - 4px);
+}
+
+.MuiAutocomplete-root:where([data-vg-core]) .MuiAutocomplete-input:where(.MuiAutocomplete-inputFocused) {
+  opacity: 1;
+}
+
+.MuiAutocomplete-root:where([data-vg-core][data-multiple]) .MuiAutocomplete-inputRoot {
+  flex-wrap: wrap;
+}
+
+// ---------------------------------------------------------------- End adornment and indicators (IconButton)
+.MuiAutocomplete-endAdornment:where([data-vg-core]) {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.MuiAutocomplete-clearIndicator:where([data-vg-core]),
+.MuiAutocomplete-popupIndicator:where([data-vg-core]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0 -2px 0 0;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  appearance: none;
+  text-decoration: none;
+  text-align: center;
+  flex: 0 0 auto;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  color: rgba(0, 0, 0, 0.54);
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --IconButton-hoverBg: rgba(0, 0, 0, 0.04);
+
+  &.Mui-disabled {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  @media print {
+    -webkit-print-color-adjust: exact;
+  }
+
+  &:hover {
+    background-color: var(--IconButton-hoverBg);
+  }
+
+  @media (hover: none) {
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+  &.Mui-disabled {
+    background-color: transparent;
+    color: rgba(0, 0, 0, 0.26);
+  }
+
+  &.MuiIconButton-loading {
+    color: transparent;
+  }
+}
+
+.MuiAutocomplete-clearIndicator:where([data-vg-core]) {
+  padding: 4px;
+  visibility: hidden;
+}
+
+.MuiAutocomplete-popupIndicator:where([data-vg-core]) {
+  padding: 2px;
+}
+
+.MuiAutocomplete-popupIndicator:where([data-vg-core].MuiAutocomplete-popupIndicatorOpen) {
+  transform: rotate(180deg);
+}
+
+// ---------------------------------------------------------------- Popper, paper, listbox
+// MUI merges `sx` (the stacking z-index) into the same emotion class, so it always wins over this default; the own
+// sx class (vg-z-*, src/primitives/react/z-index-class.ts) is a separate rule, so the default steps aside for it.
+.MuiAutocomplete-popper:where([data-vg-core]:not([class*='vg-z-'])) {
+  z-index: 1300;
+}
+
+.MuiAutocomplete-popper:where([data-vg-core].MuiAutocomplete-popperDisablePortal) {
+  position: absolute;
+}
+
+.MuiAutocomplete-paper:where([data-vg-core]) {
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+  box-shadow: var(--Paper-shadow);
+  background-image: var(--Paper-overlay);
+  font-family: $font;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+  overflow: auto;
+}
+
+.MuiAutocomplete-loading:where([data-vg-core]),
+.MuiAutocomplete-noOptions:where([data-vg-core]) {
+  color: rgba(0, 0, 0, 0.6);
+  padding: 14px 16px;
+}
+
+.MuiAutocomplete-listbox:where([data-vg-core]) {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  max-height: 40vh;
+  overflow: auto;
+  isolation: isolate;
+  position: relative;
+}
+
+.MuiAutocomplete-listbox:where([data-vg-core]) .MuiAutocomplete-option {
+  min-height: 48px;
+  display: flex;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 16px;
+  box-sizing: border-box;
+  outline: 0;
+  -webkit-tap-highlight-color: transparent;
+
+  @media (min-width: 600px) {
+    min-height: auto;
+  }
+
+  &.Mui-focused {
+    background-color: rgba(0, 0, 0, 0.04);
+
+    @media (hover: none) {
+      background-color: transparent;
+    }
+  }
+
+  &[aria-disabled='true'] {
+    opacity: 0.38;
+    pointer-events: none;
+  }
+
+  &.Mui-focusVisible {
+    background-color: rgba(0, 0, 0, 0.12);
+  }
+
+  &[aria-selected='true'] {
+    background-color: rgba(25, 118, 210, 0.08);
+
+    &.Mui-focused {
+      background-color: rgba(25, 118, 210, 0.12);
+
+      @media (hover: none) {
+        background-color: rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    &.Mui-focusVisible {
+      background-color: rgba(25, 118, 210, 0.2);
+    }
+  }
+}
+
+.MuiAutocomplete-groupLabel:where([data-vg-core]) {
+  box-sizing: border-box;
+  line-height: 48px;
+  list-style: none;
+  color: rgba(0, 0, 0, 0.6);
+  font-family: $font;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: sticky;
+  z-index: 1;
+  background-color: #fff;
+  top: -8px;
+}
+
+.MuiAutocomplete-groupUl:where([data-vg-core]) {
+  padding: 0;
+}
+
+.MuiAutocomplete-groupUl:where([data-vg-core]) .MuiAutocomplete-option {
+  padding-left: 24px;
+}
+
+// ---------------------------------------------------------------- Inside VanguardThemeProvider (pxToRem × 16/14)
+.MuiAutocomplete-clearIndicator:where([data-vg-core].vg-typography-vanguard),
+.MuiAutocomplete-popupIndicator:where([data-vg-core].vg-typography-vanguard) {
+  font-size: unquote('1.7142857142857142rem');
+}
+
+.MuiAutocomplete-paper:where([data-vg-core].vg-typography-vanguard) {
+  font-size: unquote('1.1428571428571428rem');
+}
+
+.MuiAutocomplete-groupLabel:where([data-vg-core].vg-typography-vanguard) {
+  font-size: 1rem;
+}

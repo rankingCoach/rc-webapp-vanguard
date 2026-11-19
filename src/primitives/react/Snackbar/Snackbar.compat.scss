@@ -1,0 +1,120 @@
+// Ported from @mui/material@9.5.0 Snackbar/Snackbar.js, SnackbarContent/SnackbarContent.js, Paper/Paper.js (emotion styles) (MIT)
+//
+// D15 compat partial (appended last to vanguard.css via src/styles/mui-compat.scss). Values extracted from MUI's
+// injected emotion CSS in Chromium (default theme and VanguardThemeProvider). Emotion's `.css-x` = (0,1,0) maps to
+// `.MuiSnackbar-<slot>:where([data-vg-core])`; anchorOrigin variants are keyed by MUI's anchorOrigin classes inside
+// :where. Only difference between the themes: the content font-size (pxToRem x 16/14 under VanguardThemeProvider).
+
+$font: Roboto, Helvetica, Arial, sans-serif;
+
+// ---------------------------------------------------------------- Root
+.MuiSnackbar-root:where([data-vg-core]) {
+  z-index: 1400;
+  position: fixed;
+  display: flex;
+  left: 8px;
+  right: 8px;
+  align-items: center;
+}
+
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopLeft),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopCenter),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopRight) {
+  top: 8px;
+}
+
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomLeft),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomCenter),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomRight) {
+  bottom: 8px;
+}
+
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopLeft),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomLeft) {
+  justify-content: flex-start;
+}
+
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopCenter),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomCenter) {
+  justify-content: center;
+}
+
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopRight),
+.MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomRight) {
+  justify-content: flex-end;
+}
+
+@media (min-width: 600px) {
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopLeft),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopCenter),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopRight) {
+    top: 24px;
+  }
+
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomLeft),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomCenter),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomRight) {
+    bottom: 24px;
+  }
+
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopLeft),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomLeft) {
+    left: 24px;
+    right: auto;
+  }
+
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopCenter),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomCenter) {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginTopRight),
+  .MuiSnackbar-root:where([data-vg-core].MuiSnackbar-anchorOriginBottomRight) {
+    right: 24px;
+    left: auto;
+  }
+}
+
+// ---------------------------------------------------------------- Content (Paper elevation 6)
+.MuiSnackbarContent-root:where([data-vg-core]) {
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+  box-shadow: var(--Paper-shadow);
+  background-image: var(--Paper-overlay);
+  font-family: $font;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+  color: rgb(255, 255, 255);
+  background-color: rgb(50, 50, 50);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 6px 16px;
+  flex-grow: 1;
+
+  @media (min-width: 600px) {
+    flex-grow: initial;
+    min-width: 288px;
+  }
+}
+
+.MuiSnackbarContent-message:where([data-vg-core]) {
+  padding: 8px 0;
+}
+
+.MuiSnackbarContent-action:where([data-vg-core]) {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 16px;
+  margin-right: -8px;
+}
+
+// ---------------------------------------------------------------- Inside VanguardThemeProvider (pxToRem x 16/14)
+.MuiSnackbarContent-root:where([data-vg-core].vg-typography-vanguard) {
+  font-size: 1rem;
+}

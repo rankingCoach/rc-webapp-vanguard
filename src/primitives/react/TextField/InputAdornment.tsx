@@ -1,5 +1,6 @@
 // Ported from @mui/material@9.5.0 InputAdornment/InputAdornment.js (MIT)
 import React from 'react';
+import { cx } from '../class-names';
 import { useVanguardTypography } from '../typography-context';
 import { OwnFormControlContext, useOwnFormControl } from './form-control-context';
 
@@ -16,7 +17,6 @@ export interface InputAdornmentProps {
 }
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const cx = (...parts: unknown[]) => parts.filter((p) => typeof p === 'string' && p !== '').join(' ');
 
 /**
  * MUI 9.5 InputAdornment on the own core: classes in MUI's order (root, disablePointerEvents, position, variant,

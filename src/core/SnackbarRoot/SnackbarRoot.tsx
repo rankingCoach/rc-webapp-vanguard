@@ -1,8 +1,7 @@
 import { PUB_SUB_EVENTS, pubSubService } from '@helpers/pub-sub';
-import { Slide, SlideProps } from '@mui/material';
 import { LineAlert } from '@vanguard/LineAlert/LineAlert';
 import React, { useEffect, useState } from 'react';
-
+import { Slide, SlideProps } from '../../primitives/react/Transitions/Slide';
 import { Snackbar } from '../Snackbar/Snackbar';
 import { SnackbarType } from './SnackBarService';
 

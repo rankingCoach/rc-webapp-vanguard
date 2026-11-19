@@ -1,8 +1,9 @@
 // Ported from @mui/material@9.5.0 Select/SelectInput.js, Select/Select.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
 import { isMouseEventInsideElement as inside } from '../../core/hit-test';
 import { areEqualValues, createTypeahead, TYPEAHEAD_RESET_MS, TypeaheadOption } from '../../core/typeahead';
+import { cx } from '../class-names';
 import { FocusSource, MenuPopup } from '../Menu/MenuPopup';
 import { useVanguardTypography } from '../typography-context';
 import { TextFieldFrame } from './TextFieldFrame';
@@ -549,7 +550,7 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
       textFieldRoot={!bare}
       inputRootClasses={
         bare
-          ? [
+          ? cx(
               'MuiInputBase-root',
               'MuiOutlinedInput-root',
               `MuiInputBase-color${color.charAt(0).toUpperCase()}${color.slice(1)}`,
@@ -563,9 +564,7 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
               'MuiSelect-root',
               vgType,
               inputClassName ?? '',
-            ]
-              .filter(Boolean)
-              .join(' ')
+            )
           : undefined
       }
       startAdornment={startAdornment}
@@ -648,16 +647,14 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
           if (node) setDisplayNode(node);
         }}
         // MUI: clsx(SelectDisplayProps.className, classes.select, className).
-        className={[
+        className={cx(
           SelectDisplayProps.className,
           'MuiSelect-select',
           'MuiSelect-outlined',
           'MuiInputBase-input',
           'MuiOutlinedInput-input',
           disabled ? 'Mui-disabled' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        )}
       >
         {isEmptyDisplay(display) ? (
           <span className="notranslate" aria-hidden="true">
@@ -682,7 +679,7 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         tabIndex={-1}
         disabled={disabled}
         readOnly={readOnly}
-        className={classNames('MuiSelect-nativeInput')}
+        className={cx('MuiSelect-nativeInput')}
         autoFocus={autoFocus}
         required={required}
         data-slot="select-native-input"
@@ -691,14 +688,12 @@ export const SelectTextField = (props: SelectTextFieldProps) => {
         id={htmlInput.id ?? nativeInputId}
       />
       <IconComponent
-        className={[
+        className={cx(
           IconComponent === ArrowDropDown ? 'MuiSvgIcon-root MuiSvgIcon-fontSizeMedium' : '',
           'MuiSelect-icon',
           open ? 'MuiSelect-iconOpen' : '',
           disabled ? 'Mui-disabled' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        )}
       />
     </TextFieldFrame>
   );

@@ -479,8 +479,9 @@ label[data-shrink='false'] + .MuiInputBase-formControl .MuiInputBase-input:where
   }
 }
 
-// SvgIcon (default ArrowDropDown); merged into the icon's emotion class in MUI, kept single-class here.
-svg.MuiSvgIcon-root:where([data-vg-core]) {
+// SvgIcon (default ArrowDropDown); merged into the icon's emotion class in MUI, kept single-class here at emotion's
+// (0,1,0): an `svg.` prefix made it (0,1,1) and outranked every later own-core SvgIcon size rule (B, Breadcrumbs).
+.MuiSvgIcon-root:where(svg[data-vg-core]) {
   user-select: none;
   width: 1em;
   height: 1em;
@@ -521,12 +522,17 @@ svg.MuiSvgIcon-root:where([data-vg-core]) {
 // ---------------------------------------------------------------- Menu popup (Modal + Popover + Paper + List)
 .MuiModal-root:where([data-vg-core]) {
   position: fixed;
-  z-index: 1300;
   inset: 0;
 
   &:where(.MuiModal-hidden) {
     visibility: hidden;
   }
+}
+
+// MUI merges `sx` (the stacking z-index) into the root's emotion class, so it always wins over this default; the own
+// sx class (vg-z-*, src/primitives/react/z-index-class.ts) is a separate rule, so the default steps aside for it.
+.MuiModal-root:where([data-vg-core]:not([class*='vg-z-'])) {
+  z-index: 1300;
 }
 
 .MuiBackdrop-root:where([data-vg-core]) {

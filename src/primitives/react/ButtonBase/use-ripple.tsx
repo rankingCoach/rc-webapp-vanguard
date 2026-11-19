@@ -1,7 +1,8 @@
 // Ported from @mui/material@9.5.0 ButtonBase/TouchRipple.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { mergeRippleOrder, rippleGeometry } from '../../core/ripple';
+import { cx } from '../class-names';
 
 const DURATION = 550;
 const DELAY_RIPPLE = 80;
@@ -230,29 +231,25 @@ export const useRipple = (options: {
   const ordered = state.order.map((k) => byKey.get(k)).filter((r): r is RippleItem => Boolean(r));
   const { center: _center, classes: rc, className: rootClassName, ...rootRest } = rippleProps ?? {};
   const element = (
-    <span
-      {...rootRest}
-      className={classNames('MuiTouchRipple-root', rc?.root ?? '', rootClassName ?? '')}
-      ref={rootRef}
-    >
+    <span {...rootRest} className={cx('MuiTouchRipple-root', rc?.root ?? '', rootClassName ?? '')} ref={rootRef}>
       {ordered.map((r) => (
         <span
           key={r.key}
-          className={classNames(
+          className={cx(
             'MuiTouchRipple-ripple',
             rc?.ripple ?? '',
             'MuiTouchRipple-rippleVisible',
             rc?.rippleVisible ?? '',
-            r.pulsate ? classNames('MuiTouchRipple-ripplePulsate', rc?.ripplePulsate ?? '') : '',
+            r.pulsate ? cx('MuiTouchRipple-ripplePulsate', rc?.ripplePulsate ?? '') : '',
           )}
           style={{ width: r.size, height: r.size, top: -(r.size / 2) + r.y, left: -(r.size / 2) + r.x }}
         >
           <span
-            className={classNames(
+            className={cx(
               'MuiTouchRipple-child',
               rc?.child ?? '',
-              r.exiting ? classNames('MuiTouchRipple-childLeaving', rc?.childLeaving ?? '') : '',
-              r.pulsate ? classNames('MuiTouchRipple-childPulsate', rc?.childPulsate ?? '') : '',
+              r.exiting ? cx('MuiTouchRipple-childLeaving', rc?.childLeaving ?? '') : '',
+              r.pulsate ? cx('MuiTouchRipple-childPulsate', rc?.childPulsate ?? '') : '',
             )}
           />
         </span>

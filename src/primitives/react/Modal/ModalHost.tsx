@@ -1,9 +1,12 @@
 // Ported from @mui/material@9.5.0 Modal/Modal.js, Unstable_TrapFocus/FocusTrap.js (MIT)
-import { classNames } from '@helpers/classNames';
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { defaultLayerStack } from '../../core/layer-stack';
 import { defaultModalManager, ManagedModal } from '../../core/modal-manager';
+import { cx } from '../class-names';
+import { Fade } from '../Transitions/Fade';
+import { TransitionTimeout } from '../Transitions/Transition';
 
 export type ModalCloseReason = 'escapeKeyDown' | 'backdropClick' | 'tabKeyDown';
 
@@ -11,6 +14,11 @@ export interface ModalHostProps {
   open: boolean;
   /** Keep the portal mounted while an exit transition runs (the child calls `onExited`). */
   exiting?: boolean;
+  /**
+   * MUI `closeAfterTransition` (Drawer sets it): the ModalManager entry (order, scroll lock, sibling aria-hidden) and
+   * the layer stay registered until the exit transition ends (`exiting` turns false), not until `open` turns false.
+   */
+  closeAfterTransition?: boolean;
   onClose?: (event: React.SyntheticEvent | Event, reason: ModalCloseReason) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -23,12 +31,29 @@ export interface ModalHostProps {
   disableEnforceFocus?: boolean;
   backdropClassName?: string;
   backdropStyle?: React.CSSProperties;
+  /** MUI `hideBackdrop`: no backdrop element. */
+  hideBackdrop?: boolean;
+  /** MUI Backdrop `invisible` (default true: the menu/select popups' SimpleBackdrop-like invisible backdrop). */
+  backdropInvisible?: boolean;
+  /** MUI Modal's visible Backdrop: wrap the backdrop in Fade with this timeout (Drawer: its transitionDuration). */
+  backdropTransition?: TransitionTimeout;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   children: React.ReactNode;
   [dataAttr: `data-${string}`]: unknown;
 }
 
-const focusableSelector =
-  'a[href],area[href],input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),[tabindex]:not([tabindex="-1"])';
+// MUI FocusTrap's tabbable set: elements with tabindex -1 are focusable but never tab targets.
+const focusableSelector = [
+  'a[href]',
+  'area[href]',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
+  '[tabindex]',
+]
+  .map((sel) => `${sel}:not([tabindex^="-"])`)
+  .join(',');
 
 /**
  * Modal host (MUI Modal parity, without MUI): portal into document.body with the legacy `MuiModal-root` DOM,
@@ -39,6 +64,7 @@ export const ModalHost = (props: ModalHostProps) => {
   const {
     open,
     exiting = false,
+    closeAfterTransition = false,
     onClose,
     className,
     style,
@@ -50,7 +76,11 @@ export const ModalHost = (props: ModalHostProps) => {
     disableEnforceFocus = false,
     backdropClassName,
     backdropStyle,
+    hideBackdrop = false,
+    backdropInvisible = true,
+    backdropTransition,
     children,
+    onKeyDown: onKeyDownProp,
     ...rest
   } = props;
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -65,33 +95,58 @@ export const ModalHost = (props: ModalHostProps) => {
   }
   wasOpen.current = open;
   const mounted = open || exiting;
+  // MUI Portal is two-phase: it renders nothing in the commit that mounts it and portals the content in the next one
+  // (its mount node is set in a layout effect), so MUI Modal registers, locks the scroll and hides siblings one commit
+  // later, after the first commit's passive effects (e.g. Vanguard's ModalRoot resetting body overflow on mount).
+  // Locking in the first commit let that reset undo the lock (H16 FAIL: drawer open on page mount, page scrolls).
+  const [portalReady, setPortalReady] = useState(false);
+  useLayoutEffect(() => {
+    if (mounted !== portalReady) setPortalReady(mounted);
+  }, [mounted, portalReady]);
   const ariaHiddenOnClose = !(rest['aria-hidden'] === false || rest['aria-hidden'] === 'false');
 
+  // MUI useModal: `handleOpen` (manager.add → sibling aria-hidden) runs in a passive effect when `open` turns on,
+  // `handleMounted` (manager.mount → scroll lock) once the Portal has attached the root, and `handleClose`
+  // (manager.remove) in a passive effect after the FocusTrap restored focus (or on exit with closeAfterTransition).
+  const wantRegistered = open || (closeAfterTransition && exiting);
+  const registered = portalReady && wantRegistered;
+  // Focus restore / trap / auto-focus act once the content is portaled (MUI FocusTrap lives inside the Portal).
+  const active = open && portalReady;
   useLayoutEffect(() => {
-    if (!open) return undefined;
+    if (!registered) return undefined;
     modal.current.modalRef = rootRef.current;
+    // Idempotent: normally added in the open effect below (a commit earlier); a reopen during the exit transition
+    // keeps the portal, so mount can run first.
     defaultModalManager.add(modal.current, document.body);
     defaultModalManager.mount(modal.current, { disableScrollLock });
     // Layer order for click-away hosts below this modal (core/layer-stack.ts).
     const layer = defaultLayerStack.push(() => rootRef.current, restoreTo.current);
     return () => {
-      // MUI useModal: the root stays aria-hidden while it exits unless the caller passes aria-hidden={false}.
-      defaultModalManager.remove(modal.current, ariaHiddenOnClose);
       defaultLayerStack.remove(layer);
     };
-  }, [open, disableScrollLock, ariaHiddenOnClose]);
+  }, [registered, disableScrollLock]);
 
   // Restore focus in a passive cleanup (like MUI FocusTrap): a layout cleanup runs inside React's commit, whose
   // selection restore would immediately re-focus the element that was focused in the popup.
   useEffect(() => {
-    if (!open) return undefined;
+    if (!active) return undefined;
     return () => {
       if (!disableRestoreFocus && restoreTo.current?.isConnected) {
         ignoreNextEnforce.current = true;
         restoreTo.current.focus();
       }
     };
-  }, [open, disableRestoreFocus]);
+  }, [active, disableRestoreFocus]);
+
+  // Declared after the focus-restore effect: on close MUI restores focus, then unlocks and un-hides (cleanup order).
+  useEffect(() => {
+    if (!wantRegistered) return undefined;
+    defaultModalManager.add(modal.current, document.body);
+    return () => {
+      // MUI useModal: the root stays aria-hidden while it exits unless the caller passes aria-hidden={false}.
+      defaultModalManager.remove(modal.current, ariaHiddenOnClose);
+    };
+  }, [wantRegistered, ariaHiddenOnClose]);
 
   // MUI FocusTrap enforcement: focus that leaves the content (focusin elsewhere, or falls to <body>) is pulled back
   // while this is the top modal; skipped once right after focus is restored on close.
@@ -104,10 +159,10 @@ export const ModalHost = (props: ModalHostProps) => {
   // MUI's menu takes its first focus in a later commit (Grow onEntering), after this runs; ours focuses in the opening
   // commit, so focus already inside counts as entered (same outcome as MUI's order).
   useEffect(() => {
-    if (open) activated.current = !disableAutoFocus || Boolean(rootRef.current?.contains(document.activeElement));
-  }, [open, disableAutoFocus]);
+    if (active) activated.current = !disableAutoFocus || Boolean(rootRef.current?.contains(document.activeElement));
+  }, [active, disableAutoFocus]);
   useEffect(() => {
-    if (!open || disableEnforceFocus) return undefined;
+    if (!active || disableEnforceFocus) return undefined;
     const doc = document;
     // While MUI still renders some modals (migration), its ModalManager is invisible to the own one: an open MUI modal
     // root mounted after this one (portals mount in order) is on top, and this trap stands down (Codex review, 2.5).
@@ -134,11 +189,11 @@ export const ModalHost = (props: ModalHostProps) => {
         ignoreNextEnforce.current = false;
         return;
       }
-      const active = doc.activeElement;
-      if (content.contains(active)) return;
+      const focused = doc.activeElement;
+      if (content.contains(focused)) return;
       // The sentinels move focus themselves (trap()); disableAutoFocus = not activated, like MUI.
-      if (active instanceof HTMLElement && active.dataset.testid?.startsWith('sentinel')) return;
-      if (active !== reactFocusTarget.current) reactFocusTarget.current = null;
+      if (focused instanceof HTMLElement && focused.dataset.testid?.startsWith('sentinel')) return;
+      if (focused !== reactFocusTarget.current) reactFocusTarget.current = null;
       else if (reactFocusTarget.current !== null) return;
       if (!activated.current) return;
       content.focus();
@@ -151,15 +206,16 @@ export const ModalHost = (props: ModalHostProps) => {
       doc.removeEventListener('focusin', contain);
       clearInterval(interval);
     };
-  }, [open, disableEnforceFocus]);
+  }, [active, disableEnforceFocus]);
 
   useEffect(() => {
-    if (!open || disableAutoFocus) return;
+    if (!active || disableAutoFocus) return;
     const content = contentRef.current?.nextElementSibling as HTMLElement | null;
     if (content && !content.contains(document.activeElement)) content.focus();
-  }, [open, disableAutoFocus]);
+  }, [active, disableAutoFocus]);
 
-  if (!mounted) return null;
+  // MUI Portal renders nothing on the server (its mount node is set in an effect).
+  if (!mounted || !portalReady || typeof document === 'undefined') return null;
 
   const trap = (edge: 'start' | 'end') => () => {
     const content = contentRef.current?.nextElementSibling as HTMLElement | null;
@@ -172,12 +228,31 @@ export const ModalHost = (props: ModalHostProps) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key !== 'Escape' || event.defaultPrevented || !defaultModalManager.isTopModal(modal.current)) return;
+    // MUI useModal: the consumer's onKeyDown first; IME composition (which 229) is not an Escape.
+    onKeyDownProp?.(event as React.KeyboardEvent<HTMLDivElement>);
+    if (event.key !== 'Escape' || event.which === 229 || !defaultModalManager.isTopModal(modal.current)) return;
     if (!disableEscapeKeyDown) {
       event.stopPropagation();
       onClose?.(event, 'escapeKeyDown');
     }
   };
+
+  const backdrop = (
+    <div
+      data-slot="modal-backdrop"
+      data-vg-core=""
+      // MUI Modal backdrop: class, the Fade style, then aria-hidden.
+      className={cx(
+        'MuiBackdrop-root',
+        backdropInvisible ? 'MuiBackdrop-invisible' : '',
+        'MuiModal-backdrop',
+        backdropClassName,
+      )}
+      style={backdropStyle}
+      aria-hidden="true"
+      onClick={(event) => open && onClose?.(event, 'backdropClick')}
+    />
+  );
 
   return createPortal(
     <div
@@ -185,7 +260,7 @@ export const ModalHost = (props: ModalHostProps) => {
       id={id}
       style={style}
       // MUI Modal: clsx(className, classes.root, hidden) after the root props.
-      className={[className, 'MuiModal-root', !open && !exiting ? 'MuiModal-hidden' : ''].filter(Boolean).join(' ')}
+      className={cx(className, 'MuiModal-root', !open && !exiting ? 'MuiModal-hidden' : '')}
       ref={rootRef}
       onKeyDown={handleKeyDown}
       onFocus={(event) => {
@@ -195,17 +270,13 @@ export const ModalHost = (props: ModalHostProps) => {
       }}
       {...rest}
     >
-      <div
-        data-slot="modal-backdrop"
-        data-vg-core=""
-        // MUI Modal backdrop: class, the Fade style, then aria-hidden.
-        className={['MuiBackdrop-root', 'MuiBackdrop-invisible', 'MuiModal-backdrop', backdropClassName]
-          .filter(Boolean)
-          .join(' ')}
-        style={backdropStyle}
-        aria-hidden="true"
-        onClick={(event) => open && onClose?.(event, 'backdropClick')}
-      />
+      {hideBackdrop ? null : backdropTransition !== undefined ? (
+        <Fade in={open} timeout={backdropTransition}>
+          {backdrop}
+        </Fade>
+      ) : (
+        backdrop
+      )}
       <div tabIndex={open ? 0 : -1} data-testid="sentinelStart" ref={contentRef} onFocus={trap('start')} />
       {children}
       <div tabIndex={open ? 0 : -1} data-testid="sentinelEnd" onFocus={trap('end')} />

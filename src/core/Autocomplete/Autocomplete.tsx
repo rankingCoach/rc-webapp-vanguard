@@ -2,8 +2,8 @@ import './Autocomplete.scss';
 
 import { classNames } from '@helpers/classNames';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Autocomplete as MuiAutocomplete, AutocompleteChangeReason } from '@mui/material';
-import {
+import { Autocomplete as MuiAutocomplete, type AutocompleteChangeReason } from '@mui/material';
+import type {
   AutocompleteProps as MUIAutocompleteProps,
   AutocompleteRenderOptionState,
   AutocompleteRenderValueGetItemProps,
@@ -31,6 +31,7 @@ import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Text } from '../Text/Text';
 import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
 import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
+import { OwnAutocomplete } from '../../primitives/react/Autocomplete/Autocomplete';
 
 /** State handed to a custom `renderOption`. */
 export interface AutocompleteOptionState {
@@ -185,6 +186,23 @@ export const Autocomplete = (props: AutocompleteProps) => {
   );
   delete slotMapped.renderTags;
   const listboxProps = slotMapped.slotProps?.listbox;
+
+  // Own-core render for the props Vanguard and rc-webapp pass; consumer slots, slot props, sx or legacy component props
+  // keep MUI's Autocomplete so nothing is silently dropped (Codex review, handoff 15). Same JSX either way.
+  const consumerKeys = rest as Record<string, unknown>;
+  const usesUnmodelled = [
+    'slots',
+    'slotProps',
+    'componentsProps',
+    'sx',
+    'ListboxProps',
+    'ListboxComponent',
+    'ChipProps',
+    'PaperComponent',
+    'PopperComponent',
+    'renderGroup',
+  ].some((key) => consumerKeys[key] !== undefined);
+  const AutocompleteImpl = (usesUnmodelled ? MuiAutocomplete : OwnAutocomplete) as typeof OwnAutocomplete;
 
   // F1: form writes go through the binding seam (plain setStateValue, as before).
   const binding = useFieldBinding(formconfig);
@@ -563,7 +581,7 @@ export const Autocomplete = (props: AutocompleteProps) => {
    */
   return (
     <ComponentContainer className={getContainerClasses()}>
-      <MuiAutocomplete
+      <AutocompleteImpl
         {...slotMapped}
         onInputChange={(event, inputValue, reason) => {
           onInputChange?.(

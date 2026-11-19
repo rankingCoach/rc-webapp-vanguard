@@ -106,9 +106,10 @@ function useEventCallback(fn: (...args: any[]) => any): (...args: any[]) => any 
   }).current;
 }
 
+// MUI's useId on React >= 18 returns React's id as is; `mui-` is only its fallback for React without useId.
 function useId(idOverride?: string): string {
   const reactId = React.useId();
-  return idOverride ?? `mui-${reactId}`;
+  return idOverride ?? reactId;
 }
 
 function usePreviousProps<T extends object>(value: T): Partial<T> {

@@ -1,8 +1,9 @@
 // Ported from @mui/material@9.5.0 Menu/Menu.js, Popover/Popover.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { OriginH, OriginV, popoverPosition } from '../../core/position';
 import { GROW_HIDDEN_TRANSFORM, growTransition } from '../../core/transition';
+import { cx } from '../class-names';
 import { ModalCloseReason, ModalHost } from '../Modal/ModalHost';
 import { FocusSource, MenuList } from './MenuList';
 
@@ -64,6 +65,8 @@ export const MenuPopup = (props: MenuPopupProps) => {
     children,
   } = props;
   const paperRef = useRef<HTMLDivElement | null>(null);
+  // ModalHost portals its content one commit after `open` (MUI Portal timing): the enter effect waits for the paper.
+  const [paperNode, setPaperNode] = useState<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const [exiting, setExiting] = useState(false);
   const wasOpen = useRef(open);
@@ -98,7 +101,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
     paper.style.transition = growTransition('enter', paper.clientHeight);
     paper.style.opacity = '1';
     paper.style.transform = 'none';
-  }, [open, position]);
+  }, [open, position, paperNode]);
 
   // Exit: reverse Grow, unmount when done.
   useLayoutEffect(() => {
@@ -132,11 +135,15 @@ export const MenuPopup = (props: MenuPopupProps) => {
   const { className: paperClass, style: paperStyle, ref: paperRefProp, ...paperRest } = paperProps ?? {};
   const { className: listClass, style: listStyle, onKeyDown: _ok, ...listRest } = listProps ?? {};
 
-  const setPaperRef = (node: HTMLDivElement | null) => {
-    paperRef.current = node;
-    if (typeof paperRefProp === 'function') paperRefProp(node);
-    else if (paperRefProp) (paperRefProp as React.RefObject<HTMLDivElement | null>).current = node;
-  };
+  const setPaperRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      paperRef.current = node;
+      setPaperNode(node);
+      if (typeof paperRefProp === 'function') paperRefProp(node);
+      else if (paperRefProp) (paperRefProp as React.RefObject<HTMLDivElement | null>).current = node;
+    },
+    [paperRefProp],
+  );
 
   return (
     <ModalHost
@@ -147,7 +154,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
       disableScrollLock={disableScrollLock}
       // MUI Menu: `disableAutoFocus={autoFocus}` on its Popover (the menu list moves focus itself).
       disableAutoFocus={autoFocus}
-      className={classNames('MuiPopover-root', 'MuiMenu-root', rootClass ?? '')}
+      className={cx('MuiPopover-root', 'MuiMenu-root', rootClass ?? '')}
       style={rootStyle}
       backdropStyle={{ opacity: open ? 1 : 0, transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms' }}
       data-slot="menu-popup"
@@ -156,7 +163,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
       {...rootRest}
     >
       <div
-        className={[
+        className={cx(
           'MuiPaper-root',
           'MuiPaper-elevation',
           'MuiPaper-rounded',
@@ -164,9 +171,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
           'MuiPopover-paper',
           'MuiMenu-paper',
           paperClass,
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        )}
         tabIndex={-1}
         data-slot="menu-paper"
         data-vg-core=""
@@ -180,7 +185,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
         {...paperRest}
       >
         <MenuList
-          className={classNames('MuiMenu-list', listClass ?? '')}
+          className={cx('MuiMenu-list', listClass ?? '')}
           ref={listRef}
           style={listStyle}
           autoFocusItem={open && autoFocus && autoFocusItem}

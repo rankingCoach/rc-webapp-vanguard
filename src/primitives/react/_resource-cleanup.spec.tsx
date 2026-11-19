@@ -1,19 +1,23 @@
 import { act, fireEvent, render } from '@testing-library/react';
-import React, { useRef, useState } from 'react';
+import React, { StrictMode, useRef, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultLayerStack } from '../core/layer-stack';
 import { defaultModalManager } from '../core/modal-manager';
+import OwnAutocomplete from './Autocomplete/Autocomplete';
 import { useAutocomplete } from './Autocomplete/useAutocomplete';
 import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
 import { ClickAway } from './ClickAway/ClickAway';
+import { Drawer } from './Drawer/Drawer';
 import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
 import { Portal } from './Portal/Portal';
+import { Snackbar } from './Snackbar/Snackbar';
 import { InputTextField } from './TextField/InputTextField';
 import { Tooltip } from './Tooltip/Tooltip';
 import { Fade } from './Transitions/Fade';
+import { Slide } from './Transitions/Slide';
 
 /**
  * Tier P groundwork (plan §30.3): every own-core primitive that adds a listener, timer, observer, portal node, body
@@ -343,6 +347,39 @@ describe('own-core resources are released', () => {
     expect(leftovers(before)).toEqual(CLEAN);
   });
 
+  it('own Autocomplete render (popper, listbox, indicators: open, type, highlight, close, unmount)', () => {
+    const before = baseline();
+    const view = render(
+      <OwnAutocomplete
+        options={['Apple', 'Banana', 'Cherry']}
+        renderInput={
+          ((params: Record<string, unknown>) => {
+            const { slotProps, ...rest } = params as {
+              slotProps: { input: Record<string, unknown>; htmlInput: Record<string, unknown> };
+            };
+            const { ref, ...inputRoot } = slotProps.input as { ref: React.Ref<HTMLDivElement> };
+            return (
+              <div ref={ref} {...(inputRoot as object)} {...(rest as object)}>
+                <input {...(slotProps.htmlInput as React.InputHTMLAttributes<HTMLInputElement>)} />
+              </div>
+            );
+          }) as never
+        }
+      />,
+    );
+    const input = view.container.querySelector('input') as HTMLInputElement;
+    act(() => {
+      input.focus();
+    });
+    fireEvent.change(input, { target: { value: 'a' } });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'Escape' });
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
   it('Backdrop in a Portal (Fade timers, portal node), closed mid-exit then unmounted', () => {
     const before = baseline();
     const tree = (open: boolean) => (
@@ -390,6 +427,147 @@ describe('own-core resources are released', () => {
     const view = render(<InputTextField id="t" multiline minRows={2} maxRows={4} defaultValue={'a\nb\nc'} />);
     settle();
     fireEvent.change(view.container.querySelector('textarea') as HTMLTextAreaElement, { target: { value: 'x' } });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Drawer temporary (ModalHost, exit manager entry, backdrop Fade, Slide resize listener): open, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Drawer open={open} anchor="right" variant="temporary" transitionDuration={400} onClose={() => undefined}>
+        {'drawer'}
+      </Drawer>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    settle();
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Drawer temporary closed mid-exit then unmounted', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Drawer open={open} anchor="bottom" variant="temporary" transitionDuration={400} onClose={() => undefined}>
+        {'drawer'}
+      </Drawer>
+    );
+    const view = render(tree(true));
+    settle();
+    view.rerender(tree(false));
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Drawer persistent (docked Slide): open, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Drawer open={open} anchor="left" variant="persistent" transitionDuration={400}>
+        {'drawer'}
+      </Drawer>
+    );
+    const view = render(tree(true));
+    settle();
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Slide unmounted mid-enter (timers, resize listener)', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Slide in={open} direction="up" timeout={300}>
+        <div>{'slide'}</div>
+      </Slide>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Snackbar (auto-hide timer, document keydown, window blur/focus, ClickAway, Grow): open, time out, close, unmount', () => {
+    const before = baseline();
+    const onClose = vi.fn();
+    const tree = (open: boolean) => <Snackbar open={open} autoHideDuration={3000} onClose={onClose} message="Saved" />;
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    act(() => {
+      vi.advanceTimersByTime(3100);
+    });
+    expect(onClose).toHaveBeenCalledWith(null, 'timeout');
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Snackbar paused by hover and window blur, then unmounted while open', () => {
+    const before = baseline();
+    const view = render(<Snackbar open autoHideDuration={3000} onClose={() => undefined} message="Saved" />);
+    const root = document.querySelector('.MuiSnackbar-root') as HTMLElement;
+    fireEvent.mouseEnter(root);
+    act(() => void window.dispatchEvent(new Event('blur')));
+    fireEvent.mouseLeave(root);
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  // StrictMode double-runs every effect: a registration that un-registers in the first cleanup must re-register, and
+  // nothing may be left after close/unmount (ModalManager users: MenuPopup → Menu/Select/SearchableSelect, Drawer).
+  it('StrictMode: MenuPopup (ModalHost two-phase mount) open, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <StrictMode>
+        <MenuPopupHarness open={open} />
+      </StrictMode>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    settle();
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(defaultModalManager.modalCount()).toBe(1);
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('StrictMode: temporary Drawer open on mount, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <StrictMode>
+        <Drawer open={open} anchor="right" variant="temporary" transitionDuration={400} onClose={() => undefined}>
+          {'drawer'}
+        </Drawer>
+      </StrictMode>
+    );
+    const view = render(tree(true));
+    settle();
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(defaultModalManager.modalCount()).toBe(1);
+    view.rerender(tree(false));
+    settle();
     done(view);
     settle();
     expect(leftovers(before)).toEqual(CLEAN);

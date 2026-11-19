@@ -1,5 +1,5 @@
-import { screen, fireEvent, within } from '@testing-library/react';
-import { Button, Form, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
+import { screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { Accordion, Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { render } from '@testing-library/react';
@@ -109,6 +109,28 @@ describe('installed Vanguard bundle', () => {
     expect(screen.queryByRole('listbox')).toBeNull();
     expect(screen.getByRole('combobox').textContent).toBe('Banana');
   });
+  // Autocomplete runs on Vanguard's own core in both bundles (WordPress exports it): open, filter, pick, read back.
+  it('opens the installed Autocomplete, filters and picks an option', async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    const options = [
+      { key: 0, value: 'apple', title: 'Apple' },
+      { key: 1, value: 'plum', title: 'Plum' },
+    ];
+    renderWithProviders(<Autocomplete id="fruit" testId="fruit" options={options} optionKey="title" onChange={change} />);
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    expect(input.closest('.MuiAutocomplete-root')?.hasAttribute('data-vg-core')).toBe(true);
+    await user.click(input);
+    await user.type(input, 'pl');
+    const listbox = await screen.findByRole('listbox');
+    // Matching splits the label into highlight spans, whose accessible name reads "Pl um": pick the option by text.
+    const plum = within(listbox)
+      .getAllByRole('option')
+      .find((o) => o.textContent === 'Plum') as HTMLElement;
+    await user.click(plum);
+    expect(change).toHaveBeenCalled();
+    expect(input.value).toBe('Plum');
+  });
   // Popover runs on Vanguard's own Tooltip in both bundles (WordPress exports it): hover opens, leave closes.
   it('opens the installed Popover on hover with an own-core tooltip', async () => {
     renderWithProviders(
@@ -125,6 +147,77 @@ describe('installed Vanguard bundle', () => {
     expect(wrapper.getAttribute('aria-labelledby')).toBe(tooltip.id);
     fireEvent.mouseLeave(wrapper);
     expect(wrapper.getAttribute('aria-labelledby')).toBeNull();
+  });
+
+  // Collapse runs on Vanguard's own transition in both bundles; WordPress reaches it through InfoBox. Real timers:
+  // the WordPress bundle's transition timers are not reached by vi fake timers, so the settle is awaited.
+  it('collapses an installed dismissible InfoBox with the own-core Collapse', async () => {
+    renderWithProviders(<InfoBox title="Fixture info" description="Fixture body" dismissible />);
+    const root = document.querySelector('[data-slot="collapse"]') as HTMLElement;
+    expect(root).not.toBeNull();
+    expect(root.hasAttribute('data-vg-core')).toBe(true);
+    expect(root.classList.contains('MuiCollapse-root')).toBe(true);
+    expect(root.hasAttribute('data-open')).toBe(true);
+    fireEvent.click(screen.getByTestId('info-box-cta_button'));
+    expect(root.hasAttribute('data-open')).toBe(false);
+    await waitFor(() => expect(root.classList.contains('MuiCollapse-hidden')).toBe(true), { timeout: 2000 });
+  });
+
+  // Accordion renders MUI's Accordion DOM on own core (ButtonBase primitive + own Collapse, timeout 'auto').
+  it('toggles an installed Accordion on the own core', async () => {
+    const onExpandedChange = vi.fn();
+    renderWithProviders(
+      <Accordion
+        accordionId="fx-acc"
+        summaryChildren={<span>Fixture summary</span>}
+        detailsChildren={<p>Fixture details</p>}
+        onExpandedChange={onExpandedChange}
+      />,
+    );
+    const root = document.querySelector('[data-slot="accordion"]') as HTMLElement;
+    expect(root).not.toBeNull();
+    expect(root.hasAttribute('data-vg-core')).toBe(true);
+    expect(root.classList.contains('MuiAccordion-root')).toBe(true);
+    const summary = screen.getByRole('button', { name: 'Fixture summary' });
+    expect(summary.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(summary);
+    expect(summary.getAttribute('aria-expanded')).toBe('true');
+    expect(root.classList.contains('Mui-expanded')).toBe(true);
+    expect(onExpandedChange).toHaveBeenCalledWith(true);
+    await waitFor(
+      () =>
+        expect(
+          screen.getByRole('region').closest('.MuiCollapse-root')?.classList.contains('MuiCollapse-entered'),
+        ).toBe(true),
+      { timeout: 2000 },
+    );
+  });
+
+  // Button's hover icon swap (iconLargeOnHover) runs on Vanguard's own Grow in both bundles (no MUI Grow). Real timers:
+  // the WordPress bundle's transition timers are not reached by vi fake timers.
+  it('swaps the enlarged hover icon of an installed Button on the own Grow', async () => {
+    renderWithProviders(
+      <Button icon={'caret-down' as never} iconLargeOnHover>
+        Fixture grow
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: /Fixture grow/ });
+    const wrappers = () =>
+      [...button.querySelectorAll('div > div > span')].filter(
+        (s) => s.parentElement?.parentElement?.children.length === 2,
+      ) as HTMLElement[];
+    const [small, large] = wrappers();
+    expect(small.style.opacity).toBe('1');
+    expect(large.style.opacity).toBe('0');
+    fireEvent.mouseOver(button.parentElement as HTMLElement);
+    await waitFor(
+      () => {
+        expect(small.style.opacity).toBe('0');
+        expect(large.style.opacity).toBe('1');
+      },
+      { timeout: 2000 },
+    );
+    expect(button.getAttribute('class')?.split(' ')).not.toContain('false');
   });
 });
 

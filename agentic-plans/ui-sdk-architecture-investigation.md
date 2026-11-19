@@ -10,6 +10,7 @@
 > 7. F2 (registration replacing child-walking): **CLOSED, not done by design** (fallback accepted; analysis in §D14/F2). F3 `field` prop: **GO**.
 > 8. **Known bug left in place: Slider on the legacy `formconfig` path** calls `setStateValue` without dispatching, so slider values are never stored. Kept, because fixing it would start writing into consumer stores. Verifier: rc-webapp renders Slider in 7 files and none binds a formconfig, so **zero consumer impact**; the decision stands. On the new `field` path Slider DOES store its value.
 > 9. Reporting rule: "passed" only for a Tier A/B verdict returned by the verifier; my own gates are "green on my side".
+> 10. SnackbarRoot pub-sub subscription leak (2026-11-19): **DECIDED (watchdog), fix after H17's PASS** in a separate commit with a reproducing spec (0 observers after unmount, flat over N mounts, remount replay unchanged); the `[bug-lock]` in `_SnackbarRoot.mui.spec.tsx` is rewritten to the fixed behaviour in that commit. User-facing behaviour delta: none; internal leak fixed. Tier P scenario for verifier 2: mount/unmount ×200 + service events.
 
 
 Date: 2026-11-18 · Branch: `feature/ui-sdk-architecture-investigation` (from `feature/file-manager-variants`)
@@ -856,22 +857,39 @@ Order: ToggleButtonGroup handoff → commit after Tier A PASS → Select → F0.
 
 ## 23. Paths still on MUI (keep current; each line names what removes it)
 
-1. Text field: custom `inputComponent`, `InputProps.ref` (Autocomplete), MUI `slots`/`classes`, function slots →
-   removed by the Autocomplete port (ref path) and the MUI-exit step (the rest renders as outlined/own or warns).
-2. Text field `variant` filled/standard, native select → MUI-exit step (decided above).
-3. Autocomplete, AutocompleteWithAnchor, SearchableSelect → Autocomplete group (MUI Autocomplete + Popper).
-4. Menu, MenuItem, DropdownMenu, Popover, PopoverPopper, PopoverModal → group B (ModalHost + MenuPopup).
-5. Button, Chip, Breadcrumbs, Pagination, ProgressBar, Slider, Accordion, Collapse, Fade, AIAssistant (Collapse/Fade/
-   Grow), FocusTrap, List (ListShowMore) → simple ports on ButtonBase/transition core (group C).
-6. Drawer, AppBar, Toolbar, Snackbar, SnackbarRoot → layout/overlay group (Modal manager exists).
-7. DatePicker (@mui/x-date-pickers), DateRangeInput, DateRangePicker (+ adornment), FlagAdornment, FormControl,
+Status 2026-11-19 (tip 0109680 + pack-16 Drawer). "Own" = renders on src/primitives; a remaining MUI path is a
+fallback a consumer reaches only through the props named.
+
+1. Text field: custom `inputComponent`, MUI `slots`/`classes`, function slots, `variant` filled/standard, native
+   select → MUI-exit step (renders as outlined/own or warns). InputBase `Skeleton` import → trivial.
+2. Autocomplete (own since H15, 01bcea8): MUI `Autocomplete` stays for consumers passing `slots`, `slotProps`,
+   `componentsProps`, `sx`, `ListboxProps`, `ListboxComponent`, `ChipProps`, `PaperComponent`, `PopperComponent` or
+   `renderGroup` (rc-webapp passes none) → MUI-exit step (port or warn). `useThemeProps` import → same step.
+   AutocompleteWithAnchor: MUI `ClickAwayListener` → own ClickAway (next small item).
+3. Menu / MenuItem: own for modelled props; MUI `Menu` for unmodelled consumer props (routing), MUI `MenuItem` outside
+   own lists → MUI-exit step. Popover: `TooltipClasses` type only → types step (10). PopoverModal / PopoverPopper:
+   MUI `Popper` for the non-modelled path → MUI-exit step.
+4. Popper: own OwnPopper everywhere it is wired; the `altBoundary` handling differs from popper.js only where the
+   shared resolution (ed9af0e) applies, no consumer passes it → keep, documented in Popper.tsx.
+5. ProgressBar: determinate/indeterminate own (B, de017d4); `buffer` and `query` keep `ProgressBarMui` (MUI
+   LinearProgress) → B's ProgressBar follow-up (no rc-webapp usage of either variant found yet; reachability map).
+6. B leaf queue (B owns): Button (in progress, Grow), Chip (b9f8736 passed, merge pending), Breadcrumbs, Pagination,
+   Slider, then the react-spring motion group. Accordion: `AccordionProps` type import only → types step (10).
+7. Drawer (pack-16): own (ModalHost + Slide + Paper markup). Open, not reached by rc-webapp: (a) a Drawer open together
+   with a MUI-rendered Modal (any MUI fallback above) has two scroll-lock owners, so non-LIFO closing can restore
+   scroll early / leave it locked; removed when the last MUI Modal path goes (MUI-exit step); (b) with
+   `disableAutoFocus`, focus restore targets the opener, not the first focus inside (MUI FocusTrap) → ModalHost
+   follow-up if a consumer ever passes it.
+8. AppBar, Toolbar, Snackbar, SnackbarRoot, FocusTrap, AIAssistantPanel → layout/overlay group (A, next after Drawer).
+9. DatePicker (@mui/x-date-pickers), DateRangeInput, DateRangePicker (+ adornment), FlagAdornment, FormControl,
    Documents (DocumentDisplay/Upload) → pickers group (largest; x-date-pickers is the only @mui/x import).
-8. InputBase `Skeleton` import, `use-media-query` (MUI useMediaQuery), `helpers/hex-to-rgba` (@mui/system) → trivial.
-9. VanguardThemeProvider (`createTheme`/ThemeProvider): source of the two `@mui` strings in `dist-wordpress/index.js`
-   (createTheme's palette error message and `toRuntimeSource` template) → last, once nothing reads the MUI theme.
-10. Types: `core/_internal/mui-legacy-props.ts` (public prop types derived from MUI types) and `mui-slot-compat.ts`;
-    11 emitted `.d.ts` files import `@mui/*` → vendored MUI types rolled into the published declarations (§26).
-11. Redux (not MUI): the bundles import `react-redux` as an external module (dispatch shim, legacy useFormConfig), so
+10. `use-media-query` (MUI useMediaQuery), `helpers/hex-to-rgba` (@mui/system) → trivial.
+11. VanguardThemeProvider (`createTheme`/ThemeProvider): source of the two `@mui` strings in `dist-wordpress/index.js`
+    (createTheme's palette error message and `toRuntimeSource` template) → last, once nothing reads the MUI theme.
+12. Types: `core/_internal/mui-legacy-props.ts` (public prop types derived from MUI types), `mui-slot-compat.ts` and the
+    type-only imports above; emitted `.d.ts` files import `@mui/*` → vendored MUI types in the published declarations
+    (§26).
+13. Redux (not MUI): the bundles import `react-redux` as an external module (dispatch shim, legacy useFormConfig), so
     consumers must have it installed although useFormStore needs no Provider/store → deferred end step with the
     rc-webapp fork change.
 
@@ -1186,3 +1204,55 @@ the WordPress smoke, the 16 unreachable last (still migrated, user decision). Li
    ("handoff N, verdict pending"); a FAIL gets a fix commit on top.
 6. Differential canonical form (SearchableSelect): attribute, style-declaration and class-token order are sorted
    before comparing (no observable meaning); values and structure must match.
+
+### 28.x Licence of ported code (decided by watchdog, MAJOR; 2026-11-19)
+
+The own core ports MUI 9.5 and popper.js 2.11 source (hooks, components, algorithms) and MUI's emotion styles; that is
+derivative work of MIT code. THIRD_PARTY_NOTICES.txt was derived from bundled packages only, so the notices would
+vanish with the last MUI import. Since e86a665: config/derived-notices.txt (hand-maintained "Portions derived from"
+section with both MIT texts) is appended by config/third-party-notices.ts; scripts/check-package-contents.mjs asserts
+it in both bundles' notices in the tarball (package gate); every ported file starts with
+`// Ported from <package>@<version> <file> (MIT)` (B informed; B sends other upstreams, e.g. react-spring, for A to add).
+
+### 34.1 Package gate cadence (decided by watchdog, 2026-11-19, from pack-16)
+
+Host load (163) made the full package gate (~11 min, 4 consumer fixtures) per handoff a main contributor to
+verifier-capture noise. Per handoff: build + pack and the targeted checks for what changed (its specs/stories, its
+WordPress smoke test alone, the compat-order guard). Full package.sh: when package.json / build config / notices /
+exports change, every 3rd handoff (milestone), and before Tier C. Wide vitest runs keep --maxWorkers=4.
+Pending full run: 501d8cb (styled-components dropped, package.json).
+
+## 35. H16 scroll lock: ModalHost on MUI Portal's two-phase timing (2026-11-19)
+
+1. **Exact trigger.** A temporary Drawer whose `open` is true in the same commit in which Vanguard's `ModalRoot` mounts
+   (Vanguard `drawer--temporary` story: the Storybook decorator mounts ModalProvider > ModalRoot together with the
+   story). ModalRoot's `useEffect([hasBlockingModal])` runs on mount with no blocking modal and writes
+   `body.style.overflow = ''` / `marginRight = ''`. The own ModalHost had locked in that commit's layout effect, so the
+   passive reset ran after it and removed `overflow: hidden` (the scrollbar-gap `padding-right` stayed). In rc-webapp,
+   ModalRoot mounts with the app, long before a drawer opens, so the 6 rc-webapp drawer screens kept the lock
+   (verifier 1, fingerprinted pack). It also applied to an own MenuPopup or SearchableSelect open on page mount.
+2. **Why MUI survived.** MUI's Portal renders nothing in its first commit and sets its mount node in a layout effect.
+   The content is portaled in the next (synchronous) commit, after the first commit's passive effects (ModalRoot's
+   reset) have flushed. MUI then locks (`handleMounted` via the portal ref), and hides siblings earlier in a passive
+   effect (`handleOpen`).
+3. **Fix (f1924b5).** ModalHost follows MUI's sequence:
+   1. Portal attached in the second commit (`portalReady`).
+   2. `manager.add` (sibling aria-hidden) in a passive effect on open.
+   3. `manager.mount` (lock) once the root is attached.
+   4. Focus trap/auto-focus/restore keyed on content present.
+   5. On close, focus restore before `manager.remove`.
+   6. MenuPopup's enter effect waits for its paper node; that is the only consumer change. Per the watchdog rule
+      (revert if a second consumer needs patching) the rework stays.
+4. **Rejected.**
+   1. Lock in a later passive effect only: still runs before ModalRoot when ModalRoot is a later sibling, and it
+      diverges from MUI's order.
+   2. Re-asserting the lock (observer or retry): it fights consumer code and leaves a window where a frame paints
+      unlocked.
+   3. Changing ModalRoot: its baseline behaviour is part of the app and stays as is.
+5. **Cost.** At most +1 commit per open versus MUI (Drawer: equal; SearchableSelect: one fewer).
+   `_modal-host-order.spec.tsx` asserts order equality and commits <= MUI + 1. The rule is that +2 or more than
+   1.5x fails.
+6. **Why the H16 differential missed it.**
+   1. Its snapshots covered `body.innerHTML` (sibling aria-hidden) but not body's own inline style. That applied to
+      Drawer, SearchableSelect, Autocomplete and Snackbar; all four now include it.
+   2. The harness had no app root (ModalRoot). `_Drawer.body-lock.spec.tsx` now reproduces the story condition.

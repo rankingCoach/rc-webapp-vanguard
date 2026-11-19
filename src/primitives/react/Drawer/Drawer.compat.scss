@@ -1,0 +1,79 @@
+// Ported from @mui/material@9.5.0 Drawer/Drawer.js, Paper/Paper.js (emotion styles) (MIT)
+//
+// D15 compat partial (appended last to vanguard.css via src/styles/mui-compat.scss). Values extracted from MUI's
+// injected emotion CSS in Chromium (default theme and VanguardThemeProvider render the same rules). Emotion's `.css-x`
+// = (0,1,0) maps to `.MuiDrawer-<slot>:where([data-vg-core])`. MUI 9 puts no anchor/docked class on the paper, so the
+// own paper carries `data-anchor` and `data-docked` (own markers, inside :where, no specificity).
+// Vanguard's paper sx (`--fn-bg-surface`, no overlay) is folded in: MUI merges it into the same emotion class.
+
+// ---------------------------------------------------------------- Root
+// Modal root (temporary): later than the generic `.MuiModal-root` compat rule (z-index 1300), same specificity. The
+// stacking z-index is an sx class (vg-z-*, src/primitives/react/z-index-class.ts); the default steps aside for it.
+.MuiDrawer-modal:where([data-vg-core]:not([class*='vg-z-'])) {
+  z-index: 1200;
+}
+
+// Docked root (persistent / permanent).
+.MuiDrawer-docked:where([data-vg-core]) {
+  flex: 0 0 auto;
+}
+
+// ---------------------------------------------------------------- Paper
+.MuiDrawer-paper:where([data-vg-core]) {
+  color: rgba(0, 0, 0, 0.87);
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--Paper-shadow);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1 0 auto;
+  z-index: 1200;
+  -webkit-overflow-scrolling: touch;
+  position: fixed;
+  top: 0;
+  outline: 0;
+  background-color: var(--fn-bg-surface);
+  background-image: none;
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-anchor='left']) {
+  left: 0;
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-anchor='top']) {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  max-height: 100%;
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-anchor='right']) {
+  right: 0;
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-anchor='bottom']) {
+  top: auto;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: auto;
+  max-height: 100%;
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-docked][data-anchor='left']) {
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-docked][data-anchor='top']) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-docked][data-anchor='right']) {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.MuiDrawer-paper:where([data-vg-core][data-docked][data-anchor='bottom']) {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}

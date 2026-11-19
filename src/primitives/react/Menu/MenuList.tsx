@@ -1,7 +1,8 @@
 // Ported from @mui/material@9.5.0 MenuList/MenuList.js (MIT)
-import { classNames } from '@helpers/classNames';
+
 import React, { useLayoutEffect, useRef } from 'react';
 import { createListTypeahead, nextListIndex } from '../../core/listbox';
+import { cx } from '../class-names';
 import { OptionHostContext } from './option-host-context';
 
 export type FocusSource = 'keyboard' | 'pointer' | null;
@@ -154,7 +155,7 @@ export const MenuList = (props: MenuListProps) => {
       data-slot="menu-list"
       data-vg-core=""
       {...rest}
-      className={classNames('MuiList-root', 'MuiList-padding', className ?? '')}
+      className={cx('MuiList-root', 'MuiList-padding', className ?? '')}
       ref={(node) => {
         listRef.current = node;
         if (typeof ref === 'function') ref(node);
