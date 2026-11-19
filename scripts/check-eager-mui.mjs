@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+/**
+ * Plan §36.2 B.3 gate: for every public export of the ESM build (dist/index.js), walk the EAGER import graph (static
+ * imports only; `import()` is a lazy boundary) and report the exports whose graph contains any `node_modules/@mui/*`
+ * module. Reads `.vg-build/module-graph.dist.json` (config/module-graph.ts, written by `pnpm build`).
+ *
+ * Usage: node scripts/check-eager-mui.mjs [--assert-zero] [--wordpress-table]
+ *   default        prints the count and the exports with eager @mui code
+ *   --assert-zero  exits 1 unless the count is 0 (the target once every fallback sits behind a lazy boundary)
+ *   --wordpress-table  per WordPress export (src/index-wordpress.ts), the @mui bytes its graph pulls in
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.cwd();
+const graph = JSON.parse(fs.readFileSync(path.join(root, '.vg-build/module-graph.dist.json'), 'utf8'));
+const isMui = (id) => /[\\/]node_modules[\\/](\.pnpm[\\/][^\\/]+[\\/]node_modules[\\/])?@mui[\\/]/.test(id);
+
+const eagerClosure = (start) => {
+  const seen = new Set();
+  const stack = [start];
+  while (stack.length) {
+    const f = stack.pop();
+    if (seen.has(f) || !graph[f]) continue;
+    seen.add(f);
+    for (const d of graph[f].imports) stack.push(d);
+  }
+  return seen;
+};
+
+// export name → file, from `export { a as b } from './index-X.js'` / `export * from` lines of dist/index.js
+const indexSrc = fs.readFileSync(path.join(root, 'dist/index.js'), 'utf8');
+const exportsToFile = new Map();
+for (const m of indexSrc.matchAll(/export\s*\{([^}]*)\}\s*from\s*["']\.\/([^"']+)["']/g)) {
+  for (const spec of m[1].split(',')) {
+    const name = spec.trim().split(/\s+as\s+/).pop()?.trim();
+    if (name) exportsToFile.set(name, m[2]);
+  }
+}
+// also `import {a as b} from './x.js'; export {b}` shapes of minified output
+const importMap = new Map();
+for (const m of indexSrc.matchAll(/import\s*\{([^}]*)\}\s*from\s*["']\.\/([^"']+)["']/g))
+  for (const spec of m[1].split(',')) {
+    const local = spec.trim().split(/\s+as\s+/).pop()?.trim();
+    if (local) importMap.set(local, m[2]);
+  }
+for (const m of indexSrc.matchAll(/export\s*\{([^}]*)\}\s*;?\s*$/gm))
+  for (const spec of m[1].split(',')) {
+    const [local, alias] = spec.trim().split(/\s+as\s+/).map((s) => s.trim());
+    const file = importMap.get(local);
+    if (file) exportsToFile.set(alias ?? local, file);
+  }
+
+const muiBytes = (files) => {
+  let bytes = 0;
+  const pkgs = new Set();
+  for (const f of files)
+    for (const [id, n] of Object.entries(graph[f]?.modules ?? {}))
+      if (isMui(id)) {
+        bytes += n;
+        pkgs.add(id.match(/@mui[\\/][^\\/]+/)[0].replace('\\', '/'));
+      }
+  return { bytes, pkgs: [...pkgs].sort() };
+};
+
+const rows = [...exportsToFile.entries()]
+  .map(([name, file]) => ({ name, ...muiBytes(eagerClosure(file)) }))
+  .filter((r) => r.bytes > 0)
+  .sort((a, b) => b.bytes - a.bytes || a.name.localeCompare(b.name));
+
+const args = new Set(process.argv.slice(2));
+if (args.has('--wordpress-table')) {
+  const wpSrc = fs.readFileSync(path.join(root, 'src/index-wordpress.ts'), 'utf8');
+  const wpNames = new Set();
+  for (const m of wpSrc.matchAll(/export\s*(?:type\s*)?\{([^}]*)\}/g))
+    if (!/export\s+type/.test(m[0])) for (const spec of m[1].split(',')) wpNames.add(spec.trim().split(/\s+as\s+/).pop()?.trim());
+  const wpRows = rows.filter((r) => wpNames.has(r.name));
+  console.log(`WordPress exports with @mui code in their graph: ${wpRows.length} of ${wpNames.size}`);
+  for (const r of wpRows) console.log(`  ${r.name}\t${r.bytes} B\t${r.pkgs.join(', ')}`);
+} else {
+  console.log(`eager @mui: ${rows.length} of ${exportsToFile.size} public exports`);
+  for (const r of rows) console.log(`  ${r.name}\t${r.bytes} B\t${r.pkgs.join(', ')}`);
+}
+if (args.has('--assert-zero') && rows.length > 0) process.exit(1);

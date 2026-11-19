@@ -1390,3 +1390,43 @@ implement what has any usage evidence and keep MUI as an optional dependency for
    first, since it is where consumers may theme.
 
 **C. S1.** Refactor onto the adapter interface before the parity spec goes green, so the green proves what ships.
+
+### 36.3 Eager-@mui gate: baseline at 0f9e383 + build (2026-11-19)
+
+The gate has three parts:
+1. `config/module-graph.ts` writes `.vg-build/module-graph.<outDir>.json` on every build: chunk → module ids with
+   rendered bytes, static and dynamic imports. The directory is gitignored and not packed.
+2. `scripts/check-eager-mui.mjs` walks each public export's static closure of dist/index.js.
+3. `package.sh` records `eager-mui.txt` and `eager-mui-wordpress.txt`. `--assert-zero` becomes the gate once every
+   fallback sits behind a lazy boundary.
+
+**Baseline: 32 of 298 exports.** The eager @mui sources are:
+1. DatePicker / DateTimePicker (MUI X, §36 S1–S3).
+2. Autocomplete (fallback).
+3. MuiTextField fallback in InputBase. This one drags in Input, InputBase, Select, Textarea, SearchableSelect, Table*
+   (4), PhoneNumber, RichTextEditor, TextEditDrawer, TimePicker, ColorPicker, DateRangeInput, DateRangePicker,
+   DrawerRoot/DrawerService and AIAssistant.
+4. Menu (fallback), MenuItem.
+5. Snackbar / SnackbarRoot (fallback).
+6. PopoverModal (MUI Popper fallback).
+7. AppBar / Toolbar (fallback).
+8. ProgressBar (B: buffer/query keep MUI LinearProgress).
+9. FormControl (unreachable).
+10. VanguardThemeProvider.
+
+Fixing the InputBase fallback alone clears most of the list.
+
+**WordPress (deliverable for the user, B.5): 4 of 64 WP exports pull @mui/* through a fallback route.** Bytes are
+rendered module sizes before minification; the MUI core is shared, so they do not add up.
+
+| WP export | @mui code in its graph | packages |
+| --- | --- | --- |
+| Autocomplete | 737,581 B | @mui/material, @mui/system, @mui/styled-engine |
+| Input | 531,529 B | same |
+| Select | 531,529 B | same |
+| Textarea | 531,529 B | same |
+
+Question for the user: does the WordPress plugin pass any of the fallback props to these four (Autocomplete: slots,
+slotProps, componentsProps, sx, ListboxProps, ListboxComponent, ChipProps, PaperComponent, PopperComponent,
+renderGroup; Input/Select/Textarea: textFieldProps with a non-outlined variant, native select, custom
+inputComponent, MUI slots/classes)? Until answered, WordPress keeps them.
