@@ -1793,3 +1793,16 @@ call sites across 22 files (28 `Input`, one `Textarea`, zero `Select` or `TextFi
 sites (`VerificationPinInput`, `Autocomplete` and `SearchableSelect`). The scan retains the unresolved Vanguard
 wrapper spreads and separates frozen references. [rc-webapp locations](/Users/a.kott/vanguard-verify/logs/h21-text-field-handler-sites/rc-webapp.json) ·
 [Vanguard locations](/Users/a.kott/vanguard-verify/logs/h21-text-field-handler-sites/vanguard.json).
+
+**H21 packed gate.** `8f76287e35e258976afcd19ea922c206d935ad72` passed 2,770 tests in 380 files with no global
+fallback preload and three workers. The exact [H21 tarball](/Users/a.kott/vanguard-verify/packs/8f76287e35e258976afcd19ea922c206d935ad72-h21.tgz)
+has SHA-256 `63a28ba8dccf058dd3c4f91631411d0b191c44593c49879d371d91192a771e6b`. All 4,233 packed dist files matched
+the build on disk. The canonical replay exited zero, with 34/34/44/44 runtime tests and clean gated declarations.
+The fallback audit found 22 allow-listed files with zero unexpected or stale entries. The eager graph reached
+24/298 public exports plus the allowed `RtlProvider` context. WordPress reached 4/64 exports with MUI and 336 files
+with zero missing targets. The exact-pack WordPress smoke passed three same-tick cases: the default Autocomplete
+combobox and the Input anchor/custom-control ref paths. [Gate output](/Users/a.kott/vanguard-verify/logs/8f76287e35e258976afcd19ea922c206d935ad72-h21/).
+
+Both verifiers received the pack. The masked-frame H19b recheck is assigned to verifier 2, and the first-render
+consumer and keyboard checks are assigned to verifier 1. The six local Chromium cases predate the last routing
+correction. The exact packed smoke exercises the WordPress bundle using jsdom.
