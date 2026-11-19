@@ -1444,3 +1444,24 @@ MenuItem already renders the own MenuOption. rc-webapp's 3 MenuItem sites are al
 TableToolbar / SearchableSelect use it inside own hosts. The MUI MenuItem path is reached only outside an own host
 (Menu's MUI route or a standalone MenuItem): not in rc-webapp, and MenuItem is not a WordPress export. So it needs
 only the lazy split (done), no new route.
+
+**After the lazy splits (2026-11-19, local build at bfbe154 + WP fix 764a089): eager @mui 4 of 298 (+1 allow-listed
+context module).** What remains and why:
+1. DatePicker / DateTimePicker: MUI X, §36 S1–S3.
+2. VanguardThemeProvider: separate proposal to the watchdog first.
+3. ProgressBar: B's buffer/query route on MUI LinearProgress; B's to split.
+
+Split into lazy fallback modules: MuiTextField (Input, Select, Textarea, SearchableSelect, Table*, …), Autocomplete,
+Menu, MenuItem, Snackbar, AppBar, Toolbar, PopoverPopper/PopoverModal (shared MUI Popper), FormControl. Theme
+defaults on the own routes come from `useThemeDefaultProps` (5.3). Spec and Storybook setups preload the fallbacks, so
+the existing MUI contract specs run unchanged.
+
+**WordPress.** The single file inlines the fallbacks. `config/inline-mui-fallbacks.ts` turns them into static imports
+for the WP build only. FINDING, fixed before any pack: the WordPress cleanup keeps only index.js and icon/loading
+chunks, so lazy chunks there would have been deleted and the bundle broken. The new `check-wordpress-dynamic-imports`
+gate catches that. The WP table (4 of 64: Autocomplete, Input, Select, Textarea) is unchanged and remains the user
+question.
+
+**Owed for the next package gate.** Consumer-side evidence: a consumer's own MUI ThemeProvider with
+`components.MuiTextField.defaultProps` around a packed Vanguard Input, on .472's Vanguard and on the candidate. Does
+the default apply? MUI and emotion are both bundled in dist, so the expected answer is no on both.
