@@ -1,5 +1,7 @@
 import { StoryObj } from '@storybook/react';
+import { EntryCss } from '@test-utils/consumer-css';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
+import { TRANSITION_LONGHANDS } from '@test-utils/transition-longhands';
 import { VanguardThemeProvider } from '@vanguard/VanguardThemeProvider/VanguardThemeProvider';
 import React from 'react';
 import { expect } from 'storybook/test';
@@ -53,8 +55,7 @@ const PROPS = [
   'background-image',
   'color',
   'box-shadow',
-  'transition-property',
-  'transition-duration',
+  ...TRANSITION_LONGHANDS,
   'align-items',
   'padding-left',
   'padding-right',
@@ -86,6 +87,20 @@ const Pair = () => (
   </div>
 );
 
+// rc-webapp Navbar.module.scss travels in the entry CSS, before vanguard.css (D15).
+const navbarEntryCss = `
+  .appBar {
+    background: transparent !important;
+    box-shadow: none !important;
+    z-index: 100 !important;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .appBar.scrolled {
+    background: var(--fn-bg) !important;
+    box-shadow: 0 2px 4px rgba(var(--fn-shadow-rgb), 0.1) !important;
+  }
+`;
+
 const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   const mismatches: string[] = [];
   for (const [name] of CASES) {
@@ -109,4 +124,23 @@ export const ComputedStylesMatchMuiInVanguardTheme: Story = {
     </VanguardThemeProvider>
   ),
   play,
+};
+
+export const NavbarInProductionStylesheetOrder: Story = {
+  render: () => (
+    <>
+      <EntryCss css={navbarEntryCss} />
+      <Pair />
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector('[data-case="Navbar shape"]') as HTMLElement;
+    const headers = [...row.querySelectorAll('header')];
+    const transition = (header: HTMLElement) =>
+      TRANSITION_LONGHANDS.map((property) => getComputedStyle(header).getPropertyValue(property));
+    const muiBoxShadow = ['box-shadow', '0.3s', 'cubic-bezier(0.4, 0, 0.2, 1)', '0s'];
+    await expect(headers.map(transition)).toEqual([muiBoxShadow, muiBoxShadow]);
+    for (const header of headers) header.classList.add('scrolled');
+    await expect(headers.map(transition)).toEqual([muiBoxShadow, muiBoxShadow]);
+  },
 };
