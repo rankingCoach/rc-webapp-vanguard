@@ -1,5 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
+import { Accordion, Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { render } from '@testing-library/react';
@@ -166,6 +166,31 @@ if (process.env.BUNDLE !== 'wp') {
       expect(root.hasAttribute('data-open')).toBe(false);
       await vi.advanceTimersByTimeAsync(350);
       expect(root.classList.contains('MuiCollapse-hidden')).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // Accordion renders MUI's Accordion DOM on own core (ButtonBase primitive + own Collapse, timeout 'auto').
+  it('toggles an installed Accordion on the own core', async () => {
+    vi.useFakeTimers();
+    try {
+      const onExpandedChange = vi.fn();
+      renderWithProviders(
+        <Accordion accordionId="fx-acc" summaryChildren={<span>Fixture summary</span>} detailsChildren={<p>Fixture details</p>} onExpandedChange={onExpandedChange} />,
+      );
+      const root = document.querySelector('[data-slot="accordion"]') as HTMLElement;
+      expect(root).not.toBeNull();
+      expect(root.hasAttribute('data-vg-core')).toBe(true);
+      expect(root.classList.contains('MuiAccordion-root')).toBe(true);
+      const summary = screen.getByRole('button', { name: 'Fixture summary' });
+      expect(summary.getAttribute('aria-expanded')).toBe('false');
+      fireEvent.click(summary);
+      expect(summary.getAttribute('aria-expanded')).toBe('true');
+      expect(root.classList.contains('Mui-expanded')).toBe(true);
+      expect(onExpandedChange).toHaveBeenCalledWith(true);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(screen.getByRole('region').closest('.MuiCollapse-root')?.classList.contains('MuiCollapse-entered')).toBe(true);
     } finally {
       vi.useRealTimers();
     }
