@@ -1,4 +1,4 @@
-import { screen, fireEvent, within } from '@testing-library/react';
+import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { Accordion, Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
@@ -148,54 +148,54 @@ describe('installed Vanguard bundle', () => {
     fireEvent.mouseLeave(wrapper);
     expect(wrapper.getAttribute('aria-labelledby')).toBeNull();
   });
-});
 
-// WordPress intentionally has no DatePicker export; verify the default installed implementation.
-if (process.env.BUNDLE !== 'wp') {
-  // Collapse runs on Vanguard's own transition in both bundles; WordPress reaches it through InfoBox.
+  // Collapse runs on Vanguard's own transition in both bundles; WordPress reaches it through InfoBox. Real timers:
+  // the WordPress bundle's transition timers are not reached by vi fake timers, so the settle is awaited.
   it('collapses an installed dismissible InfoBox with the own-core Collapse', async () => {
-    vi.useFakeTimers();
-    try {
-      renderWithProviders(<InfoBox title="Fixture info" description="Fixture body" dismissible />);
-      const root = document.querySelector('[data-slot="collapse"]') as HTMLElement;
-      expect(root).not.toBeNull();
-      expect(root.hasAttribute('data-vg-core')).toBe(true);
-      expect(root.classList.contains('MuiCollapse-root')).toBe(true);
-      expect(root.hasAttribute('data-open')).toBe(true);
-      fireEvent.click(screen.getByTestId('info-box-cta_button'));
-      expect(root.hasAttribute('data-open')).toBe(false);
-      await vi.advanceTimersByTimeAsync(350);
-      expect(root.classList.contains('MuiCollapse-hidden')).toBe(true);
-    } finally {
-      vi.useRealTimers();
-    }
+    renderWithProviders(<InfoBox title="Fixture info" description="Fixture body" dismissible />);
+    const root = document.querySelector('[data-slot="collapse"]') as HTMLElement;
+    expect(root).not.toBeNull();
+    expect(root.hasAttribute('data-vg-core')).toBe(true);
+    expect(root.classList.contains('MuiCollapse-root')).toBe(true);
+    expect(root.hasAttribute('data-open')).toBe(true);
+    fireEvent.click(screen.getByTestId('info-box-cta_button'));
+    expect(root.hasAttribute('data-open')).toBe(false);
+    await waitFor(() => expect(root.classList.contains('MuiCollapse-hidden')).toBe(true), { timeout: 2000 });
   });
 
   // Accordion renders MUI's Accordion DOM on own core (ButtonBase primitive + own Collapse, timeout 'auto').
   it('toggles an installed Accordion on the own core', async () => {
-    vi.useFakeTimers();
-    try {
-      const onExpandedChange = vi.fn();
-      renderWithProviders(
-        <Accordion accordionId="fx-acc" summaryChildren={<span>Fixture summary</span>} detailsChildren={<p>Fixture details</p>} onExpandedChange={onExpandedChange} />,
-      );
-      const root = document.querySelector('[data-slot="accordion"]') as HTMLElement;
-      expect(root).not.toBeNull();
-      expect(root.hasAttribute('data-vg-core')).toBe(true);
-      expect(root.classList.contains('MuiAccordion-root')).toBe(true);
-      const summary = screen.getByRole('button', { name: 'Fixture summary' });
-      expect(summary.getAttribute('aria-expanded')).toBe('false');
-      fireEvent.click(summary);
-      expect(summary.getAttribute('aria-expanded')).toBe('true');
-      expect(root.classList.contains('Mui-expanded')).toBe(true);
-      expect(onExpandedChange).toHaveBeenCalledWith(true);
-      await vi.advanceTimersByTimeAsync(500);
-      expect(screen.getByRole('region').closest('.MuiCollapse-root')?.classList.contains('MuiCollapse-entered')).toBe(true);
-    } finally {
-      vi.useRealTimers();
-    }
+    const onExpandedChange = vi.fn();
+    renderWithProviders(
+      <Accordion
+        accordionId="fx-acc"
+        summaryChildren={<span>Fixture summary</span>}
+        detailsChildren={<p>Fixture details</p>}
+        onExpandedChange={onExpandedChange}
+      />,
+    );
+    const root = document.querySelector('[data-slot="accordion"]') as HTMLElement;
+    expect(root).not.toBeNull();
+    expect(root.hasAttribute('data-vg-core')).toBe(true);
+    expect(root.classList.contains('MuiAccordion-root')).toBe(true);
+    const summary = screen.getByRole('button', { name: 'Fixture summary' });
+    expect(summary.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(summary);
+    expect(summary.getAttribute('aria-expanded')).toBe('true');
+    expect(root.classList.contains('Mui-expanded')).toBe(true);
+    expect(onExpandedChange).toHaveBeenCalledWith(true);
+    await waitFor(
+      () =>
+        expect(
+          screen.getByRole('region').closest('.MuiCollapse-root')?.classList.contains('MuiCollapse-entered'),
+        ).toBe(true),
+      { timeout: 2000 },
+    );
   });
+});
 
+// WordPress intentionally has no DatePicker export; verify the default installed implementation.
+if (process.env.BUNDLE !== 'wp') {
   it('keeps the packed DatePicker synchronized with controlled restores and locale changes', async () => {
     const { DatePicker } = await import('@rankingcoach/vanguard');
     const originalMatchMedia = window.matchMedia;
