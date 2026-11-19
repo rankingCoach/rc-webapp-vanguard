@@ -32,7 +32,7 @@ const ALLOW_LIST = [
 const allowEntry = (id) =>
   ALLOW_LIST.find((a) => id.replace(/\\/g, '/').replace(/\.[cm]?js$/, '').endsWith(`/node_modules/${a.module}`));
 
-const eagerClosure = (start) => {
+const closureOf = (start, withDynamic) => {
   const seen = new Set();
   const stack = [start];
   while (stack.length) {
@@ -40,9 +40,13 @@ const eagerClosure = (start) => {
     if (seen.has(f) || !graph[f]) continue;
     seen.add(f);
     for (const d of graph[f].imports) stack.push(d);
+    if (withDynamic) for (const d of graph[f].dynamicImports) stack.push(d);
   }
   return seen;
 };
+const eagerClosure = (start) => closureOf(start, false);
+// The WordPress build is one file: lazy fallback modules are inlined there, so its table follows import() too.
+const fullClosure = (start) => closureOf(start, true);
 
 // export name → file, from `export { a as b } from './index-X.js'` / `export * from` lines of dist/index.js
 const indexSrc = fs.readFileSync(path.join(root, 'dist/index.js'), 'utf8');
@@ -79,10 +83,12 @@ const muiBytes = (files) => {
   return { bytes, pkgs: [...pkgs].sort() };
 };
 
-const rows = [...exportsToFile.entries()]
-  .map(([name, file]) => ({ name, ...muiBytes(eagerClosure(file)) }))
-  .filter((r) => r.bytes > 0)
-  .sort((a, b) => b.bytes - a.bytes || a.name.localeCompare(b.name));
+const rowsFor = (closure) =>
+  [...exportsToFile.entries()]
+    .map(([name, file]) => ({ name, ...muiBytes(closure(file)) }))
+    .filter((r) => r.bytes > 0)
+    .sort((a, b) => b.bytes - a.bytes || a.name.localeCompare(b.name));
+const rows = rowsFor(eagerClosure);
 
 // Allow-list guards: each allow-listed module stays under its cap and its own eager graph pulls no further
 // @mui/* or @emotion/* module (so the entry cannot quietly grow).
@@ -106,8 +112,10 @@ if (args.has('--wordpress-table')) {
   const wpNames = new Set();
   for (const m of wpSrc.matchAll(/export\s*(?:type\s*)?\{([^}]*)\}/g))
     if (!/export\s+type/.test(m[0])) for (const spec of m[1].split(',')) wpNames.add(spec.trim().split(/\s+as\s+/).pop()?.trim());
-  const wpRows = rows.filter((r) => wpNames.has(r.name));
-  console.log(`WordPress exports with @mui code in their graph: ${wpRows.length} of ${wpNames.size}`);
+  const wpRows = rowsFor(fullClosure).filter((r) => wpNames.has(r.name));
+  console.log(
+    `WordPress exports with @mui code in their graph (single file: lazy fallbacks inlined): ${wpRows.length} of ${wpNames.size}`,
+  );
   for (const r of wpRows) console.log(`  ${r.name}\t${r.bytes} B\t${r.pkgs.join(', ')}`);
 } else {
   console.log(

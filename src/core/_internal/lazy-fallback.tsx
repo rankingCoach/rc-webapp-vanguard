@@ -11,10 +11,18 @@ import React, { type ComponentType, Suspense } from 'react';
  */
 const registry: (() => Promise<void>)[] = [];
 
-export const lazyFallback = <P extends object>(load: () => Promise<{ default: ComponentType<P> }>) => {
-  let Loaded: ComponentType<P> | null = null;
+type FallbackModule<P> = { default: ComponentType<P> };
+
+/**
+ * `load` is the lazy loader (`() => import('./XFallback')`). The WordPress build passes the module itself instead
+ * (config/inline-mui-fallbacks.ts rewrites the import to a static one): WordPress keeps its fallbacks inline and
+ * synchronous (watchdog B.5), since its cleanup keeps no other chunks.
+ */
+export const lazyFallback = <P extends object>(load: (() => Promise<FallbackModule<P>>) | FallbackModule<P>) => {
+  let Loaded: ComponentType<P> | null = typeof load === 'function' ? null : load.default;
   let pending: Promise<void> | null = null;
   const preload = () => {
+    if (typeof load !== 'function') return Promise.resolve();
     pending ??= load().then((module) => {
       Loaded = module.default;
     });

@@ -36,4 +36,10 @@ describe('lazyFallback', () => {
     const view = render(<Fallback label="sync" />);
     expect(view.container.innerHTML).toBe('<b>sync</b>');
   });
+
+  it('module mode (WordPress build: inlined fallback) renders synchronously on the first mount', () => {
+    const Fallback = lazyFallback({ default: ({ label }: { label: string }) => <i>{label}</i> });
+    const view = render(<Fallback label="inline" />);
+    expect(view.container.innerHTML).toBe('<i>inline</i>');
+  });
 });
