@@ -1752,6 +1752,14 @@ or repeatable candidate loss. The WordPress static walk found 336 files, zero mi
 and no new bare imports. The independent verification judgment covers sampled DOM and geometry. WordPress runtime
 and verifier 1's verdict remain separate. [Paired first-render evidence](/Users/a.kott/vanguard-verify/v2/out/h20-first-paint-comparison.json).
 
+**H20 CLOSED (decided-by-watchdog).** V2 PASS earlier, V1 PASS now on the limited scope I set (chunk 01 40/40 pairs,
+39 pixel-exact + BusinessProfile resolved by four byte-identical drawer-ready captures; routes AccountNavMenu,
+Navbar, invoice PhoneNumber, masked DateRangePicker, centred planner, both Snackbar paths; Autocomplete 12/26 sites
+in the browser, other 14 named gaps covered only by packed shape/WP evidence). One cold `.472` drawer-ready wait
+timed out. Chunk 02's `.472` baseline carries forward without a paired H20 candidate run. The count stays 29/31.
+[Scoped verdict and caveats](/Users/a.kott/vanguard-verify/v1/logs/h20-chunk01.md) ·
+[Autocomplete coverage](/Users/a.kott/vanguard-verify/v1/logs/h20-autocomplete-coverage.md).
+
 ### 36.7 H21 top-level TextField routing correction (decided-by-watchdog)
 
 The first three-worker full spec run at `8f4fc95` found a keyboard regression in VerificationPinInput. Frozen MUI
@@ -1806,6 +1814,15 @@ combobox and the Input anchor/custom-control ref paths. [Gate output](/Users/a.k
 Both verifiers received the pack. The masked-frame H19b recheck is assigned to verifier 2, and the first-render
 consumer and keyboard checks are assigned to verifier 1. The six local Chromium cases predate the last routing
 correction. The exact packed smoke exercises the WordPress bundle using jsdom.
+
+**H21 FAIL at `8f76287` (decided-by-watchdog).** Verifier 1 reproduced the same invoice PhoneNumber result in three
+valid pairs: native 185×43 px in a 617×43 px frame, versus 617×47 px native and frame on `.472`. The remainder of its
+focused H21 scope matched, including the DateRange mask, eight consumer keyboard sites, the PIN event path,
+margin/hidden-label and chips. The old pack is superseded by H22 and is not re-cut. Verifier 2 separately passed
+the H19b recheck on the exact H21 package. The mounted preview measured a 32 px end adornment on both sides under
+rc-webapp's border-box reset. The standalone Vanguard story measured 38 px and flex. The two previously declared
+class deltas were observed. [V1 verdict](/Users/a.kott/vanguard-verify/v1/logs/h21-8f76287-verdict.md) ·
+[V2 paired evidence](/Users/a.kott/vanguard-verify/v2/out/h21-masked-picker-comparison.json).
 
 ### 36.8 Planner PopoverModal independent clipping (decided-by-watchdog)
 
@@ -1879,6 +1896,16 @@ change until a verified S3. Keep the existing `MuiCalendarPicker-root` compatibi
    packed. Two independent verifier behavior FAILs on S2 or S3 keep DatePicker on MUI X for this major with the
    evidence logged. Record the MIT derived source notices for any adapted implementation.
 
+**Approved with conditions (decided-by-watchdog).** Run the adapter and differential in separate `TZ=UTC` and
+`TZ=Europe/Bucharest` processes. Cover both DST transitions, Feb 29 across a year change and Jan 31 → Feb clamping.
+For a selected day with a non-midnight value, assert the frozen `onChange` Moment identity, exact time including
+sub-second precision, locale, and second selection-state argument. In Chromium sample the month slide's presence,
+direction class, duration, and reduced-motion branch as well as the settled grid. The consumer selector scan at
+`73673465091` found four story references. Preserve `.MuiDateCalendar-root` on the calendar root, `.MuiPickersPopper-root`
+on the S3 portal frame, `.MuiPickersDay-root` on the day, and `.MuiPickersDay-hiddenDaySpacingFiller` / `.Mui-disabled`
+on the relevant day states. No production selector for those prefixes was found. The existing `MuiCalendarPicker-root`
+alias remains pinned by Vanguard's compatibility contract. [Committed consumer selectors](/Users/a.kott/vanguard-verify/logs/date-picker-s1/consumer-calendar-class-uses.txt).
+
 ### 36.10 PROPOSED FormControl, VanguardThemeProvider and MuiTextField lazy boundary
 
 **FormControl reachability at H21.** Re-running the import-bound scan at `8f76287` on rc-webapp `73673465091`
@@ -1922,3 +1949,35 @@ on the exact installed pack on its first tick, including default WordPress and r
 an unsupported cold-route control to prove the harness can see a suspension. WordPress remains a single bundle
 with its fallback inlined. External WordPress plugin props remain outside the available source. Preserve the
 public props and the unsupported fallback contracts.
+
+**Approved as a measurement-first plan (decided-by-watchdog).** Exact committed rc-webapp `73673465091` has zero
+direct `@mui/*` imports, including type and dynamic imports. A wider grep across the tracked JS/TS extensions found
+no candidate files. There are therefore no directly imported consumer MUI components under the four provider roots.
+Proceed with the prescribed paired measurements before proposing a bridge. FormControl stays last after DatePicker.
+Any MuiTextField lazy change has its own decision with three sets of measured evidence. [Direct import scan](/Users/a.kott/vanguard-verify/logs/h21-form-control-proposal/consumer-direct-mui-imports.json).
+
+### 36.11 H22 masked native controls (decided-by-watchdog)
+
+The invoice fixture uses the actual `PhoneNumber` with its disabled prefix, configured phone field and synthetic
+country/value. Its before-fix Chromium native width/height were 185×43 px versus frozen MUI 616.796875×47 px at
+rest, during focus and after blur. PhoneNumberIMask forwards the input class and consumes unknown data/style props.
+DateRangePickerIMask forwards the class, the data attributes and style through its remaining props. VerificationPinInputIMask
+supplies its own class and drops incoming class/data/style on both routes. It remains unchanged. These are the three
+production custom input implementations in Vanguard. Committed rc-webapp's only literal `inputComponent` is its
+local VerificationPinInput copy. [Native-box RED](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/red.log).
+
+The fix adds a direct `input`/`textarea` alternative within the existing zero-specificity own frame scope. It still
+requires `.MuiInputBase-input` and adds no attributes or classes. The base rule and `:where()` variants stay at
+specificity `(0,1,0)`, state rules at `(0,2,0)`, and base placeholder pseudo-elements at `(0,1,1)`. The outer label
+selector stays at `(0,3,1)`, its placeholder pseudo-elements at `(0,3,2)`, and the focused variants at `(0,4,2)`.
+Selector order and all declarations stay in place. Select display has its own rule and is excluded from the new
+native-element branch.
+
+Guarded Chromium passed all 16 scoped stories. Removing just the new branch in place produced byte-identical full
+computed property maps for ordinary Input, Select display, Textarea and the Autocomplete chip input and frames.
+The D15 AiVisibility route, SetupKeywordChipsEditor entry, and Select entry/route fixtures passed. The native-box
+checks matched frozen MUI for PhoneNumber, VerificationPinInput and DateRangePicker. They cover a start-flag sibling
+on a custom phone mask, an end-adornment sibling on the real DateRange mask, and the Autocomplete start chips.
+The invoice's real flag is in the separate prefix input. The exact H21 packed WordPress Input control reran 3/3
+first-tick cases including default Input, and will be repeated on H22. [Guarded browser evidence](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/frame-selector.log) ·
+[WordPress control](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/h21-wordpress-input-control.json).
