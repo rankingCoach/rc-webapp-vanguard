@@ -8,6 +8,7 @@ import { useAutocomplete } from './Autocomplete/useAutocomplete';
 import { Backdrop } from './Backdrop/Backdrop';
 import { ButtonBase } from './ButtonBase/ButtonBase';
 import { ClickAway } from './ClickAway/ClickAway';
+import { Drawer } from './Drawer/Drawer';
 import { MenuOption } from './Menu/MenuOption';
 import { MenuPopup } from './Menu/MenuPopup';
 import { OwnPopper } from './Popper/Popper';
@@ -15,6 +16,7 @@ import { Portal } from './Portal/Portal';
 import { InputTextField } from './TextField/InputTextField';
 import { Tooltip } from './Tooltip/Tooltip';
 import { Fade } from './Transitions/Fade';
+import { Slide } from './Transitions/Slide';
 
 /**
  * Tier P groundwork (plan §30.3): every own-core primitive that adds a listener, timer, observer, portal node, body
@@ -424,6 +426,74 @@ describe('own-core resources are released', () => {
     const view = render(<InputTextField id="t" multiline minRows={2} maxRows={4} defaultValue={'a\nb\nc'} />);
     settle();
     fireEvent.change(view.container.querySelector('textarea') as HTMLTextAreaElement, { target: { value: 'x' } });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Drawer temporary (ModalHost, exit manager entry, backdrop Fade, Slide resize listener): open, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Drawer open={open} anchor="right" variant="temporary" transitionDuration={400} onClose={() => undefined}>
+        {'drawer'}
+      </Drawer>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    settle();
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Drawer temporary closed mid-exit then unmounted', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Drawer open={open} anchor="bottom" variant="temporary" transitionDuration={400} onClose={() => undefined}>
+        {'drawer'}
+      </Drawer>
+    );
+    const view = render(tree(true));
+    settle();
+    view.rerender(tree(false));
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Drawer persistent (docked Slide): open, close, unmount', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Drawer open={open} anchor="left" variant="persistent" transitionDuration={400}>
+        {'drawer'}
+      </Drawer>
+    );
+    const view = render(tree(true));
+    settle();
+    view.rerender(tree(false));
+    settle();
+    done(view);
+    settle();
+    expect(leftovers(before)).toEqual(CLEAN);
+  });
+
+  it('Slide unmounted mid-enter (timers, resize listener)', () => {
+    const before = baseline();
+    const tree = (open: boolean) => (
+      <Slide in={open} direction="up" timeout={300}>
+        <div>{'slide'}</div>
+      </Slide>
+    );
+    const view = render(tree(false));
+    view.rerender(tree(true));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     done(view);
     settle();
     expect(leftovers(before)).toEqual(CLEAN);

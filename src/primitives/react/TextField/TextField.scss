@@ -521,12 +521,17 @@ svg.MuiSvgIcon-root:where([data-vg-core]) {
 // ---------------------------------------------------------------- Menu popup (Modal + Popover + Paper + List)
 .MuiModal-root:where([data-vg-core]) {
   position: fixed;
-  z-index: 1300;
   inset: 0;
 
   &:where(.MuiModal-hidden) {
     visibility: hidden;
   }
+}
+
+// MUI merges `sx` (the stacking z-index) into the root's emotion class, so it always wins over this default; the own
+// sx class (vg-z-*, src/primitives/react/z-index-class.ts) is a separate rule, so the default steps aside for it.
+.MuiModal-root:where([data-vg-core]:not([class*='vg-z-'])) {
+  z-index: 1300;
 }
 
 .MuiBackdrop-root:where([data-vg-core]) {

@@ -4,6 +4,8 @@ import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { defaultLayerStack } from '../../core/layer-stack';
 import { defaultModalManager, ManagedModal } from '../../core/modal-manager';
+import { Fade } from '../Transitions/Fade';
+import { TransitionTimeout } from '../Transitions/Transition';
 
 export type ModalCloseReason = 'escapeKeyDown' | 'backdropClick' | 'tabKeyDown';
 
@@ -11,6 +13,11 @@ export interface ModalHostProps {
   open: boolean;
   /** Keep the portal mounted while an exit transition runs (the child calls `onExited`). */
   exiting?: boolean;
+  /**
+   * MUI `closeAfterTransition` (Drawer sets it): the ModalManager entry (order, scroll lock, sibling aria-hidden) and
+   * the layer stay registered until the exit transition ends (`exiting` turns false), not until `open` turns false.
+   */
+  closeAfterTransition?: boolean;
   onClose?: (event: React.SyntheticEvent | Event, reason: ModalCloseReason) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -23,12 +30,29 @@ export interface ModalHostProps {
   disableEnforceFocus?: boolean;
   backdropClassName?: string;
   backdropStyle?: React.CSSProperties;
+  /** MUI `hideBackdrop`: no backdrop element. */
+  hideBackdrop?: boolean;
+  /** MUI Backdrop `invisible` (default true: the menu/select popups' SimpleBackdrop-like invisible backdrop). */
+  backdropInvisible?: boolean;
+  /** MUI Modal's visible Backdrop: wrap the backdrop in Fade with this timeout (Drawer: its transitionDuration). */
+  backdropTransition?: TransitionTimeout;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   children: React.ReactNode;
   [dataAttr: `data-${string}`]: unknown;
 }
 
-const focusableSelector =
-  'a[href],area[href],input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),[tabindex]:not([tabindex="-1"])';
+// MUI FocusTrap's tabbable set: elements with tabindex -1 are focusable but never tab targets.
+const focusableSelector = [
+  'a[href]',
+  'area[href]',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
+  '[tabindex]',
+]
+  .map((sel) => `${sel}:not([tabindex^="-"])`)
+  .join(',');
 
 /**
  * Modal host (MUI Modal parity, without MUI): portal into document.body with the legacy `MuiModal-root` DOM,
@@ -39,6 +63,7 @@ export const ModalHost = (props: ModalHostProps) => {
   const {
     open,
     exiting = false,
+    closeAfterTransition = false,
     onClose,
     className,
     style,
@@ -50,7 +75,11 @@ export const ModalHost = (props: ModalHostProps) => {
     disableEnforceFocus = false,
     backdropClassName,
     backdropStyle,
+    hideBackdrop = false,
+    backdropInvisible = true,
+    backdropTransition,
     children,
+    onKeyDown: onKeyDownProp,
     ...rest
   } = props;
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -67,8 +96,9 @@ export const ModalHost = (props: ModalHostProps) => {
   const mounted = open || exiting;
   const ariaHiddenOnClose = !(rest['aria-hidden'] === false || rest['aria-hidden'] === 'false');
 
+  const registered = open || (closeAfterTransition && exiting);
   useLayoutEffect(() => {
-    if (!open) return undefined;
+    if (!registered) return undefined;
     modal.current.modalRef = rootRef.current;
     defaultModalManager.add(modal.current, document.body);
     defaultModalManager.mount(modal.current, { disableScrollLock });
@@ -79,7 +109,7 @@ export const ModalHost = (props: ModalHostProps) => {
       defaultModalManager.remove(modal.current, ariaHiddenOnClose);
       defaultLayerStack.remove(layer);
     };
-  }, [open, disableScrollLock, ariaHiddenOnClose]);
+  }, [registered, disableScrollLock, ariaHiddenOnClose]);
 
   // Restore focus in a passive cleanup (like MUI FocusTrap): a layout cleanup runs inside React's commit, whose
   // selection restore would immediately re-focus the element that was focused in the popup.
@@ -159,7 +189,8 @@ export const ModalHost = (props: ModalHostProps) => {
     if (content && !content.contains(document.activeElement)) content.focus();
   }, [open, disableAutoFocus]);
 
-  if (!mounted) return null;
+  // MUI Portal renders nothing on the server (its mount node is set in an effect).
+  if (!mounted || typeof document === 'undefined') return null;
 
   const trap = (edge: 'start' | 'end') => () => {
     const content = contentRef.current?.nextElementSibling as HTMLElement | null;
@@ -172,12 +203,33 @@ export const ModalHost = (props: ModalHostProps) => {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key !== 'Escape' || event.defaultPrevented || !defaultModalManager.isTopModal(modal.current)) return;
+    // MUI useModal: the consumer's onKeyDown first; IME composition (which 229) is not an Escape.
+    onKeyDownProp?.(event as React.KeyboardEvent<HTMLDivElement>);
+    if (event.key !== 'Escape' || event.which === 229 || !defaultModalManager.isTopModal(modal.current)) return;
     if (!disableEscapeKeyDown) {
       event.stopPropagation();
       onClose?.(event, 'escapeKeyDown');
     }
   };
+
+  const backdrop = (
+    <div
+      data-slot="modal-backdrop"
+      data-vg-core=""
+      // MUI Modal backdrop: class, the Fade style, then aria-hidden.
+      className={[
+        'MuiBackdrop-root',
+        backdropInvisible ? 'MuiBackdrop-invisible' : '',
+        'MuiModal-backdrop',
+        backdropClassName,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={backdropStyle}
+      aria-hidden="true"
+      onClick={(event) => open && onClose?.(event, 'backdropClick')}
+    />
+  );
 
   return createPortal(
     <div
@@ -195,17 +247,13 @@ export const ModalHost = (props: ModalHostProps) => {
       }}
       {...rest}
     >
-      <div
-        data-slot="modal-backdrop"
-        data-vg-core=""
-        // MUI Modal backdrop: class, the Fade style, then aria-hidden.
-        className={['MuiBackdrop-root', 'MuiBackdrop-invisible', 'MuiModal-backdrop', backdropClassName]
-          .filter(Boolean)
-          .join(' ')}
-        style={backdropStyle}
-        aria-hidden="true"
-        onClick={(event) => open && onClose?.(event, 'backdropClick')}
-      />
+      {hideBackdrop ? null : backdropTransition !== undefined ? (
+        <Fade in={open} timeout={backdropTransition}>
+          {backdrop}
+        </Fade>
+      ) : (
+        backdrop
+      )}
       <div tabIndex={open ? 0 : -1} data-testid="sentinelStart" ref={contentRef} onFocus={trap('start')} />
       {children}
       <div tabIndex={open ? 0 : -1} data-testid="sentinelEnd" onFocus={trap('end')} />
