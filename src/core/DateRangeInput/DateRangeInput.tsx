@@ -1,7 +1,7 @@
+import { InputAdornment } from '../../primitives/react/TextField/InputAdornment';
 import './DateRangeInput.scss';
 
 import { validInput } from '@helpers/validators/valid-input/valid-input';
-import { InputAdornment } from '@mui/material';
 import { InputBase, rcInputBaseProps } from '@vanguard/_internal/InputBase/InputBase';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
@@ -9,12 +9,12 @@ import { useFieldBinding } from '../../primitives/react/form/use-field-binding';
 import { Button, ButtonSizes, ButtonTypes } from '../Button/Button';
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { DateRangeInitialProps, DateRangePickerResp, RcDateRangePickerProps } from '../DateRange/DateRange';
+import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 import { IconSize } from '../Icon/Icon';
 import { IconNames } from '../Icon/IconNames';
 import { ModalResponseHandler } from '../Modal/ModalRoot/ModalRoot';
 import { ModalService } from '../Modal/ModalService';
 import { DateRangeModal } from '../StandardModals/DateRangeModal/DateRangeModal';
-import { useResolvedFormConfig } from '../Form/use-resolved-form-config';
 
 type Props = {
   /** F3: bind to the nearest <Form config>'s field of this name (no `formconfig` prop needed). */

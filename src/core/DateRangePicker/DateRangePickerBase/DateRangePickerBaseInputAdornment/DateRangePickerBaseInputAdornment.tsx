@@ -1,7 +1,7 @@
-import { InputAdornment } from '@mui/material';
 import { Icon, IconSize } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import React from 'react';
+import { InputAdornment } from '../../../../primitives/react/TextField/InputAdornment';
 
 export interface DateRangePickerBaseInputAdornmentProps {
   onClick?: () => void;
