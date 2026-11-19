@@ -1,3 +1,4 @@
+// Internal; the public API is @helpers/classNames (different contract, see src/helpers/_class-builders-contract.spec.ts).
 /**
  * Internal class-attribute builder for the own core, clsx semantics as MUI emits them: every part is split on
  * whitespace, empty / false / undefined / null parts dropped, tokens joined by single spaces, order kept. Callers'
