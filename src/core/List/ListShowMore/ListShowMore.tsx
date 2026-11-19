@@ -1,5 +1,5 @@
-import { Collapse } from '@mui/material';
 import { AnimatedConditional } from '@vanguard/AnimatedConditional/AnimatedConditional';
+import { OwnCollapse } from '@vanguard/Collapse/Collapse/own-collapse';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { ListElementSchema, ListProps } from '@vanguard/List/List';
@@ -27,7 +27,7 @@ export const ListShowMore = (props: ListShowMoreProps) => {
 
   return (
     <ComponentContainer>
-      <Collapse in={currentlyDisplayed > limit} timeout={1500}>
+      <OwnCollapse in={currentlyDisplayed > limit} timeout={1500}>
         <div>
           {listElements
             .filter((e: ListElementSchema, index: number) => index >= limit)
@@ -47,7 +47,7 @@ export const ListShowMore = (props: ListShowMoreProps) => {
               );
             })}
         </div>
-      </Collapse>
+      </OwnCollapse>
 
       <AnimatedConditional condition={currentlyDisplayed < listElements.length} animation={'none'}>
         <CtaWithIcon

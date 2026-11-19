@@ -807,3 +807,53 @@ Merged A's tip e002abc (edf9c0d; mui-compat.scss conflict: both appended lines k
 1. Header added: own-collapse.tsx + _Collapse.compat.scss (Collapse/Collapse.js), own-progress-bar.tsx + _ProgressBar.compat.scss (LinearProgress/LinearProgress.js); compat partials carry `(emotion styles)`.
 2. No header: Fade.tsx (renders A's Fade primitive, no ported code), StyledSVG.compat.scss (our own former styled-components rules). Parity specs/stories are tests, not ported code.
 3. Every future leaf port gets the header in the same commit. Non-MUI sources (e.g. react-spring for the motion group) → package@version + licence to A for config/derived-notices.txt.
+
+### g4 Accordion (own core: ButtonBase primitive + own Collapse timeout 'auto')
+1. `Accordion.tsx` renders MUI 9.5 Accordion's DOM itself: Paper root div (MuiPaper-*/MuiAccordion-* classes, `--Paper-shadow` inline for elevation) > `div.MuiAccordion-heading` > summary = A's ButtonBase (native button, disableRipple, focusRipple false, focusVisibleClassName Mui-focusVisible, aria-expanded, id/aria-controls = accordionId) with content span + expandIconWrapper span; OwnCollapse(timeout 'auto') > region (role=region, aria-labelledby, id) > details. Props modelled = everything Vanguard ever forwarded to MUI (`expanded` via own state, `disableGutters`, `variant`); every other MUI prop in the public type stays ignored (bug-locks in A's `_Accordion.mui.spec` unchanged and green). Public type unchanged (MUI AccordionProps type-only import). No MUI fallback path.
+2. own-collapse: `timeout?: number | 'auto'` (MUI getAutoHeightDuration; completion through Transition.getAutoTimeout). Red/green: 2 new 'auto' scenarios in `_collapse-parity.spec` failed on the old own-collapse, pass now (8/8).
+3. Compat: `_Accordion.compat.scss` from the injected emotion rules (identical with/without VanguardThemeProvider), 0,1,0 base / ownerState variants inside `:where()` / real classes, pseudos and `+` outside (same specificity as emotion). Content gutters keyed by `.MuiAccordionSummary-gutters > ` (MUI 9.5 puts no contentGutters class on the content). One `@use` line (approval requested from A).
+4. Markers: `data-vg-core` on every part; slots accordion, accordion-heading, accordion-summary, accordion-summary-content, accordion-icon, collapse(+-wrapper/-content), accordion-region, accordion-details; root `data-variant` (elevation|outlined) + `data-open`.
+5. Evidence: `_accordion-parity.spec` 12 timelines vs `_AccordionMui.reference.tsx` (former implementation verbatim, test-only): whole subtree tags/classes(-css-*)/attrs(-markers)/inline styles at every step incl. Collapse writes with 'auto' (wrapper height mocked to 120 → 249 ms), click/Enter/Space/focus/controlled/variant toggles/ignored MUI props, onExpandedChange calls. Mutations: timeout 300 → 6 fail; gutters class dropped → 11 fail. Chromium `_AccordionParity.stories` (default + VanguardThemeProvider): sibling groups (first/last-of-type, expanded+expanded), 34 computed props of 8 parts + root ::before + boxes, initial / toggled / toggled back, keyboard focus-visible: identical. Synthetic-click focus-visible was order-dependent (the second side clicked inherits Chromium's programmatic-focus heuristic; swapping the order moves the diff to the MUI side) → blur after each click. `_Accordion.cleanup.spec` 3/3 (no timer after mid-transition unmount, no document/window listener left, DOM contract). A's `_Accordion.mui.spec` + contract stories + Collapse specs/stories green, `_mui-compat-order` 6/6, tsc lib 0.
+6. Size: Accordion eager closure 133.8 → 48.3 KB gzip, no emotion runtime.
+7. Consumers: rc-webapp 11 files; consumer CSS (WhatIsCard, AiVisibilitySearchesAndAnswersCard) targets `.MuiAccordion-root.Accordion-container .MuiAccordionSummary-root .MuiAccordionSummary-content` — kept. Collision: rc-webapp `[data-open="true"]` (ChronicleEntry.module) is on its own module class, not Accordion. WordPress export → smoke patch sent to A.
+8. Biome: 2 kept patterns (fragment fallback `?? <></>`, effect deps) are verbatim from the former code; changing them would change behaviour.
+
+### StarRating remount growth: classified NOT a leak (browser bookkeeping of in-flight animations)
+Probe (watchdog brief; Chromium 1148 headless via Playwright, `--expose-gc`, no Storybook): esbuild bundle of the built `dist/index-StarRating.js` (+ dist/vanguard.css) in a bare page; remount = re-render with a new key (as forceRemount); metrics via CDP `Performance.getMetrics` after 2× `HeapProfiler.collectGarbage`; `document.getAnimations().length`. Control = plain `<div>` of 5 `<svg><path>` animated by the same `fillup .8s ease`. Scripts: scratchpad `starprobe/` (entry.tsx, run.mjs).
+
+| run (React build) | cycles × wait | nodes base → mounted mid → end | after clear | after 10 s idle + GC | anims mounted / after clear | listeners |
+|---|---|---|---|---|---|---|
+| A StarRating, prod | 200 × 0 | 16 → 67 → 67 | 16 | 16 | 15 / 0 | 154 → 161 → 154 |
+| B StarRating, prod | 60 × 1 s | 16 → 67 → 67 | 16 | 16 | 0 / 0 | 154 → 161 → 154 |
+| C plain div, prod | 200 × 0 | 16 → 38 → 38 | 27 | 16 | 5 / 0 | 154 flat |
+| D plain div, prod | 60 × 1 s | 16 → 27 → 27 | 16 | 16 | 0 / 0 | 154 flat |
+| A StarRating, dev | 200 × 0 | 29 → 275 → 275 | 80 | 29 | 15 / 0 | 154 → 161 → 154 |
+| B StarRating, dev | 40 × 1 s | 29 → 262 → 262 | 29 | 29 | 0 / 0 | 154 → 161 → 154 |
+| C plain div, dev | 200 × 0 | 16 → 27 → 27 | 16 | 16 | 5 / 0 | 154 flat |
+
+Answers:
+1. Per cycle: no growth. The count is the same at cycle 100 and cycle 200, in prod and in dev, with or without a 1 s wait.
+2. Idle: after 200 cycles plus 10 s idle and GC, nodes and listeners are back at baseline exactly.
+3. `document.getAnimations()`: never grows. It holds only the live instance's 15 animations (5 stars × 3 paths) and drops to 0 on clear.
+4. Transient retention: unmounting mid-animation leaves one instance's worth of detached nodes (+51 dev, +11 for the plain div). These are released once the animation timeline moves past them. The plain div with the same keyframes shows the same effect.
+
+Conclusion: this is Blink holding detached elements that have in-flight CSS animations until the next animation tick. It is bounded at one instance and does not accumulate, so it is not a leak. No code change.
+
+Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, not even per cycle. The difference is the harness: Storybook dev instrumentation (actions/interactions, the DevTools hook) can keep the args and fibers of earlier renders. I've asked for a post-idle sample (10 s idle + forced GC) of the Storybook scenario.
+
+### g5 List / ListShowMore (own Collapse, timeout 1500)
+1. MUI's only use in List/ListShowMore was `<Collapse in timeout={1500}>` in ListShowMore. It now renders the component-local OwnCollapse with the same props. List.tsx had no MUI. No new compat CSS: the Collapse rules come from `_Collapse.compat.scss`. No `@use` line needed.
+2. Red/green:
+   2.1 New `_listshowmore-parity.spec` vs `_ListShowMoreMui.reference.tsx` (the former code verbatim, test-only).
+   2.2 Red: the own-core marker test failed on the MUI path.
+   2.3 Green after the swap, 3/3: the whole-subtree timeline (show all / show less, including interrupted transitions, Collapse writes with 1500 ms) is identical step by step, and below-limit / no-limit renders the same.
+3. Other checks:
+   3.1 A's `_ListShowMore.mui.spec` and the `_ListShowMoreMuiContract` story (Chromium geometry + 1500 ms timing) are unchanged and green.
+   3.2 List specs green: 9 files / 36.
+   3.3 tsc lib: 0.
+   3.4 `ListShowMore.stories.tsx` is on the known never-indexed list (no leading underscore), so it is not run.
+4. Size and consumers:
+   4.1 List/ListShowMore eager closure: 234.0 → 166.7 KB gzip. Emotion is no longer in it; the rest is ListItem/Text/CTA.
+   4.2 Not a WordPress export.
+   4.3 rc-webapp imports List in several screens, but none passes `limit`, so none reaches the ListShowMore branch.
+5. Biome: 4 warnings, all pre-existing in the verbatim code (unused `e` params, empty effect).

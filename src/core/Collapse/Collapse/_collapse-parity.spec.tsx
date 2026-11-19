@@ -2,7 +2,6 @@ import { Collapse as MuiCollapse } from '@mui/material';
 import { act, render } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { OwnCollapse } from './own-collapse';
 
 /**
@@ -10,17 +9,17 @@ import { OwnCollapse } from './own-collapse';
  * `orientation`), vs the own Collapse on the same timelines. At every step the three elements' classes (MUI's
  * emotion `css-*` hashes dropped), attributes (own-core markers dropped) and inline styles must match.
  */
-type Props = { in: boolean; orientation?: 'vertical' | 'horizontal'; className?: string };
+type Props = { in: boolean; orientation?: 'vertical' | 'horizontal'; className?: string; timeout?: 'auto' };
 type Impl = 'mui' | 'own';
 const OWN_ONLY = new Set(['data-vg-core', 'data-slot', 'data-orientation', 'data-open']);
 
 const element = (impl: Impl, p: Props) =>
   impl === 'mui' ? (
-    <MuiCollapse in={p.in} className={p.className} orientation={p.orientation}>
+    <MuiCollapse in={p.in} className={p.className} orientation={p.orientation} timeout={p.timeout}>
       <span>content</span>
     </MuiCollapse>
   ) : (
-    <OwnCollapse in={p.in} className={p.className} orientation={p.orientation}>
+    <OwnCollapse in={p.in} className={p.className} orientation={p.orientation} timeout={p.timeout}>
       <span>content</span>
     </OwnCollapse>
   );
@@ -42,7 +41,11 @@ const run = (impl: Impl, steps: { props: Props; advance?: number }[]) => {
   const trace: unknown[] = [];
   const snap = () => {
     const root = view.container.firstElementChild;
-    trace.push([describeEl(root), describeEl(root?.firstElementChild ?? null), describeEl(root?.firstElementChild?.firstElementChild ?? null)]);
+    trace.push([
+      describeEl(root),
+      describeEl(root?.firstElementChild ?? null),
+      describeEl(root?.firstElementChild?.firstElementChild ?? null),
+    ]);
   };
   for (const [i, step] of steps.entries()) {
     if (i > 0) view.rerender(element(impl, step.props));
@@ -78,9 +81,23 @@ const scenarios: Record<string, { props: Props; advance?: number }[]> = {
     { props: { in: true, orientation: 'horizontal' }, advance: 350 },
     { props: { in: false, orientation: 'horizontal' }, advance: 350 },
   ],
-  'className change while open': [
-    { props: { in: true, className: 'a' } },
-    { props: { in: true, className: 'b' } },
+  'className change while open': [{ props: { in: true, className: 'a' } }, { props: { in: true, className: 'b' } }],
+};
+
+// timeout 'auto' (how MUI Accordion calls Collapse): the duration derives from the wrapper's size, so the wrapper reports
+// a height (jsdom has no layout). 120px → getAutoHeightDuration = 249 ms.
+const autoScenarios: Record<string, { props: Props; advance?: number }[]> = {
+  'auto: open then close': [
+    { props: { in: false, timeout: 'auto' } },
+    { props: { in: true, timeout: 'auto' }, advance: 200 },
+    { props: { in: true, timeout: 'auto' }, advance: 100 },
+    { props: { in: false, timeout: 'auto' }, advance: 200 },
+    { props: { in: false, timeout: 'auto' }, advance: 100 },
+  ],
+  'auto: open at mount, close interrupted by open': [
+    { props: { in: true, timeout: 'auto' } },
+    { props: { in: false, timeout: 'auto' }, advance: 100 },
+    { props: { in: true, timeout: 'auto' }, advance: 400 },
   ],
 };
 
@@ -91,6 +108,29 @@ describe('Collapse parity: MUI 9.5 vs own', () => {
   for (const [name, steps] of Object.entries(scenarios)) {
     it(name, () => {
       expect(run('own', steps)).toEqual(run('mui', steps));
+    });
+  }
+});
+
+describe('Collapse parity: timeout auto', () => {
+  let restore: () => void;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    const spy = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockImplementation(function (this: HTMLElement) {
+      return this.classList.contains('MuiCollapse-wrapper') ? 120 : 0;
+    });
+    restore = () => spy.mockRestore();
+  });
+  afterEach(() => {
+    restore();
+    vi.useRealTimers();
+  });
+
+  for (const [name, steps] of Object.entries(autoScenarios)) {
+    it(name, () => {
+      const own = run('own', steps);
+      expect(JSON.stringify(own)).toContain('transition-duration: 249ms');
+      expect(own).toEqual(run('mui', steps));
     });
   }
 });
