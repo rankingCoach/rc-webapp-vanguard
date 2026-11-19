@@ -1465,3 +1465,25 @@ question.
 **Owed for the next package gate.** Consumer-side evidence: a consumer's own MUI ThemeProvider with
 `components.MuiTextField.defaultProps` around a packed Vanguard Input, on .472's Vanguard and on the candidate. Does
 the default apply? MUI and emotion are both bundled in dist, so the expected answer is no on both.
+
+**Correction (2026-11-19, package smoke on the B.3 build).** The MuiTextField route is REACHABLE, so its lazy split is
+reverted to a static import. The trigger is Autocomplete's `renderInput`, which passes `InputProps.ref` (the popper
+anchor) and so always routed its text field to MUI's TextField. That covers rc-webapp's 26 Autocomplete sites and
+WordPress. IMask inputs passing `inputComponent` take the same route. With the lazy boundary, the packed Autocomplete
+rendered no input on first use (smoke: no combobox).
+
+My spec setup's preload had hidden this. It now has an audit switch: `VG_NO_FALLBACK_PRELOAD=1` runs the specs without
+preloading, so any Vanguard-internal path that reaches a lazy route renders empty and fails.
+
+Audit of the remaining lazy routes (Menu, MenuItem, Snackbar, AppBar, Toolbar, PopoverPopper/PopoverModal, FormControl,
+Autocomplete):
+1. Every failure without preload uses a deliberately unmodelled prop (`component`, `classes`, `sx`, `slotProps`,
+   `transitionDuration`, transition props, a standalone MenuItem).
+2. rc-webapp's Menu shape (AccountNavMenu: anchorEl, open, onClose, height, width, `Render`-wrapped MenuItems) takes
+   the own route.
+3. Popper, PopoverModal and AutocompleteWithAnchor had no failure.
+
+Consequence: the Input family (Input, InputBase, Select, Textarea, SearchableSelect, Table*, PhoneNumber,
+RichTextEditor, TextEditDrawer, TimePicker, ColorPicker, DateRange*, DrawerRoot/Service, AIAssistant, Autocomplete)
+stays eager on @mui through MuiTextField until the own text field models `InputProps.ref` and `inputComponent`. That
+is the next B.2 item ("implement every prop with reachability evidence"), not a lazy split.

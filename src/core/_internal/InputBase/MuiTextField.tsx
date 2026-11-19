@@ -1,13 +1,14 @@
 import React from 'react';
 import { InputTextField } from '../../../primitives/react/TextField/InputTextField';
 import { SelectTextField } from '../../../primitives/react/TextField/SelectTextField';
-import { lazyFallback } from '../lazy-fallback';
 import type { VanguardTextFieldProps } from '../mui-legacy-props';
 import { mapLegacyComponentAliases, mapLegacyModalAliases, mapLegacySlots } from '../mui-slot-compat';
 import { useThemeDefaultProps } from '../theme-default-props';
+import MuiTextFieldFallback from './MuiTextFieldFallback';
 
-// MUI's TextField route behind a lazy boundary (plan §36.2 B.3): the eager graph stays free of @mui/*.
-const MuiTextFieldFallback = lazyFallback(() => import('./MuiTextFieldFallback'));
+// MUI's TextField route stays EAGER: it is reachable (Autocomplete's renderInput passes InputProps.ref, IMask inputs
+// pass inputComponent), so a lazy boundary would render an empty field on first use (package smoke, 2026-11-19).
+// Removing it needs the own text field to model those props (plan §36.3).
 
 /** InputBase-root props only MUI models: their presence keeps a text field on MUI. */
 const OWN_TEXT_FALLBACK_INPUT_KEYS = [
