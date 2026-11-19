@@ -1,14 +1,16 @@
-import { DiscountBadge, DiscountBadgeProps } from "./DiscountBadge";
+import { DiscountBadge, type DiscountBadgeProps } from "./DiscountBadge";
 import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/DiscountBadge",
   component: DiscountBadge,
   extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories

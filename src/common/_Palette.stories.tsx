@@ -17,11 +17,13 @@ import {
 } from "@globalStyles";
 
 type PaletteKeys = "brand-color" | "p" | "n" | "s" | "e" | "w" | "a1" | "a2" | "a3" | "i" | "fn" | "sc";
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "Vanguard/Palette",
   component: null,
   tags: ['skip-test'],
-});
+}),
+};
 
 /*
 The CSS property is always read as text, exactly as it is in the CSS file. This means you'll have to handle any needed

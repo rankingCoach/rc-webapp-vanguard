@@ -1,6 +1,6 @@
 @import '@styles/color-functions';
-@import '../../../styles/media-mixins';
-@import '../../../styles/spacings';
+@import '../../styles/media-mixins';
+@import '../../styles/spacings';
 
 .hoverable-card {
     background-color: var(--fn-bg-surface);

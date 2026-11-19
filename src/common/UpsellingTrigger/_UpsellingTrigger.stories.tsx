@@ -1,11 +1,13 @@
-import { UpsellingTrigger, UpsellingTriggerProps } from "./UpsellingTrigger";
+import { UpsellingTrigger, type UpsellingTriggerProps } from "./UpsellingTrigger";
 import React from "react";
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/UpsellingTrigger",
   component: UpsellingTrigger,
-});
+}),
+};
 
 export const UpsellingTriggerStory = (props: UpsellingTriggerProps) => {
   const {

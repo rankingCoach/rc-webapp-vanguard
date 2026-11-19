@@ -2,13 +2,15 @@ import { ExpandableItem, ExpandableItemProps } from "./ExpandableItem";
 import React from "react";
 import { disableControls, SbDecorator } from "@test-utils/get-storybook-decorator";
 
-export default SbDecorator({
+export default {
+  ...SbDecorator({
   title: "BuildingBlocks/ExpandableItem",
   component: ExpandableItem,
   extra: {
     ...disableControls([""]),
   },
-});
+}),
+};
 
 /**
  * Default props of all the stories

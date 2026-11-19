@@ -176,14 +176,20 @@ const examplesFor = (name, file, exported) => {
   const dir = path.dirname(file);
   if (path.basename(dir) !== name) return [];
   const storyDir = path.join(dir, 'stories');
-  if (!fs.existsSync(storyDir)) return [];
+  // stories/*.story.tsx first, then the folder's own collected _*.stories.tsx files.
+  const storyFiles = [
+    ...(fs.existsSync(storyDir) ? fs.readdirSync(storyDir).filter((x) => x.endsWith('.story.tsx')).sort().map((x) => path.join(storyDir, x)) : []),
+    ...fs.readdirSync(dir).filter((x) => /^_.*\.stories\.tsx$/.test(x)).sort().map((x) => path.join(dir, x)),
+  ];
+  if (!storyFiles.length) return [];
   const ts = require('typescript5');
   const seen = new Set();
   const out = [];
-  for (const f of fs.readdirSync(storyDir).filter((x) => x.endsWith('.story.tsx')).sort()) {
-    const src = read(path.join(storyDir, f));
+  for (const file of storyFiles) {
+    const f = path.basename(file);
+    const src = read(file);
     const sf = ts.createSourceFile(f, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-    const consts = collectConsts(ts, sf, path.join(storyDir, f));
+    const consts = collectConsts(ts, sf, file);
     for (const stmt of sf.statements) {
       if (!ts.isVariableStatement(stmt) || !stmt.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
       for (const decl of stmt.declarationList.declarations) {
