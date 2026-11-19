@@ -1,6 +1,6 @@
 import { render } from '@test-utils/test-utils';
 import { fireEvent } from '@testing-library/react';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { replayRouteShapes, sourceRoutes } from '../../agentic-plans/mui-upgrade-gates/package-fixture/smoke/replay-route-shapes';
 import { AppBar } from './AppBar/AppBar';
 import { Autocomplete } from './Autocomplete/Autocomplete';
@@ -14,11 +14,19 @@ import { SearchableSelect } from './SearchableSelect/SearchableSelect';
 import { Snackbar } from './Snackbar/Snackbar';
 import { Toolbar } from './Toolbar/Toolbar';
 
+const { loadMuiPopper } = vi.hoisted(() => ({ loadMuiPopper: vi.fn() }));
+vi.mock('./Popover/PopoverPopper/MuiPopperFallback', (importOriginal) => {
+  loadMuiPopper();
+  return importOriginal();
+});
+
 it.each(sourceRoutes)('renders every inventoried %s shape without preload', { timeout: 15_000 }, (name) => {
   replayRouteShapes(
     name,
     { AppBar, Autocomplete, Menu, MenuItem, PopoverPopper, PopoverModal, Render, SearchableSelect, Snackbar, Toolbar },
     render,
+    false,
+    () => expect(loadMuiPopper).not.toHaveBeenCalled(),
   );
 });
 

@@ -108,7 +108,13 @@ function valuesFor(anchor: HTMLButtonElement) {
   } satisfies Record<string, unknown>;
 }
 
-export function replayRouteShapes(name: RouteName, components: Components, render: Render, wordpress = false) {
+export function replayRouteShapes(
+  name: RouteName,
+  components: Components,
+  render: Render,
+  wordpress = false,
+  assertNoMuiPopperRequest?: () => void,
+) {
   const cases: Shape[] = wordpress ? [{ keys: ['options'] }] : shapes[name];
   const { Menu, MenuItem, Render, SearchableSelect } = components;
   const Component = components[name];
@@ -171,7 +177,12 @@ export function replayRouteShapes(name: RouteName, components: Components, rende
       const content = document.body.querySelector(selector);
       expect(content, description).not.toBeNull();
       if (name === 'PopoverModal') {
-        expect(content?.hasAttribute('data-vg-core'), description).toBe(!props.centerPopover);
+        expect(content?.hasAttribute('data-vg-core'), description).toBe(true);
+        if (props.renderInPortal) expect(content?.parentElement, description).toBe(document.body);
+        if (props.centerPopover) {
+          if (!assertNoMuiPopperRequest) throw new Error('The planner fixture requires a fallback request observer');
+          assertNoMuiPopperRequest();
+        }
       }
       if (name === 'Menu') expect(view.getByText(menuLabel), description).toBeDefined();
     } catch (cause) {

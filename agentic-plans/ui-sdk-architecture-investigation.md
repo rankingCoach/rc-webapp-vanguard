@@ -1611,7 +1611,7 @@ WordPress smoke is green.
 | Toolbar | 1 / 0 | 1 | 1 | 0 | One packed replay. Navbar class and children |
 | PopoverPopper | 0 / 1 | 1 | 1 | 0 | Private AutocompleteWithAnchor source replay. Absent from both packed public entries |
 | FormControl | 0 / 0 | 0 | 0 | 0 | No production caller or WordPress export. Default pack cold control has no first-commit FormControl root |
-| PopoverModal | — | 2 | 1 | 1 eager | Event details and centered create-event portal |
+| PopoverModal | — | 2 | 2 | 0 | Event details and centered create-event portal. Both shapes render synchronously on the own route as of the H22 port. |
 | ProgressBar | 34 / 1 | 22 | 22 | 0 | B's verified `f94d932`, 48 same-tick checks and cold buffer/query controls |
 
 Independent replay used `scan.cjs` and `render.cjs` from `72a8633`, exact `32a6b93` packed modules, and read-only
@@ -1838,6 +1838,14 @@ Two separate regression cases now pin the remaining fallback classifier. A custo
 must produce `supported: false` with `['observePlacement']`, and the `document` root boundary must produce
 `supported: false` with `['flip.rootBoundary']`. Both checks keep the MUI route reachable for options the own
 primitive would otherwise ignore. [Targeted fallback controls](/Users/a.kott/vanguard-verify/logs/dual-boundary-popper-rejection-controls.log).
+
+**H22 shared fixture update (decided-by-watchdog).** The initial full gate at `559be2d` failed the single
+PopoverModal shape audit because it still expected the previous centered MUI route. The shared source and package
+replay now require the own marker on both shapes, the exact body parent for portals, and zero fallback requests for
+the centered shape. The source mock records any original fallback module evaluation. The installed-package fixture
+registers a Node resolver observer before importing the pack and checks it with a resolution-only control. Existing
+same-tick queries and selectors are unchanged. The search for other negative marker assertions found three unrelated
+cases: an intentionally unmodeled Autocomplete route and the frozen AppBar/Toolbar reference nodes.
 
 ### 36.9 PROPOSED DatePicker S1 calendar
 

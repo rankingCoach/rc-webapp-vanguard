@@ -3,12 +3,36 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import { Accordion, Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { type ReactElement, useState } from 'react';
 import userEvent from '@testing-library/user-event';
 import { entryFile, installedBundle, isFromNodeModules } from './installed-package';
 import { renderWithProviders } from './providers';
 import { packedRoutes, replayRouteShapes } from './replay-route-shapes';
+
+const muiPopperRequests = await vi.hoisted(async () => {
+  if (process.env.BUNDLE === 'wp') return undefined;
+  const { createRequire, registerHooks } = await import('node:module');
+  const { pathToFileURL } = await import('node:url');
+  const fallback = createRequire(`${process.cwd()}/package.json`).resolve('@rankingcoach/vanguard/dist/index-MuiPopperFallback.js');
+  // Run import.meta.resolve in the native ESM loader. Vitest rewrites its own import.meta, while require.resolve
+  // does not traverse the ESM hook on Node 22.
+  const nativeResolver = await import('data:text/javascript,export const resolve = url => import.meta.resolve(url)');
+  const requests: string[] = [];
+  const hook = registerHooks({
+    resolve(specifier, context, nextResolve) {
+      const result = nextResolve(specifier, context);
+      if (result.url.endsWith('/index-MuiPopperFallback.js')) requests.push(result.url);
+      return result;
+    },
+  });
+  // A resolution-only control verifies the observer before the installed bundle is imported. No module is evaluated.
+  nativeResolver.resolve(pathToFileURL(fallback).href);
+  const sawControl = requests.length === 1;
+  requests.length = 0;
+  return { requests, sawControl, stop: () => hook.deregister() };
+});
+afterAll(() => muiPopperRequests?.stop());
 
 const fixtureOptions = [
   { key: 'apple', value: 'apple', title: 'Apple' },
@@ -21,7 +45,10 @@ const noop = () => {};
 describe('first render from the installed bundle', () => {
   const wordpress = process.env.BUNDLE === 'wp';
   it.each(wordpress ? ['Autocomplete'] as const : packedRoutes)('replays audited %s shapes without preloading', (name) => {
-    replayRouteShapes(name, Vanguard, renderWithProviders, wordpress);
+    replayRouteShapes(name, Vanguard, renderWithProviders, wordpress, () => {
+      expect(muiPopperRequests?.sawControl).toBe(true);
+      expect(muiPopperRequests?.requests).toEqual([]);
+    });
   });
 
   it('mounts ModalRoot and provides the modal context', () => {
