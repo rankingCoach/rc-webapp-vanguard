@@ -2,8 +2,10 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { cleanupOverlaySpec } from '@test-utils/cleanup-overlay-spec';
 import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Icon } from '@vanguard/Icon/Icon';
+import { IconNames } from '@vanguard/Icon/IconNames';
 import React from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { act, render } from '../../../test-utils/test-utils';
 import { AutocompleteMuiReference } from './_Autocomplete.mui-reference';
 import { Autocomplete, AutocompleteProps } from './Autocomplete';
@@ -65,13 +67,24 @@ const canonical = (html: string) => {
 const snapshot = () =>
   `<body style="${document.body.getAttribute('style') ?? ''}">${canonical(normalize(document.body.innerHTML))}`;
 
-const settle = async (signal: AbortSignal) => {
+const settle = async (container: HTMLElement, signal: AbortSignal) => {
+  signal.throwIfAborted();
+  // Both implementations use lazy SVG assets. Compare settled markup, including the Clear indicator that
+  // appears after selecting an option, rather than taking whichever implementation's asset resolved first.
+  await waitFor(
+    () => {
+      const indicators = container.querySelectorAll('.MuiAutocomplete-popupIndicator, .MuiAutocomplete-clearIndicator');
+      for (const button of indicators) expect(button.querySelector('svg')).not.toBeNull();
+    },
+    { timeout: 2500 },
+  );
   let last = '';
   for (let i = 0; i < 60; i++) {
     await act(async () => {
       await sleep(5, undefined, { signal });
     });
-    const now = snapshot();
+    // Compare the live DOM while it settles. Parse and canonicalize only the recorded snapshots.
+    const now = `${document.body.style.cssText}\n${document.body.innerHTML}`;
     if (now === last) return;
     last = now;
   }
@@ -95,13 +108,8 @@ const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[], 
       {...props}
     />,
   );
-  const popupIndicator = view.container.querySelector('.MuiAutocomplete-popupIndicator');
-  // The settled DOM includes the packaged icon, which resolves separately from the input frame.
-  if (popupIndicator) {
-    await waitFor(() => expect(popupIndicator.querySelector('svg')).not.toBeNull(), { timeout: 2500 });
-  }
   const trace: { html: string; log: string[] }[] = [];
-  await settle(signal);
+  await settle(view.container, signal);
   trace.push({ html: snapshot(), log: log.splice(0) });
   const input = () => document.querySelector('input[role="combobox"], input') as HTMLInputElement;
   for (const step of steps) {
@@ -115,7 +123,7 @@ const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[], 
       await act(async () => {
         input().blur();
       });
-    await settle(signal);
+    await settle(view.container, signal);
     trace.push({ html: snapshot(), log: log.splice(0) });
   }
   view.unmount();
@@ -123,6 +131,20 @@ const go = async (impl: Impl, props: Partial<AutocompleteProps>, steps: Step[], 
   return trace;
 };
 
+beforeAll(async () => {
+  // Start both sides of the settled differential with the same warm asset state.
+  const icons = render(
+    <>
+      <Icon>{IconNames.caretDown}</Icon>
+      <Icon>{IconNames.close}</Icon>
+    </>,
+  );
+  try {
+    await waitFor(() => expect(icons.container.querySelectorAll('svg')).toHaveLength(2), { timeout: 5000 });
+  } finally {
+    icons.unmount();
+  }
+});
 afterEach(cleanupOverlaySpec);
 
 const CASES: [string, Partial<AutocompleteProps>, Step[]][] = [
