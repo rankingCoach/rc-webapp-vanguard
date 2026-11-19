@@ -1,3 +1,5 @@
+import { OwnPopper as Popper } from '../../primitives/react/Popper/Popper';
+import { Fade } from '../../primitives/react/Transitions/Fade';
 import './DateRangePicker.scss';
 
 import { useInsideClickCallback } from '@custom-hooks/use-inside-click-callback';
@@ -6,7 +8,6 @@ import { dFlex } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import { dateIsBefore, dateIsSameDay } from '@helpers/date-helpers';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Fade, Popper } from '@mui/material';
 import { translationService } from '@services/translation.service';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import { DateRangePickerResp } from '@vanguard/DateRange/DateRange';
