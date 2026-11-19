@@ -10,6 +10,7 @@
 > 7. F2 (registration replacing child-walking): **CLOSED, not done by design** (fallback accepted; analysis in §D14/F2). F3 `field` prop: **GO**.
 > 8. **Known bug left in place: Slider on the legacy `formconfig` path** calls `setStateValue` without dispatching, so slider values are never stored. Kept, because fixing it would start writing into consumer stores. Verifier: rc-webapp renders Slider in 7 files and none binds a formconfig, so **zero consumer impact**; the decision stands. On the new `field` path Slider DOES store its value.
 > 9. Reporting rule: "passed" only for a Tier A/B verdict returned by the verifier; my own gates are "green on my side".
+> 10. SnackbarRoot pub-sub subscription leak (2026-11-19): **DECIDED (watchdog), fix after H17's PASS** in a separate commit with a reproducing spec (0 observers after unmount, flat over N mounts, remount replay unchanged); the `[bug-lock]` in `_SnackbarRoot.mui.spec.tsx` is rewritten to the fixed behaviour in that commit. User-facing behaviour delta: none; internal leak fixed. Tier P scenario for verifier 2: mount/unmount ×200 + service events.
 
 
 Date: 2026-11-18 · Branch: `feature/ui-sdk-architecture-investigation` (from `feature/file-manager-variants`)
