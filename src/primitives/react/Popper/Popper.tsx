@@ -56,6 +56,8 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
 
   // The anchor size the last position was computed from (the anchor observer / font triggers compare against it).
   const anchorSize = useRef<{ width: number; height: number } | null>(null);
+  // The popper's own layout size at that time (the font trigger also compares it: a web font changes text width).
+  const popperSize = useRef<{ width: number; height: number } | null>(null);
   const update = useCallback(() => {
     const node = nodeRef.current;
     if (!node || !anchor || !open) return;
@@ -63,6 +65,7 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     anchorSize.current = { width: ar.width, height: ar.height };
     const result = computeAnchored(anchor, node, options);
     const size = layoutSize(node);
+    popperSize.current = { width: size.width, height: size.height };
     Object.assign(
       node.style,
       mapToStyles({
@@ -144,6 +147,18 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
       if (last && last.width === r.width && last.height === r.height) return;
       onEvent();
     };
+    // Font trigger: a web font swapping in changes text width, of the anchor or of the popper itself (tooltip text;
+    // verifier 1 on 277bc04: candidate stayed at the pre-font x 506, MUI settled at 514). Lazy icons fire no font
+    // event, so the handoff-14 rule (no re-position on content growth alone) still holds for the observer.
+    const onFontsLoaded = () => {
+      const lastPopper = popperSize.current;
+      const now = layoutSize(node);
+      if (lastPopper && (lastPopper.width !== now.width || lastPopper.height !== now.height)) {
+        onEvent();
+        return;
+      }
+      onAnchorChange();
+    };
     for (const t of targets) t.addEventListener('scroll', onEvent, { passive: true });
     const win = node.ownerDocument.defaultView ?? window;
     win.addEventListener('resize', onEvent, { passive: true });
@@ -155,13 +170,13 @@ const PopperTooltip = (props: OwnPopperProps & { TransitionProps?: AnyProps }) =
     // ResizeObserver never reports non-replaced inline boxes (an inline text anchor); a web font swapping in after
     // open changes their width (verifier handoff 12, describe-child-chip 63 vs 66). Re-position when fonts load.
     const fonts = (node.ownerDocument as Document).fonts as (EventTarget & FontFaceSet) | undefined;
-    fonts?.addEventListener?.('loadingdone', onAnchorChange);
+    fonts?.addEventListener?.('loadingdone', onFontsLoaded);
     return () => {
       cancelled = true;
       for (const t of targets) t.removeEventListener('scroll', onEvent);
       win.removeEventListener('resize', onEvent);
       observer?.disconnect();
-      fonts?.removeEventListener?.('loadingdone', onAnchorChange);
+      fonts?.removeEventListener?.('loadingdone', onFontsLoaded);
     };
   }, [anchor, open, options.strategy, disablePortal]);
 

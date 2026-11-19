@@ -121,4 +121,25 @@ describe('OwnPopper anchor observer', () => {
     view.unmount();
     restore();
   });
+
+  it('a web font swapping in that changes the POPPER width re-positions (verifier 1, 277bc04 tooltip 506 vs 514)', async () => {
+    const { anchor, restore } = setup();
+    const fonts = new EventTarget();
+    Object.defineProperty(document, 'fonts', { configurable: true, value: fonts });
+    const view = render(
+      <OwnPopper open anchorEl={anchor} placement="bottom" data-testid="floating">
+        <div>{'Edit opening times'}</div>
+      </OwnPopper>,
+    );
+    await flush();
+    const el = view.getByTestId('floating');
+    const before = el.style.transform;
+    floatingWidth = 220; // tooltip text re-measured with the loaded font; the icon anchor is unchanged
+    fonts.dispatchEvent(new Event('loadingdone'));
+    await flush();
+    expect(el.style.transform).not.toBe(before);
+    view.unmount();
+    delete (document as unknown as { fonts?: unknown }).fonts;
+    restore();
+  });
 });

@@ -20,7 +20,7 @@ keepMuiCompatLast();
 afterEach(() => cleanup());
 // Plan §36.2 B.3: MUI fallback routes sit behind lazy boundaries; load them up front so specs render them
 // synchronously (same DOM as before the split).
-beforeAll(() => preloadMuiFallbacks());
+beforeAll(() => (process.env.VG_NO_FALLBACK_PRELOAD ? undefined : preloadMuiFallbacks()));
 
 // Global test wrapper component (framework-agnostic)
 export const GlobalTestWrapper = ({
