@@ -1,8 +1,8 @@
 import { useDynamicImport } from '@custom-hooks/use-dynamic-import/use-dynamic-import';
 import { pl2 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
-import { InputAdornment } from '@mui/material';
 import React from 'react';
+import { InputAdornment } from '../../primitives/react/TextField/InputAdornment';
 
 export interface FlagAdornmentProps {
   countryCode: string;
