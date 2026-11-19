@@ -4,7 +4,6 @@ import {
   CONTENY_TYPE_APPLICATION_PDF,
   DocumentFileMimeType,
 } from '@vanguard/Documents/Document.types';
-import JSZip from 'jszip';
 
 type FileMimeType = DocumentFileMimeType; // Extend if needed
 
@@ -33,6 +32,8 @@ export const downloadFile = async (fileSrc: string, fileName: string, mimeType?:
 };
 
 export const downloadZipFile = async (files: { src: string; name: string }[], zipFileName: string) => {
+  // Loaded on use: jszip (~40 KB gzip) stays out of every importer's eager bundle.
+  const { default: JSZip } = await import('jszip');
   const zip = new JSZip();
 
   // Fetch each file and add it to the ZIP
