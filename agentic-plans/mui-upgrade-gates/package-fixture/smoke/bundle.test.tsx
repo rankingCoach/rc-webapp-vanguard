@@ -1,5 +1,5 @@
 import { screen, fireEvent, within } from '@testing-library/react';
-import { Autocomplete, Button, Form, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
+import { Autocomplete, Button, Form, InfoBox, Input, Popover, Select, Textarea, useFormConfig, useFormStore } from '@rankingcoach/vanguard';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { render } from '@testing-library/react';
@@ -152,6 +152,25 @@ describe('installed Vanguard bundle', () => {
 
 // WordPress intentionally has no DatePicker export; verify the default installed implementation.
 if (process.env.BUNDLE !== 'wp') {
+  // Collapse runs on Vanguard's own transition in both bundles; WordPress reaches it through InfoBox.
+  it('collapses an installed dismissible InfoBox with the own-core Collapse', async () => {
+    vi.useFakeTimers();
+    try {
+      renderWithProviders(<InfoBox title="Fixture info" description="Fixture body" dismissible />);
+      const root = document.querySelector('[data-slot="collapse"]') as HTMLElement;
+      expect(root).not.toBeNull();
+      expect(root.hasAttribute('data-vg-core')).toBe(true);
+      expect(root.classList.contains('MuiCollapse-root')).toBe(true);
+      expect(root.hasAttribute('data-open')).toBe(true);
+      fireEvent.click(screen.getByTestId('info-box-cta_button'));
+      expect(root.hasAttribute('data-open')).toBe(false);
+      await vi.advanceTimersByTimeAsync(350);
+      expect(root.classList.contains('MuiCollapse-hidden')).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('keeps the packed DatePicker synchronized with controlled restores and locale changes', async () => {
     const { DatePicker } = await import('@rankingcoach/vanguard');
     const originalMatchMedia = window.matchMedia;
