@@ -5,10 +5,14 @@
  */
 import { FormHelperText, InputLabel, OutlinedInput, useFormControl } from '@mui/material';
 import React, { createRef } from 'react';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { render, screen } from '../../../test-utils/test-utils';
 import { FormControl } from './FormControl';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 const ProbeHarness63 = ({ seen }: { seen: Array<Record<string, unknown> | undefined> }) => {
       const ctx = useFormControl();

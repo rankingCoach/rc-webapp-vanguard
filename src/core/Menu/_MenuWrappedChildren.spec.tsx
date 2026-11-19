@@ -5,9 +5,13 @@ import userEvent from '@testing-library/user-event';
 import { MenuItem } from '@vanguard/MenuItem/MenuItem';
 import { Render } from '@vanguard/Render/Render';
 import React from 'react';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, expect, test, vi, beforeAll } from 'vitest';
 
 import { Menu } from './Menu';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 const anchors: HTMLElement[] = [];
 afterEach(() => {

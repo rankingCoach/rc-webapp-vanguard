@@ -18,10 +18,14 @@ import { Menu, MenuItemConfig, MenuProps } from '@vanguard/Menu/Menu';
 import { MenuItem } from '@vanguard/MenuItem/MenuItem';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { useState } from 'react';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi, beforeAll } from 'vitest';
 
 import { render, screen, waitFor } from '../../../test-utils/test-utils';
 import styles from './Menu.module.scss';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 const items: MenuItemConfig[] = [
   { key: 'alpha', children: 'Alpha' },

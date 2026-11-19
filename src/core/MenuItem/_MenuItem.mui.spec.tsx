@@ -20,9 +20,13 @@ import { IconNames } from '@vanguard/Icon/IconNames';
 import { MenuItem } from '@vanguard/MenuItem/MenuItem';
 import { TextTypes } from '@vanguard/Text/Text';
 import React from 'react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi, beforeAll } from 'vitest';
 
 import { fireEvent, render, screen } from '../../../test-utils/test-utils';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 // Everything except the explicit standalone block renders inside a MUI MenuList, so the v9 "throws outside
 // Menu/MenuList" change only reds the standalone tests and not every content/state assertion.

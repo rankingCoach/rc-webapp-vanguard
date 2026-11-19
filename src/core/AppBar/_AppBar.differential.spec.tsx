@@ -1,10 +1,14 @@
 import { render } from '@test-utils/test-utils';
 import React, { createRef } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { ToolbarMuiReference } from '../Toolbar/_Toolbar.mui-reference';
 import { Toolbar } from '../Toolbar/Toolbar';
 import { AppBarMuiReference } from './_AppBar.mui-reference';
 import { AppBar } from './AppBar';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 /**
  * Differential parity, jsdom: AppBar / Toolbar on the own core vs the frozen MUI implementations, per position and

@@ -1,9 +1,13 @@
 import { Slide, SlideProps } from '@mui/material';
 import { Snackbar } from '@vanguard/Snackbar/Snackbar';
 import React, { createRef } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, beforeAll } from 'vitest';
 
 import { act, fireEvent, render, screen } from '../../../test-utils/test-utils';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 const LintSlideLeft270 = (props: SlideProps) => <Slide {...props} direction="left" />;
 

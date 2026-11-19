@@ -10,10 +10,14 @@
 import '@testing-library/jest-dom/vitest';
 
 import React, { createRef } from 'react';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, beforeAll } from 'vitest';
 
 import { render, screen } from '../../../test-utils/test-utils';
 import { Toolbar } from './Toolbar';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
+
+// Renders MUI fallback routes on purpose (plan §36.5 allow-list): load them before the cases run.
+beforeAll(() => preloadMuiFallbacks());
 
 // Derived from the Vanguard component (not the MUI deep import), so the spec survives the v7 import fix.
 type ToolbarProps = React.ComponentProps<typeof Toolbar>;
