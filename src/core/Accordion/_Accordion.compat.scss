@@ -1,0 +1,156 @@
+// Ported from @mui/material@9.5.0 Accordion/Accordion.js, AccordionSummary/AccordionSummary.js, AccordionDetails/AccordionDetails.js, Paper/Paper.js, ButtonBase/ButtonBase.js (emotion styles) (MIT)
+// MUI 9.5 Accordion emotion output as Vanguard's Accordion renders it (variant elevation|outlined, gutters on|off,
+// default light palette: identical with and without VanguardThemeProvider), extracted from the injected rules, at
+// emotion's specificity (D15). Emotion emits one hash per ownerState combination (Paper+Accordion merged, ButtonBase+
+// AccordionSummary merged): `.css-x` (0,1,0) → `.Mui*-root:where([data-vg-core]…)`, the ownerState variants (elevation,
+// outlined, gutters) inside `:where()`; selectors emotion wrote with real classes/pseudos (`.Mui-expanded`,
+// `:first-of-type`, `::before`, `+`) keep them outside, so every rule keeps its original specificity.
+// The Collapse rules come from _Collapse.compat.scss (own-collapse.tsx). Appended last to vanguard.css via
+// src/styles/mui-compat.scss.
+
+// ---------------------------------------------------------------- Root (Paper + Accordion)
+.MuiAccordion-root:where([data-vg-core]) {
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  transition: margin 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-radius: 0;
+  position: relative;
+  overflow-anchor: none;
+}
+.MuiAccordion-root:where([data-vg-core].MuiPaper-elevation) {
+  box-shadow: var(--Paper-shadow);
+  background-image: var(--Paper-overlay);
+}
+.MuiAccordion-root:where([data-vg-core].MuiPaper-outlined) {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+.MuiAccordion-root:where([data-vg-core])::before {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  right: 0;
+  height: 1px;
+  content: '';
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.12);
+  transition:
+    opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.MuiAccordion-root:where([data-vg-core]):first-of-type::before {
+  display: none;
+}
+.MuiAccordion-root:where([data-vg-core]).Mui-expanded::before {
+  opacity: 0;
+}
+.MuiAccordion-root:where([data-vg-core]).Mui-expanded:first-of-type {
+  margin-top: 0;
+}
+.MuiAccordion-root:where([data-vg-core]).Mui-expanded:last-of-type {
+  margin-bottom: 0;
+}
+.MuiAccordion-root:where([data-vg-core]).Mui-expanded + .MuiAccordion-root:where([data-vg-core]).Mui-expanded::before {
+  display: none;
+}
+.MuiAccordion-root:where([data-vg-core]).Mui-disabled {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.MuiAccordion-root:where([data-vg-core]):first-of-type {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.MuiAccordion-root:where([data-vg-core]):last-of-type {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+@supports (-ms-ime-align: auto) {
+  .MuiAccordion-root:where([data-vg-core]):last-of-type {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+.MuiAccordion-root:where([data-vg-core].MuiAccordion-gutters).Mui-expanded {
+  margin: 16px 0;
+}
+
+// ---------------------------------------------------------------- Summary (ButtonBase + AccordionSummary)
+.MuiAccordionSummary-root:where([data-vg-core]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 0px 16px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  min-height: 48px;
+  transition:
+    min-height 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.MuiAccordionSummary-root:where([data-vg-core])::-moz-focus-inner {
+  border-style: none;
+}
+.MuiAccordionSummary-root:where([data-vg-core]).Mui-disabled {
+  pointer-events: none;
+  cursor: default;
+}
+@media print {
+  .MuiAccordionSummary-root:where([data-vg-core]) {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}
+.MuiAccordionSummary-root:where([data-vg-core]).Mui-focusVisible {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.MuiAccordionSummary-root:where([data-vg-core]).Mui-disabled {
+  opacity: 0.38;
+}
+.MuiAccordionSummary-root:where([data-vg-core]):hover:not(.Mui-disabled) {
+  cursor: pointer;
+}
+.MuiAccordionSummary-root:where([data-vg-core].MuiAccordionSummary-gutters).Mui-expanded {
+  min-height: 64px;
+}
+
+// ---------------------------------------------------------------- Summary content / expand icon
+// MUI 9.5 puts no gutters class on the content element: the gutters variant is keyed by the summary's class.
+.MuiAccordionSummary-content:where([data-vg-core]) {
+  display: flex;
+  text-align: start;
+  flex-grow: 1;
+  margin: 12px 0;
+}
+.MuiAccordionSummary-content:where(.MuiAccordionSummary-gutters > [data-vg-core]) {
+  transition: margin 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.MuiAccordionSummary-content:where(.MuiAccordionSummary-gutters > [data-vg-core]).Mui-expanded {
+  margin: 20px 0;
+}
+.MuiAccordionSummary-expandIconWrapper:where([data-vg-core]) {
+  display: flex;
+  color: rgba(0, 0, 0, 0.54);
+  transform: rotate(0deg);
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.MuiAccordionSummary-expandIconWrapper:where([data-vg-core]).Mui-expanded {
+  transform: rotate(180deg);
+}
+
+// ---------------------------------------------------------------- Details
+.MuiAccordionDetails-root:where([data-vg-core]) {
+  padding: 8px 16px 16px;
+}
