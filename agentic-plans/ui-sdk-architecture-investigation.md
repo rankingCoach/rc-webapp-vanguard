@@ -1742,3 +1742,54 @@ The corrected canonical replay on that same tarball exited **0**. The four consu
 tests and every gated declaration log was empty. The corrected default declaration and runtime-artifact checks
 also exited 0 against a read-only copy of `.472`. One-minute load went from 14.02 to 22.99 during the replay and
 sampled free memory stayed at or above 57%. [Replay output](/Users/a.kott/vanguard-verify/logs/h20-types-baselines/replay-bc76c32b/package.log).
+
+Verifier 2 passed the unchanged H20 pack in guarded, fingerprinted rc-webapp `73673465091` shadows. Navbar,
+AccountNavMenu, the Autocomplete field and 316-option popup, the IMask calendar and the centered planner portal all
+had content in the same sampled first frame as `.472`. The Dashboard reached 6 and then 30 progress bars on the first
+two report frames, with no named fallback request. The packed ProgressBar replay passed 48/48 across 22 shapes.
+Snackbar first visible frame counts on frames 0/1/2 were 2/8/0 on `.472` and 4/5/1 on H20, with no fallback request
+or repeatable candidate loss. The WordPress static walk found 336 files, zero missing targets, no removed exports
+and no new bare imports. The independent verification judgment covers sampled DOM and geometry. WordPress runtime
+and verifier 1's verdict remain separate. [Paired first-render evidence](/Users/a.kott/vanguard-verify/v2/out/h20-first-paint-comparison.json).
+
+### 36.7 H21 top-level TextField routing correction (decided-by-watchdog)
+
+The first three-worker full spec run at `8f4fc95` found a keyboard regression in VerificationPinInput. Frozen MUI
+TextField binds top-level key handlers to FormControl. Vanguard put them on the control, where the real IMask drops
+them. The existing pin test failed at `onKeyDown`. The new frozen differential also reproduced the missing `onKeyUp`
+and identified four root-state differences for explicitly supplied props: `component`, `margin`, `hiddenLabel` and
+`focused` on a disabled field. No pack was cut at `8f4fc95`. The corrected H21 keeps the existing public props and
+restores those routing contracts. `margin='dense'|'normal'` activates the original MUI form-control spacing,
+`component` chooses the requested host, and `hiddenLabel` restores the reference input/adornment tokens. Disabling
+the field takes precedence over a forced focus state. These changes only affect fields that supply those props.
+
+The table follows frozen MUI 9.5 `TextField`'s `RootSlot` and `InputElement`, then the `FormControl` context and
+`InputBase`'s native control. The last column identifies how the own route matches it.
+
+| Top-level props | Frozen MUI destination | Own outlined-text destination and probe |
+| --- | --- | --- |
+| `ref`, `component`, `className`, `style`, `sx`, `margin` | FormControl host/ref and its classes or CSS | FormControl host/ref, class and plain CSS style; native has no probe attribute. Dense and normal margin rules are scoped to that root. |
+| `aria-*`, `data-*`, `role`, `title`, `tabIndex`, `dir`, `lang` and other HTML div attributes | FormControl `...other` | Same root pass-through. Explicit native overrides use `inputProps`. |
+| `onKeyDown`, `onKeyUp`, other keyboard, mouse, pointer, clipboard, input, drag, touch, wheel and inherited DOM handlers, including capture | FormControl `...other` | Same root pass-through. Probe records target and currentTarget and orders them against the native handler, including the masked control that drops its native key handlers. |
+| `onChange`, `onBlur`, `onFocus` | InputBase calls the top-level and native callbacks with the control event | Same native event and order. Change calls the HTML input callback first. Focus and blur call the outer API callback first. |
+| `autoComplete`, `autoFocus`, `defaultValue`, `value`, `id`, `inputRef`, `name`, `placeholder`, `type` | Native control via InputBase. `id` also supplies label and helper links | Same control properties, native focus/ref, and label/helper identifiers. |
+| `multiline`, `rows`, `minRows`, `maxRows` | InputBase and the native autosizing textarea | Same control kind, visible row count and shadow textarea. `rows` provides both row bounds. |
+| `color`, `disabled`, `error`, `focused`, `fullWidth`, `hiddenLabel`, `required`, `size` | FormControl context and InputBase, native attributes where applicable, label and helper | Same input state/classes, native required/disabled/invalid attributes, label sizing and FormControl width class. Disabled wins over forced focus. |
+| `label`, `helperText` | Label/helper children with IDs derived from the input `id` | Same children and linkage; both kept on the frame and out of the native attributes. |
+| `InputProps`, `InputLabelProps`, `inputProps`, `FormHelperTextProps`, `slotProps`, `slots` | OutlinedInput root/control, label, native input and helper respectively. Supported root/input overrides are resolved by MUI | Same modeled slots and legacy aliases. At the key handler boundary, `inputProps` wins over `InputProps` on the native control and neither replaces the FormControl handler. Unsupported shapes still use the eager fallback. |
+| `variant`, `select`, `SelectProps`, `children`, `classes` | Variant/selection routing, optional children for select, class overrides | `outlined` text stays on this route. Select uses a separate route, with `SelectProps` and `children` unused in text mode. `classes` uses the eager MUI route. |
+
+The new differential passed the control-identity and propagation probes against both implementations. The original
+H20 full run did not inject a process-level network guard. The first H21 run did and blocked three DocumentDisplay
+assertions using synthetic `data:` URLs. The revised gate-only guard allows `data:` and denies outbound fetch and
+socket connections. The three unchanged DocumentDisplay cases passed with that guard. No exception for HTTP or
+HTTPS was added. [Initial differential](/Users/a.kott/vanguard-verify/logs/h21-text-field-prop-routing-red.log) ·
+[Targeted pass](/Users/a.kott/vanguard-verify/logs/h21-text-field-prop-routing-green.log).
+
+The import-bound scan of committed rc-webapp `73673465091` found 29 `Input`/`Select`/`Textarea`/`TextField` handler
+call sites across 22 files (28 `Input`, one `Textarea`, zero `Select` or `TextField`), plus one masked
+`VerificationPinInput` call to `InputBase`. The Vanguard source had three direct sites across three files
+(`VerificationCodeInput`, `RteLinkEditor`, and `InputBase`'s `MuiTextField` call), plus three source `InputBase`
+sites (`VerificationPinInput`, `Autocomplete` and `SearchableSelect`). The scan retains the unresolved Vanguard
+wrapper spreads and separates frozen references. [rc-webapp locations](/Users/a.kott/vanguard-verify/logs/h21-text-field-handler-sites/rc-webapp.json) ·
+[Vanguard locations](/Users/a.kott/vanguard-verify/logs/h21-text-field-handler-sites/vanguard.json).

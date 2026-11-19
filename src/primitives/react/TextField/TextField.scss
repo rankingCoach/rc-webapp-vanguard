@@ -28,6 +28,16 @@ $error: rgb(211, 47, 47);
   border: 0;
   vertical-align: top;
 
+  &:where(.MuiFormControl-marginNormal) {
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  &:where(.MuiFormControl-marginDense) {
+    margin-top: 8px;
+    margin-bottom: 4px;
+  }
+
   &:where(.MuiFormControl-fullWidth) {
     width: 100%;
   }

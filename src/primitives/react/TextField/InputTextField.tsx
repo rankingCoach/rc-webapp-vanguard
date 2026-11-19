@@ -89,6 +89,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
     children: _children,
     className,
     color = 'primary',
+    component,
     defaultValue,
     disabled = false,
     error = false,
@@ -103,8 +104,6 @@ export const InputTextField = (props: InputTextFieldProps) => {
     onBlur,
     onChange,
     onFocus,
-    onKeyDown,
-    onKeyUp,
     placeholder,
     required = false,
     rows,
@@ -118,8 +117,8 @@ export const InputTextField = (props: InputTextFieldProps) => {
     sx,
     style,
     focused: focusedProp,
-    margin: _margin,
-    hiddenLabel: _hiddenLabel,
+    margin,
+    hiddenLabel,
     ...rootRest
   } = props;
   const vgType = useVanguardTypography() === 'vanguard' ? 'vg-typography-vanguard' : '';
@@ -162,8 +161,9 @@ export const InputTextField = (props: InputTextFieldProps) => {
   const ibOnChange = ib('onChange', onChange);
   const ibOnFocus = ib('onFocus', onFocus);
   const ibOnBlur = ib('onBlur', onBlur);
-  const ibOnKeyDown = ib('onKeyDown', onKeyDown);
-  const ibOnKeyUp = ib('onKeyUp', onKeyUp);
+  // TextField's top-level key handlers are FormControl events. Only InputBase's slot handlers reach the control.
+  const ibOnKeyDown = inputBaseOverrides.onKeyDown;
+  const ibOnKeyUp = inputBaseOverrides.onKeyUp;
   const ibInputRef = ib('inputRef', inputRef);
 
   // ---- FormControl state
@@ -172,7 +172,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
   useEffect(() => {
     if (disabled && focusedState) setFocused(false);
   }, [disabled, focusedState]);
-  const focused = focusedProp ?? (disabled ? false : focusedState);
+  const focused = disabled ? false : (focusedProp ?? focusedState);
   const adornedStart = Boolean(startAdornment);
   const shrink = labelSlot.shrink ?? (focused || filledState || adornedStart);
   const hasLabel = label != null && label !== '';
@@ -325,6 +325,7 @@ export const InputTextField = (props: InputTextFieldProps) => {
     ibMultiline ? 'MuiInputBase-multiline' : '',
     startAdornment ? 'MuiInputBase-adornedStart' : '',
     endAdornment ? 'MuiInputBase-adornedEnd' : '',
+    hiddenLabel ? 'MuiInputBase-hiddenLabel' : '',
     readOnly ? 'MuiInputBase-readOnly' : '',
     vgType,
     inputRootClassName ?? '',
@@ -334,6 +335,9 @@ export const InputTextField = (props: InputTextFieldProps) => {
     <TextFieldFrame
       id={id}
       className={className}
+      component={component}
+      margin={margin}
+      hiddenLabel={hiddenLabel}
       sx={sx}
       style={style}
       rootProps={rootRest}

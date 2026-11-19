@@ -19,6 +19,9 @@ export interface TextFieldFrameProps {
   id: string;
   /** Root (`MuiFormControl-root`) props: consumer className, sx/style and the remaining TextField props. */
   className?: string;
+  component?: React.ElementType;
+  margin?: 'none' | 'dense' | 'normal';
+  hiddenLabel?: boolean;
   sx?: unknown;
   style?: React.CSSProperties;
   rootProps?: AnyProps;
@@ -74,6 +77,9 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
   const {
     id,
     className,
+    component: Root = 'div',
+    margin = 'none',
+    hiddenLabel,
     sx,
     style,
     rootProps,
@@ -118,14 +124,19 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
 
   // MUI FormControl context, as own children read it (InputAdornment variant/size classes).
   const formControlState = useMemo(
-    () => ({ variant: 'outlined' as const, size: size === 'small' ? ('small' as const) : ('medium' as const) }),
-    [size],
+    () => ({
+      variant: 'outlined' as const,
+      size: size === 'small' ? ('small' as const) : ('medium' as const),
+      hiddenLabel,
+    }),
+    [size, hiddenLabel],
   );
   return (
     <OwnFormControlContext.Provider value={formControlState}>
-      <div
+      <Root
         className={cx(
           'MuiFormControl-root',
+          margin !== 'none' ? `MuiFormControl-margin${capitalize(margin)}` : '',
           fullWidth ? 'MuiFormControl-fullWidth' : '',
           textFieldRoot ? 'MuiTextField-root' : '',
           className ?? '',
@@ -242,7 +253,7 @@ export const TextFieldFrame = (props: TextFieldFrameProps) => {
           </p>
         ) : null}
         {after}
-      </div>
+      </Root>
     </OwnFormControlContext.Provider>
   );
 };
