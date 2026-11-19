@@ -69,14 +69,14 @@ const Harness = (props: {
 const inputs = () => Array.from(document.querySelectorAll<HTMLInputElement>('.vanguard-input input'));
 
 describe('F0 Form characterization', () => {
-  it('host is a div.Form-container (literal "undefined" class without className); not a <form>', () => {
+  it('host is a div.Form-container (no class token without className); not a <form>', () => {
     const { actions, store } = makeStore();
     const { container } = render(<Harness actions={actions} render={() => <span>{'x'}</span>} />, {
       customStore: store,
     });
     const host = container.querySelector('.Form-container') as HTMLElement;
     expect(host.tagName).toBe('DIV');
-    expect(host.className).toBe('Form-container undefined');
+    expect(host.className).toBe('Form-container');
     expect(container.querySelector('form')).toBeNull();
   });
 

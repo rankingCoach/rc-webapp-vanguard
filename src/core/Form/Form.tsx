@@ -1,5 +1,6 @@
 import './Form.scss';
 
+import { classNames } from '@helpers/classNames';
 import { validInput } from '@helpers/validators/valid-input/valid-input';
 import { FormElement, FormElementChildChange } from '@vanguard/Form/FormElement/FormElement';
 import React, { useEffect, useState } from 'react';
@@ -154,7 +155,7 @@ export const Form = <T,>(props: Props<T>) => {
       // error too.
 
       if (React.isValidElement(child)) {
-        let idx = undefined;
+        let idx;
         const childConfig = extractFormConfig(child);
         const formConfigKey = extractFormConfigKey(child);
         const stringKey = childConfig.stateFieldName;
@@ -221,7 +222,7 @@ export const Form = <T,>(props: Props<T>) => {
         childRemoved,
       }}
     >
-      <ComponentContainer className={`Form-container ${className}`}>
+      <ComponentContainer className={classNames('Form-container', className)}>
         {action ? (
           <form
             action={action}

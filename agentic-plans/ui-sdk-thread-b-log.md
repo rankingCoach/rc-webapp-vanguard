@@ -1076,3 +1076,42 @@ Reply to the watchdog after step 1's grep result.
 5. Lock: `_StyledSVGLegacyParity.stories` (Icon-ado, Icon-maps, shield_secured, superpages). Deleting `.vg-styled-svg--size path` reproduces 16px → auto.
 6. Open MINOR: which of 6.1–6.3 explains rc-webapp's auto (pack-15 CSS without the block / last block not loaded / consumer rule winning). Waiting for verifier 2's matched-rules dump; 6.2/6.3 would be a D15 order data point.
 7. Watchdog also approved the TableFooter fixture regeneration (track h) and the ProgressCircle story-only fix.
+
+### Track (h) junk class tokens: implementation + proof (decided-by-watchdog)
+1. Public helper `@helpers/classNames` (API, rc-webapp imports it):
+   1.1 It drops non-string (`false|true|undefined|null|NaN|0`) and empty/whitespace-only entries. Order is kept; output is single-spaced.
+   1.2 For all-string, non-empty calls it is byte-identical to the former `args.join(' ')`.
+   1.3 `_class-names.spec` checks this with 2000 seeded random calls against the inlined legacy join, plus the drop rules and a junk-free-output fuzz.
+2. Watchdog split (confirmed):
+   2.1 Internal `cx` (A, src/primitives/react/class-names.ts, not exported) for own-core components reproducing MUI markup.
+   2.2 The public helper for everything else.
+   2.3 Two contracts on purpose: the helper keeps internal double spaces of string arguments (identity guarantee), while cx collapses them.
+   2.4 Conditions: one-line header per file; a spec pins the difference; cx is never exported; A mirrors the decision in the plan.
+3. Template-literal sites moved to the helper, per site, token order kept:
+   3.1 Form `Form-container ${className}`.
+   3.2 RadioButton label + text div.
+   3.3 SectionMissing.
+   3.4 Found by the scan: Divider `rc-divider ${className}`, Gallery `gallery-list ${className}`, TagList (template inside classNames), DragAndDropFile.
+   3.5 `_junk-class-sites.spec` compares each against its inlined former expression over all prop combinations. Red on old code: 5 + 4 failures. Green: 12/12.
+   3.6 Declared deltas: Divider/Gallery no longer render a literal "undefined" token; Form without className is `Form-container`.
+4. Bug-lock rewritten (approved, same commit): `_FormCharacterization.spec` `'Form-container undefined'` → `'Form-container'`. The assertion stays an exact string.
+5. Lock: the Button `[class^="icon-"]` spec. No Button element's class starts with `icon-` across 144 variants, including after hover.
+6. The 10 exact-className specs (TimePicker, Input, Snackbar, Slider, PhoneNumberBase, PhoneNumberPrefix, Textarea, Select, FormControl, Form) pass unchanged.
+7. TableFooter fixture regenerated (approved). A script proves 15/30 keys change, only stray spaces inside class attributes, 0 junk tokens left.
+8. Story scan. Derivation: static Storybook build of 0cac8bd (before) vs the track-(h) tree (after). Playwright, every indexed story (1408; 1407 scanned, 1 timeout on both sides: slider-slidermuicontract--drag-in-real-browser, reported to verifier 2). Every `[class]` attribute. Junk regex `(^|\s)(false|true|undefined|null|NaN)(\s|$)`, spacing regex `\s{2,}|^\s|\s$`.
+
+   | measure | before | after |
+   |---|---|---|
+   | elements with junk tokens or irregular spacing | 14,009 | 278 (0 junk tokens) |
+   | elements changed (each == old minus junk/whitespace) | — | 13,496 in 1008 stories |
+   | changes other than junk removal | — | 140, all in stories that also change in a before-vs-before noise run (19 ⊆ 20) |
+   | structural (element-count) diffs | — | 9; 5 not in the noise run, identical in 3× isolated rescans per side → load noise |
+
+   8.1 Targeted rescan for the 4 scan-found sites: 17 stories, 60 → 0 elements, 0 other changes.
+9. Residue (documented, not touched), 278 elements, spacing only:
+   9.1 ApexCharts text 153 (third-party).
+   9.2 video.js 6 (third-party).
+   9.3 Internal `_showcase` stories 101 (CssUpdatesShowcase `item_*` 87, RcTransparentShowcase 16; not shipped; no sweep).
+   9.4 After the per-site fixes, the shipped-site residue is 0.
+10. ProgressCircle: `size` and `progress` are REQUIRED by type, so this is a story-only fix: args plus a play asserting finite svg geometry. Without the args the play fails on NaN.
+11. Full spec project: 342 files / 2497 tests, 0 failures.

@@ -29,7 +29,6 @@ import { Render } from '@vanguard/Render/Render';
 import { FontWeights, Text, TextReplacements, TextTypes } from '@vanguard/Text/Text';
 import Compressor from 'compressorjs';
 import React, { useEffect, useState } from 'react';
-
 import { FilePriority, MediaItemSelectInput } from '../../FileSelect/MediaItemSelectInput';
 import { IconNames } from '../../Icon/IconNames';
 import { ModalService } from '../../Modal/ModalService';
@@ -351,7 +350,7 @@ export const Gallery = (props: Props) => {
     if (config?.removeDuplicates) {
       mediaItems.map((mediaItem) => {
         if (
-          !!displayMediaItems.find((displayPhoto) => {
+          displayMediaItems.find((displayPhoto) => {
             return (displayPhoto?.file as File)?.name === (mediaItem.file as File)?.name;
           })
         ) {
@@ -567,7 +566,7 @@ export const Gallery = (props: Props) => {
     <div data-slot="gallery-container" className={classNames('gallery-container')}>
       <InfoBox {...inlineAlert} />
 
-      <div data-slot="gallery" className={`gallery-list ${className}`}>
+      <div data-slot="gallery" className={classNames('gallery-list', className)}>
         <MediaItemSelectInput
           multiple={!maxNumberOfMediaItems || maxNumberOfMediaItems > 1}
           accept={acceptTypes}

@@ -3,7 +3,6 @@ import './TagList.scss';
 import { gap0_5, gap1 } from '@globalStyles';
 import { classNames } from '@helpers/classNames';
 import React from 'react';
-
 import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 import { Tag, TagProps, TagVariant } from './Tag/Tag';
 
@@ -21,7 +20,7 @@ export const TagList = (props: Props) => {
     <ComponentContainer
       data-slot={'tag-list'}
       data-variant={variant}
-      className={classNames(`TagList-container ${className ?? ''} ${variant === 'tag' ? gap1 : gap0_5}`)}
+      className={classNames('TagList-container', className, variant === 'tag' ? gap1 : gap0_5)}
     >
       {tags &&
         tags.length &&
