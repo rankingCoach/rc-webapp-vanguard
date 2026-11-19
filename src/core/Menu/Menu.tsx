@@ -1,14 +1,16 @@
 import styles from './Menu.module.scss';
 import { uuidv4 } from '@helpers/generate-uid';
-import { Menu as MuiMenu, MenuProps as MuiMenuProps } from '@mui/material';
-import { useThemeProps } from '@mui/material/styles';
-import { useRtl } from '@mui/system';
+import type { MenuProps as MuiMenuProps } from '@mui/material';
+// MUI's RtlContext itself (1 KB, React-only module): MUI's ThemeProvider and RtlProvider write it.
+import { useRtl } from '@mui/system/RtlProvider';
 import type { VanguardLegacyMenuProps } from '@vanguard/_internal/mui-legacy-props';
 import { mapLegacyModalAliases, mapLegacySlots } from '@vanguard/_internal/mui-slot-compat';
 import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';
 import { OVERLAY_BASE_Z_INDEX, OverlayStackingService } from '@vanguard/OverlayStacking/OverlayStackingService';
 import React, { useEffect, useRef, useState } from 'react';
 import { MenuPopup } from '../../primitives/react/Menu/MenuPopup';
+import { lazyFallback } from '../_internal/lazy-fallback';
+import { useThemeDefaultProps } from '../_internal/theme-default-props';
 
 export type MenuItemConfig = MenuItemProps & {
   key?: React.Key;
@@ -26,6 +28,10 @@ export type MenuProps = {
     children?: React.ReactNode;
   };
 
+// MUI's Menu route behind a lazy boundary (plan §36.2 B.3).
+const MuiMenu = lazyFallback(() => import('./MuiMenuFallback') as never) as React.ComponentType<
+  Record<string, unknown>
+>;
 /** Props (after legacy-slot mapping) the own-core Menu models; any other key keeps MUI's Menu. */
 const OWN_MENU_PROPS = new Set([
   'open',
@@ -58,10 +64,9 @@ const isModelledItem = (props: Record<string, unknown> | undefined) =>
   !props || (props.component === undefined && props.href === undefined);
 
 export const Menu = (inProps: MenuProps) => {
-  const { testId, items, children, width, height, maxWidth, maxHeight, disableEscapeKeyDown, ...rest } = useThemeProps({
-    props: inProps,
-    name: 'MuiMenu',
-  });
+  // MUI's useThemeProps semantics without importing MUI (src/core/_internal/theme-default-props.ts, option 5.3).
+  const { testId, items, children, width, height, maxWidth, maxHeight, disableEscapeKeyDown, ...rest } =
+    useThemeDefaultProps(inProps as unknown as Record<string, unknown>, 'MuiMenu') as unknown as MenuProps;
   const mapped = mapLegacySlots(
     mapLegacyModalAliases(rest),
     { MenuListProps: 'list', PaperProps: 'paper', TransitionProps: 'transition', BackdropProps: 'backdrop' },
