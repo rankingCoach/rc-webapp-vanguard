@@ -1006,3 +1006,41 @@ Reply to the watchdog after step 1's grep result.
 6. Consumers:
    6.1 rc-webapp RankingsInsightWidget (admin PartnerApiTester; shape rounded, controlled). Its module CSS targets `.MuiPagination-ul` / `.MuiPaginationItem-root`, which are kept.
    6.2 Internally: the VanguardThemeProvider story. Not a WordPress export.
+
+### g10 Slider (own core: component-local use-own-slider.ts, port of MUI 9.5 useSlider)
+1. Rendering: `Slider.tsx` keeps the Vanguard wrapper verbatim (formconfig/field binding, controlledValue, externalControlled, ComponentContainer classes). Only `<MuiSlider>` is replaced by `OwnSlider`, which renders MUI 9.5's DOM:
+   1.1 Root span (MuiSlider-root, Mui-disabled, MuiSlider-dragging, MuiSlider-marked, colorPrimary, sizeMedium).
+   1.2 Rail, track (inline left/width), marks + mark labels (markActive / markLabelActive, MUI's duplicated markLabel token).
+   1.3 One thumb per value (MUI's duplicated thumb/Mui-disabled tokens, Mui-active, Mui-focusVisible, inline left + z-index/pointer-events).
+   1.4 Hidden range input (aria-*, `step="any"` for step null + marks, visually-hidden style).
+   1.5 Value label (unless 'off').
+2. Behaviour (`use-own-slider.ts`, header-marked port): MUI's value model, pointer drag with pointer capture + document listeners (drag threshold, stray-pointer and buttons=0 handling), touch, keyboard (arrows, shift, Page, Home/End, marks-only stepping), range thumb swap, focus/open/active state, onChange event cloning (target = { value, name }), disabled blur.
+   2.1 Reachable surface only: horizontal, LTR, identity scale, disableSwap false, shiftStep 10. These are listed as not modelled; Vanguard never passes them.
+   2.2 Component-local; A agreed to be offered it after PASS.
+3. Compat: `_Slider.compat.scss` comes from the injected rules (identical in both themes except label rem), with a `vg-typography-vanguard` root class. Vanguard's own Slider.scss skin still overrides most of it, as it did over emotion. One @use line (A-approved).
+4. Markers:
+   4.1 `data-vg-core` on all parts.
+   4.2 Slots: slider, slider-rail, slider-track, slider-mark, slider-mark-label, slider-thumb, slider-value-label.
+   4.3 Root data-disabled / data-dragging.
+   4.4 Class strings are filtered joins.
+5. Evidence:
+   5.1 A's `_Slider.mui.spec` (44 cases: drag, touch, keyboard, range swap, formconfig, externalControlled), `_pointer-capture.spec` and `_FormFieldBindingInputs.spec` are unchanged and green: 4 files / 61.
+   5.2 `_slider-parity.spec` vs `_SliderMui.reference.tsx`:
+       5.2.1 Whole subtree over 134 combinations × 2 themes.
+       5.2.2 10 timelines (pointer, threshold, step + clamp, non-left/stray pointer/buttons=0, range swap + hover/active z-index, touch, keyboard incl. Page/Home/End/shift/focus/blur labels, range keyboard swap, marks without step, controlled prop + externalControlled, disabled) comparing DOM, active element and every onChange/onChangeCommitted call. Total 12/12.
+       5.2.3 The first version dispatched `fireEvent.pointer*`. jsdom has no PointerEvent, so those carried no button/clientX and both sides ignored them (vacuous). It now dispatches MouseEvents with pointer types as A's spec does, plus a guard that drag scenarios record pointer changes.
+       5.2.4 Mutations: drag threshold → 4 fail; range swap → 1 fail; stray-pointer guard → 1 fail.
+   5.3 Chromium `_SliderParity.stories` (both themes):
+       5.3.1 6 cases; 26 computed properties incl. thumb ::before/::after, plus boxes and positions.
+       5.3.2 States: rest, forced hover on root + thumb (skin hovers on the root; guarded), keyboard focus + ArrowRight, real pointerdown (Mui-active, guarded), release.
+       5.3.3 After-release focus is blurred symmetrically: MUI's rAF focus plus blur quirk otherwise make it order-dependent.
+       5.3.4 Compat mutation (thumb ::after 42 → 43px) caught. A value-label padding mutation was legitimately invisible: the skin sets that padding.
+   5.4 `_Slider.cleanup.spec` 4/4: no document listener after a released drag, an unmount mid-drag, a touch drag, or disable mid-drag; touchstart removed; DOM contract; no junk tokens.
+   5.5 Slider/Cropper/MUIComponentsShowcase stories 5 files / 19; `_mui-compat-order` 6/6; tsc lib 0.
+   5.6 FULL spec project: 340 files / 2485 tests, 0 failures. A first run had one timeout in `_chip-parity` (219-combination matrix, 5.99 s > 5 s default under full load). That test now has the 60 s timeout the other matrix tests use; no assertion changed.
+6. Size: Slider 129.0 → 55.7 KB gzip. Exports with the emotion runtime eager: 41 → 37.
+7. Consumers:
+   7.1 rc-webapp, 7 files: BudgetUsageSlider, AdTargetRegion, BusinessLogoSquareEditor, AgeSlider, ReviewWidget, ReputationWidget, ConceptExplainerWidget. ComposedInputs.module.scss targets `.vng-slider-container .MuiSlider-root .MuiSlider-rail`, which is kept.
+   7.2 rc-webapp TaskTray `[data-dragging]` is on its own module class, so no collision.
+   7.3 Internal: Cropper, AgeSlider, MUIComponentsShowcase, Form binding.
+   7.4 Not a WordPress export.
