@@ -21,9 +21,16 @@ cd "$ROOT"
 if [ -n "${PACKAGE_FIXTURE_TGZ:-}" ]; then
   TGZ="$PACKAGE_FIXTURE_TGZ"
 else
-if [ "$SKIP_BUILD" -eq 0 ]; then pnpm build > "$OUT/build.log" 2>&1; fi
+# npm runs the `prepare` lifecycle (prepare → pnpm run build) on pack even with --ignore-scripts (npm 10), so the pack
+# IS the build: one build, not two, and `--skip-build` cannot skip it (accepted for compatibility, it only warns).
+# Rollup's chunk numbering is not deterministic, so a separate build before the pack produced a different dist than
+# the one packed (H16 sha mismatch). After packing, the tarball's dist must equal the dist on disk (asserted below).
+if [ "$SKIP_BUILD" -eq 1 ]; then echo "warning: --skip-build has no effect: npm pack runs prepare (the build)" >&2; fi
 npm pack --ignore-scripts --json --pack-destination "$OUT/pack" > "$OUT/pack.json" 2> "$OUT/pack-lifecycle.log"
+cp "$OUT/pack-lifecycle.log" "$OUT/build.log"
 TGZ=$(node -e 'const fs=require("fs"),path=require("path"); const raw=fs.readFileSync(process.argv[1],"utf8"); const candidates=[...raw.matchAll(/^\[/gm)].reverse(); let packed; for(const m of candidates){try{const value=JSON.parse(raw.slice(m.index));if(value[0]?.filename){packed=value;break;}}catch{}} if(!packed)throw Error("npm pack produced no valid JSON result"); console.log(path.join(process.argv[2],packed[0].filename))' "$OUT/pack.json" "$OUT/pack")
+  # Gate integrity: the packed dist is the dist on disk (what dist-based checks and the @mui count read).
+  python3 "$HERE/../package-dist-identity.py" "$TGZ" "$ROOT" > "$OUT/dist-identity.log" 2>&1 || { cat "$OUT/dist-identity.log" >&2; exit 3; }
 fi
 fail=0
 for bundle in default wp; do
