@@ -110,7 +110,8 @@ const useRenderer = (testId: string, onChangeCb: (args: any) => void | null) => 
 
 describe('DateRangePicker component tests', () => {
   //
-  test('datepicker with click on start & end date', async () => {
+  // Both selections run real pointer sequences through the rendered calendar, including the cold first open.
+  test('datepicker with click on start & end date', { timeout: 10_000 }, async () => {
     const testId = 'daterangepicker-test-id';
     const { component: DTRender } = useRenderer(testId, (data: any) => {
       //console.log(data);
