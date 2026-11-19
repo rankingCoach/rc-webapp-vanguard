@@ -1,5 +1,6 @@
-import { StoryObj } from '@storybook/react';
 import { fn } from 'storybook/test';
+import { StoryObj } from '@storybook/react';
+
 import { DocumentUpload } from '../DocumentUpload';
 
 export type Story = StoryObj<typeof DocumentUpload>;

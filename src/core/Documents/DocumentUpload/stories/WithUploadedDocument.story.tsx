@@ -1,10 +1,12 @@
-import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import React from 'react';
+
 import { DocumentUpload } from '../DocumentUpload';
 import { mockOnDocumentRemoved, mockOnDocumentSelected, Story } from './_DocumentUpload.default';
 
 // 1x1 transparent PNG
-const PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+const PNG_BASE64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 const createPngFile = () => {
   const bytes = Uint8Array.from(atob(PNG_BASE64), (char) => char.charCodeAt(0));

@@ -1,22 +1,22 @@
-import React from 'react';
-import { expect, within } from 'storybook/test';
-import { DocumentUpload } from '../DocumentUpload';
-import { mockOnDocumentRemoved, mockOnDocumentSelected, Story } from './_DocumentUpload.default';
+import React from "react";
+import { DocumentUpload } from "../DocumentUpload";
+import { within, expect } from "storybook/test";
+import { Story, mockOnDocumentSelected, mockOnDocumentRemoved } from "./_DocumentUpload.default";
 
 export const Default: Story = {
   args: {
     onDocumentSelected: mockOnDocumentSelected,
     onDocumentRemoved: mockOnDocumentRemoved,
-    documentName: 'Test Document',
+    documentName: "Test Document",
   },
   render: (args) => (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: "20px" }}>
       <DocumentUpload {...args} />
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const container = canvas.getByTestId('DocumentUpload');
+    const container = canvas.getByTestId("DocumentUpload");
     await expect(container).toBeInTheDocument();
   },
 };
