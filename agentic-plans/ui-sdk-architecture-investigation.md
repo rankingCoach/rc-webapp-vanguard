@@ -1833,3 +1833,84 @@ from one asserted unsupported case to zero. Its replacement requires `supported:
 the planner content and body-portal assertions, requires `data-vg-core`, and asserts the MUI fallback module was
 never requested. The ESM source change is scoped to the planner's former eager PopoverModal fallback. The later packed
 first-render and paired rc-webapp evidence still apply. [Recorded planner anchor geometry](/Users/a.kott/vanguard-verify/v1/logs/h20-rc472-planner-clip.json).
+
+Two separate regression cases now pin the remaining fallback classifier. A custom `observePlacement` write modifier
+must produce `supported: false` with `['observePlacement']`, and the `document` root boundary must produce
+`supported: false` with `['flip.rootBoundary']`. Both checks keep the MUI route reachable for options the own
+primitive would otherwise ignore. [Targeted fallback controls](/Users/a.kott/vanguard-verify/logs/dual-boundary-popper-rejection-controls.log).
+
+### 36.9 PROPOSED DatePicker S1 calendar
+
+The S1 deliverable is an internal `DateCalendar` primitive with a frozen DateCalendar differential. `DatePicker`
+continues calling its current MUI X renderer through S1 and S2. There is no public export or package dependency
+change until a verified S3. Keep the existing `MuiCalendarPicker-root` compatibility hook when the shell switches.
+
+1. Put calendar date operations behind a typed adapter consumed by the primitive before declaring the differential
+   green. Use the existing Moment value type and AdapterMoment semantics, including calendar-day comparisons,
+   month/year transitions and month-end clamping, locale-aware week starts, and formatted labels. Start with the
+   adapter operations the calendar actually uses and reuse the same seam in S2. The MUI X `AdapterMoment` reference
+   remains in the test. Before S3 removes the production dependency, run these adapter cases on the Moment-backed
+   implementation itself. Keep the existing Moment locale source. Do not route display through the date-pattern
+   lookup or change the `getDatePatternFromLocale` bug-lock.
+2. Write the reference-first differential under a controlled date and locale. Compare the initial visible month,
+   weekday/day/year grid and selection, role, name, `tabIndex`, `aria-selected`, `aria-current`, disabled state and
+   ordered class aliases. Use separate controlled and empty-value cases. Pin min/max/disablePast at inclusive
+   edges, disabled month/year switches, Today and selected days, adjacent-month navigation, month/year change and
+   accepting a day. Compare `onChange` payloads and callback order, month changes, and focus per interaction.
+3. Exercise arrows, Home/End, PageUp/PageDown, Enter/Space, and disabled targets with the same actions on both
+   sides. Take the exact supported key list and each result from the frozen MUI X calendar. Keep the focus target
+   attached and verify a single roving tab stop with the correct month/year transitions after navigation. Include
+   root, calendar header/grid and selected/focus/disabled states in Chromium computed parity, including the
+   transition longhands. Compare the same settled and first-visible state on both sides. Use a deliberate mutation
+   of a roving focus or boundary transition to show the differential goes red.
+4. S2 remains a separate unopened route. Its differential matrix covers the six configured format patterns crossed
+   with locales, the rc-webapp dash-locale behavior, paste/IME, backspace across sections, invalid and partial
+   values, min/max, readOnly/disabled, a controlled change during editing and the accessible section DOM. S3 owns
+   the desktop popper and mobile ModalHost on `(pointer: fine)`, SSR/first-render selection, the toolbar and keyboard
+   view, and close/focus/body effects. Run the existing DatePicker contracts unchanged before the shell switch is
+   packed. Two independent verifier behavior FAILs on S2 or S3 keep DatePicker on MUI X for this major with the
+   evidence logged. Record the MIT derived source notices for any adapted implementation.
+
+### 36.10 PROPOSED FormControl, VanguardThemeProvider and MuiTextField lazy boundary
+
+**FormControl reachability at H21.** Re-running the import-bound scan at `8f76287` on rc-webapp `73673465091`
+found zero consumer or Vanguard production call sites, 30 direct test/story calls and one Storybook metadata
+reference. The H21 ESM entry still exports FormControl and VanguardThemeProvider. Neither is a named export of
+the exact WordPress entry. The public FormControl wrapper is still MUI-backed. H21's default input fields use
+their own internal FormControl frame and context. The public wrapper can still be called by external ESM
+consumers, with arbitrary children. [Source scan](/Users/a.kott/vanguard-verify/logs/h21-form-control-proposal/FormControl-sites.json) ·
+[Exact packed exports](/Users/a.kott/vanguard-verify/logs/h21-form-control-proposal/packed-exports.json).
+
+**FormControl proposal.** Go last as in B.6. Use the existing frame's FormControl layout and context for the
+standalone wrapper's proven host/spacing/width/state cases. Freeze the public wrapper first and exercise the
+actual nested Input and Select children that ship in its stories. Preserve `FormControl-container`, the overridable
+host, required/error/disabled/fullWidth/hiddenLabel/margin and variant/size behavior. Keep the existing lazy
+MUI route for unmodeled style callbacks or child trees whose FormControl context contract the own route cannot
+prove. Avoid guessing descendant compatibility from DOM tags through arbitrary React wrappers. No public type or
+WordPress export change is needed. Leave the public implementation alone if a safe own-route guard would still
+alter existing uses.
+
+**VanguardThemeProvider proposal.** The current provider is reachable in four rc-webapp roots (App, RenderRoot,
+WidgetImageRender and WidgetPreviewHost). Its own typography context already carries the Vanguard choice into
+own components. The MUI provider still creates and supplies the bundled typography theme (16 px font and HTML
+font, no uppercase buttons), the MUI/system/styled-engine theme contexts and default theme behavior to MUI
+fallbacks and the remaining MUI X tree. Source tests also exercise a direct `useTheme()` descendant. The H21
+graph reports 202,673 rendered MUI bytes reachable from this ESM export. It is outside the WordPress public entry.
+Measure isolation before changing it. Pair packed `.472` and H21 on a consumer MUI ThemeProvider with a
+`components.MuiTextField.defaultProps` marker, and probe a consumer MUI descendant under the Vanguard provider.
+Also cover internal fallback typography and default-props behavior with and without the provider, nested roots,
+RTL, first render and SSR. A fallback-local MUI theme bridge is worth proposing only if these probes show it
+preserves the observed consumer contract. Keep the provider eager if a direct descendant still needs its global
+MUI context. The source `useTheme` test remains a requirement. [H21 eager report](/Users/a.kott/vanguard-verify/logs/8f76287e35e258976afcd19ea922c206d935ad72-h21/eager-mui.txt).
+
+**MuiTextField proposal.** H21 models the Autocomplete anchor ref and the reachable masks. Remaining eager
+branches include non-outlined variants, native Select, unmodeled slots or classes and unsupported InputBase
+slot keys. Audit the **combined** resolved prop shapes, including wrapper forwarding, runtime theme defaults and
+WordPress defaults. Keep the static fallback if any real shape resolves to it. A lazy ESM proposal needs all
+three observed results on its exact source and pack. First, scan all committed rc-webapp and internal sites and
+review unresolved spreads, aliases and theme defaults. Second, run each resolved shape against the shared runtime
+router in no-global-preload mode and require own first render in the full source audit. Third, render each shape
+on the exact installed pack on its first tick, including default WordPress and reachable masked fields, and use
+an unsupported cold-route control to prove the harness can see a suspension. WordPress remains a single bundle
+with its fallback inlined. External WordPress plugin props remain outside the available source. Preserve the
+public props and the unsupported fallback contracts.
