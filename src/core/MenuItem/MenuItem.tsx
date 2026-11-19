@@ -1,4 +1,4 @@
-import { MenuItem as MuiMenuItem, MenuItemProps as MuiMenuItemProps } from '@mui/material';
+import type { MenuItemProps as MuiMenuItemProps } from '@mui/material';
 import { IconNames } from '@vanguard/Icon';
 import { Icon, IconProps } from '@vanguard/Icon/Icon';
 import { Text, TextTypes } from '@vanguard/Text/Text';
@@ -6,6 +6,12 @@ import React from 'react';
 import { MenuOption } from '../../primitives/react/Menu/MenuOption';
 import { useInOwnOptionHost } from '../../primitives/react/Menu/option-host-context';
 import { sxToStyle } from '../../primitives/react/sx-compat';
+import { lazyFallback } from '../_internal/lazy-fallback';
+
+// MUI's MenuItem route behind a lazy boundary (plan §36.2 B.3); inside own-core hosts the own MenuOption renders.
+const MuiMenuItem = lazyFallback(() => import('./MuiMenuItemFallback') as never) as React.ComponentType<
+  Record<string, unknown>
+>;
 
 export type MenuItemIconPosition = 'before' | 'after';
 

@@ -1430,3 +1430,17 @@ Question for the user: does the WordPress plugin pass any of the fallback props 
 slotProps, componentsProps, sx, ListboxProps, ListboxComponent, ChipProps, PaperComponent, PopperComponent,
 renderGroup; Input/Select/Textarea: textFieldProps with a non-outlined variant, native select, custom
 inputComponent, MUI slots/classes)? Until answered, WordPress keeps them.
+
+**Allow-list (watchdog decision, 2026-11-19).** The gate allows one context module, `@mui/system/RtlProvider`
+(MUI's RtlContext, ~1 KB, React-only). A context works by object identity, and `_MenuOwnRouting`'s RtlProvider case
+needs MUI's own object. Conditions:
+1. 2 KB cap.
+2. The module's own eager graph contains no further @mui/@emotion module.
+3. The gate output states the allow-listed count separately. Count: N = 1.
+4. On the next-major removal list together with Menu's RTL routing.
+
+**MenuItem reachability.** Inside an own-core option host (Menu's own route, Select, SearchableSelect) Vanguard
+MenuItem already renders the own MenuOption. rc-webapp's 3 MenuItem sites are all inside Menu (AccountNavMenu), and
+TableToolbar / SearchableSelect use it inside own hosts. The MUI MenuItem path is reached only outside an own host
+(Menu's MUI route or a standalone MenuItem): not in rc-webapp, and MenuItem is not a WordPress export. So it needs
+only the lazy split (done), no new route.
