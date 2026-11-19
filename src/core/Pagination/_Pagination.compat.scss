@@ -1,0 +1,164 @@
+// Ported from @mui/material@9.5.0 Pagination/Pagination.js, PaginationItem/PaginationItem.js, ButtonBase/ButtonBase.js, SvgIcon/SvgIcon.js (emotion styles) (MIT)
+// MUI 9.5 Pagination emotion output as Vanguard's Pagination renders it (variant text, color standard; size small |
+// medium | large × shape circular | rounded × selected / disabled / focus-visible / hover), extracted from the
+// injected rules, at emotion's specificity (D15): `.css-x` (0,1,0) → `.<MuiClass>:where([data-vg-core]…)`, the
+// ownerState variants (size, shape, button vs ellipsis) inside `:where()`, real classes/pseudos outside, in emotion's
+// order. Icons use `svg.` (0,1,1) to tie with the generic own-core SvgIcon rule (primitives TextField) and win by order.
+// `.vg-typography-vanguard` (on the nav) = VanguardThemeProvider (htmlFontSize 14 → other rem values).
+// Appended last to vanguard.css via src/styles/mui-compat.scss.
+
+// ---------------------------------------------------------------- List
+.MuiPagination-ul:where([data-vg-core]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+// ---------------------------------------------------------------- Item (page / first / last / previous / next = ButtonBase)
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0 3px;
+  border-radius: 16px;
+  padding: 0 6px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.87);
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+  text-align: center;
+  min-width: 32px;
+  height: 32px;
+  transition:
+    color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+// ---------------------------------------------------------------- Ellipsis (div)
+.MuiPaginationItem-root:where([data-vg-core].MuiPaginationItem-ellipsis) {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+  border-radius: 16px;
+  text-align: center;
+  box-sizing: border-box;
+  min-width: 32px;
+  padding: 0 6px;
+  margin: 0 3px;
+  color: rgba(0, 0, 0, 0.87);
+  height: auto;
+}
+
+// ---------------------------------------------------------------- Sizes (button + ellipsis), shape rounded (button only)
+.MuiPaginationItem-root:where([data-vg-core].MuiPaginationItem-sizeSmall) {
+  min-width: 26px;
+  border-radius: 13px;
+  margin: 0 1px;
+  padding: 0 4px;
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiPaginationItem-sizeSmall.MuiButtonBase-root) {
+  height: 26px;
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiPaginationItem-sizeLarge) {
+  min-width: 40px;
+  border-radius: 20px;
+  padding: 0 10px;
+  font-size: 0.9375rem;
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiPaginationItem-sizeLarge.MuiButtonBase-root) {
+  height: 40px;
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiPaginationItem-rounded.MuiButtonBase-root) {
+  border-radius: 4px;
+}
+.MuiPaginationItem-root:where(.vg-typography-vanguard [data-vg-core]) {
+  font-size: 1rem; // pxToRem(14) with htmlFontSize 14
+}
+.MuiPaginationItem-root:where(.vg-typography-vanguard [data-vg-core].MuiPaginationItem-sizeLarge) {
+  font-size: unquote('1.0714285714285714rem'); // pxToRem(15), unrounded
+}
+
+// ---------------------------------------------------------------- States (button: emotion order)
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root)::-moz-focus-inner {
+  border-style: none;
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root).Mui-disabled {
+  pointer-events: none;
+  cursor: default;
+}
+@media print {
+  .MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root) {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root).Mui-focusVisible {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.MuiPaginationItem-root:where([data-vg-core]).Mui-disabled {
+  opacity: 0.38;
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root):hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root).Mui-selected {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root).Mui-selected:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root).Mui-selected.Mui-focusVisible {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.MuiPaginationItem-root:where([data-vg-core].MuiButtonBase-root).Mui-selected.Mui-disabled {
+  opacity: 1;
+  color: rgba(0, 0, 0, 0.26);
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+// ---------------------------------------------------------------- Icons (SvgIcon + PaginationItem icon)
+svg.MuiPaginationItem-icon:where([data-vg-core]) {
+  user-select: none;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  fill: currentColor;
+  font-size: 1.25rem;
+  margin: 0 -8px;
+}
+svg.MuiPaginationItem-icon:where(.MuiPaginationItem-sizeSmall > [data-vg-core]) {
+  font-size: 1.125rem;
+}
+svg.MuiPaginationItem-icon:where(.MuiPaginationItem-sizeLarge > [data-vg-core]) {
+  font-size: 1.375rem;
+}
+svg.MuiPaginationItem-icon:where(.vg-typography-vanguard [data-vg-core]) {
+  font-size: unquote('1.4285714285714284rem'); // pxToRem(20), unrounded
+}
+svg.MuiPaginationItem-icon:where(.vg-typography-vanguard .MuiPaginationItem-sizeSmall > [data-vg-core]) {
+  font-size: unquote('1.2857142857142856rem'); // pxToRem(18)
+}
+svg.MuiPaginationItem-icon:where(.vg-typography-vanguard .MuiPaginationItem-sizeLarge > [data-vg-core]) {
+  font-size: unquote('1.5714285714285714rem'); // pxToRem(22)
+}

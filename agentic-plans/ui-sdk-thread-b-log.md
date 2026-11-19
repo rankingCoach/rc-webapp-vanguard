@@ -921,3 +921,88 @@ Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, n
 4. Size: Button eager closure 162.6 → 109.3 KB gzip, no emotion. Modal 167.2 → 113.8. Exports with the emotion runtime eager: 82 → 43 of 299.
 5. Consumers: rc-webapp iconLargeOnHover user is StatisticsBoardItem; every other Button renders unchanged by construction (only the Grow path changed). WordPress export → smoke patch to A.
 6. Biome: 4 infos (`?? <></>` fragment fallbacks), verbatim from the former code.
+
+### g8 Breadcrumbs (own core: ButtonBase primitive for the ellipsis)
+1. Rendering: `Breadcrumbs.tsx` now renders MUI 9.5 Breadcrumbs' DOM itself.
+   1.1 Structure: Typography body1 `nav` (MuiTypography-root/-body1/MuiBreadcrumbs-root) > `ol.MuiBreadcrumbs-ol` > `li.MuiBreadcrumbs-li` entries with aria-hidden `li.MuiBreadcrumbs-separator`. Non-element children are dropped.
+   1.2 Collapsing: past `maxItems` (default 8; before/after default 1; an invalid combination shows everything) a plain `li` holds A's ButtonBase (native button, focusRipple, aria-label "Show path"). Its only class is MuiButtonBase-root, as in MUI.
+   1.3 Expanding: a click expands and focuses the first `a[href],button,[tabindex]` in the list. Expanded state persists across rerenders.
+   1.4 Icon: MUI's MoreHoriz svg.
+   1.5 Public props unchanged; no MUI fallback.
+2. Compat: `_Breadcrumbs.compat.scss` comes from the injected rules, identical in both themes except rem.
+   2.1 Root font-size `pxToRem(16)` and icon `pxToRem(24)` follow VanguardThemeProvider via `vg-typography-vanguard` on the root, keyed with `:where()` for the svg.
+   2.2 The ellipsis button has no MuiBreadcrumbCollapsed class in MUI's DOM, so it is keyed by its own-core slot.
+   2.3 The icon rule is `svg.MuiSvgIcon-root:where(…)` (0,1,1). A's generic own-core SvgIcon rule in primitives/react/TextField.scss is `svg.MuiSvgIcon-root:where([data-vg-core])` (0,1,1) and gave 1em × 1em. At 0,1,0 my rule lost: the Chromium differential caught it (24×24 vs 16). Now it ties and wins by order. Told A.
+3. Markers:
+   3.1 `data-vg-core` on every part.
+   3.2 Slots: breadcrumbs, breadcrumbs-list, breadcrumbs-item, breadcrumbs-separator, breadcrumbs-collapsed, breadcrumbs-expand.
+   3.3 Root `data-expanded`.
+   3.4 The root class is a filtered join, so no stray spaces from an unset className.
+4. Evidence:
+   4.1 `_breadcrumbs-parity.spec` vs `_BreadcrumbsMui.reference.tsx` (former code verbatim):
+       4.1.1 Whole subtree over 171 combinations × 2 themes: n 0–12 × maxItems undefined/3/0 × before/after incl. invalid × links/mixed, plus node separator, aria-label/className/testId and text-only collapsed. Null/string children included.
+       4.1.2 Three expand timelines: focus, ripple press, Enter+click → expanded + focused entry, rerender keeps expanded.
+       4.1.3 Total 5/5. Mutations: no focus after expand → 2 fail; separator aria-hidden dropped → 5 fail.
+   4.2 Chromium `_BreadcrumbsParity.stories` (both themes):
+       4.2.1 5 cases, 28 computed properties plus boxes and positions of nav/ol/li/button/svg.
+       4.2.2 States: rest, forced :hover/:active (with a guard), :focus, expanded.
+   4.3 `_Breadcrumbs.cleanup.spec` 2/2: no timer or global listener after focus/press/expand/unmount; DOM contract; no junk class tokens on own parts.
+   4.4 Breadcrumbs specs 3 files / 9; stories 2 / 4; `_mui-compat-order` 6/6; tsc lib 0.
+5. Size: Breadcrumbs 89.9 → 5.6 KB gzip, no emotion.
+6. Consumers:
+   6.1 rc-webapp AdminTopNav (separator "→"; its module CSS targets `.MuiBreadcrumbs-separator`, which is kept) and PartnerLayout.
+   6.2 No internal consumer. Not a WordPress export.
+7. Note for A: A's ButtonBase emits stray spaces in its class attribute (`"MuiButtonBase-root    "`) from empty classNames entries. MUI has none. That is A's primitive, so it's reported rather than changed.
+
+## Track (h) "junk class tokens" (decided-by-watchdog; queued AFTER Pagination + Slider, before Tier C)
+Source: verifier 2's retro scan of 1400 stories, base vs candidate. Regressions: 0. Pre-existing junk: 320 items in 170 stories. Data: rc-webapp tmp/research/vanguard-ui-sdk-visual-baseline/v2/out/junk-*.json.
+- Literal tokens: div false 219, div undefined 72, span false 18, label undefined 8, img false 3. Plus irregular spacing.
+- Sources: BenchmarkGauge family (~158 stories), InfoBox 39, Input 33, PageSection 30, ColorPicker 16, AvatarCheckbox 9, RadioButton 8, Form (`Form-container ${className}`), PageSectionLoading, FrostedGlass, ImgLoader.
+1. Grep first: rc-webapp + Vanguard (scss, tsx, specs, cypress-style selectors) for `.false`, `.undefined`, `[class="…"]`/`[class$=…]` exact matches, and snapshot/innerHTML assertions containing those tokens. List anything found to the watchdog before changing.
+2. Fix at the source, only if step 1 is clean:
+   2.1 `@helpers/classNames` drops non-string and empty entries (order kept, single spaces, no trailing space). A spec must prove identical output for every all-string call.
+   2.2 Template-literal sites (`${className}` with unset prop) move to the helper.
+   2.3 Only `false|true|undefined|null|NaN` and whitespace may disappear.
+3. Proof:
+   3.1 Per touched component, a differential spec: old token set minus junk == new set, real-token order unchanged.
+   3.2 Full spec project; collision/attribute checks.
+   3.3 Fixtures regenerated only where a script proves the diff is confined to those tokens.
+   3.4 A's files (MUI-backed, primitives) → patch list to A. Known so far: ButtonBase stray spaces (g8 note).
+4. Verifier 2 judges by expected form: all 170 stories + rc-webapp shadow specs.
+5. Same track, separate item: ProgressCircle renders `NaN` geometry when size/stroke are missing (story spreads no args).
+   5.1 If the props are required by type → story-only fix (give it args).
+   5.2 If optional → red spec + smallest guard keeping every existing combination byte-identical. Tell the watchdog which case it is.
+Reply to the watchdog after step 1's grep result.
+
+### g9 Pagination (own core: ButtonBase primitive per item)
+1. Rendering: `Pagination.tsx` now renders MUI 9.5 Pagination's DOM itself (variant text, color standard).
+   1.1 Structure: `nav[aria-label="pagination navigation"]` (MuiPagination-root/-text) > `ul.MuiPagination-ul` > `li` per item.
+   1.2 Items: pages and first/previous/next/last are A's ButtonBase (native button) with MuiPaginationItem-* classes (size, text, shape, Mui-disabled, Mui-selected, type), aria-label ("Go to page n" / "page n" / "Go to <type> page"), and aria-current on the selected page. Ellipses are plain divs.
+   1.3 Icons: MUI's FirstPage/LastPage/NavigateBefore/NavigateNext svgs.
+   1.4 Behaviour: MUI's usePagination item model (boundary/sibling ranges, disabled edges), controlled/uncontrolled exactly as MUI (`if (!pageProp) setState`), and the focus hand-over to the new aria-current page when the activated first/previous/next/last button becomes disabled.
+   1.5 Public props unchanged; no MUI fallback.
+2. Compat: `_Pagination.compat.scss` comes from the injected rules.
+   2.1 Item = ButtonBase reset + PaginationItem. Ellipsis has its own base.
+   2.2 Sizes keyed by class; shape rounded applies to buttons only (as emitted); state rules in emotion's order.
+   2.3 Icons use `svg.` (0,1,1). A has since scoped the generic SvgIcon rule (d936811); I'll drop the workaround only if the differential stays green after merging that.
+   2.4 VanguardThemeProvider rem sizes via `vg-typography-vanguard` on the nav.
+3. Markers:
+   3.1 `data-vg-core` on all parts.
+   3.2 Slots: pagination, pagination-list, pagination-item, pagination-ellipsis.
+   3.3 nav data-size/data-shape/data-disabled; item data-selected.
+   3.4 Own class strings are filtered joins (no junk tokens).
+4. Evidence:
+   4.1 `_pagination-parity.spec` vs `_PaginationMui.reference.tsx` (former code verbatim):
+       4.1.1 Whole subtree over 446 combinations × 2 themes: count 0–20 × page × sibling/boundary × button sets; size × shape × disabled; defaultPage; className/testId.
+       4.1.2 Four click/keyboard timelines, controlled and uncontrolled, including the focus hand-over and onChange calls.
+       4.1.3 Total 6/6. Mutations: focus hand-over removed → 4 fail; sibling range off by one → 4 fail.
+   4.2 Chromium `_PaginationParity.stories` (both themes):
+       4.2.1 13 cases, 30 computed properties plus boxes and positions of nav/ul/li/items/ellipses/icons.
+       4.2.2 States: rest, forced :hover/:active on a page and the selected page (guarded), keyboard focus on the selected page, after paging.
+       4.2.3 Compat mutation (rounded 4px → 5px) caught.
+   4.3 `_Pagination.cleanup.spec` 2/2.
+   4.4 Pagination + VanguardThemeProvider specs 4 files / 13; stories 3 / 6; `_mui-compat-order` 6/6; tsc lib 0.
+5. Size: Pagination 93.1 → 6.6 KB gzip, no emotion.
+6. Consumers:
+   6.1 rc-webapp RankingsInsightWidget (admin PartnerApiTester; shape rounded, controlled). Its module CSS targets `.MuiPagination-ul` / `.MuiPaginationItem-root`, which are kept.
+   6.2 Internally: the VanguardThemeProvider story. Not a WordPress export.
