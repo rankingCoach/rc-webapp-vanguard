@@ -857,3 +857,35 @@ Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, n
    4.2 Not a WordPress export.
    4.3 rc-webapp imports List in several screens, but none passes `limit`, so none reaches the ListShowMore branch.
 5. Biome: 4 warnings, all pre-existing in the verbatim code (unused `e` params, empty effect).
+
+### g6 Chip (own core: ButtonBase primitive as div)
+1. Rendering: `Chip.tsx` now renders MUI 9.5 Chip's DOM itself (color 'default'):
+   1.1 Root is a plain div, or A's ButtonBase (component div, nativeButton false) when `onClick` or `onDelete` is set. The ButtonBase has role=button and tabindex; disabled is passed only when clickable (MUI: `clickable && disabled`), ripple only when clickable and not deletable, and focusVisibleClassName is Mui-focusVisible.
+   1.2 Children: cloned icon with `MuiChip-icon`, the label span, and MUI's Cancel svg (SvgIcon markup) as the delete icon. A click on the delete icon stops propagation and calls onDelete.
+   1.3 Keyboard: Backspace/Delete on the chip itself preventDefaults on keydown and calls onDelete on keyup.
+   1.4 Public props unchanged; `onKeyDown`/`onKeyUp`/`tabIndex` are chained as MUI does. No MUI fallback.
+2. Compat: `_Chip.compat.scss` comes from the injected emotion rules of every combination.
+   2.1 The ButtonBase part holds only the reset properties the Chip root does not re-set.
+   2.2 Variants (sizeSmall, outlined, clickable, deletable, ButtonBase) sit inside `:where()`. Real classes and pseudos (`.Mui-disabled`, `.Mui-focusVisible`, `:hover`, `:active`, ` .MuiChip-icon`) stay outside, in emotion's order.
+   2.3 `.vg-typography-vanguard` (A's `useVanguardTypography`) selects VanguardThemeProvider's rem sizes (pxToRem 13 / 24 with htmlFontSize 14).
+   2.4 MUI's `iconColor === color` icon colour is keyed by a `data-icon-color="default"` marker, set unless the icon element brings its own `color`.
+3. Markers:
+   3.1 Root: `data-vg-core`, `data-slot` (chip; caller data-slot wins via the rest spread), data-variant, data-size, data-disabled, data-icon-color.
+   3.2 chip-label and chip-delete carry `data-vg-core`.
+   3.3 Class `vg-typography-vanguard` inside the provider.
+4. Evidence:
+   4.1 `_chip-parity.spec` (DOM, both themes) against `_ChipMui.reference.tsx` (former code verbatim, test-only):
+       4.1.1 219 prop combinations × 2 themes: size × variant × none/click/delete/both × disabled × no/plain/coloured icon, plus the Autocomplete getItemProps spread, HTML attrs and a node label.
+       4.1.2 Interactions (focus, click, Enter, Backspace, Delete, Backspace on the label, blur, delete-icon click) on 6 kinds, with the callbacks fired.
+       4.1.3 Total 9/9.
+       4.1.4 Mutations: colorDefault class dropped → 8 fail; keydown preventDefault dropped → 5 fail; disabled/ripple on deletable → 5 fail.
+   4.2 Chromium `_ChipParity.stories` (both themes, 36 cases):
+       4.2.1 31 computed properties of root, label, icon and delete icon, plus boxes, in rest, hover, active and keyboard focus-visible.
+       4.2.2 :hover/:active are forced by cloning each such rule in place with `[data-force-hover|active]`, same specificity and position.
+       4.2.3 A guard proves the forced states change the MUI side.
+       4.2.4 A compat mutation (outlined clickable hover 0.04 → 0.05) is caught and named.
+   4.3 `_Chip.cleanup.spec` 2/2. React DOM's own once-per-document `selectionchange` listener is excluded by a warm-up root; it shows up identically on the MUI path.
+   4.4 A's Autocomplete specs/stories, the Chip consumer: green. Chip + Autocomplete specs 8 files / 119; stories 5 / 24.
+   4.5 `_mui-compat-order` 6/6, tsc lib 0.
+5. Size: Chip 88.9 → 5.6 KB gzip, no emotion. Autocomplete 436.6 → 441.5 KB (+4.9): it still bundles MUI for its own parts (A's) and now also the own Chip and ButtonBase; this goes away with A's Autocomplete port.
+6. Consumers: none in rc-webapp. rc-webapp's admin Quality `Chip` is its own component; no consumer CSS on MuiChip. Not a WordPress export.

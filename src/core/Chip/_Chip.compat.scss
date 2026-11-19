@@ -1,0 +1,184 @@
+// Ported from @mui/material@9.5.0 Chip/Chip.js, ButtonBase/ButtonBase.js, SvgIcon/SvgIcon.js (emotion styles) (MIT)
+// MUI 9.5 Chip emotion output as Vanguard's Chip renders it (color 'default'; size small|medium × filled|outlined ×
+// clickable × deletable × disabled × icon), extracted from the injected rules, at emotion's specificity (D15).
+// Emotion merges ButtonBase + Chip (and every ownerState variant) into one hash per combination: `.css-x` (0,1,0) →
+// `.MuiChip-root:where([data-vg-core]…)`, the variant conditions inside `:where()`, and the rules keep emotion's
+// order where two of them set the same property at the same specificity. Selectors emotion wrote with real
+// classes/pseudos (`.Mui-disabled`, `.Mui-focusVisible`, `:hover`, `:active`, ` .MuiChip-icon`) keep them outside.
+// `.vg-typography-vanguard` = inside VanguardThemeProvider (htmlFontSize 14 → other rem values), set by Chip.tsx.
+// Appended last to vanguard.css via src/styles/mui-compat.scss.
+
+// ---------------------------------------------------------------- ButtonBase part (clickable or deletable chips)
+// Only the reset properties the Chip root does not set again (emotion: ButtonBase first, Chip root after it).
+.MuiChip-root:where([data-vg-core].MuiButtonBase-root) {
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  margin: 0;
+  user-select: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
+// ---------------------------------------------------------------- Root
+.MuiChip-root:where([data-vg-core]) {
+  max-width: 100%;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-size: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  white-space: nowrap;
+  transition:
+    background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  cursor: unset;
+  outline: 0;
+  text-decoration: none;
+  border: 0;
+  padding: 0;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.MuiChip-root:where([data-vg-core].vg-typography-vanguard) {
+  font-size: unquote('0.9285714285714285rem'); // exact MUI pxToRem(13) with htmlFontSize 14, unrounded
+}
+.MuiChip-root:where([data-vg-core].MuiButtonBase-root)::-moz-focus-inner {
+  border-style: none;
+}
+.MuiChip-root:where([data-vg-core].MuiButtonBase-root).Mui-disabled {
+  pointer-events: none;
+  cursor: default;
+}
+@media print {
+  .MuiChip-root:where([data-vg-core].MuiButtonBase-root) {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}
+.MuiChip-root:where([data-vg-core]).Mui-disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+.MuiChip-root:where([data-vg-core]) .MuiChip-icon {
+  margin-left: 5px;
+  margin-right: -6px;
+}
+.MuiChip-root:where([data-vg-core]) .MuiChip-deleteIcon {
+  -webkit-tap-highlight-color: transparent;
+  color: rgba(0, 0, 0, 0.26);
+  font-size: 22px;
+  cursor: pointer;
+  margin: 0 5px 0 -6px;
+}
+.MuiChip-root:where([data-vg-core]) .MuiChip-deleteIcon:hover {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+// ---------------------------------------------------------------- size small
+.MuiChip-root:where([data-vg-core].MuiChip-sizeSmall) {
+  height: 24px;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-sizeSmall) .MuiChip-icon {
+  font-size: 18px;
+  margin-left: 4px;
+  margin-right: -4px;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-sizeSmall) .MuiChip-deleteIcon {
+  font-size: 16px;
+  margin-right: 4px;
+  margin-left: -4px;
+}
+
+// ---------------------------------------------------------------- icon colour (MUI: ownerState.iconColor === color)
+.MuiChip-root:where([data-vg-core][data-icon-color='default']) .MuiChip-icon {
+  color: #616161;
+}
+
+// ---------------------------------------------------------------- deletable
+.MuiChip-root:where([data-vg-core].MuiChip-deletable).Mui-focusVisible {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+// ---------------------------------------------------------------- clickable
+.MuiChip-root:where([data-vg-core].MuiChip-clickable) {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-clickable):hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.MuiChip-root:where([data-vg-core].MuiChip-clickable).Mui-focusVisible {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.MuiChip-root:where([data-vg-core].MuiChip-clickable):active {
+  box-shadow:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+
+// ---------------------------------------------------------------- outlined
+.MuiChip-root:where([data-vg-core].MuiChip-outlined) {
+  background-color: transparent;
+  border: 1px solid #bdbdbd;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-outlined).MuiChip-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.MuiChip-root:where([data-vg-core].MuiChip-outlined).Mui-focusVisible {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.MuiChip-root:where([data-vg-core].MuiChip-outlined) .MuiChip-icon {
+  margin-left: 4px;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-outlined) .MuiChip-deleteIcon {
+  margin-right: 5px;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-outlined.MuiChip-sizeSmall) .MuiChip-icon {
+  margin-left: 2px;
+}
+.MuiChip-root:where([data-vg-core].MuiChip-outlined.MuiChip-sizeSmall) .MuiChip-deleteIcon {
+  margin-right: 3px;
+}
+
+// ---------------------------------------------------------------- Label
+.MuiChip-label:where([data-vg-core]) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 12px;
+  padding-right: 12px;
+  white-space: nowrap;
+}
+.MuiChip-label:where(.MuiChip-sizeSmall > [data-vg-core]) {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.MuiChip-label:where(.MuiChip-outlined > [data-vg-core]) {
+  padding-left: 11px;
+  padding-right: 11px;
+}
+.MuiChip-label:where(.MuiChip-outlined.MuiChip-sizeSmall > [data-vg-core]) {
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+// ---------------------------------------------------------------- Delete icon (SvgIcon fontSize medium)
+.MuiChip-deleteIcon:where([data-vg-core]) {
+  user-select: none;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  fill: currentColor;
+  font-size: 1.5rem;
+}
+.MuiChip-deleteIcon:where(.vg-typography-vanguard > [data-vg-core]) {
+  font-size: unquote('1.7142857142857142rem'); // exact MUI pxToRem(24) with htmlFontSize 14, unrounded
+}
