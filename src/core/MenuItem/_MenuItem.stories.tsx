@@ -5,12 +5,16 @@ import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';
 import { IconNames } from '@vanguard/Icon/IconNames';
 import { TextTypes } from '@vanguard/Text/Text';
 import { StoryObj } from '@storybook/react';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
 
 export default {
   ...SbDecorator({
     title: 'vanguard/MenuItem',
     component: MenuItem,
   }),
+  beforeEach: async () => {
+    await preloadMuiFallbacks();
+  },
   render: (args: MenuItemProps) => (
     <MenuList>
       <MenuItem {...args} />

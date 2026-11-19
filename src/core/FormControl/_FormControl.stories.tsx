@@ -1,4 +1,5 @@
 import { SbDecorator } from "@test-utils/get-storybook-decorator";
+import { preloadMuiFallbacks } from "../_internal/lazy-fallback";
 import { FormControl } from "./FormControl";
 import { Story } from "./stories/_FormControl.default";
 import { Default as _Default } from "./stories/Default.story";
@@ -20,6 +21,9 @@ export default {
     title: "Vanguard/FormControl",
     component: FormControl,
   }),
+  beforeEach: async () => {
+    await preloadMuiFallbacks();
+  },
 };
 
 export const Default: Story = { ..._Default };

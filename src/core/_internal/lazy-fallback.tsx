@@ -6,8 +6,8 @@ import React, { type ComponentType, Suspense } from 'react';
  * nothing) — acceptable only because these routes are unreachable in rc-webapp (props it never passes). Once loaded
  * every later render is synchronous and renders exactly what the MUI route rendered before.
  *
- * `preloadMuiFallbacks()` loads every registered fallback (spec setup, so the existing MUI contract specs run against
- * the same DOM without awaiting the chunk).
+ * Tests and stories that exercise a fallback deliberately can call `preloadMuiFallbacks()` to load the registered
+ * routes before rendering. The gate allow-lists those files.
  */
 const registry: (() => Promise<void>)[] = [];
 

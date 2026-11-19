@@ -30,6 +30,7 @@ import { ToggleButtonGroup } from '@vanguard/ToggleButtonGroup/ToggleButtonGroup
 import { Toolbar } from '@vanguard/Toolbar/Toolbar';
 import { Icon } from '@vanguard/Icon/Icon';
 import { IconNames } from '@vanguard/Icon/IconNames';
+import { preloadMuiFallbacks } from '../_internal/lazy-fallback';
 import muiComponentsDescription from './MUIComponentsShowcase.description.md?raw';
 
 export const Showcase: React.FC = () => {
@@ -314,6 +315,9 @@ export default {
       customStore: baseStore,
     },
   }),
+  beforeEach: async () => {
+    await preloadMuiFallbacks();
+  },
   parameters: {
     docs: {
       description: {
