@@ -1,12 +1,11 @@
+import styles from './Button.module.scss';
 import { useHover } from '@custom-hooks/use-hover';
 import { classNames } from '@helpers/classNames';
-import { Grow } from '@mui/material';
 import React, { RefObject, useCallback, useRef, useState } from 'react';
-
+import { Grow } from '../../primitives/react/Transitions/Grow';
 import { Icon, IconSize } from '../Icon/Icon';
 import { IconNames } from '../Icon/IconNames';
 import { FontWeights, Text, TextReplacements, TextTypes } from '../Text/Text';
-import styles from './Button.module.scss';
 
 /**
  * Types

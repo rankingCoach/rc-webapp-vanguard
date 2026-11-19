@@ -899,3 +899,25 @@ Verifier 2's per-remount +56 in Storybook is not reproduced outside Storybook, n
    4.2 No `false` token remains. The characterization spec is unchanged and green.
 5. Full spec project (`--maxWorkers=4 --project spec src`): 332 files / 2445 tests, 0 failures.
 6. Other own-code `classNames` calls checked: Accordion, Chip, OwnCollapse and ProgressBar pass only strings, `''` or `undefined` (join renders undefined as empty), no booleans.
+
+### g7 Button (Tier A + B; A's OK after the G1/G2 PASS): hover icon swap on A's Grow
+1. Change: Button's only MUI use was `Grow` for the `iconLargeOnHover` small/large icon swap. It now uses A's `primitives/react/Transitions/Grow` with the same props. Nothing else in Button changed: no markers, no compat CSS, no @use line. Button renders its own `<button>` with CSS-module styles, so there was no MUI DOM to port.
+2. Red/green: the new `_Button.own-core.spec` asserts Button imports nothing from `@mui`; it was red on the MUI import and is green now (3/3).
+   2.1 A `vi.mock('@mui/material')` red attempt did not intercept Button's import (the test's own import was mocked, Button's resolved to the real module), so the import check is the static one.
+   2.2 The same spec covers the hover/press cycle: no timer or document/window listener left. The warm-up excludes React DOM's once-per-document listeners and jsdom's nwsapi, which adds document mouseover/mouseout lazily on its first selector match.
+   2.3 Junk-token check (watchdog): no `false|true|undefined|null` tokens and no duplicates in any class attribute.
+3. Evidence (Tier B):
+   3.1 `_button-parity.spec` vs `_ButtonMui.reference.tsx` (former code verbatim, enums shared):
+       3.1.1 Whole subtree over 2530 prop combinations: type (incl. none) × size (incl. none) × 7 icon configs (none/left/right/grow left/grow right/grow with large icon/circle+colours) × 6 states (rest/loading/disabled/rounded/w100/wrap+uppercase) × label/icon-only, plus muted blurred/onDark/pressed/inverted, textColor, inverted primary, testId/className/htmlType and the deprecated iconLeft/iconRight.
+       3.1.2 Five hover timelines with fake timers, step by step: enter, mid, settled, leave, re-enter mid-exit, then press/click with callback counts.
+       3.1.3 Total 6/6. Mutation `timeout={100}` on Grow → 4 timelines fail.
+   3.2 Chromium `_ButtonParity.stories` (default + VanguardThemeProvider), 140 cases (5 types × 4 sizes × text/growLeft/growRight/iconOnly/loading/disabled/rounded):
+       3.2.1 24 computed properties plus boxes on the button and every inner div/span, in rest, CSS :hover (forced by rule cloning), JS hover settled (Grow swap), JS hover left, and focus.
+       3.2.2 Infinite animations (shimmer, spinner) are frozen at 0; finite ones are finished.
+       3.2.3 Guards: every icon slot holds its svg; the Grow pair goes 1/0 → 0/1 on the MUI side; CSS hover changes the primary background. A first run without the svg guard compared unloaded icons (0 = 0) and was fixed.
+       3.2.4 Mutation `timeout={100}` → caught (`transition: opacity 0.1s… vs 0.177s…`).
+   3.3 Existing Button stories (3 files / 58) and ActionButton stories (4) green. ActionButton is the internal iconLargeOnHover user.
+   3.4 FULL spec project (`--maxWorkers=4 --project spec src`): 334 files / 2454 tests, 0 failures. tsc lib 0.
+4. Size: Button eager closure 162.6 → 109.3 KB gzip, no emotion. Modal 167.2 → 113.8. Exports with the emotion runtime eager: 82 → 43 of 299.
+5. Consumers: rc-webapp iconLargeOnHover user is StatisticsBoardItem; every other Button renders unchanged by construction (only the Grow path changed). WordPress export → smoke patch to A.
+6. Biome: 4 infos (`?? <></>` fragment fallbacks), verbatim from the former code.
