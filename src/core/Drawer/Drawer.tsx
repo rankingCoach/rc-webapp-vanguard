@@ -69,16 +69,9 @@ export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
       open={open}
       variant={variant}
       sx={zIndex !== undefined ? { zIndex } : { zIndex: 1099 }}
-      PaperProps={{
-        // MUI's paper defaults to white (+ an elevation background-image in dark themes).
-        // Force the dark-aware surface (light: white, dark: #18212f) and drop the overlay.
-        sx: { backgroundColor: 'var(--fn-bg-surface)', backgroundImage: 'none' },
-      }}
       ModalProps={{
         hideBackdrop: hideBackdrop,
-        BackdropProps: {
-          invisible: !!hideBackdrop,
-        },
+        slotProps: { backdrop: { invisible: !!hideBackdrop } },
         style: zIndex !== undefined ? { zIndex } : undefined,
         // The drawer is a side panel, not a blocking dialog — we layer modals
         // and popovers on top of it. MUI's default FocusTrap yanks focus back
@@ -96,6 +89,13 @@ export const Drawer = (props: PropsWithChildren<DrawerProps>) => {
           },
         })
       }
+      slotProps={{
+        paper: {
+          // MUI's paper defaults to white (+ an elevation background-image in dark themes).
+          // Force the dark-aware surface (light: white, dark: #18212f) and drop the overlay.
+          sx: { backgroundColor: 'var(--fn-bg-surface)', backgroundImage: 'none' },
+        },
+      }}
     >
       <div className={classNames(styles.drawer, anchor === AnchorTypes.right ? styles.right : styles.left)}>
         <div className={classNames(isHeaderSticky ? styles.headerSticky : undefined, styles.headerContainer)}>

@@ -1,0 +1,17 @@
+.chip {
+  font-family: inherit;
+
+  &:global(.MuiChip-filled) {
+    background: var(--fn-bg-var);
+    color: var(--fn-fg);
+  }
+
+  &:global(.MuiChip-outlined) {
+    border-color: var(--fn-brd-gl);
+    color: var(--fn-fg);
+  }
+
+  :global(.MuiChip-deleteIcon) {
+    color: var(--fn-fg-light);
+  }
+}

@@ -83,7 +83,7 @@ export const Select = (props: Props) => {
   const [adornmentIndex, setAdornmentIndex] = useState(0);
   const selectInputRef = useRef<HTMLDivElement>(null);
 
-  const ShowAdornment = (index: number): React.ReactNode | null => {
+  const showAdornment = (index: number): React.ReactNode | null => {
     if (!adornment) return null;
     return adornment[index];
   };
@@ -126,7 +126,7 @@ export const Select = (props: Props) => {
         valueAsDefaultValue={valueAsDefaultValue}
         select={true}
         multiline={false}
-        adornment={ShowAdornment(adornmentIndex)}
+        adornment={showAdornment(adornmentIndex)}
         triggerChangeOnStateFieldChange={true}
         selectRenderValue={(value: string | number) => {
           if (!options) {
@@ -175,7 +175,7 @@ export const Select = (props: Props) => {
               style={containToSelectWidth ? { maxWidth: selectWidth } : undefined}
             >
               <Render if={!customOptionsRenderer}>
-                {ShowAdornment(index)}
+                {showAdornment(index)}
                 {item.leftImageUrl && <img src={item.leftImageUrl} alt="" width="32" height="24" />}
                 <div className={classNames(descriptionUnderTitle ? styles.descUnderTitle : '', dFlex, gap1)}>
                   <Text type={TextTypes.text} translate={translateOptions}>

@@ -1,5 +1,4 @@
 import { FormFieldType } from '@custom-hooks/useFormConfig';
-import { TextFieldProps } from '@mui/material';
 import {
   InputAdornmentProps,
   InputBase,
@@ -10,6 +9,7 @@ import {
   InputLabelProps,
   InputValueProps,
 } from '@vanguard/_internal/InputBase/InputBase';
+import type { VanguardTextFieldProps } from '@vanguard/_internal/mui-legacy-props';
 import { ComponentContainer } from '@vanguard/ComponentContainer/ComponentContainer';
 import React, { useMemo } from 'react';
 
@@ -22,7 +22,7 @@ export type InputProps = {
   size?: 'small' | 'medium'; // @todo implement this ???
   isLoading?: boolean;
   loadingText?: string;
-  textFieldProps?: TextFieldProps;
+  textFieldProps?: VanguardTextFieldProps;
 } & InputValueProps &
   InputCounterProps &
   InputHighlightsProps &

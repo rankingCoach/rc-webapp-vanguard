@@ -1,0 +1,19 @@
+{
+  "warnings": {},
+  "warning_count": 0,
+  "warning_identities": 0,
+  "declaration_blocks": [],
+  "wp_move": [
+    "mv: dist-wordpress/types/src/index-wordpress.d.ts: No such file or directory"
+  ],
+  "other_esbuild_warnings": [
+    "[plugin vite:esbuild] src/core/Autocomplete/Autocomplete.tsx: Comparison using the \"===\" operator here is always false",
+    "[plugin vite:esbuild] src/core/Autocomplete/Autocomplete.tsx: Comparison using the \"===\" operator here is always false"
+  ],
+  "master_warning_count": 720,
+  "other_warning_identities": [
+    "[plugin vite:esbuild] src/core/Autocomplete/Autocomplete.tsx: Comparison using the \"===\" operator here is always false",
+    "[plugin vite:esbuild] src/core/Autocomplete/Autocomplete.tsx: Comparison using the \"===\" operator here is always false"
+  ],
+  "historical_directive_baseline": "595/338 retained at out/s5b-build-reconciliation; superseded by user-directed filter"
+}

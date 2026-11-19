@@ -1,0 +1,100 @@
+@import "@styles/spacings";
+
+.container {
+  width: 100%;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--fn-fg);
+  font: inherit;
+}
+
+.cell {
+  padding: $x1_5 $x2;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--fn-divider-gl);
+  background: var(--fn-bg-surface);
+}
+
+.small .cell {
+  padding: 6px $x1_5;
+}
+
+.header-cell {
+  font-weight: 700;
+}
+
+.head .cell {
+  color: var(--fn-fg-light);
+  background: var(--fn-bg-var);
+  border-bottom-width: 2px;
+  white-space: nowrap;
+}
+
+.foot .cell {
+  font-weight: 700;
+  border-bottom: 0;
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.muted {
+  background: var(--fn-bg-var);
+}
+
+.hover:hover > .cell {
+  background: var(--fn-bg-hov-n-gl);
+}
+
+.selected > .cell {
+  background: var(--p100);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.sticky-header .head .cell {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.sticky-first-column .cell:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.sticky-header.sticky-first-column .head .cell:first-child {
+  z-index: 3;
+}
+
+// A table nested in a cell (key/value detail) drops its outer spacing and last border.
+.cell .table {
+  margin: (-$x0_5) 0;
+}
+
+.cell .table tr:last-child > .cell {
+  border-bottom: 0;
+}

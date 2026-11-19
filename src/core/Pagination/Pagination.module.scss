@@ -1,0 +1,19 @@
+.pagination {
+  :global(.MuiPaginationItem-root) {
+    color: var(--fn-fg);
+    font-family: inherit;
+  }
+
+  :global(.MuiPaginationItem-root:hover) {
+    background: var(--fn-bg-hov-n-gl);
+  }
+
+  :global(.MuiPaginationItem-root.Mui-selected) {
+    background: var(--fn-bg-cta);
+    color: var(--fn-fg-cta);
+  }
+
+  :global(.MuiPaginationItem-root.Mui-selected:hover) {
+    background: var(--fn-bg-cta-hov);
+  }
+}

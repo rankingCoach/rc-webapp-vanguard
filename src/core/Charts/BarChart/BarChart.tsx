@@ -11,7 +11,7 @@ import { TextReplacements } from '@vanguard/Text/Text';
 import { ApexOptions } from 'apexcharts';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { renderToString } from 'react-dom/server';
+import { renderToString } from 'react-dom/server.browser';
 
 /**
  * Types

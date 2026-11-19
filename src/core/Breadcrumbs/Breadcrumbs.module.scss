@@ -1,0 +1,10 @@
+@import "@styles/spacings";
+
+.breadcrumbs {
+  color: var(--fn-fg-light);
+  font-family: inherit;
+
+  :global(.MuiBreadcrumbs-separator) {
+    margin: 0 $x1;
+  }
+}

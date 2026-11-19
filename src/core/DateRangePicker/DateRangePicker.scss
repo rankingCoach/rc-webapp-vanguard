@@ -44,7 +44,9 @@
   flex-direction: row;
   align-items: flex-start;
   padding: 8px 0px;
-  width: 140%;
+  // Size to the calendar so the Popper measures the real box and keeps it inside the viewport.
+  width: max-content;
+  max-width: 100vw;
   left: 0px;
   top: 56px;
   overflow-y: scroll;
@@ -590,8 +592,10 @@
 
 }
 
-.date-range-picker-dropdown-predefined {
-  width: 100%;
+.date-range-picker-dropdown-content {
+  // The preset list keeps its previous width; the calendar grows past it.
+  min-width: 238px;
+  top: 20px;
 }
 
 .date-range-picker-popper {

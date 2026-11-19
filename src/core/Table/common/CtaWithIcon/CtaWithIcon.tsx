@@ -6,6 +6,21 @@ import React, { SyntheticEvent } from 'react';
 
 import styles from './CtaWithIcon.module.scss';
 
+const IconCmpRender = (rotateIcon: CtaWithIconProps['rotateIcon'], iconColor: CtaWithIconProps['iconColor'], disabled: CtaWithIconProps['disabled'], props: { iconType?: IconNames; className?: string }) => {
+    const { iconType, className } = props;
+    if (!iconType) return null;
+
+    return (
+      <Icon
+        className={classNames(className, styles.icon, rotateIcon ? styles.rotateIcon : undefined)}
+        color={iconColor ?? (!disabled ? 'var(--brand-color)' : 'var(--n300)')}
+      >
+        {iconType}
+      </Icon>
+    );
+  };
+
+
 export interface CtaWithIconProps {
   className?: string;
   disabled?: boolean;
@@ -26,19 +41,7 @@ export const CtaWithIcon = (props: CtaWithIconProps) => {
     onClick && onClick(evt);
   };
 
-  const IconCmp = (props: { iconType?: IconNames; className?: string }) => {
-    const { iconType, className } = props;
-    if (!iconType) return null;
-
-    return (
-      <Icon
-        className={classNames(className, styles.icon, rotateIcon ? styles.rotateIcon : undefined)}
-        color={iconColor ?? (!disabled ? 'var(--brand-color)' : 'var(--n300)')}
-      >
-        {iconType}
-      </Icon>
-    );
-  };
+  const IconCmp = IconCmpRender.bind(null, rotateIcon, iconColor, disabled);
 
   const leftArrow = typeof icon === 'object' ? icon : <IconCmp className={mr0_5} iconType={icon as IconNames} />;
   const rightArrow = typeof icon === 'object' ? icon : <IconCmp className={ml0_5} iconType={icon as IconNames} />;

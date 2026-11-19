@@ -1,4 +1,5 @@
 import React from 'react';
+import { MenuList } from '@mui/material';
 import { SbDecorator } from '@test-utils/get-storybook-decorator';
 import { MenuItem, MenuItemProps } from '@vanguard/MenuItem/MenuItem';
 import { IconNames } from '@vanguard/Icon/IconNames';
@@ -10,6 +11,11 @@ export default {
     title: 'vanguard/MenuItem',
     component: MenuItem,
   }),
+  render: (args: MenuItemProps) => (
+    <MenuList>
+      <MenuItem {...args} />
+    </MenuList>
+  ),
 };
 
 type Story = StoryObj<typeof MenuItem>;
