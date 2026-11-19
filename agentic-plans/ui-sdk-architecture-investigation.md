@@ -12,6 +12,8 @@
 > 9. Reporting rule: "passed" only for a Tier A/B verdict returned by the verifier; my own gates are "green on my side".
 > 10. SnackbarRoot pub-sub subscription leak (2026-11-19): **DECIDED (watchdog), fix after H17's PASS** in a separate commit with a reproducing spec (0 observers after unmount, flat over N mounts, remount replay unchanged); the `[bug-lock]` in `_SnackbarRoot.mui.spec.tsx` is rewritten to the fixed behaviour in that commit. User-facing behaviour delta: none; internal leak fixed. Tier P scenario for verifier 2: mount/unmount ×200 + service events.
 > 11. Class builders (2026-11-19): **DECIDED (watchdog), two documented contracts, not duplication.** Internal `cx` (src/primitives/react/class-names.ts, never exported) for own-core components that reproduce MUI markup (clsx semantics, collapses whitespace inside tokens); the public `@helpers/classNames` keeps its contract for everything else (drops non-string/empty entries, byte-identical for all-string calls). Conditions: a one-line header per file, src/helpers/_class-builders-contract.spec.ts pins the difference, `cx` never exported.
+> 13. Shared host memory budget (2026-11-19, **decided-by-watchdog**). Run no wide gate or full spec project while the one-minute load exceeds 40. Cap Vitest at `--maxWorkers=4` and keep targeted runs at `--maxWorkers=2` by default. Run at most one Storybook. Ask the watchdog to reserve a wide slot and keep it clear of verifier Storybook swaps.
+> 14. Durable verification evidence (2026-11-19, **decided-by-watchdog**). Put packs in `/Users/a.kott/vanguard-verify/packs/<sha>-<label>.tgz` and record each exact file's SHA-256 in `SHA256SUMS` there. Keep logs and traces used for decisions under `agentic-plans/` or `/Users/a.kott/vanguard-verify/`. The reboot removed pkg-16d and both verifier shadows. Close the `277bc04` sweep as partial and restart the broad consumer sweep on the shared H19b / H16c pack.
 
 
 Date: 2026-11-18 · Branch: `feature/ui-sdk-architecture-investigation` (from `feature/file-manager-variants`)
@@ -1578,3 +1580,18 @@ sample and present after settling. Both were present immediately on warm replays
 merge-base `99ee34c` is limited to data attributes. H15 remains PASS. The settled differential gives both sides the
 same warm asset state and waits for both indicators. The replay used jsdom. Chromium first-frame checks remain part
 of H20.
+
+### 36.5 Preload timing samples (2026-11-19)
+
+| Source | Cache | Wall time | Vitest aggregate setup | One-minute host load, start → finish |
+| --- | --- | ---: | ---: | ---: |
+| `0f71f7f` | Cold | 463 s | 882.31 s | 25.85 → 30.36 |
+| `0f71f7f` | Warm | 1,225 s | 2,870.79 s | 30.36 → 53.94 |
+| `c8e69a2` | Cold | 446 s | 402.87 s | 53.94 → 34.46 |
+| `c8e69a2` | Warm | 497 s | 527.40 s | 34.46 → 29.91 |
+| `f703205` | Cold | 1,284 s | 1,612.43 s | 29.91 → 69.96 |
+
+The 12:25 host reboot interrupted the warm `f703205` run. That sample is void. The completed cold run had 20
+test failures and the load reached roughly 100 during the run. The five completed samples have different host
+conditions and cannot establish a preload speedup or regression. Rule 13 applies to any further wide measurements.
+The original scratch timing logs were lost in the reboot. This table preserves the readings recorded before it.

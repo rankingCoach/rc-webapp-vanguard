@@ -60,8 +60,9 @@ src/primitives, mui-compat.scss (except approved lines) or config/derived-notice
 
 ## 3. Gates and how to run them
 
-Use `--maxWorkers=4` for wide runs, `--maxWorkers=2` when the host load is high. The watchdog may ask you to hold off
-heavy runs while the verifiers capture.
+Use `--maxWorkers=4` at most and `--maxWorkers=2` for targeted runs. Per decision 13, reserve a wide slot with the
+watchdog, start only below a one-minute load of 40, and keep it clear of verifier Storybook swaps. Run at most one
+Storybook on the host.
 
 1. **Targeted:**
    `npx vitest run --maxWorkers=2 --project spec <dirs/files>`
@@ -107,6 +108,9 @@ Commit by path first as `… (handoff N, verdict pending)`. A FAIL gets a fix co
 containing:
 1. One SHA.
 2. The pack path, with the sha256 computed from that exact file. pkg-16b/16c got mixed up once.
+   Store it at `/Users/a.kott/vanguard-verify/packs/<sha>-<label>.tgz`, with its checksum in `SHA256SUMS` there.
+   Keep the logs and traces relied on for decisions under `agentic-plans/` or `/Users/a.kott/vanguard-verify/`
+   (decision 14).
 3. The base: 9d3b75b for Vanguard stories, .472 for rc-webapp.
 4. Gate numbers.
 5. Changed files.
