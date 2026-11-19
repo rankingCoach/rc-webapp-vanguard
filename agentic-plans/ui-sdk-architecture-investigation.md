@@ -1186,3 +1186,20 @@ the WordPress smoke, the 16 unreachable last (still migrated, user decision). Li
    ("handoff N, verdict pending"); a FAIL gets a fix commit on top.
 6. Differential canonical form (SearchableSelect): attribute, style-declaration and class-token order are sorted
    before comparing (no observable meaning); values and structure must match.
+
+### 28.x Licence of ported code (decided by watchdog, MAJOR; 2026-11-19)
+
+The own core ports MUI 9.5 and popper.js 2.11 source (hooks, components, algorithms) and MUI's emotion styles; that is
+derivative work of MIT code. THIRD_PARTY_NOTICES.txt was derived from bundled packages only, so the notices would
+vanish with the last MUI import. Since e86a665: config/derived-notices.txt (hand-maintained "Portions derived from"
+section with both MIT texts) is appended by config/third-party-notices.ts; scripts/check-package-contents.mjs asserts
+it in both bundles' notices in the tarball (package gate); every ported file starts with
+`// Ported from <package>@<version> <file> (MIT)` (B informed; B sends other upstreams, e.g. react-spring, for A to add).
+
+### 34.1 Package gate cadence (decided by watchdog, 2026-11-19, from pack-16)
+
+Host load (163) made the full package gate (~11 min, 4 consumer fixtures) per handoff a main contributor to
+verifier-capture noise. Per handoff: build + pack and the targeted checks for what changed (its specs/stories, its
+WordPress smoke test alone, the compat-order guard). Full package.sh: when package.json / build config / notices /
+exports change, every 3rd handoff (milestone), and before Tier C. Wide vitest runs keep --maxWorkers=4.
+Pending full run: 501d8cb (styled-components dropped, package.json).
