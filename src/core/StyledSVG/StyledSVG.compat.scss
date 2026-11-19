@@ -1,0 +1,34 @@
+// StyledSVG's former styled-components rules, at their original specificities (one class = the old generated class).
+// Appended last to vanguard.css via src/styles/mui-compat.scss (D15), the position runtime-injected styles had.
+// Each rule has its own class, present only when its prop is set (see StyledSVG.tsx).
+.vg-styled-svg {
+  vertical-align: baseline;
+}
+.vg-styled-svg--size {
+  width: var(--vg-svg-size);
+  height: var(--vg-svg-size);
+}
+.vg-styled-svg--repeat {
+  background-repeat: var(--vg-svg-repeat);
+}
+.vg-styled-svg--size path {
+  width: var(--vg-svg-size);
+  height: var(--vg-svg-size);
+}
+.vg-styled-svg--fill path {
+  fill: var(--vg-svg-fill);
+}
+.vg-styled-svg--fill-opacity path {
+  fill-opacity: var(--vg-svg-fill-opacity);
+}
+.vg-styled-svg--repeat path,
+.vg-styled-svg--repeat rect {
+  background-repeat: var(--vg-svg-repeat);
+}
+.vg-styled-svg--rect-fill rect {
+  fill: var(--vg-svg-rect-fill);
+}
+.vg-styled-svg--hover-fill:hover path,
+.vg-styled-svg--hover-fill.hover path {
+  fill: var(--vg-svg-hover-fill);
+}
