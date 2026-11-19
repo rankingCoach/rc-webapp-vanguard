@@ -1,0 +1,46 @@
+// MUI 9.5 Collapse emotion styles (CollapseRoot / CollapseWrapper / CollapseWrapperInner) for the own-core Collapse, at
+// emotion's specificity (D15): `.css-x` = (0,1,0) → `.MuiCollapse-*:where([data-vg-core]…)`. Emotion emits one class
+// per ownerState combination with the variants merged after the base; here the variants are later rules of the same
+// specificity, keyed by MUI's own state classes. theme.transitions.create('height'|'width') = standard 300ms easeInOut.
+// Appended last to vanguard.css via src/styles/mui-compat.scss.
+
+// ---------------------------------------------------------------- Root
+.MuiCollapse-root:where([data-vg-core]) {
+  height: 0;
+  overflow: hidden;
+  transition: height 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.MuiCollapse-root:where([data-vg-core].MuiCollapse-horizontal) {
+  height: auto;
+  width: 0;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+.MuiCollapse-root:where([data-vg-core].MuiCollapse-entered) {
+  height: auto;
+  overflow: visible;
+}
+.MuiCollapse-root:where([data-vg-core].MuiCollapse-entered.MuiCollapse-horizontal) {
+  width: auto;
+}
+.MuiCollapse-root:where([data-vg-core].MuiCollapse-hidden) {
+  visibility: hidden;
+}
+
+// ---------------------------------------------------------------- Wrapper
+.MuiCollapse-wrapper:where([data-vg-core]) {
+  display: flex;
+  width: 100%;
+}
+.MuiCollapse-wrapper:where([data-vg-core].MuiCollapse-horizontal) {
+  width: auto;
+  height: 100%;
+}
+
+// ---------------------------------------------------------------- WrapperInner
+.MuiCollapse-wrapperInner:where([data-vg-core]) {
+  width: 100%;
+}
+.MuiCollapse-wrapperInner:where([data-vg-core].MuiCollapse-horizontal) {
+  width: auto;
+  height: 100%;
+}
