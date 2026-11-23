@@ -5641,3 +5641,108 @@ behaviour, NOT for the .472 Vanguard wrapper (which used them only inside DatePi
   section resolver; staging the whole file put the resolver into dd65757c. decided-by-watchdog (A): no rewrite; 2c
   commits without it and says so. The field's mousedown section resolver landed in dd65757c (staging slip). Rule from
   here: files touched by two planned commits are staged per hunk, and each commit's --stat is checked against its plan.
+- Stage 1 of the next cut (2026-11-23): commits c04e22e0 … 49bfae08, RELEASE-INPUT-ID-8 (manifest-v2)
+  aa7b26102d880ba65efb34299d83b1fdf66824f1001931b6ef2ed429a1149504 (old scheme 52ce9da1…bd0d7), tsc 0/0, targeted
+  specs 54 files 972/972. Two builds: dist-wordpress byte-identical; dist identical except index-Parser2.js (htmlparser2
+  Parser: optional hoisted bare `import "./index-decode.js"` + minified class name). decided-by-watchdog: no iter2d in
+  this cut; acceptance = dist identical except that chunk (two known variants).
+- Follow-up iter2d (`output.hoistTransitiveImports: false`): measure first how many chunks change, whether any entry's
+  eager import closure changes, package gate + D12 consumers, and 4 fresh-clone build pairs.
+- Finding for the owner: 47 `src/**/*.spec.ts(x)` without the `_` prefix never run (spec include `**/_*.spec.{ts,tsx}`
+  since the initial commit); list in logs/next-cut-plan.noindex/stage1/never-run-specs.txt, sent to B.
+- decided-by-watchdog (stage 2 prep): coverage gate = regression run of the unchanged 35-file table (none changed); a
+  report-only coverage run for the 5 changed sources (DatePickerShell, DateField, DateCalendar, DrawerRoot, pub-sub)
+  runs AFTER the pack and hand-over (line/branch % per file + unexecuted changed lines; information, not a gate).
+- Follow-up: the coverage gate table lacks the own DatePicker files (DatePickerShell, DateField, DateCalendar); add them.
+- Correction: the 47 never-run specs result is single-source static (A and B used the same method); open: do they pass,
+  are some deliberately superseded by `_` specs.
+- decided-by-watchdog (stage 2): storybook leg RED (browser connection closed at _RecommendationCard.stories.tsx, 56 of
+  260 files not run, run storybook.b6H28Y kept as RED-superseded-by-rerun); option (a): ONE re-run of the storybook leg
+  only, same snapshot/config/guards, lock kept; acceptance 260/260, 0 errors, exit 0; any red = stop, release the lock.
+- Stage 2 storybook re-run (storybook.v8Wk46) RED: 258/260 files, 3 tests (PaginationParity Default/Vanguard theme
+  paged-state parity; InputBaseMuiContract Outlined Input Styles rest colour read CTA blue). No lost connection. Lock
+  released to V1; no third attempt; coverage/pack/audits not run. Note: gate outputs (mui-upgrade-gates/out/,
+  .tsbuildinfo-app) land in the snapshot and change the manifest walk; exclude them from future IDs.
+- decided-by-watchdog (stage 2 RED ×2): the cut stays open; no pack on a red storybook leg, no weakening, no skip, no
+  retry-until-green; ID-8 not released. Ports to V1 (probe session); A diagnoses offline: (3.1) do the 3 new story
+  files leave pointer/focus/overlay state; (3.2) do PaginationParity / InputBaseMuiContract read rest state without
+  parking, with the real diff; (3.3) file order before each failure in both runs; (3.4) page reuse across files.
+  Then targeted runs with the lock (each failing file alone ×3; after its predecessor ×3; known-bad must fail, fix
+  must turn it green). Allowed fix: park/reset at the END of state-leaving stories, or one global after-each pointer
+  park in the storybook setup; never the failing stories' assertions. A fix = new commit, new ID, stage 2 again once.
+- Cut plan: exclude `agentic-plans/mui-upgrade-gates/out/` and `.tsbuildinfo*` from the manifest walk for the next ID.
+- Storybook RED diagnosis (offline, single-source static): both failing assertions are rest-state reads under a real
+  :hover (Pagination small-rounded item 3 MUI bg rgb(185,197,216); InputBase fieldset border CTA blue). The storybook
+  project reuses one Playwright page per worker (pointer persists across files); neither failing story parks the
+  pointer; my two DatePicker stories leave it at the viewport's bottom-right (≈412,894 of 414×896). Run order differs
+  between runs; the exact leaving story is not identifiable offline. Proposal: global beforeEach pointer park in
+  .storybook/vitest.setup.ts (63de883f convention made global), admitted with known-bad/known-good ×3.
+- decided-by-watchdog: the pointer-park admission (A1/A2/A3 only) runs now on 6031/6032 in a shared window with V1's
+  lock on 6012 (watchdog exception; no gate-lock acquire). Static/full/coverage/pack still need the lock.
+- Pointer-park admission INVALID (shared window): A1 Pagination alone 3/3 green; InputBase alone fails Adornment
+  Margins 3/3 via the console trap (pre-existing React "empty src" error); A2 Pagination probe failed (wrong element
+  selector), InputBase known-bad did NOT reproduce (pointer left at the end of the previous file gave no :hover in the
+  next file's fresh iframe); A3 one SLEEP-INVALID run. Nothing committed; proposal: same-document probe with -t scoping.
+- Real-order repro (2026-11-23, valid runs outside sleep windows): Slider → Pagination reproduces PaginationParity RED
+  (rp-pag-1, rp-pag-3, kb-sp-1, kb-sp-2); diagnostic: real :hover on a MUI small pagination item, no mousemove in the
+  document, focus on body → stationary pointer carried over from SliderParity. InputBase not reproduced. Park fix:
+  Pagination GREEN 3/3, but SliderParity › Vanguard Theme RED 3/3 (its own 63de883f park intercepts the hover of the
+  global 2×2 park at the same corner). Stopped; proposed: move the global park to top:0; left:8px.
+- decided-by-watchdog: park moved to top:0; left:8px; 2×2 (option a); `force: true` rejected. Re-admission: known-bad
+  Slider → Pagination 3/3 valid RED (HEAD setup); fixed ×3 (Pagination + SliderParity GREEN, trap 0); SliderParity,
+  AutocompleteFieldFrameParity and PopoverModalMuiContract alone ×1 with the park. InputBase Outlined Input Styles: seen
+  once (v8Wk46), same symptom class, not reproduced in 3 orders; the park removes the carried-pointer path; the :hover
+  dump stays armed in the gate config copy (not the repo).
+- CORRECTION: a stationary carried-over pointer DOES produce :hover in the next file's document (Pagination case,
+  diagnostic dump). My earlier "carried-over pointer gives no :hover" came from the InputBase probe, which was specific
+  to that case (and partly ran next to a sleep window); withdrawn as a general statement.
+- Re-admission GREEN (valid, 0 sleep events): known-bad Slider → Pagination 3/3 RED on HEAD setup; fixed ×3 4/4 with
+  the park (Pagination + SliderParity), SliderParity, AutocompleteFieldFrameParity, PopoverModalMuiContract green,
+  trap 0. Commit 46c4f648 test(storybook): park the real pointer before every story (body line 3 is 101 characters:
+  disclosed, no amend). RELEASE-INPUT-ID-9 (manifest-v2b, excludes gate outputs)
+  c0f08cf3464d72796414f83fa5260026ac4b79f12147a707884684a2fb0ad64d. :hover dump armed in the gate config copy only.
+
+- 2026-11-23 — Report-only coverage of the 5 changed sources (ID-9, spec project) [single-source, not a gate].
+  - Line/branch %: DatePickerShell 89.51/81.95, DateField 85.06/84.14, DateCalendar 92.43/83.55, DrawerRoot 93.54/69.23,
+    pub-sub 89.28/78.57.
+  - Changed lines no spec executes: 0.
+  - Untaken branch arms on changed lines: Shell 19 (Tab trap 272-289, `?? null` fallbacks at 97 and 234, line 327 else),
+    Field 9 (guards in the mousedown resolver, 340-375), Calendar 2 (461, 462).
+  - Untaken arms are covered by Chromium story cells only, or not at all. Feeds follow-up 2. Sent to the watchdog.
+
+- 2026-11-23 — Watchdog decision: final2 is NOT promoted to QA build; final-56fde stays the QA build; final3 comes after the DatePicker fixes.
+  - Red: 13 new behaviour-parity cells (V2's final2 table, opener = Month) plus a jsdom `clickAwayInput` case. All red on the
+    own picker; the frozen side matches V2's .472 column.
+  - Mechanism, from MUI X PickerPopper.js:
+    - Lines 267-283: focus returns to the element active at open.
+    - Lines 296-305: a click-away on an interactive element cancels that refocus.
+  - Fix in DatePickerShell: `openerSection()` is the default restore target; `clickAwayRestore(event)` on both click-away
+    paths.
+  - Green: specs 249/249; stories 40/41 + 34/34. Remaining red: LaneDoubleClickDay.
+  - Double-click on .472 stays open only for a sub-frame dblclick (the popup mounts about 111 ms later), per probes
+    dp3-dblprobe-1 and dp3-gapprobe-1. Human-speed clicks close on both pickers. Asked the watchdog to choose option (a), (b)
+    or (c).
+  - Q5: the click-away restore has existed since 9ba4da51. Hypothesis: it surfaced through dd65757c's mousedown resolver,
+    which makes Month the opener.
+- 2026-11-23 — Decisions (decided-by-watchdog):
+  1. Double-click: option (a). The atomic dblClick cell is replaced by LaneTwoClicksDay0 and LaneTwoClicksDay120. The atomic
+     variant goes to KNOWN-ISSUES as ".472 tooling/timing artifact: atomic dblClick completes before the popup mounts".
+     Single-source until V2 reproduces it.
+  2. Items 1-2 fix accepted. LaneMonthClickAwayPlain added (non-interactive click-away refocuses the opener): green.
+     V2's outside-input typing check ("abc" + "x") added to the click-away input cells. Known-bad on the HEAD shell: the 4
+     click-away cells are red and the value stays "abc".
+  3. Hand-over line: "restore-on-click-away existed since 9ba4da51 without a cell; became visible in final2 because
+     dd65757c's mousedown resolver gives the field focus before open".
+  4. The 28 tsc errors come from the root tsconfig.json (stories) and are already in HEAD: ID-9 shows 28 as well. The gate
+     configs app and lib have 0. No diag files are in the tree.
+  5. QUICKPACK final3-quickpack-1.tgz, sha256 2d3630af…36c74 (ID-9 + 3 files), sent to V2. No commit before V2 reports
+     0 differences.
+- 2026-11-23 — V2 table on final3-quickpack-1: 0 product differences, so the fix is confirmed. GO for the final3 cut
+  (decided-by-watchdog).
+  - Commits: 24bcd30d fix(date-picker) (shell, behaviour story, open-close differential spec), then 330334dd
+    test(date-picker).
+  - 330334dd removes the gap-0 two-click cell from the asserted set. The watchdog confirmed this after 24bcd30d; the cell
+    was never part of a release cut. The 120 ms cell stays asserted; behaviour story 38/38.
+  - KNOWN-ISSUES 1.16 (fix) and 2.6 (.472 timing artifacts) added.
+  - Next: V1 releases the lock, then gate-lock acquire A, new ID (v2b), stage 2 once, pack final3-<id12>, audits, and
+    compare against final2 and final-56fde.
