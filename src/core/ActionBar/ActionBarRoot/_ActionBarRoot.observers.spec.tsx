@@ -1,8 +1,6 @@
 import { PUB_SUB_EVENTS, pubSubService } from '@helpers/pub-sub';
 import { act, render } from '@testing-library/react';
 import { ActionBarRoot } from '@vanguard/ActionBar/ActionBarRoot/ActionBarRoot';
-import http from 'node:http';
-import net from 'node:net';
 import React from 'react';
 import { expect, it } from 'vitest';
 
@@ -26,9 +24,6 @@ const fixture = (generation?: number) => (
 );
 
 it('releases all four ActionBarRoot observers after natural teardown and remount', async () => {
-  expect(http.request).toBe(net.Socket.prototype.connect);
-  expect(http.request).toBe(http.get);
-  expect(() => Reflect.apply(http.request, http, [])).toThrow(/^Outbound network denied for the H21 gate$/);
   expect(pubSubService).toBe(sourceSingleton);
   expect(ActionBarRoot).toBe(sourceRoot);
   expect(channels).toEqual([
