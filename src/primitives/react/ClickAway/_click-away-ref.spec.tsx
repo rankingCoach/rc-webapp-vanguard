@@ -39,6 +39,28 @@ describe('ClickAway refs and layers', () => {
     expect(go('own')).toEqual(go('mui'));
   });
 
+  it('clears an object ref before attaching its replacement callback and calls that callback with null on unmount', () => {
+    const objectRef = React.createRef<HTMLDivElement>();
+    const callbackRef = vi.fn<(node: HTMLDivElement | null) => void>(() => {
+      expect(objectRef.current).toBeNull();
+    });
+    const tree = (ref: React.Ref<HTMLDivElement>) => (
+      <ClickAway onClickAway={() => undefined}>
+        <div ref={ref}>{'child'}</div>
+      </ClickAway>
+    );
+    const view = render(tree(objectRef));
+    const child = view.getByText('child');
+    expect(objectRef.current).toBe(child);
+
+    view.rerender(tree(callbackRef));
+    expect(view.getByText('child')).toBe(child);
+    expect(callbackRef.mock.calls).toEqual([[child]]);
+
+    view.unmount();
+    expect(callbackRef.mock.calls).toEqual([[child], [null]]);
+  });
+
   it('ignoreHigherLayers={false}: a click inside a layer opened from inside is a click-away (MUI)', () => {
     vi.useFakeTimers();
     const seen: Record<string, number> = { mui: 0, own: 0, ownDefault: 0 };

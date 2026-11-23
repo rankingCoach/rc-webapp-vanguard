@@ -137,7 +137,12 @@ export const ClickAway = (props: ClickAwayProps) => {
   const handleRef = useCallback(
     (node: Element | null) => {
       nodeRef.current = node;
-      const cleanup = typeof childRef === 'function' ? childRef(node) : (setRef(childRef, node), undefined);
+      let cleanup: unknown;
+      if (typeof childRef === 'function') {
+        cleanup = childRef(node);
+      } else {
+        setRef(childRef, node);
+      }
       return () => {
         nodeRef.current = null;
         if (typeof cleanup === 'function') cleanup();
