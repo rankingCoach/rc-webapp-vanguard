@@ -12,7 +12,7 @@ import { DatePicker, type DatePickerProps } from './DatePicker';
 /**
  * Desktop open/close transitions against the frozen MUI X 9.17 DatePicker (V2 behaviour verdict, production builds):
  * (a) a click on a date section while the popup is open, (b) Escape from the calendar after opening from a section,
- * (c) Escape from a date section while the popup is open.
+ * (c) Escape from a date section while the popup is open, (d) a click on an outside input while the popup is open.
  */
 const initial = new Date(2024, 2, 15, 13, 42, 56, 789).valueOf();
 const popupSelector = '.MuiPickersPopper-root';
@@ -32,18 +32,23 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-type Step = 'clickSectionWhileOpen' | 'escapeFromCalendar' | 'escapeFromSection';
+type Step = 'clickSectionWhileOpen' | 'escapeFromCalendar' | 'escapeFromSection' | 'clickAwayInput';
 
 const observe = async (Impl: React.ComponentType<DatePickerProps>, step: Step) => {
   finePointer();
   const user = userEvent.setup();
-  const view = render(<Impl value={initial} locale="en_US" label="Date" onChange={() => undefined} />);
+  const view = render(
+    <>
+      <input aria-label="outside input" />
+      <Impl value={initial} locale="en_US" label="Date" onChange={() => undefined} />
+    </>,
+  );
   try {
     const field = view.getByRole('group');
     const section = (name: string) => within(field).getByRole('spinbutton', { name });
     const witness = () => ({
       open: document.querySelector(popupSelector) !== null,
-      editor: field.contains(document.activeElement) ? document.activeElement?.getAttribute('aria-label') : null,
+      editor: document.activeElement?.getAttribute('aria-label') ?? null,
       inCalendar: document.querySelector(popupSelector)?.contains(document.activeElement) ?? false,
     });
     await user.click(section('Day'));
@@ -53,6 +58,9 @@ const observe = async (Impl: React.ComponentType<DatePickerProps>, step: Step) =
     } else if (step === 'escapeFromCalendar') {
       await waitFor(() => expect(witness().inCalendar).toBe(true));
       await user.keyboard('{Escape}');
+    } else if (step === 'clickAwayInput') {
+      // MUI X: a click-away on an interactive element leaves focus on it (no return to the opener).
+      await user.click(view.getByRole('textbox', { name: 'outside input' }));
     } else {
       act(() => section('Day').focus());
       await user.keyboard('{Escape}');
@@ -65,7 +73,7 @@ const observe = async (Impl: React.ComponentType<DatePickerProps>, step: Step) =
   }
 };
 
-it.each(['clickSectionWhileOpen', 'escapeFromCalendar', 'escapeFromSection'] as const)(
+it.each(['clickSectionWhileOpen', 'escapeFromCalendar', 'escapeFromSection', 'clickAwayInput'] as const)(
   'matches the frozen desktop transition: %s',
   async (step) => {
     const reference = await observe(FrozenDatePicker, step);
@@ -73,7 +81,10 @@ it.each(['clickSectionWhileOpen', 'escapeFromCalendar', 'escapeFromSection'] as 
     if (step === 'escapeFromSection') {
       // jsdom only: the frozen picker leaves focus on the pressed section here, while in Chromium it moves to the
       // first section. The focus target is asserted in _DatePickerOpenCloseParity.stories.tsx (real browser).
-      expect({ open: candidate.open, inCalendar: candidate.inCalendar }).toEqual({
+      expect({
+        open: candidate.open,
+        inCalendar: candidate.inCalendar,
+      }).toEqual({
         open: reference.open,
         inCalendar: reference.inCalendar,
       });

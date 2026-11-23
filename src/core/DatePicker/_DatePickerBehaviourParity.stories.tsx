@@ -29,9 +29,16 @@ const Host = () => {
   const Impl = impl === 'frozen' ? FrozenDatePicker : DatePicker;
   return (
     <div style={{ padding: 24 }}>
-      <button type="button" data-testid="outside">
-        outside
-      </button>
+      {/* Own row with a gap: the field's shrunk label overlaps whatever sits directly above the field. */}
+      <div style={{ marginBottom: 24 }}>
+        <button type="button" data-testid="outside">
+          outside
+        </button>
+        <input data-testid="outside-input" aria-label="outside input" />
+        <div data-testid="outside-plain" style={{ display: 'inline-block', width: 80, height: 24 }}>
+          plain
+        </div>
+      </div>
       {impl ? (
         <Impl key={impl} value={fixture.value} locale={fixture.locale} label="Date" onChange={() => undefined} />
       ) : null}
@@ -79,9 +86,15 @@ type Step =
   | 'escapeInYearView'
   | 'keyboardYearChoice'
   | 'keyboardYearChoiceNatural'
-  | 'openFromDayThenEscape';
+  | 'openFromDayThenEscape'
+  | 'clickAwayButton'
+  | 'clickAwayInput'
+  | 'clickAwayPlain'
+  | 'twoClicksDay0'
+  | 'twoClicksDay120';
 
-const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step) => {
+// `openFrom`: the section clicked to open the picker; without it the field group is clicked (its centre).
+const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step, openFrom?: 'Day' | 'Month') => {
   const mobile = step.startsWith('mobile');
   const restore = mobile ? coarsePointer() : () => undefined;
   try {
@@ -104,9 +117,21 @@ const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step) 
     const button = (text: string) =>
       [...(popup()?.querySelectorAll<HTMLElement>('button') ?? [])].find((b) => b.textContent?.trim() === text);
 
-    // Open as V2 does (a click on the field group), or from the Day section for the opener-dependent cell.
-    await userEvent.click(step === 'openFromDayThenEscape' ? section('Day') : field);
-    await waitFor(() => expect(popup()).not.toBeNull());
+    const outsideInput = canvas.querySelector<HTMLInputElement>('[data-testid="outside-input"]')!;
+    outsideInput.value = 'abc';
+    if (step === 'twoClicksDay0' || step === 'twoClicksDay120') {
+      // Two real clicks on the Day section of the closed picker: .472 opens on the first and closes on the second at
+      // every gap (0 = separate clicks, 60/120/200 ms probed). Playwright's atomic `dblClick` is not asserted: on .472 it
+      // completes within one frame, before the popup mounts, so the popup stays open (.472 tooling/timing artifact).
+      await userEvent.click(section('Day'));
+      if (step === 'twoClicksDay120') await wait(120);
+      await userEvent.click(section('Day'));
+    } else {
+      // Open as V2 does (a click on the field group), or from a section for the opener-dependent cells.
+      const from = step === 'openFromDayThenEscape' ? 'Day' : openFrom;
+      await userEvent.click(from ? section(from) : field);
+      await waitFor(() => expect(popup()).not.toBeNull());
+    }
     await wait(400);
     const trace: string[] = [];
     switch (step) {
@@ -157,7 +182,11 @@ const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step) 
         break;
       case 'mobileBackdrop': {
         const backdrop = document.querySelector<HTMLElement>(`${mobilePopup} .MuiBackdrop-root`);
-        if (backdrop) await userEvent.click(backdrop, { position: { x: 5, y: 5 }, force: true } as never);
+        if (backdrop)
+          await userEvent.click(backdrop, {
+            position: { x: 5, y: 5 },
+            force: true,
+          } as never);
         break;
       }
       case 'mobileEscape':
@@ -165,6 +194,22 @@ const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step) 
         break;
       case 'openFromDayThenEscape':
         await userEvent.keyboard('{Escape}');
+        break;
+      case 'clickAwayButton':
+        await userEvent.click(canvas.querySelector<HTMLElement>('[data-testid="outside"]')!);
+        break;
+      case 'clickAwayInput':
+        // V2: the clicked input keeps focus and receives the typed text.
+        await userEvent.click(outsideInput);
+        await userEvent.keyboard('x');
+        trace.push(`value:${outsideInput.value}`);
+        break;
+      case 'clickAwayPlain':
+        // A click-away on a non-interactive element: MUI X returns focus to the opener section.
+        await userEvent.click(canvas.querySelector<HTMLElement>('[data-testid="outside-plain"]')!);
+        break;
+      case 'twoClicksDay0':
+      case 'twoClicksDay120':
         break;
       case 'keyboardYearChoiceNatural': {
         // Keys pressed where focus lands after opening the year view (no manual focus), as V2 does.
@@ -188,21 +233,27 @@ const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step) 
       }
     }
     await wait(600);
-    const result = { open: popup() !== null, focus: where(), ...(trace.length ? { trace: trace.join(' > ') } : {}) };
+    const result = {
+      open: popup() !== null,
+      focus: where(),
+      ...(trace.length ? { trace: trace.join(' > ') } : {}),
+    };
     showImpl?.(null);
     await waitFor(() => expect(popup()).toBeNull());
+    // Leave nothing focused for the next run (an outside input would keep focus across implementations).
+    (document.activeElement as HTMLElement | null)?.blur();
     return result;
   } finally {
     restore();
   }
 };
 
-const parity = (step: Step, v2Lane = false): Story => ({
+const parity = (step: Step, v2Lane = false, openFrom?: 'Day' | 'Month'): Story => ({
   render: () => <Host />,
   play: async ({ canvasElement }) => {
     fixture = v2Lane ? { value: Date.UTC(2026, 0, 15), locale: 'en' } : { value: initial, locale: 'en_US' };
-    const frozen = await observe(canvasElement, 'frozen', step);
-    const own = await observe(canvasElement, 'own', step);
+    const frozen = await observe(canvasElement, 'frozen', step, openFrom);
+    const own = await observe(canvasElement, 'own', step, openFrom);
     await expect({ step, own }).toEqual({ step, own: frozen });
   },
 });
@@ -232,3 +283,19 @@ export const KeyboardYearChoiceNatural = parity('keyboardYearChoiceNatural');
 export const OpenFromDayThenEscape = parity('openFromDayThenEscape');
 export const LaneKeyboardYearChoiceNatural = parity('keyboardYearChoiceNatural', true);
 export const LaneOpenFromDayThenEscape = parity('openFromDayThenEscape', true);
+// V2 final2 table: the picker opened from the Month section (the opener is not the first section).
+export const LaneClickAwayButton = parity('clickAwayButton', true);
+export const LaneClickAwayInput = parity('clickAwayInput', true);
+export const LaneMonthClickAwayButton = parity('clickAwayButton', true, 'Month');
+export const LaneMonthClickAwayInput = parity('clickAwayInput', true, 'Month');
+export const LaneMonthPickDayByClick = parity('pickDayByClick', true, 'Month');
+export const LaneMonthPickDayByEnter = parity('pickDayByEnter', true, 'Month');
+export const LaneMonthPickDayBySpace = parity('pickDayBySpace', true, 'Month');
+export const LaneMonthEscapeFromSection = parity('escapeFromSection', true, 'Month');
+export const LaneMonthMobileOk = parity('mobileOk', true, 'Month');
+export const LaneMonthMobileCancel = parity('mobileCancel', true, 'Month');
+export const LaneMonthMobileBackdrop = parity('mobileBackdrop', true, 'Month');
+export const LaneMonthMobileEscape = parity('mobileEscape', true, 'Month');
+export const LaneMonthClickAwayPlain = parity('clickAwayPlain', true, 'Month');
+export const LaneTwoClicksDay0 = parity('twoClicksDay0', true);
+export const LaneTwoClicksDay120 = parity('twoClicksDay120', true);

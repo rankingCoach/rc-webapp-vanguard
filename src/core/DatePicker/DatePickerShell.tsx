@@ -27,6 +27,16 @@ const mobileZIndex = 1300;
 const calendarTargets =
   '.MuiDateCalendar-root, .MuiPickersCalendarHeader-root, .MuiPickersDay-root, .MuiPickersArrowSwitcher-root, .MuiDayCalendar-weekContainer';
 
+// MUI X PickerPopper (isElementInteractive): a click-away whose path holds an interactive element leaves focus there;
+// any other click-away returns focus to the opener section.
+const isInteractive = (node: EventTarget) =>
+  node instanceof HTMLElement &&
+  (/^(BUTTON|DETAILS|EMBED|IFRAME|KEYGEN|LABEL|SELECT|TEXTAREA)$/.test(node.nodeName) ||
+    (node.nodeName === 'A' && node.hasAttribute('href')) ||
+    (node instanceof HTMLInputElement && node.type !== 'hidden') ||
+    (node.hasAttribute('tabindex') && node.tabIndex > -1));
+const clickAwayRestore = (event: Event) => (event.composedPath().some(isInteractive) ? null : undefined);
+
 const boundaryDate = (stamp?: number) => {
   if (!stamp) return undefined;
   const seconds = stamp.toString().length === 13 ? Math.floor(stamp / 1000) : stamp;
@@ -93,8 +103,17 @@ export const DatePickerShell = ({
   const opener = useRef<HTMLElement | null>(null);
   const originalStamp = useRef<number | undefined>(undefined);
   const focusRestore = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  // MUI X focuses the field's first section after the picker closes (pick, OK/Cancel/backdrop/Escape on mobile).
-  const firstSection = () => fieldHost.current?.querySelector<HTMLElement>('[role="spinbutton"]') ?? null;
+  // MUI X returns focus to the section that opened the picker (pick, Escape, OK/Cancel/backdrop on mobile). A click on
+  // the field's padding can open it before a date section receives focus: then the active section stands in.
+  const openerSection = useCallback(() => {
+    const host = fieldHost.current;
+    if (!host) return null;
+    if (opener.current && host.contains(opener.current)) return opener.current;
+    return (
+      host.querySelector<HTMLElement>('[role="spinbutton"][tabindex="0"]') ??
+      host.querySelector<HTMLElement>('[role="spinbutton"]')
+    );
+  }, []);
   const restoreAfterMobileExit = useRef(false);
   // Remount the calendar on every open so its autoFocus moves focus to the selected day again (MUI X re-open).
   const [openCount, setOpenCount] = useState(0);
@@ -128,8 +147,8 @@ export const DatePickerShell = ({
     setOpen(true);
   };
 
-  // `restoreTo`: the element to focus after closing (default: the element focused when the popup opened); `null` keeps
-  // focus where it is (a click on the field already moved it to the clicked section).
+  // `restoreTo`: the element to focus after closing (default: the opener section); `null` keeps focus where it is (a
+  // click on the field or on an outside control already moved it).
   const dismiss = useCallback(
     (restoreTo?: HTMLElement | null) => {
       if (!live.current) return;
@@ -137,7 +156,7 @@ export const DatePickerShell = ({
       OverlayStackingService.unregister(claim);
       setZIndex(OVERLAY_BASE_Z_INDEX);
       if (desktop) {
-        const target = restoreTo === undefined ? opener.current : restoreTo;
+        const target = restoreTo === undefined ? openerSection() : restoreTo;
         focusRestore.current = setTimeout(() => {
           if (target?.isConnected) target.focus();
         });
@@ -147,7 +166,7 @@ export const DatePickerShell = ({
       }
       setOpen(false);
     },
-    [claim, desktop],
+    [claim, desktop, openerSection],
   );
 
   useEffect(() => {
@@ -162,7 +181,7 @@ export const DatePickerShell = ({
         !mobilePaperRef.current?.contains(target) &&
         !target.closest(calendarTargets)
       )
-        dismiss();
+        dismiss(clickAwayRestore(event));
     };
     owner?.addEventListener('mousedown', outsideDown);
     return () => owner?.removeEventListener('mousedown', outsideDown);
@@ -179,7 +198,7 @@ export const DatePickerShell = ({
   }, [onChange]);
   const choose: NonNullable<React.ComponentProps<typeof DateCalendar>['onChange']> = (next, selection) => {
     if (!Object.is(next?.valueOf(), value)) publish(next);
-    if (desktop && selection === 'finish') dismiss(firstSection());
+    if (desktop && selection === 'finish') dismiss();
   };
   const cancel = () => {
     if (!Object.is(value, originalStamp.current)) onChange?.(originalStamp.current);
@@ -211,8 +230,8 @@ export const DatePickerShell = ({
 
   return (
     <ClickAway
-      onClickAway={() => {
-        if (desktop) dismiss();
+      onClickAway={(event) => {
+        if (desktop) dismiss(clickAwayRestore(event));
       }}
     >
       <div ref={wrapper} className={styles.container}>
@@ -229,10 +248,8 @@ export const DatePickerShell = ({
           }}
           onKeyDownCapture={(event) => {
             if (!desktop && event.key === 'Enter') show();
-            // MUI X: Escape in a date section closes the desktop popup and focuses the field's first section.
-            if (desktop && live.current && event.key === 'Escape') {
-              dismiss(fieldHost.current?.querySelector<HTMLElement>('[role="spinbutton"]') ?? null);
-            }
+            // MUI X: Escape in a date section closes the desktop popup and focuses the opener section.
+            if (desktop && live.current && event.key === 'Escape') dismiss();
           }}
         >
           <DateField
@@ -294,11 +311,6 @@ export const DatePickerShell = ({
               }
               if (event.key !== 'Escape') return;
               event.stopPropagation();
-              const host = fieldHost.current;
-              if (host && !host.contains(opener.current)) {
-                // A click on the field's padding can open the calendar before a date section receives focus.
-                opener.current = host.querySelector<HTMLElement>('[role="spinbutton"][tabindex="0"]');
-              }
               dismiss();
             }}
           >
@@ -326,7 +338,7 @@ export const DatePickerShell = ({
                 setKeyboard(false);
                 if (restoreAfterMobileExit.current) {
                   restoreAfterMobileExit.current = false;
-                  firstSection()?.focus();
+                  openerSection()?.focus();
                 }
               }}
             >
