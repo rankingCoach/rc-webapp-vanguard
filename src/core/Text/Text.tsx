@@ -7,7 +7,7 @@ import { translationHelper } from '@helpers/translation-helper';
 import { translationService } from '@services/translation.service';
 import { rcWindow } from '@stores/window.store';
 import { Props } from '@vanguard/Text/Text.types';
-import { LazyAnimatedWords } from '@vanguard/Text/text-animated-words-lazy';
+import { applyWordAnimation } from '@vanguard/Text/text-animate-words-style';
 import { parseFullLinks } from '@vanguard/Text/text-links-parser';
 import { TextWrapBalancer } from '@vanguard/Text/TextWrapBalancer/TextWrapBalancer';
 import parse from 'html-react-parser';
@@ -404,9 +404,7 @@ export const Text = (props: TextProps & Omit<React.HTMLAttributes<HTMLElement>, 
       }
 
       if (!!animateWords) {
-        // Same as applyWordAnimation: only string content animates; react-spring loads lazily.
-        content.children =
-          typeof translated === 'string' ? <LazyAnimatedWords text={translated} animation={animateWords} /> : translated;
+        content.children = applyWordAnimation(translated, animateWords);
       }
 
       return content;
