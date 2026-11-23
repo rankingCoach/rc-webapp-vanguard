@@ -332,6 +332,53 @@ export const DateField = (props: DateFieldProps) => {
         aria-labelledby={label && groupLabel === undefined ? labelId : undefined}
         aria-invalid={Boolean(error)}
         onKeyDown={handleKey}
+        onMouseDown={(event) => {
+          // MUI X useFieldRootProps.handleMouseDown: a primary press inside the field resolves its own section. A
+          // separator or section padding belongs to its section; the field padding and the blank space past the
+          // sections pick the first section unless a section already has focus; a gap between sections picks the
+          // closest one by x.
+          if (disabled || selection === 'all' || event.button !== 0) return;
+          const list = editor.current;
+          const target = event.target as Element;
+          if (!list) return;
+          const inside = list.contains(target);
+          if (
+            !inside &&
+            target !== event.currentTarget &&
+            !target.classList.contains('MuiPickersOutlinedInput-notchedOutline')
+          ) {
+            return;
+          }
+          const section = inside ? target.closest<HTMLElement>('[data-sectionindex]') : null;
+          const spin = (index: number) =>
+            list.querySelector<HTMLElement>(`[data-sectionindex="${index}"] [role="spinbutton"]`);
+          if (section) {
+            if (target.getAttribute('role') === 'spinbutton') return;
+            event.preventDefault();
+            spin(Number(section.dataset.sectionindex))?.focus();
+            return;
+          }
+          const sections = [...list.querySelectorAll<HTMLElement>('[data-sectionindex]')];
+          const first = sections[0]?.getBoundingClientRect();
+          const last = sections[sections.length - 1]?.getBoundingClientRect();
+          const outside = !inside || !first || !last || event.clientX < first.left || event.clientX > last.right;
+          event.preventDefault();
+          if (outside) {
+            if (!list.contains(document.activeElement)) spin(0)?.focus();
+            return;
+          }
+          let closest = 0;
+          let distance = Number.POSITIVE_INFINITY;
+          sections.forEach((element, index) => {
+            const box = element.getBoundingClientRect();
+            const d = Math.min(Math.abs(event.clientX - box.left), Math.abs(event.clientX - box.right));
+            if (d < distance) {
+              distance = d;
+              closest = index;
+            }
+          });
+          spin(closest)?.focus();
+        }}
         onBlur={(event) => {
           const focus = event.currentTarget.ownerDocument.activeElement;
           const movedInside = event.currentTarget.contains(event.relatedTarget);
@@ -403,9 +450,19 @@ export const DateField = (props: DateFieldProps) => {
                 );
               })}
         </div>
+        {/* MUI X order and classes (D2): notched outline, then the hidden input with the outlined alias class. */}
+        <fieldset aria-hidden="true" className="MuiPickersOutlinedInput-notchedOutline" data-notched={hasNotch}>
+          <legend>
+            <span>
+              {label || '\u200b'}
+              {label && required ? '\u2009' : ''}
+              {label && required ? '*' : ''}
+            </span>
+          </legend>
+        </fieldset>
         <input
           type="text"
-          className={pickersInput + 'input'}
+          className={cx(pickersInput + 'input', 'MuiPickersOutlinedInput-input')}
           aria-hidden="true"
           aria-invalid={reportInputValidation ? Boolean(error) : undefined}
           tabIndex={-1}
@@ -422,15 +479,6 @@ export const DateField = (props: DateFieldProps) => {
             }
           }}
         />
-        <fieldset aria-hidden="true" className="MuiPickersOutlinedInput-notchedOutline" data-notched={hasNotch}>
-          <legend>
-            <span>
-              {label || '\u200b'}
-              {label && required ? '\u2009' : ''}
-              {label && required ? '*' : ''}
-            </span>
-          </legend>
-        </fieldset>
       </div>
     </div>
   );
