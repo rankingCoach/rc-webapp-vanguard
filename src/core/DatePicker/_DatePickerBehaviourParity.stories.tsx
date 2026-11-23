@@ -90,7 +90,6 @@ type Step =
   | 'clickAwayButton'
   | 'clickAwayInput'
   | 'clickAwayPlain'
-  | 'twoClicksDay0'
   | 'twoClicksDay120';
 
 // `openFrom`: the section clicked to open the picker; without it the field group is clicked (its centre).
@@ -119,12 +118,13 @@ const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step, 
 
     const outsideInput = canvas.querySelector<HTMLInputElement>('[data-testid="outside-input"]')!;
     outsideInput.value = 'abc';
-    if (step === 'twoClicksDay0' || step === 'twoClicksDay120') {
-      // Two real clicks on the Day section of the closed picker: .472 opens on the first and closes on the second at
-      // every gap (0 = separate clicks, 60/120/200 ms probed). Playwright's atomic `dblClick` is not asserted: on .472 it
-      // completes within one frame, before the popup mounts, so the popup stays open (.472 tooling/timing artifact).
+    if (step === 'twoClicksDay120') {
+      // Two real clicks on the Day section of the closed picker: .472 opens on the first and closes on the second
+      // (60/120/200/300 ms probed). Not asserted, .472 timing artifacts: Playwright's atomic `dblClick` ends within one
+      // frame, before the popup mounts, so the popup stays open; at gap 0 the focus restore races the second mousedown
+      // (V2 saw BODY on .472, this harness Day).
       await userEvent.click(section('Day'));
-      if (step === 'twoClicksDay120') await wait(120);
+      await wait(120);
       await userEvent.click(section('Day'));
     } else {
       // Open as V2 does (a click on the field group), or from a section for the opener-dependent cells.
@@ -208,7 +208,6 @@ const observe = async (canvas: HTMLElement, impl: 'frozen' | 'own', step: Step, 
         // A click-away on a non-interactive element: MUI X returns focus to the opener section.
         await userEvent.click(canvas.querySelector<HTMLElement>('[data-testid="outside-plain"]')!);
         break;
-      case 'twoClicksDay0':
       case 'twoClicksDay120':
         break;
       case 'keyboardYearChoiceNatural': {
@@ -297,5 +296,4 @@ export const LaneMonthMobileCancel = parity('mobileCancel', true, 'Month');
 export const LaneMonthMobileBackdrop = parity('mobileBackdrop', true, 'Month');
 export const LaneMonthMobileEscape = parity('mobileEscape', true, 'Month');
 export const LaneMonthClickAwayPlain = parity('clickAwayPlain', true, 'Month');
-export const LaneTwoClicksDay0 = parity('twoClicksDay0', true);
 export const LaneTwoClicksDay120 = parity('twoClicksDay120', true);
