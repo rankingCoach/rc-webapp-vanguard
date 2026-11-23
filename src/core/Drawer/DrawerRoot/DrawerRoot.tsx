@@ -36,7 +36,7 @@ export const DrawerRoot = (props: DrawerRootProps) => {
     /**
      * Open Drawer
      */
-    pubSubService.$sub(
+    const openSubscription = pubSubService.$sub(
       PUB_SUB_EVENTS.reactDrawerOpen,
       ({ component, options, id }: { component: any; options?: DrawerProps; id: string }) => {
         // If a previous drawer is still registered (e.g. open→open without close),
@@ -58,12 +58,20 @@ export const DrawerRoot = (props: DrawerRootProps) => {
     /**
      * Close Drawer
      */
-    pubSubService.$sub(PUB_SUB_EVENTS.reactDrawerClose, ({ id }) => {
+    const closeSubscription = pubSubService.$sub(PUB_SUB_EVENTS.reactDrawerClose, ({ id }) => {
       if (id !== activeDrawerId.current) return;
       OverlayStackingService.unregister(id);
       activeDrawerId.current = null;
       setIsDrawerOpen(false);
     });
+
+    return () => {
+      openSubscription.unsubscribe();
+      closeSubscription.unsubscribe();
+      // Unmounted while a drawer is open: free its stacking slot.
+      if (activeDrawerId.current) OverlayStackingService.unregister(activeDrawerId.current);
+      activeDrawerId.current = null;
+    };
   }, []);
 
   // Caller-supplied zIndex in drawerProps still wins — only inject ours when

@@ -68,7 +68,7 @@ class PubSubService implements IPubSubService {
     }
 
     if (this.events[event] === undefined) {
-      this.events[event] = new ReplaySubject<any>();
+      this.events[event] = new ReplaySubject<any>(REPLAY_LIMIT[event] ?? Number.POSITIVE_INFINITY);
     }
 
     if (typeof callback !== 'function') {
@@ -132,3 +132,13 @@ export enum PUB_SUB_EVENTS {
   reactDrawerOpen = 'REACT_DRAWER_OPEN',
   reactDrawerClose = 'REACT_DRAWER_CLOSE',
 }
+
+/**
+ * Channels whose history would otherwise grow for the app's lifetime. Drawer opens carry the drawer's React element;
+ * a late subscriber only needs the latest open and the latest close to converge (DrawerRoot ignores a close for
+ * another drawer). Every other channel keeps its full replay.
+ */
+const REPLAY_LIMIT: Partial<Record<string, number>> = {
+  [PUB_SUB_EVENTS.reactDrawerOpen]: 1,
+  [PUB_SUB_EVENTS.reactDrawerClose]: 1,
+};
