@@ -6,8 +6,8 @@ import { Text } from './Text';
 
 /**
  * Word animation must start on the first commit, as on .472: the spans rendered first are the spans that fade in,
- * and the fade settles inside the animation's own window. A Suspense fallback (replaced spans after React's 300 ms
- * fallback throttle) is a visible regression (watchdog FINDING 3, B's paired WordPress smoke).
+ * and the fade settles inside the animation's own window. A Suspense fallback (first-commit spans replaced by new
+ * spans and a later fade start; over a real network the chunk fetch adds more) is a visible regression (FINDING 3).
  */
 const words = (root: HTMLElement) => Array.from(root.querySelectorAll<HTMLElement>(':scope > span'));
 const frame = (spans: HTMLElement[]) => spans.map((span) => [span.style.opacity, span.style.transform]);
