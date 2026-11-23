@@ -24,10 +24,6 @@ const Host = () => {
   showImpl = setImpl;
   return (
     <div style={{ padding: 24, width: 360 }}>
-      <span
-        data-pointer-park-end=""
-        style={{ position: 'fixed', right: 0, bottom: 0, width: 4, height: 4, zIndex: 2147483647 }}
-      />
       {impl === 'reference' ? (
         <DateFieldReference locale="en" format="DD.MM.YYYY" label="Date" value={value} />
       ) : impl === 'own' ? (
@@ -73,9 +69,6 @@ const parity = (target: Target): Story => ({
   play: async ({ canvasElement }) => {
     const reference = await observe(canvasElement, 'reference', target);
     const own = await observe(canvasElement, 'own', target);
-    // Leave the real pointer on a corner no story renders in, so the next story's rest-state reads see no :hover
-    // (the top-left is where most parity panes sit).
-    await userEvent.hover(canvasElement.querySelector<HTMLElement>('[data-pointer-park-end]')!);
     await expect({ target, own }).toEqual({ target, own: reference });
   },
 });

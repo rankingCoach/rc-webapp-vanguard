@@ -29,10 +29,6 @@ const Host = () => {
   const Impl = impl === 'frozen' ? FrozenDatePicker : DatePicker;
   return (
     <div style={{ padding: 24 }}>
-      <span
-        data-pointer-park-end=""
-        style={{ position: 'fixed', right: 0, bottom: 0, width: 4, height: 4, zIndex: 2147483647 }}
-      />
       <button type="button" data-testid="outside">
         outside
       </button>
@@ -207,9 +203,6 @@ const parity = (step: Step, v2Lane = false): Story => ({
     fixture = v2Lane ? { value: Date.UTC(2026, 0, 15), locale: 'en' } : { value: initial, locale: 'en_US' };
     const frozen = await observe(canvasElement, 'frozen', step);
     const own = await observe(canvasElement, 'own', step);
-    // Leave the real pointer on a corner no story renders in, so the next story's rest-state reads see no :hover
-    // (the top-left is where most parity panes sit).
-    await userEvent.hover(canvasElement.querySelector<HTMLElement>('[data-pointer-park-end]')!);
     await expect({ step, own }).toEqual({ step, own: frozen });
   },
 });
