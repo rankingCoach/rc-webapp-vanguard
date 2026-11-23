@@ -12,6 +12,27 @@ import React, { type ComponentType, Suspense } from 'react';
 const registry: (() => Promise<void>)[] = [];
 
 type FallbackModule<P> = { default: ComponentType<P> };
+type FallbackRoute<P> = {
+  readLoaded: () => ComponentType<P> | null;
+  preload: () => Promise<void>;
+};
+
+function renderInner<P extends object>(route: FallbackRoute<P>, props: P) {
+  const Loaded = route.readLoaded();
+  if (Loaded) return <Loaded {...props} />;
+  throw route.preload();
+}
+
+function renderFallback<P extends object>(route: FallbackRoute<P>, Inner: ComponentType<P>, props: P) {
+  const Loaded = route.readLoaded();
+  return Loaded ? (
+    <Loaded {...props} />
+  ) : (
+    <Suspense fallback={null}>
+      <Inner {...props} />
+    </Suspense>
+  );
+}
 
 /**
  * `load` is the lazy loader (`() => import('./XFallback')`). The WordPress build passes the module itself instead
@@ -29,19 +50,9 @@ export const lazyFallback = <P extends object>(load: (() => Promise<FallbackModu
     return pending;
   };
   registry.push(preload);
-  const Inner = (props: P) => {
-    if (Loaded) return <Loaded {...props} />;
-    throw preload();
-  };
-  const Fallback = (props: P) =>
-    Loaded ? (
-      <Loaded {...props} />
-    ) : (
-      <Suspense fallback={null}>
-        <Inner {...props} />
-      </Suspense>
-    );
-  return Fallback;
+  const route = { readLoaded: () => Loaded, preload };
+  const Inner = (renderInner<P>).bind(null, route);
+  return (renderFallback<P>).bind(null, route, Inner);
 };
 
 export const preloadMuiFallbacks = () => Promise.all(registry.map((preload) => preload()));

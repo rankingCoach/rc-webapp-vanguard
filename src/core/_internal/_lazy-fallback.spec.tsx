@@ -1,7 +1,9 @@
 import { act, render } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { lazyFallback } from './lazy-fallback';
+
+const SharedFallback = ({ label }: { label: string }) => <span>{label}</span>;
 
 /**
  * Plan §36.2 B.3 lazy boundary: before the module loads the first render suspends (renders nothing) and the content
@@ -41,5 +43,36 @@ describe('lazyFallback', () => {
     const Fallback = lazyFallback({ default: ({ label }: { label: string }) => <i>{label}</i> });
     const view = render(<Fallback label="inline" />);
     expect(view.container.innerHTML).toBe('<i>inline</i>');
+  });
+
+  it('deduplicates cold mounts and keeps distinct routes stable on the warm branch', async () => {
+    const module = { default: SharedFallback };
+    let resolve!: (value: typeof module) => void;
+    const pending = new Promise<typeof module>((done) => {
+      resolve = done;
+    });
+    const load = vi.fn(() => pending);
+    const Route = lazyFallback(load);
+    const OtherRoute = lazyFallback(module);
+    const view = render(
+      <>
+        <Route label="First cold" />
+        <Route label="Second cold" />
+      </>,
+    );
+    expect(view.container.textContent).toBe('');
+    expect(load).toHaveBeenCalledTimes(1);
+    await act(async () => resolve(module));
+    expect(view.container.textContent).toBe('First coldSecond cold');
+
+    // Establish the direct loaded branch before taking a node identity witness.
+    view.rerender(<Route label="Warm" />);
+    const warmNode = view.getByText('Warm');
+    view.rerender(<Route label="Still warm" />);
+    expect(view.getByText('Still warm')).toBe(warmNode);
+
+    view.rerender(<OtherRoute label="Other route" />);
+    expect(view.getByText('Other route')).not.toBe(warmNode);
+    expect(load).toHaveBeenCalledTimes(1);
   });
 });
