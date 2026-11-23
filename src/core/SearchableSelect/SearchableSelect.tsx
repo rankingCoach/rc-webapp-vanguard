@@ -1,6 +1,7 @@
 import './SearchableSelect.scss';
 
 import { classNames } from '@helpers/classNames';
+import { parseColor } from '@helpers/color-helpers';
 import { uuidv4 } from '@helpers/generate-uid';
 import createFuzzer from '@nozbe/microfuzz';
 import { InputBase } from '@vanguard/_internal/InputBase/InputBase';
@@ -34,6 +35,9 @@ export interface SearchableSelectProps<T extends string, O extends SelectOptionP
  */
 
 const DEFAULT_SEARCHABLE_PROPS: any[] = ['title'];
+// Preserve the existing 16 × 16 caret paths while updating one mounted glyph in the open commit.
+const CARET_UP = 'M3 9.29163L4.41667 10.7083L8 7.12496L11.5833 10.7083L13 9.29163L8 4.29163L3 9.29163Z';
+const CARET_DOWN = 'M3 6.70829L8 11.7083L13 6.70829L11.5833 5.29163L8 8.87496L4.41667 5.29163L3 6.70829Z';
 
 export const SearchableSelect = <T extends string, O extends SelectOptionProp<T> = SelectOptionProp<T>>(
   props: SearchableSelectProps<T, O>,
@@ -95,11 +99,37 @@ export const SearchableSelect = <T extends string, O extends SelectOptionProp<T>
     setDisplayedOptions(filteredOptions);
   }, [searchText, options, search]);
 
+  const caretColor = parseColor('--n400');
   const endAdornment = (
     <InputAdornment position="end">
-      <Icon color={'--n400'} type={IconSize.small}>
-        {isOpen ? IconNames.caretUp : IconNames.caretDown}
-      </Icon>
+      <span
+        data-slot="icon"
+        data-icon={isOpen ? IconNames.caretUp : IconNames.caretDown}
+        data-size={IconSize.small}
+        style={{ display: 'flex', flexShrink: 0 }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          role="figure"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          color={caretColor}
+          className="vg-styled-svg vg-styled-svg--size vg-styled-svg--fill vg-styled-svg--hover-fill"
+          data-testid=""
+          {...{ hovercolor: caretColor, testid: '' }}
+          style={
+            {
+              '--vg-svg-size': '16px',
+              '--vg-svg-fill': caretColor,
+              '--vg-svg-hover-fill': caretColor,
+            } as React.CSSProperties
+          }
+        >
+          <path fill="#2A3546" d={isOpen ? CARET_UP : CARET_DOWN} />
+        </svg>
+      </span>
     </InputAdornment>
   );
   const start = startAdornment && (
