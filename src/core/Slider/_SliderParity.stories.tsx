@@ -122,8 +122,26 @@ const diff = (own: unknown, mui: unknown) => {
     .map((k) => `${k}: own=${a[k]} mui=${b[k]}`);
 };
 
+// A real-pointer story elsewhere (vitest/browser page/userEvent) can leave the Playwright mouse over a pane, which
+// gives it a real :hover. Park the pointer on a fixed, topmost element outside every pane before rest-state reads.
+const PointerPark = () => (
+  <div
+    data-pointer-park=""
+    aria-hidden
+    style={{ position: 'fixed', top: 0, left: 0, width: 4, height: 4, zIndex: 2147483647 }}
+  />
+);
+const parkPointer = async (canvas: HTMLElement) => {
+  const park = canvas.querySelector<HTMLElement>('[data-pointer-park]');
+  if (!park) throw new Error('Missing pointer park');
+  // Outside the Vitest browser runner (plain Storybook) there is no carried-over real pointer to reset.
+  const browser = await import('vitest/browser').catch(() => undefined);
+  await browser?.userEvent.hover(park);
+};
+
 const Grid = () => (
   <div style={{ width: 360, padding: '40px 20px' }}>
+    <PointerPark />
     {Object.entries(CASES).map(([name, p]) =>
       (['mui', 'own'] as const).map((impl) => {
         const C = impl === 'mui' ? SliderMui : Slider;
@@ -151,6 +169,7 @@ const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
         }),
       );
   };
+  await parkPointer(canvasElement);
   await settle();
   await compare('rest');
 
@@ -227,6 +246,7 @@ const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     await expect((snap.mui as { cls: string }[]).some((m) => m.cls.includes('Mui-active'))).toBe(true);
     await expect({ name, diffs: diff(snap.own, snap.mui) }).toEqual({ name, diffs: [] });
   }
+  await parkPointer(canvasElement);
   await compare('released');
 };
 

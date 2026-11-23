@@ -87,9 +87,27 @@ function readField(field: Element) {
   };
 }
 
+// A real-pointer story elsewhere (vitest/browser page/userEvent) can leave the Playwright mouse over a pane, which
+// gives it a real :hover. Park the pointer on a fixed, topmost element outside every pane before rest-state reads.
+const PointerPark = () => (
+  <div
+    data-pointer-park=""
+    aria-hidden
+    style={{ position: 'fixed', top: 0, left: 0, width: 4, height: 4, zIndex: 2147483647 }}
+  />
+);
+const parkPointer = async (canvas: HTMLElement) => {
+  const park = canvas.querySelector<HTMLElement>('[data-pointer-park]');
+  if (!park) throw new Error('Missing pointer park');
+  // Outside the Vitest browser runner (plain Storybook) there is no carried-over real pointer to reset.
+  const browser = await import('vitest/browser').catch(() => undefined);
+  await browser?.userEvent.hover(park);
+};
+
 function Pairs({ state }: { state: FieldState }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <PointerPark />
       {sizes.map((size, index) => (
         <React.Fragment key={size ?? 'default'}>
           <Field reference id={`ref-${index}`} index={index} state={state} />
@@ -112,6 +130,7 @@ export const LabelNotchAndPopup: StoryObj<typeof OwnAutocomplete> = {
   play: async ({ canvasElement }) => {
     await document.fonts.ready;
     for (const [index] of sizes.entries()) {
+      await parkPointer(canvasElement);
       const pair = panes(canvasElement, index);
       const resting = pair.map((pane) => readField(pane).styles);
       expect(resting[0].labelShrink).toBe('true');
@@ -131,6 +150,7 @@ export const LabelNotchAndPopup: StoryObj<typeof OwnAutocomplete> = {
         );
         await userEvent.keyboard('{Escape}');
         input.blur();
+        await parkPointer(canvasElement);
       }
       expect(focused[1]).toEqual(focused[0]);
     }
@@ -142,6 +162,7 @@ export const AutofillLabelAndNotch: StoryObj<typeof OwnAutocomplete> = {
   play: async ({ canvasElement }) => {
     await document.fonts.ready;
     for (const [index] of sizes.entries()) {
+      await parkPointer(canvasElement);
       const [reference, candidate] = panes(canvasElement, index);
       expect(readField(reference).styles.labelShrink).toBe('false');
       expect(readField(candidate).styles).toEqual(readField(reference).styles);
@@ -153,17 +174,23 @@ export const AutofillLabelAndNotch: StoryObj<typeof OwnAutocomplete> = {
           // Exercise MUI's browser-autofill signal without supplying credentials or depending on Chromium autofill.
           readField(pane).input.dispatchEvent(new AnimationEvent('animationstart', { animationName, bubbles: true }));
         }
-        await waitFor(() => {
-          const before = readField(reference).styles;
-          expect(before.labelShrink).toBe(shrink);
-          expect(readField(candidate).styles).toEqual(before);
-        });
+        // Explicit ceiling: the frozen reference rarely takes over 1 s to apply the autofill shrink (pre-existing; 0/20
+        // vs 0/20 runs, medians 136.5/137 ms on rc1 and H24). Same wait and the same assertions for both panes.
+        await waitFor(
+          () => {
+            const before = readField(reference).styles;
+            expect(before.labelShrink).toBe(shrink);
+            expect(readField(candidate).styles).toEqual(before);
+          },
+          { timeout: 3000 },
+        );
       }
     }
   },
 };
 
-function checkRestingState(canvas: HTMLElement, state: 'disabled' | 'error') {
+async function checkRestingState(canvas: HTMLElement, state: 'disabled' | 'error') {
+  await parkPointer(canvas);
   for (const [index] of sizes.entries()) {
     const [reference, candidate] = panes(canvas, index);
     const before = readField(reference).styles;
@@ -177,7 +204,7 @@ export const DisabledField: StoryObj<typeof OwnAutocomplete> = {
   render: () => <Pairs state="disabled" />,
   play: async ({ canvasElement }) => {
     await document.fonts.ready;
-    checkRestingState(canvasElement, 'disabled');
+    await checkRestingState(canvasElement, 'disabled');
   },
 };
 
@@ -185,6 +212,6 @@ export const ErrorField: StoryObj<typeof OwnAutocomplete> = {
   render: () => <Pairs state="error" />,
   play: async ({ canvasElement }) => {
     await document.fonts.ready;
-    checkRestingState(canvasElement, 'error');
+    await checkRestingState(canvasElement, 'error');
   },
 };
