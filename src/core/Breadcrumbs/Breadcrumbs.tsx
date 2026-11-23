@@ -50,6 +50,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const allItems = React.Children.toArray(children)
     .filter((child) => React.isValidElement(child))
     .map((child, index) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: positional key, parity with @mui/material 9.5.0 Breadcrumbs (`child-${index}`); a semantic key changes focus on insert (BC1)
       <li data-vg-core="" data-slot={'breadcrumbs-item'} className={'MuiBreadcrumbs-li'} key={`child-${index}`}>
         {child}
       </li>
@@ -99,6 +100,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
           data-slot={'breadcrumbs-separator'}
           aria-hidden={true}
           className={'MuiBreadcrumbs-separator'}
+          // biome-ignore lint/suspicious/noArrayIndexKey: positional key, parity with @mui/material 9.5.0 Breadcrumbs (`separator-${index}`); aria-hidden separator, no item identity
           key={`separator-${index}`}
         >
           {separator}

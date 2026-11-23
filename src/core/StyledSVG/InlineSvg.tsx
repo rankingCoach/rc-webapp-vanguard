@@ -142,6 +142,7 @@ function ReactInlineSVG(props: Props) {
   }, []);
 
   // Run on mount
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mount-only lifetime; src/handleError/status would re-run setup, swap in the no-op cleanup and lose the late-unmount guard (see _InlineSvg.lifecycle.spec.tsx T2/T3)
   useEffect(
     () => {
       isActive.current = true;

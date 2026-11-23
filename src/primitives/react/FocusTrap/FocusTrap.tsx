@@ -149,6 +149,7 @@ export function FocusTrap(props: FocusTrapProps) {
     activated.current = !disableAutoFocus;
   }, [disableAutoFocus, open]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: parity with @mui/material 9.5.0 FocusTrap; restore policy is read at close, changing disableRestoreFocus while open is unsupported
   React.useEffect(() => {
     // Strict Mode replays this effect after its cleanup has set this flag.
     ignoreNextEnforceFocus.current = false;
@@ -172,6 +173,7 @@ export function FocusTrap(props: FocusTrapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: parity with @mui/material 9.5.0 FocusTrap; these toggles re-arm containment listeners (pruning changes recovery timing; B log "FocusTrap dependency lifetimes")
   React.useEffect(() => {
     if (!open || !rootRef.current) return;
     const doc = rootRef.current.ownerDocument;

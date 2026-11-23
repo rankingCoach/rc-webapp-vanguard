@@ -109,6 +109,7 @@ export const DateField = (props: DateFieldProps) => {
     }
   }, [error, onError, value]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: parts re-selects the active section after each committed edit (pruning loses the native Range; B log "DateField parts commit")
   useLayoutEffect(() => {
     if (!selected || selection === null) return;
     const enabler = editor.current;

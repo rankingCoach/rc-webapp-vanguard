@@ -206,6 +206,7 @@ const OwnSlider = (props: OwnSliderProps) => {
             ? mark.value >= s.values[0] && mark.value <= s.values[s.values.length - 1]
             : mark.value <= s.values[0];
           return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: positional key, parity with @mui/material 9.5.0 Slider marks; data-index pairs mark and label (SL3)
             <React.Fragment key={index}>
               <span
                 data-index={index}
@@ -238,6 +239,7 @@ const OwnSlider = (props: OwnSliderProps) => {
         const open = s.open === index || s.active === index || valueLabelDisplay === 'on';
         return (
           <span
+            // biome-ignore lint/suspicious/noArrayIndexKey: thumb identity is its sorted rank (data-index, focusThumb), parity with @mui/material 9.5.0; a value key remounts the input on every step (SL1)
             key={index}
             data-index={index}
             data-vg-core=""

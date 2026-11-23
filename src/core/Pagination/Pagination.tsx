@@ -198,6 +198,7 @@ export const Pagination = (props: PaginationProps) => {
           const label = ariaLabel(item.type, item.page, item.selected);
           if (item.type === 'start-ellipsis' || item.type === 'end-ellipsis')
             return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: positional key, parity with @mui/material 9.5.0 Pagination; a semantic key changes the focus target (PG1)
               <li key={index}>
                 <div data-vg-core="" data-slot={'pagination-ellipsis'} className={cx(...itemClasses(item))}>
                   …
@@ -206,6 +207,7 @@ export const Pagination = (props: PaginationProps) => {
             );
           const icon = ICONS[item.type];
           return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: positional key, parity with @mui/material 9.5.0 Pagination; a semantic key changes the focus target (PG1)
             <li key={index}>
               <ButtonBase
                 data-vg-core=""

@@ -156,6 +156,7 @@ export const DateCalendar = ({
     return () => window.clearTimeout(timeout);
   }, [slide]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dayFocus/yearFocus rearm the focus transfer on every cursor move (pruning loses grid focus; B log "DateCalendar day/year roving-focus rearm")
   useLayoutEffect(() => {
     if (!focusGrid || slide) return;
     const focused =

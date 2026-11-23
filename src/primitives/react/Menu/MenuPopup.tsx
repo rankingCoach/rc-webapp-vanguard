@@ -91,6 +91,7 @@ export const MenuPopup = (props: MenuPopupProps) => {
   }, [anchorEl, anchorOrigin, transformOrigin, marginThreshold]);
 
   // Enter: position, then run the Grow transition from the hidden state.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: paperNode rearms position + Grow when the paper attaches after open (pruning skips the enter on delayed attach; B log "MenuPopup committed paper")
   useLayoutEffect(() => {
     const paper = paperRef.current;
     if (!open || !paper) return;
