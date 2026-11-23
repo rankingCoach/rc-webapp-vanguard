@@ -173,7 +173,7 @@ function ReactInlineSVG(props: Props) {
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [load],
   );
 
   // Handle prop changes
