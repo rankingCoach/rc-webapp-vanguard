@@ -8,7 +8,7 @@ A comprehensive React component library optimized for performance and flexibilit
 
 ```bash
 # Install the library
-npm install vanguard
+npm install @rankingcoach/vanguard
 
 # Build the library
 npm run build-lib
@@ -208,14 +208,10 @@ npx vanguard build
 ## 📋 Important Notes
 
 ### Redux Dependencies
-It is very important that consuming projects use the correct versions of Redux and Redux Toolkit. Make sure they match the versions in this package.json. Updates should happen at the same time.
+`@reduxjs/toolkit` (>=1.7.1) and `react-redux` (>=7.2.6) are peer dependencies (see `peerDependencies` in package.json); the packed fixture is verified with `@reduxjs/toolkit` 2.13.0 and `react-redux` 9.3.1. Forms built on `useFormStore` need no Redux store or Provider; the legacy `useFormConfig` path needs `react-redux`.
 
 ### Automatic Build Process
-Vanguard uses a smart postinstall build system:
-- **Development Environment**: Skips postinstall build (uses `prepare` script)
-- **Production Installation**: Builds automatically
-- **Missing Dependencies**: Gracefully skips build if dev dependencies unavailable
-- **Up-to-date Check**: Skips build if distribution files are current
+The package ships prebuilt (`dist/`, `dist-wordpress/`). Its `postinstall` only runs `scripts/clean-assets-based-on-vanguardrc.js`: it removes asset categories excluded by the consumer's `.vanguardrc` and, in `"mode": "wordpress"`, replaces `dist` with `dist-wordpress`. It does not build.
 
 ### Backward Compatibility
 - All existing code continues to work without changes

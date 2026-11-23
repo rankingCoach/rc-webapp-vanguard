@@ -35,6 +35,7 @@ export const parseEntryExports = (file) => {
     }
   }
   for (const m of src.matchAll(/export\s+(?:const|function|class)\s+([A-Za-z0-9_$]+)/g)) names.add(m[1]);
+  for (const m of src.matchAll(/export\s*\*\s*as\s+([A-Za-z0-9_$]+)\s+from/g)) names.add(m[1]);
   return names;
 };
 
@@ -53,17 +54,28 @@ export const shortType = (t) => {
 const SLOT_RE = /data-slot=(?:\{\s*)?['"`]([a-z0-9-]+)['"`]/g;
 const STATE_RE = /\b(data-(?!slot\b|testid\b)[a-z][a-z0-9-]*)=/g;
 
-/** data-slot values and state attributes in a source file and in the src/primitives files it imports directly. */
+/**
+ * data-slot values and state attributes in a source file, in the same-folder files it imports or re-exports (its own
+ * parts, e.g. DatePicker → DatePickerShell → DateField / DateCalendar), and in the src/primitives files those import.
+ */
+const resolveSource = (from, spec) => {
+  const base = path.resolve(path.dirname(from), spec);
+  for (const ext of ['.tsx', '.ts', '/index.tsx', '/index.ts']) if (fs.existsSync(base + ext)) return base + ext;
+  return null;
+};
 export const scrapeSlots = (file) => {
   const files = [file];
-  const src = read(file);
-  for (const m of src.matchAll(/from\s+['"]([^'"]*primitives\/[^'"]+)['"]/g)) {
-    const base = path.resolve(path.dirname(file), m[1]);
-    for (const ext of ['.tsx', '.ts', '/index.tsx', '/index.ts']) {
-      if (fs.existsSync(base + ext)) {
-        files.push(base + ext);
-        break;
-      }
+  const dir = path.dirname(file);
+  for (let i = 0; i < files.length; i++) {
+    const src = read(files[i]);
+    for (const m of src.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+      const spec = m[1];
+      const sameFolder = spec.startsWith('./') && !spec.slice(2).includes('/');
+      if (!sameFolder && !/primitives\//.test(spec)) continue;
+      const target = resolveSource(files[i], spec);
+      if (!target || files.includes(target) || /\.(spec|stories|story|test)\.|\.reference\.|Fallback\./.test(target)) continue;
+      if (sameFolder && path.dirname(target) !== dir) continue;
+      files.push(target);
     }
   }
   const slots = new Set();
@@ -86,7 +98,9 @@ const prodFiles = (dir) =>
 const usesMui = (file) => {
   const dir = path.dirname(file);
   if (!dir.includes(`${path.sep}src${path.sep}core${path.sep}`) && !dir.includes(`${path.sep}src${path.sep}common${path.sep}`)) return false;
-  return prodFiles(dir).some((f) => /from\s+['"]@mui\//.test(read(f)));
+  return prodFiles(dir)
+    .filter((f) => !/(^|[\\/])_[^\\/]*\.reference\.tsx?$|mui-reference\.tsx?$|Fallback\.tsx?$/.test(f))
+    .some((f) => /^\s*import\s+(?!type\b)[^;]*from\s+['"]@mui\//m.test(read(f)));
 };
 
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
@@ -256,6 +270,17 @@ const MUI_NOTES = {
   ToggleButtonGroup: null,
   PopoverPopper: 'Positioning: own core (own Popper). The surrounding popper shell: pending rebuild (MUI).',
   MenuItem: 'Inside Select and Menu it renders the own-core menu option; standalone rendering: pending rebuild (MUI).',
+  Autocomplete:
+    'Own core for the props Vanguard and rc-webapp pass. Consumer `slots`, `slotProps`, `componentsProps`, `sx`, `ListboxProps`, `ListboxComponent`, `ChipProps`, `PaperComponent`, `PopperComponent` or `renderGroup`: MUI Autocomplete route (pending rebuild).',
+  Menu: 'Own core for the modelled props, slots and items. Right-to-left, unmodelled props or slots, or function slot props: MUI Menu route (pending rebuild).',
+  ProgressBar: '`determinate` and `indeterminate`: own core. `buffer` and `query`: MUI LinearProgress route (pending rebuild).',
+  AppBar: 'Own core for the modelled props (the Navbar shape). Other props (e.g. `sx`, `component`, `classes`): MUI AppBar route (pending rebuild).',
+  Toolbar: 'Own core for the modelled props. Other props (e.g. `sx`, `component`, `classes`): MUI Toolbar route (pending rebuild).',
+  Snackbar: 'Own core for the modelled props. Any other prop: MUI Snackbar route (pending rebuild).',
+  Popover: 'Own core, including positioning. Popper options the own Popper does not support, `slots` or `component`: MUI Popper route (pending rebuild).',
+  InputBase:
+    'Outlined text and select fields: own core, including a custom `inputComponent`. Filled/standard variants, a native select, MUI `classes`/`slots`/`sx`/`inputProps` on the input, or function-valued slot props: MUI TextField route (pending rebuild).',
+  FormControl: 'Renders MUI FormControl through a lazy fallback; not exported by the WordPress entry. The own port is pending rebuild.',
 };
 
 const kindOf = (r) => {
@@ -367,29 +392,95 @@ Vanguard's CSS decides equal-specificity ties by position. Keep the head order: 
 ## Components, hooks and helpers
 `;
 
-export const buildLlms = (records, wordpress) => {
+/**
+ * Root exports the props extractor yields no record for (a namespace re-export, a value declared in the entry file).
+ * Each gets a hand-described page so every runtime export is documented; anything else missing is listed in
+ * llms.txt under "No page" and warned about at build time.
+ */
+const styleMembers = () => {
+  const src = read(path.join(ROOT, 'src', 'styles', 'general.module.tsx'));
+  const block = src.match(/export const \{([^}]*)\}/);
+  return block ? block[1].split(',').map((x) => x.trim()).filter(Boolean) : [];
+};
+export const SPECIAL_PAGES = {
+  VanguardStyle: {
+    summary: 'Namespace of the shared utility class names (layout, spacing, alignment) from the global stylesheet.',
+    page: (wp) => {
+      const members = styleMembers();
+      return [
+        '# VanguardStyle',
+        '',
+        'Namespace of the shared utility class names from the global stylesheet (`src/styles/general.module.scss`). Each member is a CSS-module class name string, applied with `className`.',
+        '',
+        '- Kind: value (namespace)',
+        `- Import: \`import { VanguardStyle } from '${PKG}';\``,
+        `- WordPress bundle: ${wp ? 'yes' : 'no'}`,
+        '',
+        '## Usage',
+        '',
+        '```tsx',
+        `import { VanguardStyle } from '${PKG}';`,
+        '',
+        '<div className={VanguardStyle.alignContentCenter} />',
+        '```',
+        '',
+        `## Members (${members.length})`,
+        '',
+        members.map((m) => `\`${m}\``).join(', '),
+        '',
+      ].join('\n');
+    },
+  },
+  lottieAnimation: {
+    summary: "Deprecated placeholder (the empty string), kept only so existing imports compile; use LottieAnimationLoader.",
+    page: (wp) =>
+      [
+        '# lottieAnimation',
+        '',
+        "Deprecated placeholder: its value is the empty string `''`. It exists only so existing imports keep compiling. It is not an animation and not an asset; passed as an image URL it draws nothing. For animations use `LottieAnimationLoader`.",
+        '',
+        '- Kind: value (deprecated)',
+        `- Import: \`import { lottieAnimation } from '${PKG}';\``,
+        `- WordPress bundle: ${wp ? 'yes' : 'no'}`,
+        '',
+      ].join('\n'),
+  },
+};
+
+export const buildLlms = (records, wordpress, special = [], noPage = []) => {
   const groups = { component: [], hook: [], helper: [] };
   for (const r of records) {
     const meta = loadMeta(r.name);
     const wp = wordpress.has(r.name) ? ' (WordPress)' : '';
     groups[kindOf(r)].push(`- [${r.name}](components/${r.name}.md)${wp}${meta?.summary ? `: ${esc(meta.summary)}` : ''}`);
   }
+  for (const name of special) {
+    const wp = wordpress.has(name) ? ' (WordPress)' : '';
+    groups.helper.push(`- [${name}](components/${name}.md)${wp}: ${esc(SPECIAL_PAGES[name].summary)}`);
+  }
   const out = [LLMS_HEAD];
   for (const [title, key] of [['Components', 'component'], ['Hooks', 'hook'], ['Helpers and values', 'helper']]) {
     out.push(`### ${title}`, '', ...groups[key].sort((a, b) => a.localeCompare(b)), '');
   }
+  if (noPage.length) out.push('### No page', '', ...noPage.sort().map((n) => `- \`${n}\`: exported, not documented yet`), '');
   return `${out.join('\n').trimEnd()}\n`;
 };
 
 export const generate = (outDir) => {
   const { main } = require('./generate-exports-props.js');
-  const names = [...parseEntryExports(path.join(ROOT, 'src', 'index.ts'))].sort();
+  const all = [...parseEntryExports(path.join(ROOT, 'src', 'index.ts'))].sort();
+  const special = all.filter((n) => Object.hasOwn(SPECIAL_PAGES, n));
+  const names = all.filter((n) => !special.includes(n));
   const records = main({ write: false, quiet: true, names }).sort((a, b) => a.name.localeCompare(b.name));
   const wordpress = parseEntryExports(path.join(ROOT, 'src', 'index-wordpress.ts'));
   const pages = buildPages(records, wordpress);
+  for (const name of special) pages.set(name, SPECIAL_PAGES[name].page(wordpress.has(name)));
+  const recorded = new Set(records.map((r) => r.name));
+  const noPage = names.filter((n) => !recorded.has(n));
+  if (noPage.length) console.warn(`[generate-agent-docs] exported without a page: ${noPage.join(', ')}`);
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(path.join(outDir, 'components'), { recursive: true });
-  fs.writeFileSync(path.join(outDir, 'llms.txt'), buildLlms(records, wordpress));
+  fs.writeFileSync(path.join(outDir, 'llms.txt'), buildLlms(records, wordpress, special, noPage));
   for (const [name, md] of pages) fs.writeFileSync(path.join(outDir, 'components', `${name}.md`), md);
   return { count: pages.size, sources: Object.fromEntries(records.map((r) => [r.name, r.from])) };
 };
