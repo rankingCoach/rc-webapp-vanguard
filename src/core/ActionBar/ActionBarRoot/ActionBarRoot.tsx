@@ -19,7 +19,7 @@ export const ActionBarRoot = () => {
    * Events
    */
   useEffect(() => {
-    pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarAddMessage, ({ id, priority, props }) => {
+    const addMessageSubscription = pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarAddMessage, ({ id, priority, props }) => {
       const newStack = { ...stack };
       newStack[id as string] = {
         priority: priority as number,
@@ -29,7 +29,7 @@ export const ActionBarRoot = () => {
       setStack(newStack);
     });
 
-    pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarRemoveMessage, ({ id }) => {
+    const removeMessageSubscription = pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarRemoveMessage, ({ id }) => {
       const item = stack[id];
       if (item !== undefined) {
         const newStack = stack;
@@ -43,7 +43,7 @@ export const ActionBarRoot = () => {
       }
     });
 
-    pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarSetFooter, ({ actionBarProps, priority }) => {
+    const setFooterSubscription = pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarSetFooter, ({ actionBarProps, priority }) => {
       const newStack = { ...stack };
       newStack['ACTION_BAR_FOOTER'] = {
         priority: priority || 100,
@@ -53,11 +53,18 @@ export const ActionBarRoot = () => {
       setStack(newStack);
     });
 
-    pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarHideFooter, () => {
+    const hideFooterSubscription = pubSubService.$sub(PUB_SUB_EVENTS.reactActionBarHideFooter, () => {
       const newStack = { ...stack };
       delete newStack['ACTION_BAR_FOOTER'];
       setStack(newStack);
     });
+
+    return () => {
+      addMessageSubscription.unsubscribe();
+      removeMessageSubscription.unsubscribe();
+      setFooterSubscription.unsubscribe();
+      hideFooterSubscription.unsubscribe();
+    };
   }, []);
 
   /**
