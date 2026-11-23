@@ -848,8 +848,10 @@ Textarea. The same curve occurs in a bare browser textarea. Undo/Redo behavior i
    wanted: enqueue `vanguard.css` with the theme stylesheet as a dependency (or at a later priority). RISK LOGGED.
 
 4. **DatePicker date format per locale (watchdog decision A, 2026-11-19; pre-existing, not changed).**
-   rc-webapp passes dash locales (`localeFormatted`), but `getDatePatternFromLocale` is keyed by underscores, so
-   every DatePicker shows DD.MM.YYYY and logs a console.error. Fixing the lookup (accepting `-`) would show:
+   The four older rc-webapp DatePicker files pass dash locales. With underscore keys in `getDatePatternFromLocale`,
+   those seven sites show DD.MM.YYYY and log a console.error. The composed widget normalizes its locale before
+   calling DatePicker and uses the matching pattern. The existing lookup would show the following for the older
+   paths if it accepted dashes:
 
    | locale | today | after a fix |
    | --- | --- | --- |
@@ -1341,25 +1343,42 @@ Each stage is its own commit; S3 is the handoff. `@mui/x-date-pickers` leaves `d
 `value, required, label, minDate, maxDate, disablePast, formconfig, field, index, closeOnCLickAway, onChange, locale`.
 Every one of these must be implemented; no MUI X prop is reachable from outside.
 
-**rc-webapp sites.** 8 sites in 4 files:
+**rc-webapp sites (static correction, decided-by-watchdog, 2026-11-19).** At committed
+`73673465091`, there are 8 JSX calls in 5 files. The first four files account for seven direct
+`<DatePicker>` tags. The composed widget accounts for one tag through a package-top-level alias.
+
 1. GoogleAdsPerformanceDateRange (2): locale "en-GB", label, required, value, minDate, maxDate, onChange, key.
 2. BoostDuration (1): locale, disablePast, label, required, value, minDate, onChange.
 3. PostCount.step (2): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange.
-4. EventsSetupFormMain (2+): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange, label.
+4. EventsSetupFormMain (2): locale, required, disablePast, closeOnCLickAway, value, maxDate/minDate, onChange, label.
+5. DatePicker.composed (1) imports `DatePicker as VanguardDatePicker` from `vanguard`. The editable
+   tag passes `key`, `value`, `minDate`, `maxDate`, `locale`, `closeOnCLickAway` and `onChange`.
+   It uses `toDatePatternLocale(dateLocale)` and publishes the chosen ISO day to the tree state.
+   [Composed DatePicker](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ai-conversations/widgets/ai/ComposedViewConversationWidget/components/inputs/DatePicker.composed.tsx:49).
 
 No formconfig/field use was found at the sites.
 
 **Locales.**
-1. `localeFormatted` is the location's locale with `_` → `-` (de-DE, de-AT, en-GB, en-IE, en-US, es-ES, …).
-2. FINDING, pre-existing, not changed: `getDatePatternFromLocale` keys are `de_DE`-style. Every rc-webapp locale
-   misses, so all production sites use the fallback `DD.MM.YYYY` and log a console.error. Fixing it would change the
-   visible format per locale (en-US → MM/DD/YYYY). That is a behaviour change for the user to decide, not part of the
-   port.
+1. The older paths pass dash locales, including the literal `en-GB`. `localeFormatted` converts the
+   location locale from underscore to dash (de-DE, de-AT, en-GB, en-IE, en-US, es-ES, …).
+2. The older seven calls fall back to `DD.MM.YYYY` and log a console.error because the lookup uses
+   keys like `de_DE`. The composed widget converts dash back to underscore with `toDatePatternLocale`,
+   so known location locales use their configured date pattern. Accepting dash locales in the shared
+   lookup would change the older fields' visible format and remains a separate user decision.
 3. The port keeps the lookup as is. The S2 matrix still covers every format the map can produce: MM/DD/YYYY,
    DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY, YYYY-MM-DD, YYYY/MM/DD.
 4. Week start: moment's global locale. Vanguard passes no adapterLocale and rc-webapp never calls `moment.locale()`,
    so the reachable case is `en`, week starting Sunday.
 5. Digits: Latin only (no ar/fa/hi locales in the map).
+
+**Paired consumer handoff.** Include the existing composed widget spec and the `Data` and `Narrow`
+stories. Cover the active location's actual date pattern and the hidden section field's serialized
+day. The spec asserts serialized field and replay output and calls the `formatIsoDay` helper
+directly. `Data` and `Narrow` render the widget without a play step. Claim publication coverage
+only if a guarded synthetic day pick in the eventual pair updates the `asOf` tree state. This is
+queued for the consumer handoff.
+[Composed spec](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ai-conversations/widgets/ai/ComposedViewConversationWidget/components/inputs/_DatePicker.spec.tsx:8) ·
+[Data and Narrow stories](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ai-conversations/widgets/ai/ComposedViewConversationWidget/components/inputs/_DatePicker.stories.tsx:17).
 
 **WordPress.** DatePicker is not exported from index-wordpress.ts.
 
@@ -1950,7 +1969,42 @@ host, required/error/disabled/fullWidth/hiddenLabel/margin and variant/size beha
 MUI route for unmodeled style callbacks or child trees whose FormControl context contract the own route cannot
 prove. Avoid guessing descendant compatibility from DOM tags through arbitrary React wrappers. No public type or
 WordPress export change is needed. Leave the public implementation alone if a safe own-route guard would still
-alter existing uses.
+alter existing uses. **Decided by watchdog.** FormControl stays last. Unknown external descendants can read
+MUI context through arbitrary wrappers. Keep their existing route and retain the public implementation if
+there is no conservative guard.
+
+**FormControl guard review (static, during the H24 slot).** The existing evidence supports
+keeping the public lazy MUI implementation. The H21 scan found no production caller to
+justify a narrower own branch. The exact H24 ESM graph still contains the dynamic
+`index-FormControlMuiFallback.js` edge. The WordPress graph contains neither module.
+[H24 ESM graph](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/module-graph.dist.json) ·
+[H24 WordPress graph](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/module-graph.dist-wordpress.json).
+
+| Existing witness | What a route guard must preserve |
+| --- | --- |
+| Frozen wrapper tests with empty and native children | The outer `FormControl-container`, inner root alias, custom class, `component="fieldset"` and root ref are observable. The width and dense-margin assertions separately pin 100% and 8 px. An intrinsic-only tree can rule out descendant context readers within that closed tree. Root props, theme defaults and styling would still need their own proof. [Frozen wrapper spec](../src/core/FormControl/_FormControl.mui.spec.tsx:30). |
+| Frozen Material descendants and hook probes | The direct OutlinedInput, InputLabel and FormHelperText receive disabled/error/required. Focus forces the label to shrink. A function component that returns `null` reads fullWidth, size and variant via MUI's `useFormControl()`, including filled and the outlined defaults. Preserving only the root DOM or scanning for Material host classes would miss this contract. [Context and focus cases](../src/core/FormControl/_FormControl.mui.spec.tsx:57). |
+| Shipped TextField and Select compositions | Default uses Material TextField, which creates its own inner FormControl. Its presence check alone does not prove the outer provider. WithSelect uses Material InputLabel and Select without that inner TextField boundary. Required pins the outer-context asterisk on its sibling label. ErrorState, Disabled and WithHelperText include direct Material labels/helpers while their nested fields either receive explicit props or create their own frame. Those presence checks cannot certify an own outer provider. [Default](../src/core/FormControl/stories/Default.story.tsx) · [WithSelect](../src/core/FormControl/stories/WithSelect.story.tsx) · [Required](../src/core/FormControl/stories/Required.story.tsx) · [ErrorState](../src/core/FormControl/stories/ErrorState.story.tsx) · [Disabled](../src/core/FormControl/stories/Disabled.story.tsx) · [WithHelperText](../src/core/FormControl/stories/WithHelperText.story.tsx). |
+
+A guard sees a wrapper's element type and props before React renders it. The same wrapper
+can return a native element or a MUI context consumer based on its own state, and the
+existing hook probe demonstrates that a context read may produce no DOM. Fragments and
+host wrappers preserve context for their descendants. A direct-child identity or
+`muiName` check cannot prove what a composite, memo/lazy wrapper, custom root or portal
+will render. The own context has a separate identity and carries only outlined variant,
+size and hiddenLabel for own children. It cannot satisfy Material's hook or its focus,
+filled and adornment update callbacks. The frozen source contract requires the MUI
+provider for descendants using that Material context instance. The archived tests
+preload that route intentionally and do not establish context sharing with a separate
+host-installed MUI copy. The historical cold pack control establishes that the lazy
+root is absent on the first commit for that opt-out, independently of the mounted
+context contract. [Own context](../src/primitives/react/TextField/form-control-context.ts:3) ·
+[Packed cold control](/Users/a.kott/vanguard-verify/logs/h20-shapes-32a6b93/FormControl-render.json).
+
+Any future guard would have to exclude opaque descendants and custom roots, or provide
+the same Material context, and demonstrate the root contract separately. Existing evidence
+offers no safe own route for wrapped MUI descendants. Keep the public fallback and leave
+FormControl last. The declared-profile packed TextField replay and scope are recorded below.
 
 **VanguardThemeProvider proposal.** The current provider is reachable in four rc-webapp roots (App, RenderRoot,
 WidgetImageRender and WidgetPreviewHost). Its own typography context already carries the Vanguard choice into
@@ -1982,12 +2036,12 @@ use the exact exported chunks. They do not measure Chromium layout or server-ren
 [.472 first-render results](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/base-client.json) ·
 [H21 first-render results](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/h21-client.json).
 
-**PROPOSED bridge disposition.** Keep the public provider eager this major. Although the packed host and
+**Bridge disposition (decided-by-watchdog).** Keep the public provider eager this major. Although the packed host and
 bundled MUI copies are isolated, the direct source `useTheme()` descendant is an explicit contract, and the
 measurements show that eager MUI fallbacks consume the bundled theme on first render. A fallback-local
 prototype can consume the existing Vanguard typography context and supply the exact bundled MUI theme
-before each fallback mounts. Only prototype it after the DatePicker and FormControl routing is settled.
-Require the source `16|16|none` descendant, both packed isolation directions, nested LTR/RTL, same-tick fallback
+before each fallback mounts. Keep it on paper until DatePicker and FormControl routing is settled and a reduction
+in eager bytes is plausible. Require the source `16|16|none` descendant, both packed isolation directions, nested LTR/RTL, same-tick fallback
 and provider SSR to pass, plus a measured decrease in the eager graph. A provider change requires an explicit
 decision if retaining synchronous source MUI context consumes the same eager dependencies. No provider
 production or public API change is made here.
@@ -2009,6 +2063,69 @@ direct `@mui/*` imports, including type and dynamic imports. A wider grep across
 no candidate files. There are therefore no directly imported consumer MUI components under the four provider roots.
 Proceed with the prescribed paired measurements before proposing a bridge. FormControl stays last after DatePicker.
 Any MuiTextField lazy change has its own decision with three sets of measured evidence. [Direct import scan](/Users/a.kott/vanguard-verify/logs/h21-form-control-proposal/consumer-direct-mui-imports.json).
+
+**MuiTextField reachability witness (decided-by-watchdog).** The fallback stays eager while collecting the
+three evidence sets. The existing router's first render for a synthetic outlined `select` with
+`slotProps.select: () => ({ native: true })` is an **own** DIV combobox. It calls the callback with `{}`,
+then drops `native` in the own Select. Frozen MUI invokes the callback with the TextField owner state
+and renders a native SELECT. The literal `slotProps.select: { native: true }` control in the same
+router renders a native SELECT through the eager fallback. The committed `73673465091` rc-webapp scan
+found no literal TextField `slotProps` use or `native: true` Select shape. Its two `SelectProps` sites in
+GoogleAdsCampaignForm configure display ARIA attributes. Dynamic forwarding and external WordPress props
+remain unresolved. This witness characterizes the current route and does not earn first-render coverage
+for dynamic shapes. [Committed consumer scan](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/rc-73673465091-text-field-routing-witnesses.txt) ·
+[Targeted source witness](/Users/a.kott/vanguard-verify/logs/date-picker-s2/echo-format-green-and-select-route.log).
+
+#### MuiTextField three-criterion evidence matrix
+
+Read-only reconciliation during V1's H24 slot. **Partial evidence for all three criteria.**
+Criterion 1 needs an inventory of resolved combined call-site shapes. Criterion 2 needs an own
+first render per shape through the source router without global preload. Criterion 3 needs the
+same on the exact installed pack plus a TextField-specific cold suspension control. Rendering
+an input synchronously is evidence of availability. An inner `.MuiTextField-root[data-vg-core]`
+assertion also establishes the own route. Browser witnesses sample visible frames separately.
+
+The committed rc-webapp baseline is `73673465091`. H24 means approved tree
+`a327c176c3180f765596d20364db53a1bb606735`, pack SHA-256
+`2afc5e74a51389473c5bc19d5b12974affbafe412e61d649a8c9abde73edd755`.
+Its source spec gate passed 2,865/2,865 with `VG_NO_FALLBACK_PRELOAD=1`. Its installed
+default and WordPress suites passed 34/34 and 44/44 respectively in both dependency profiles.
+Earlier runs count at their own fingerprints. [H24 source and package log](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/canonical-package.log) ·
+[Installed H24 smoke source](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/fixture/default-declared/smoke/bundle.test.tsx).
+
+| Reachable family | 1. Resolved source shapes | 2. Existing no-preload source evidence | 3. Existing exact-pack first-render evidence and gaps |
+| --- | --- | --- | --- |
+| Autocomplete-generated outlined field | The [import-bound inventory](/Users/a.kott/vanguard-verify/logs/h20-shapes-32a6b93/Autocomplete-sites.json) records 26 rc-webapp JSX sites and one Vanguard `AutocompleteWithAnchor` site. Both outer Autocomplete routes bridge generated root props and object input, HTML and label slots. The anchor ref, adornments and handlers fit the own inner route. | The [field differential](../src/core/_internal/InputBase/_MuiTextFieldReachability.differential.spec.tsx:232) pins the generated keys, separate refs, handlers, ARIA and inner own marker for its real callback fixture. The [wrapper replay](../src/core/_reachable-lazy-route-shapes.spec.tsx:23) checks the outer marker, including the private anchored parent case separately. | The [32a6b93 replay](/Users/a.kott/vanguard-verify/logs/h20-shapes-32a6b93/Autocomplete-render.json) recorded 27 default renders. H24 replays the [22 manifest rows](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/fixture/default-declared/smoke/reachable-route-shapes.json) and separately checks representative controlled single/multiple DOM. The shared replay checks the outer marker and combobox. The anchored private wrapper and per-shape **inner** marker/ref checks are missing from the packed replay. |
+| Ordinary Input, direct InputBase and Textarea | The [committed prop scan](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/rc-73673465091-text-field-routing-witnesses.txt) shows native attrs such as `maxLength`, ARIA, autocomplete and `type`, plus named and autofocus fields. The [handler scan](/Users/a.kott/vanguard-verify/logs/h21-text-field-handler-sites/rc-webapp.json) is scoped to handler sites, not a complete combined shape inventory. Vanguard's internal verification-code and rich-text-link fields and the public ESM InputBase share the outlined path. | [InputBase contracts](../src/core/_internal/InputBase/_InputBase.mui.spec.tsx:468) and the [top-level routing differential](../src/core/_internal/InputBase/_MuiTextFieldPropRouting.differential.spec.tsx) cover multiline, native props/ref, form wiring and callback targets/order. No combined per-site route assertion. | H24 mounted an Input with native ARIA/maxlength and change, form-bound Input, and a three-row native Textarea in both bundles. These assert representative DOM/behavior. They leave the inner marker, caller combinations and dynamic overrides unasserted. The [H21 exported-chunk probe](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/h21-client.json) did observe default Input own on the first synchronous commit. |
+| Non-native Select and nested search/text fields | The two rc-webapp GoogleAdsCampaignForm `SelectProps` uses supply display ARIA. Vanguard defaults to outlined non-native Select. SearchableSelect conditionally mounts a small outline search with a start adornment; DateRangeInput's trigger, DateRangePicker's right-hand read-only trigger and ColorPicker's text input also pass through this router. | [Select ARIA](../src/primitives/react/TextField/_select-aria-parity.spec.tsx), [SearchableSelect search](../src/core/SearchableSelect/_SearchableSelect.differential.spec.tsx:99), [DateRangeInput](../src/core/DateRangeInput/_DateRangeInput.differential.spec.tsx) and [DateRangePicker](../src/core/DateRangePicker/_DateRangePicker.differential.spec.tsx) cover representative behaviors. No per-site combined replay or equivalent ColorPicker routing assertion was located. | H24 asserts the default own Select trigger on the same turn in both bundles. The default SearchableSelect pack fixture opens a two-option list, below the search field's default ten-option threshold. No packed witness located for that search field, the GoogleAds ARIA shapes, DateRangeInput or ColorPicker. The range-picker mask test queries the left field only. |
+| PhoneNumber national mask and separate prefix | Vanguard renders `PhoneNumberIMask` through PhoneNumberBase's outlined InputBase and a separate unmasked prefix. The real invoice form and other committed consumers reach the production wrapper. Prefix, flag and form configuration are part of those shapes. | The [real mask differential](../src/core/_internal/InputBase/_MuiTextFieldReachability.differential.spec.tsx:268) asserts the own frame, edit, caret, paste and reset. [H22 guarded source stories](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/frame-selector.log) cover the real invoice and start-flag controls, including the absent native marker case. | H24 default smoke immediately finds the actual GB masked input. It does not assert the inner frame route or cover the combined invoice settings. [Exact H22 invoice](/Users/a.kott/vanguard-verify/v1/logs/h22-focused-rc-webapp.md) supplies paired first viewport-visible geometry, 617×47, and focus/blur. H21's 185×43 was a real box failure, superseded by H22. No real phone mask in the H24 WP graph. |
+| DateRangePicker calendar mask | The real left calendar field passes `DateRangePickerIMaskInput`, end adornment and conditional native read-only; the right range selector is a separate unmasked field. rc-webapp calls the wrapper. The public ESM `maskInput` alias also permits external use. | The [real mask and registered-ref differential](../src/core/_internal/InputBase/_MuiTextFieldReachability.differential.spec.tsx) covers own frame, edit, paste, reset and form focus. The real picker timeline and [H22 native-box stories](/Users/a.kott/vanguard-verify/logs/h22-native-mask-browser/frame-selector.log) exercise the mounted calendar frame. | H24 default smoke queries the actual left input immediately for fixed dates. It leaves the own marker and remaining consumer combinations unasserted. The [exact H21 paired real field](/Users/a.kott/vanguard-verify/v2/out/h21-masked-picker-comparison.json) proves sampled masked DOM/adornment style; it is a browser witness. No date-range mask in the H24 WP graph. |
+| Verification PIN masks | Vanguard [VerificationPinInput](../src/common/VerificationPinInput/VerificationPinInput.tsx:34) and the committed rc-webapp local copy pass `InputProps.inputComponent`, native `pinMask` and top-level handlers to InputBase. The consumer copy is the sole literal rc-webapp `inputComponent` found and is distinct from the Vanguard source wrapper. | [PIN wrapper specs](../src/common/VerificationPinInput/_VerificationPinInput.mui.spec.tsx) and the [real-mask handler differential](../src/core/_internal/InputBase/_MuiTextFieldPropRouting.differential.spec.tsx:105) cover ref, value and the top-level event route. The consumer-local variants are outside Vanguard's source suite. | [Exact H22 browser PIN fixtures](/Users/a.kott/vanguard-verify/v1/logs/h22-focused-rc-webapp.md) cover actual five/six-digit consumer controls at the first sampled viewport-visible frame and settled states. No packed same-tick PIN route fixture found. The exact H24 default and WP graphs contain no Vanguard PIN mask module. |
+| WordPress export defaults | `Input`, `Textarea`, `Select` and `Autocomplete` reach the outlined defaults described above. External plugin props, computed spreads and host theme defaults are unresolved. The default graph cannot stand in for a plugin call-site inventory. [WP static route trace](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/wordpress-muitextfield-static.md). | Shared wrapper and router tests cover these families. There is no complete WP-default source replay tied to inner route markers for all four exports. | Exact H22 WP [Input probe](/Users/a.kott/vanguard-verify/logs/3d078f3a317e0860176690386f7b85895bcad2e4-h22/Input-wp-first-render.json) has three same-tick inner markers (default, anchor ref, synthetic custom control with native ref). The separate [WP Autocomplete probe](/Users/a.kott/vanguard-verify/logs/3d078f3a317e0860176690386f7b85895bcad2e4-h22/Autocomplete-wp-first-render.json) checks the **inner** marker for one default combo. The H24 canonical WP replay checks the **outer** combo marker, the default own Select trigger and native Textarea DOM. The Textarea inner marker, nested field under outer MUI Autocomplete, and nonfixture external props remain open. |
+| Eager variants, native Select, dynamic forwarding and theme | `filled`/`standard`, object `SelectProps.native` or `slotProps.select.native`, and the unsupported outlined-text slot/class/input keys can select the eager fallback. No literal consumer TextField `slotProps` or native Select shape was found. Handler and key scans leave dynamic spreading, external ESM/WordPress props and visible theme defaults unresolved. | InputBase covers literal filled and legacy native. [Theme/slot compatibility](../src/core/_internal/InputBase/_MuiTextFieldCompatibility.spec.tsx) covers precedence. The [separate callback witness](/Users/a.kott/vanguard-verify/logs/date-picker-s2/echo-format-green-and-select-route.log) observes callback-native wrongly staying own and object-native reaching MUI. It is characterization outside the H24 snapshot. | Exact H24 WP renders all three explicit filled overrides immediately through MUI. The H21 exported-chunk probe renders a forced `classes` fallback immediately and measures host theme isolation. There is no exact packed literal/callback-native witness or production inventory of effective dynamic defaults. |
+| Unsupported cold control | Use one deliberately unsupported **MuiTextField** shape, for example a filled field or literal native Select, for a future ESM split's cold control. | Existing compatibility tests keep eager fallback behavior intact. The router currently uses a static import, so these cases do not exercise suspension. | **Missing for MuiTextField.** The archived [Autocomplete `sx` opt-out](/Users/a.kott/vanguard-verify/logs/h20-shapes-32a6b93/Autocomplete-render.json) checks the outer component's cold route. The WP filled probes prove synchronous inline MUI. Neither establishes that the harness catches suspension in an unsupported inner TextField route. |
+
+The H24 [ESM graph](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/module-graph.dist.json)
+contains the phone and date-range mask modules and the eager TextField fallback. The
+[WordPress graph](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/module-graph.dist-wordpress.json)
+contains the fallback and none of the three mask modules. These are pack reachability facts.
+They leave external forwarding, host defaults and custom controls unresolved. The current evidence
+does not satisfy the approved split criteria. Keep MuiTextField eager and FormControl last.
+
+**Partial evidence accepted (decided-by-watchdog).** The isolated packed smoke draft adds
+same-turn inner field markers for the two real masks, WordPress Textarea, and the covered
+Autocomplete shapes, including the field under the WordPress MUI outer route. The existing
+runner and assertions are retained. The draft dry-applies to all four H24 fixture profiles.
+The serial, guarded replay against the original H24 pack `2afc5e74…755` passed both declared
+profiles (`default` 8/8, `wp` 8/8). The default profile proves the two real masks' inner
+markers. The WordPress profile proves the default Textarea inner marker and the own inner
+field under outer MUI Autocomplete, and retains the synchronous inline MUI filled checks.
+These are fixture-specific same-turn assertions. Dynamic forwarding, external plugin props,
+host theme defaults and unsupported cold suspension for a future ESM split remain open.
+MuiTextField stays eager. [Default result](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/packed-smoke-draft/replay.cqEfNJ/default.log) ·
+[WordPress result](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/packed-smoke-draft/replay.cqEfNJ/wp.log) ·
+[Fixture patch](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/packed-smoke-draft/inner-text-field-first-render.patch) ·
+[Replay handoff and evidence boundaries](/Users/a.kott/vanguard-verify/logs/packed-theme-boundary/packed-smoke-draft/README.md).
 
 ### 36.11 H22 masked native controls (decided-by-watchdog)
 
@@ -2119,6 +2236,20 @@ source and red scripts exits both stop the gate. No H23 package was cut in this 
 [Initial scripts results](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/scripts-before.json) ·
 [Corrected scripts results](/Users/a.kott/vanguard-verify/logs/master-2.11.0-merge/scripts-after.json).
 
+**H23 exact-source checklist (decided-by-watchdog).** One integrated wide slot covers A and B. Record the
+source identity once for the gate and pack, distinguishing uncommitted DateField and TextField audit work
+from any source included in that snapshot. Archive `tsc --noEmit -p tsconfig.lib.json` (or the existing
+static gate's `tsc-lib.raw.txt`), no-global-preload spec results, exact fallback audit and installed-pack
+scripts. Confirm these B cases collect and pass on that snapshot:
+
+- `src/core/Autocomplete/_Autocomplete.differential.spec.tsx`
+- `src/core/DateRangePicker/_DateRangePicker.differential.spec.tsx` and `_DateRangePicker.spec.tsx`
+- `src/primitives/react/Modal/_modal-host-order.spec.tsx`, both describe groups
+- `src/core/ProgressBar/_ProgressBar.mui.spec.tsx` and `scripts/check-fallback-audit.mjs`, intentional local preload
+- `scripts/_agent-docs.spec.ts` and `scripts/_mui-compat-order.spec.ts`, installed-pack scripts
+
+The prior 77/77 scripts result is pre-H23 evidence. The checklist does not release a wide slot.
+
 ### 36.14 Tier P Textarea native history (decided-by-watchdog)
 
 The guarded mounted form type-and-clear scenario retained one native Text node per trusted cycle on H22
@@ -2135,3 +2266,2857 @@ Undo/Redo state, bounded by mount lifetime and by the browser's undo stack; not 
 [Paired retention](/Users/a.kott/vanguard-verify/v2/out/perf/h22-textarea-retention-comparison.json) ·
 [Native controls](/Users/a.kott/vanguard-verify/v2/out/perf/h22-textarea-native-controls.json) ·
 [Redo reproducer evidence](/Users/a.kott/vanguard-verify/v2/out/perf/h22-textarea-undo-control.json).
+
+
+### 36.15 S2 internal DateField local handoff
+
+The working-tree DateField is internal and unwired. DatePicker continues using MUI X for its actual field
+and calendar. The S2 reference ran first and reached 29 intended missing-candidate failures in both UTC and
+Europe/Bucharest. The full internal matrix then passed 31/31 in each time zone. It covers the six numeric
+format patterns across four locales, the unchanged dash-locale fallback, accessible section roles and
+names, serialization, partial input, synthetic composition, paste, Backspace, disabled/readOnly, controlled
+replacement and validation callback order. Payload mutations failed all 24 locale/format cases. Reversed
+navigation and discarded validation context each made their own targeted tests red.
+
+The same-object controlled echo reproduced the stale positional sections. After editing 15 March to 20
+March and echoing the exact emitted Moment, changing MM/DD/YYYY → DD/MM/YYYY left the old `03/20/2024`
+serialization on the own field while the reference showed `20/03/2024`. The own field now rebuilds from the
+current value when the format or adapter locale changes, independently of the echoed-value identity.
+The format and subsequent locale change preserve focus, section labels and serialization, with no extra
+publication. [Controlled-echo red](/Users/a.kott/vanguard-verify/logs/date-picker-s2/echo-format-red-and-select-route.log) ·
+[Controlled-echo green](/Users/a.kott/vanguard-verify/logs/date-picker-s2/echo-format-green-and-select-route.log).
+
+Initial Chromium was red in the three style stories and at the first programmatic selection assertion in
+both keyboard stories. The isolated trusted follow-up established both reference and own selection, ArrowRight
+and ArrowUp on fresh mounts. Both then stopped at fixture ClipboardEvent construction. A real DataTransfer
+fixed that fixture. Source styling now matches the disabled label ink, notched legend line height and required
+asterisk text-node boundaries. The seven guarded stories pass, including exact computed styles and bounds,
+trusted selection on each side, and both paired posting orders. The fixture sent zero outbound requests.
+Native OS IME remains outside the Chromium run. This internal development round is not an independent
+verifier failure and does not count toward the S2/S3 stop rule.
+[Initial Chromium](/Users/a.kott/vanguard-verify/logs/date-picker-s2/chromium.c9Lv6T/chromium.log) ·
+[Isolated diagnosis](/Users/a.kott/vanguard-verify/logs/date-picker-s2/chromium.ekFsD3/chromium.log) ·
+[Guarded green Chromium](/Users/a.kott/vanguard-verify/logs/date-picker-s2/chromium.VI0Jy0/chromium.log).
+
+The final targeted runs passed 52/52 in UTC (DateField, TextField compatibility and locale lock) and 39/39 in
+Europe/Bucharest (DateCalendar and DateField). Targeted TypeScript was clean. The earlier targeted full
+DatePicker plus locale pass was 204/204 before the controlled-format follow-up. Port 6031 is closed and released
+to V2. The branch tip is `55dc6113c814fd3f198af5a2743ff76b92174612`; S2, the TextField characterization and
+the related plan changes are uncommitted. No H23-wide gate or package was run.
+[Local handoff](/Users/a.kott/vanguard-verify/logs/date-picker-s2/local-handoff.md).
+
+### 36.16 Scoped development and final verification (decided-by-watchdog, 2026-11-19)
+
+Select development verification case by case. Around ten minutes is illustrative, with no fixed budget,
+confidence quota or pass criterion. For H23's SearchableSelect caret, require deterministic red→green on
+the changed behavior, the unchanged ModalHost click-return count and order test with cold checks, and
+only the immediate consumers touched by the diff. Coordinate one paired caret CSS and markup witness
+with V1. Expand development coverage on a concrete signal or a shared-path change.
+
+Run full rc-webapp, WordPress and Tier P sweeps once on the final candidate. Preserve the covered evidence,
+saved captures and named flags for final adjudication. The H23 package gate is one milestone after review
+of the scoped evidence. The existing final coverage, resource limits and hard constraints still apply.
+
+### 36.17 H23 reviewed snapshot and package result
+
+H23's canonical guarded offline gate passed on `55dc6113c814fd3f198af5a2743ff76b92174612`
+plus approved declaration patch `b6d8f443d148…` and SearchableSelect caret patch `e8a4c2b07880…`.
+The resulting tree is `1e32b126298c385807290e516a1c4360eee6a8aa`. It excludes the uncommitted S2,
+TextField and planning work. Source TypeScript exited 0. The no-preload spec project passed 2,799/2,799
+across 385 files, including the original ModalHost count/order cases. The installed-package scripts
+project passed 79/79 across 12 files. The four offline consumers passed gated TypeScript and
+34/34/44/44 runtime checks, 156 total. Their installed npm resolution graphs are archived.
+
+The exact tar retains all checked public declaration targets, has 817 ESM declarations and 247 WordPress
+declarations, and contains zero frozen reference files or declaration references. The 4,218 packed dist
+files match the on-disk build. WordPress reached 336 files with zero missing targets. The fallback audit
+was 22/22 allow-listed, with zero unexpected or stale entries. Eager MUI is 23/298 ESM exports plus one
+allow-listed context module. The WordPress report has 4/64 exports with MUI in their bundled graph.
+
+V1 passed the exact local SearchableSelect pair in eight guarded cycles. Settled size, inset, paths,
+ink, hover, focus, body portal and Escape matched. Own shows the up glyph with the first open frame.
+The two dark-open screenshot differences are the already approved paper-background delta. The nearest
+direct rc-webapp caller, ProductRatePlanSearchCell, has no eligible existing story at `73673465091`.
+The broad rc-webapp, WordPress and Tier P sweeps remain assigned to the final candidate.
+
+Pack SHA-256 is `0c5ae6295363e83054ca7eb9be1a89b2e797a971b2fbec9d958fdb828dc65301`.
+[H23 pack](/Users/a.kott/vanguard-verify/packs/55dc6113c814fd3f198af5a2743ff76b92174612-h23-b6d8f443-e8a4c2b0.tgz) ·
+[Canonical gate](/Users/a.kott/vanguard-verify/logs/55dc6113c814fd3f198af5a2743ff76b92174612-h23-b6d8f443-e8a4c2b0/canonical-package.log) ·
+[Provenance](/Users/a.kott/vanguard-verify/logs/55dc6113c814fd3f198af5a2743ff76b92174612-h23-b6d8f443-e8a4c2b0/provenance.txt).
+
+### 36.18 Independent S2 PASS (decided-by-watchdog, 2026-11-19)
+
+V2 passed the private, unwired DateField on `55dc6113c814fd3f198af5a2743ff76b92174612` plus the exact
+seven-file patch SHA-256 `c118dc410a9aa26b9b41c118029116b8c2a81c75aa9aac3f2766d564624e27aa`, tree
+`836eaf2ce45f8f1deec99eec86888ef49dcda17d`. All seven file fingerprints match before and after.
+The unchanged differential passed 31/31 in both UTC and Europe/Bucharest. All five paired Chromium
+stories passed, including both trusted edit orders. Native OS IME remains outside the result.
+The Chromium proxy self-test passed and its guard log was empty during evidence collection.
+Storybook's separate Node telemetry was enabled in that run and delivery was uninstrumented.
+Set `STORYBOOK_DISABLE_TELEMETRY=1` for S3 and any replay. V2 closed the slot and released it to A.
+The public DatePicker route and dependencies stay at the base during frozen-reference work.
+[Exact S2 patch and fingerprints](/Users/a.kott/vanguard-verify/logs/date-picker-s2/independent-v2/provenance.txt) ·
+[V2 evidence](/Users/a.kott/vanguard-verify/v2/datefield-s2-evidence).
+
+The H23 packed WordPress entry has no direct DatePicker export or declaration, and its linked graph
+contains neither Vanguard DatePicker nor MUI X date-picker modules. That reachability result applies
+to the exact packed WordPress entry. Application and consumer-side aliases are outside that check.
+[WordPress reachability](/Users/a.kott/vanguard-verify/logs/date-picker-s3/wordpress-reachability.txt).
+
+### 36.19 Reviewed S3 frozen reference (decided-by-watchdog, 2026-11-19)
+
+The unchanged public wrapper at `55dc611` (source blob `f26bce99c36b706d31884be447533dd40ce7cb50`)
+passed the two native pointer/hydration Chromium cases, 15 scoped lifecycle/callback specs and the
+three focused Chromium placement/keyboard cases. The telemetry-disabled browser runs had empty guard
+logs after the guard self-test. First hydration commit uses the desktop field in both contexts.
+The settled touch context shows the read-only field. True windowless module import fails at
+`src/stores/window.store.ts:2`; it is a separate frozen result.
+
+Live pointer changes swap the mounted overlay type in both directions with a stable public claim value.
+The fitting desktop story pins `bottom-end`; the clipped fixture flips to `top-end` and follows the
+anchor. The hydration fixture's `bottom-start` is specific to that fixture. Nested mobile stays at
+1300. The four nested timer-held close/unmount cases preserve the parent claim, body and ARIA state,
+retire the child listeners and drain the pending timers. No observer allocation was observed there.
+Published dates are observed while the overlay is present and its claim active, before dismissal.
+Keep the current callback signature, public contracts and dependency pins. The reviewed evidence
+authorizes paired red→green for the private S3 candidate while the public route remains at the base.
+[Frozen outcomes and exact inputs](/Users/a.kott/vanguard-verify/logs/date-picker-s3/frozen-probes/reviewed-reference.md) ·
+[Fixture and evidence fingerprints](/Users/a.kott/vanguard-verify/logs/date-picker-s3/frozen-probes/reviewed-files.sha256).
+
+### 36.20 Private S3 candidate and value contract
+
+The four-file S3 patch on the approved S2 tree has SHA-256
+`99d7ff0e23f1ad5f2c96765683582e44627ef18fe81900a908c63d506b6a5cb3` and produces tree
+`091c7b57b7f741a2d373fe1fc710bb4cd0defe84`. The detached verification tree excludes the H23
+declaration and caret changes and the separate TextField work.
+
+The initial paired harness ran the frozen branch in 11 cases and failed when the private shell
+was absent. After the shell was added, three more pairs went red on initial and controlled
+value replacement. Runtime null wrongly marked the field group invalid, and the serialization
+input lacked `aria-invalid` in all three cases. The private shell now treats null and undefined
+as empty and valid and NaN as empty and invalid. The pairs also assert that controlled changes
+emit no callback. A separate red pair caught a closing mobile portal returning and locking the
+body after a fine/coarse round trip. The private shell now clears the pending mobile exit when
+the desktop branch takes over.
+
+The final no-preload replay passed 161/161 in each of UTC and Europe/Bucharest, including 15
+private shell cases, 31 private DateField cases, 8 calendar cases and 107 unchanged public
+DatePicker cases. Scoped TypeScript exited 0. Two guarded Chromium pairs passed with telemetry
+disabled and no unexpected denied requests. They cover trusted mouse and touch, hydration, the
+field focus ring, Escape focus return and touch backdrop dismissal. The fine pair matched at
+`bottom-start` in its narrow fixture. The coarse pair used 1300. Both browser runs shut down
+and released port 6031.
+
+Public wiring and types are at the base. The candidate still needs review, including paired
+candidate fit/flip, broader visual parity and external value replacement during an open mobile
+session. No commit or package was created.
+[Private S3 provenance and fingerprints](/Users/a.kott/vanguard-verify/logs/date-picker-s3/private-candidate/provenance.txt) ·
+[Red and green evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/private-candidate/handoff.md).
+
+### 36.21 Private S3 controls before independent verification (decided-by-watchdog, 2026-11-19)
+
+Freeze the open mobile sequence in which the parent echoes a selected day, then replaces the value
+before Cancel. The frozen calendar selects March 20, then selects and displays the parent's March 25.
+Cancel republishes the original March 15 while the dialog and claim are active, then closes with the
+field displaying March 15. External replacement causes no publication. The private shell matched
+the frozen sequence without a source change. The pair asserts the selected day, field value and
+exact publications.
+
+Independent V2 handoff follows the guarded private fit/flip and scroll-follow pairs. Keep all 107
+public contract tests, public wiring and dependencies at the base, with telemetry disabled and no
+commit, package or wide gate.
+
+The watchdog approved the Cancel closure and directed a local desktop paper fix. In the D15
+Storybook stylesheet order, the red paper foreground differed in both themes and the dark
+background was `rgb(24, 33, 47)` instead of white. The private desktop paper now uses the frozen
+white and `rgba(0, 0, 0, 0.87)` from the bundled light palette. Shared Popper and CSS are unchanged.
+The clipped fixture uses a fresh scroll container for each branch, resets it to 120 before open
+and asserts that both branches stay at 120 through the initial capture.
+
+All four guarded pairs passed in light and dark. The fit popup was `bottom-end` at (236, 133)
+and the clipped popup was `top-end` at (858, 489), moving to (858, 497) as the anchor moved 8 px.
+Paper, selected day and field dimensions and the asserted computed properties matched.
+The captures retain two smaller visual differences outside the paper fix. The field's top outline
+stroke sits lower, and the month/year switch uses an 18 px glyph versus 24 px in the frozen route.
+The screenshots differ by 291 pixels in each fit pair and 419 in each clipped pair before and after
+scroll. Record these as open observations for adjudication. The SearchableSelect paper exception
+remains specific to SearchableSelect.
+
+The final private tree is `da94f26e69c3c848a85f1be2761d001cc7bf1962` with S3 patch SHA-256
+`3a091e925ccb9dd696fe71593e83ef4c22a0d91626aaecb030f74027e6a83450` on the approved S2 tree.
+The guarded no-preload replay passed 162/162 in UTC and Europe/Bucharest, including the 107
+unchanged public tests. Scoped TypeScript passed. [V2 handoff and exact evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/private-reviewed/handoff.md).
+
+### 36.22 Private S3 desktop visual closure (decided-by-watchdog, 2026-11-19)
+
+Keep `da94f26e69c3c848a85f1be2761d001cc7bf1962` frozen while V2 runs its independent
+verification. Two desktop findings must close before public wiring. Match the hidden legacy
+legend and the top outline stroke inside DatePicker. Match the month/year switch glyph,
+its hit box, centering and keyboard focus. The initial frozen dimensions are 24 px for the
+glyph and 34 px for the hit box. Standalone S2, shared styles and primitives stay out of
+this change.
+
+The scratch assertions retain the existing placement, paint and scroll checks and compare
+the real top-stroke pixels in a straight section of the fitting field. Run the intended red
+and guarded green only after V2 directly releases its slot. Use desktop private selectors,
+preserve D15 stylesheet order and keep telemetry disabled. Return the exact delta for
+review. No duplicate unit sweep, public wiring, commit or package.
+[Focused fixture and CSS proposal](/Users/a.kott/vanguard-verify/logs/date-picker-s3/private-visual-draft/design.md).
+
+The watchdog approved both scopes and the focused witnesses. Capture a passing frozen-only
+control for the keyboard focus sequence before interpreting any candidate failure. Begin
+the control only after direct V2 release and a passing preflight.
+
+V2 released the slot after independently passing scoped behavior, placement and computed
+styles on the exact `da94f26e` tree. Both patch paths and all ten hashes matched. UTC and
+Europe/Bucharest passed 162/162 each, scoped TypeScript exited 0, and guarded Chromium
+passed 4/4 with telemetry disabled. Both visual differences reproduced in both themes:
+the top stroke moved from row 86 to 91, and the month/year glyph measured 18 px versus
+24 px in the frozen route. The scoped pass makes no pixel parity claim.
+[Independent V2 verdict](/Users/a.kott/vanguard-verify/v2/datepicker-s3-evidence/verdict.md).
+
+The frozen-only keyboard control passed 4/4 before comparing the candidate. Shift+Tab
+reached the toggle with visible focus inside the calendar, including after clipped scroll.
+The paired red failed 4/4 with the candidate legend visible, a stroke at row 91 and an
+18 px glyph in a 28 px hit box. The two-file delta scopes the legacy hidden legend to the
+private desktop field host and applies the existing medium glyph token inside the private
+desktop paper. Both fixes passed the same guarded matrix 4/4 and the outline strip matched
+exactly in both themes. The stroke is back at row 86 in the fitting fixture, and the 24 px
+glyph is centered in the 34 px hit box before and after keyboard focus. All six sampled
+1200×900 RGB frame pairs were pixel-identical, including the clipped post-scroll frames.
+Telemetry was disabled, the guard logged zero unexpected requests and port 6031 closed.
+
+The two-file visual patch on the independent tree has SHA-256
+`eb655e991cf283fca03db0fabc319f7516d404f7ab5367b998a712d0868e02ce` and produces private
+tree `711adf69bb71b03f378f0420da95f004cc296fb3`. No duplicate unit sweep ran. Review this
+local delta before public cutover. [Exact patch and evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/private-visual-draft/handoff.md).
+
+### 36.23 Proposed frozen-reference split for the public DatePicker switch
+
+**Design approved (decided-by-watchdog, 2026-11-19).** Use the shared type-only import,
+the public candidate's own-field marker, the unchanged 107 public contract tests and the
+emitted graph checks below. Reuse the H23 exclusion witness. Keep the exact independent
+tree `da94f26e69c3c848a85f1be2761d001cc7bf1962` frozen. Public wiring can proceed after
+V2's independent pass and guarded green results for both §36.22 visual fixes.
+
+**Test-only split.** Copy the frozen implementation from `55dc6113c814fd3f198af5a2743ff76b92174612`
+to `src/core/DatePicker/_DatePicker.mui-reference.tsx`. The input blob is
+`f26bce99c36b706d31884be447533dd40ce7cb50`. Keep its executable body, MUI X imports and shared
+stylesheet imports intact. Replace the copied props interface with
+`import type { DatePickerProps } from './DatePicker'` so there is one public contract. Export the
+fixture component as `DatePicker` within that file only. Add no barrel or package export for it.
+The split can be checked before the switch by importing the fixture as the reference and keeping
+the differential's existing private candidate resolver.
+The retained MUI X imports are the package root and its `AdapterMoment`, `DateField`, `DatePicker`,
+`dateViewRenderers`, `hooks`, `models` and `PickersLayout` subpaths.
+
+**Imports at cutover.** In `_DatePickerShell.differential.spec.tsx`, use
+`import { DatePicker as FrozenDatePicker } from './_DatePicker.mui-reference'` for every frozen
+observation and `import { DatePicker, type DatePickerProps } from './DatePicker'` for the
+candidate and shared type. Replace the interim `import.meta.glob('./DatePickerShell.tsx')` and
+`own()` calls with the public candidate in those same observations. Assert once that the selected
+field has the own DateField marker on the candidate and lacks it on the frozen route. This catches
+a public export accidentally left pointing to MUI even when behavioral traces agree.
+`_DatePicker.mui.spec.tsx` stays byte-identical, including its public `./DatePicker` import, so all
+107 assertions exercise the candidate. Other public DatePicker specs and the existing public
+contract stories retain their imports. S1 and S2 keep their dedicated references.
+
+For post-switch replay, redirect only the frozen legs of the external scratch stories
+`_DatePickerShellPrivate.stories.tsx` and `_DatePickerShellPairedPlacement.stories.tsx` to
+`./_DatePicker.mui-reference`, with the candidate leg through `./DatePicker`. Frozen-only
+`_DatePickerShellFrozen.stories.tsx`, `_DatePickerShellPlacement.stories.tsx`,
+`_DatePickerShellFrozen.spec.tsx`, `_DatePickerShellCallbacks.spec.tsx` and
+`_DatePickerShell.windowless.spec.tsx` use that same fixture import if replayed after cutover.
+Their shared `s3-reference-helpers.tsx` uses
+`@vanguard/DatePicker/_DatePicker.mui-reference` for its reference. Preserve prior evidence files
+and update replay copies only.
+
+**Declaration and bundle boundary.** Reuse the H23 `**/*.mui-reference.tsx` exclusions in
+`tsconfig.dts.json` and the ESM dts configuration. WordPress also emits declarations from its
+entry reachability set. Add the concrete DatePicker reference to the existing
+`scripts/_dts-package-imports.spec.ts` exclusion witness when the file is created. Keep
+`DatePicker.tsx` in the ESM declaration set and keep all production imports and public entrypoints
+free of references to the fixture. An explicit production import can bypass a TypeScript root-file
+exclusion. The MUI X package is already a pinned dev dependency and remains available to the
+reference fixtures and the existing MUI-installed consumer control. Keep the derived MIT notices.
+
+At the next authorized exact-source package gate, archive both `.vg-build/module-graph.dist.json`
+and `.vg-build/module-graph.dist-wordpress.json`. Check every emitted chunk's source module IDs,
+then walk static and dynamic imports from the ESM entry and the WordPress entry. Require zero
+`.mui-reference` and zero bundled `@mui/x-date-pickers` modules, including lazy chunks. Check
+emitted JS import specifiers for an external MUI X edge as well. The ESM public DatePicker must
+reach the own shell; WordPress must continue to have no direct or transitive DatePicker route.
+The exact extracted tar must contain no frozen reference file or declaration import to one and
+no MUI X import in either declaration tree. Verify public ESM `DatePicker` and
+`DatePickerProps` resolve through the same exports, keep the D12 subpaths and replay the existing
+offline consumer fixtures. `package-fixture/fixtures/components.tsx` already pins the ESM props,
+and `package-fixture/fixtures/wp.tsx` pins the absent WordPress export. In the declared-dependencies
+ESM smoke, mount the public picker without installed MUI X and assert the own field on first render.
+Keep the eager-MUI and WordPress import-closure gates. Use actual module IDs and import
+specifiers to distinguish runtime reachability from the retained notice text.
+
+**Public switch and rollback.** Make the public entry a separate reviewable wiring delta
+after the private visual fixes and independent evidence are accepted. Keep the exact
+`DatePickerProps` definition and the existing barrel paths, and point the public runtime
+`DatePicker` binding at `DatePickerShell`. The shell's import of that interface remains type
+only. If the public candidate fails the unchanged contract or reaches the §36.0 stop rule,
+restore the public `DatePicker.tsx` from blob `f26bce99c36b706d31884be447533dd40ce7cb50`.
+Return the differential's candidate leg to the private resolver so it continues comparing two
+implementations. The test-only frozen copy and the private S1–S3 work can remain available for
+diagnosis. Until a separate cutover is approved, public wiring, source and dependency pins
+stay at the current independent checkpoint, with no runtime work during V2's reserved slot.
+
+**Cutover authorized (decided-by-watchdog, 2026-11-19).** The watchdog accepted the exact
+two-file visual delta on `711adf69`, including the guarded red and green, the keyboard
+control, both outline strips and six sampled pixel-identical pairs. Start the public
+switch with a failing own-field marker against the current export. Keep the original
+107-test contract byte-identical, use an excluded frozen reference and refresh the paired
+replays. Return the exact local diff and scoped evidence for review. Package and wide
+gates remain at the milestone.
+
+**Cutover attempt rolled back.** The own-field marker failed against the frozen public export,
+then passed on attempted tree `bdd4ed1d0b7432224be4b480426aee55e8f139c9`. The new paired suite
+passed 17/17, but the scoped UTC suite passed only 200/215. Six of the 107 unchanged public
+contracts failed. Across the run, eight failures involved partial or invalid date editing, two
+involved Escape focus restoration, two hit the year-button role, and three involved mobile Enter
+and MUI theme defaults. This was a local cutover run. The exact V2 private verdict remains scoped
+to its recorded cases.
+
+The §36.23 rollback restored the public file to blob `f26bce99c36b706d31884be447533dd40ce7cb50`.
+The post-rollback DatePicker suite passed 214/214 in UTC across 16 files, including all 107 public
+contracts. The retained test-only split uses the private candidate resolver and the excluded
+frozen executable. Both focused H23 declaration exclusion checks passed. The refreshed external
+browser pairs are staged for the next public attempt and have an own-route assertion. The
+browser, package and emitted-graph gates did not run on the failed cutover.
+[Exact patches, failure output and rollback evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/public-cutover/handoff.md).
+
+### 36.24 Private DatePicker section-edit parity (decided-by-watchdog, 2026-11-19)
+
+Keep the verified public rollback in the integration checkout. Reproduce the eight partial
+and invalid edit failures against the archived public candidate in the guarded shadow.
+Preserve the byte-identical public contract and the independent standalone DateField defaults.
+Keep focus, year-role and mobile-theme issues queued. Defer browser and package gates until
+the scoped DatePicker contract passes.
+
+The archived candidate failed all eight selected original tests and five of six new paired
+traces. The frozen picker publishes `NaN` for each accepted partial section edit, followed
+by the exact intermediate date timestamps. A rejected symbol emits nothing. A parent that
+echoes an accepted deletion sees an empty field after a single `undefined` callback. With a
+retained February 15, typing day 31 publishes `NaN` and restores the accepted field without
+another callback.
+
+The shell opts its desktop editor into reporting accepted drafts without treating a parent
+`NaN` echo as a new accepted date. Complete edits remain parent-controlled, the numeric
+day is parsed against the assembled date, and an acknowledged clear empties the field.
+Standalone DateField and the mobile dialog editor keep their existing defaults.
+
+All eight unchanged cases and six traces passed after the fix. All 61 retained differential
+assertions passed in UTC and Europe/Bucharest, including 31 standalone DateField cases.
+The scoped shadow suite passed 213/220 in UTC. The remaining seven failures are the same
+two focus, two year-role and three mobile-theme cases. Integration remains on the frozen
+public export. [Exact edit delta and guarded evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/edit-parity/handoff.md).
+
+**Edit group approved (decided-by-watchdog).** The delayed external `NaN` pair pins an
+ignored initial partial edit, a same-value parent rerender, then an external `NaN`.
+Both keep `03/DD/YYYY` and emit exactly one callback, on the first edit. The frozen
+shell's `lastEmissionInvalid` survives a same-value rerender and treats the next
+`NaN` as an acknowledgment. Keep the candidate's matching behavior and the witness.
+The final shadow had 214/221 passing in UTC, with the same seven residual failures.
+All 62 differentials passed in both time zones. The final integration picker tree is
+`a42502cdd0d3ff1e61c022a1e7a81fc1eeb7f0b7`.
+
+### 36.25 Private DatePicker desktop focus restoration (decided-by-watchdog, 2026-11-19)
+
+Start from the approved edit delta and keep the public rollback. Reproduce the two
+unchanged desktop focus failures in the guarded shadow and compare actual focus before
+open, inside the calendar, after Escape closes the overlay and after Tab leaves the
+editor. Keep year-role and mobile-theme issues queued while the focus delta is verified.
+
+The frozen padding click returned focus to Month on Escape and Tab reached the next
+control. The shadow left focus on the body, dropped the field ring and missed the next
+control. Clicking a real Day section already restored Day on both routes. Both unchanged
+focus tests and the padding-click pair failed on the pre-fix shadow.
+
+The fix is confined to the desktop Escape handler. If its saved opener is outside the
+field, it uses the first tabbable date section for the existing delayed restore. A saved
+editor target still wins. Both unchanged focus tests and both pairs passed. The scoped UTC
+suite now passes 218/223, with only the two year-role and three mobile-theme failures.
+Public wiring remains rolled back. [Exact focus delta and traces](/Users/a.kott/vanguard-verify/logs/date-picker-s3/focus-parity/handoff.md).
+
+**Focus group approved (decided-by-watchdog).** The exact private tree `d38d70c263048e5fe18c3e09d40470146cccd20d`
+passed 4/4 focused tests, 218/223 scoped UTC with the five prior failures, 64/64 Bucharest
+differentials and scoped TypeScript. The desktop Escape-only fallback retains the existing
+restore timer lifecycle.
+
+### 36.26 Private DatePicker year-view compatibility (decided-by-watchdog, 2026-11-19)
+
+Start from the approved focus tree with the public rollback in place. Freeze the year
+control role, mousedown containment, selection publication and the return to day view.
+Keep the correction owned by DatePicker and leave the three mobile-default failures queued.
+
+The paired red isolated the role. The frozen control is a button and the shadow was a
+radio. Both kept the popup and its claim on mousedown without publishing. Releasing
+published the same March 15, 2026 timestamp once while year view and claim were still
+active, then returned to day 15 in the March 2026 grid with the popup open.
+
+DatePicker now requests the button role from its internal calendar. The standalone
+calendar retains the radio default. Both unchanged year tests and the paired witness
+passed. The scoped UTC suite passed 221/224, including all 107 unchanged public
+contracts. Only the same three mobile-theme cases remain. Public wiring stays rolled
+back. [Exact year-role patch and evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/year-parity/handoff.md).
+
+**Year-view group approved (decided-by-watchdog).** Exact private tree
+`6547a2dc75fa4194e700341aa3ae80d699e7411b` passed 3/3 focused, 221/224 scoped UTC,
+65/65 Bucharest differentials and scoped TypeScript. The three residual failures
+are the mobile theme defaults.
+
+### 36.27 Private DatePicker mobile Enter theme defaults (decided-by-watchdog, 2026-11-19)
+
+Keep the integration public rollback and all existing contract assertions. Compare
+the frozen disabled and read-only defaults and the `MuiDateField` consumer key
+handler against the shadow before changes. Record the event order and preserve the
+no-provider route. Reuse the existing theme-default bridge for the relevant defaults
+when supported by the witness. Return this delta and its scoped evidence before a
+new public cutover.
+
+The guarded red reproduced all three existing mobile failures and four paired failures.
+The no-provider pair already matched. The frozen picker gates opening on disabled and
+read-only defaults. Its themed field handler runs on the section list between capture
+and outer bubble, after the claim is acquired and before the dialog commits.
+
+The desktop follow-up found that the frozen consumer handler also runs for ArrowUp.
+It runs on the same section-list event as the edit, with default prevention set before
+publication. A consumer preventDefault still permits the internal edit. A read-only
+picker default blocks desktop popup opening while its desktop field remains editable.
+The three desktop pairs failed on the mobile-only delta and passed after removing the
+desktop gate and composing the handler in the section-list event. The no-provider
+field and standalone editor require no theme handler.
+
+The final guarded shadow passed all eleven focused cases together, 232/232 scoped
+UTC including the 107 unchanged public contracts, and 73/73 Bucharest differentials.
+Exact private tree
+`4f61196a6fa521233091d3d1d05317997c0176b5` remains on the public rollback.
+[Theme delta and guarded evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/mobile-theme-parity/handoff.md).
+
+**Theme group approved (decided-by-watchdog).** The watchdog accepted the three desktop
+pairs, 232/232 scoped UTC and 73/73 Bucharest. The final scoped TypeScript check exited
+0 on the exact public shadow `5a1ee0156cf31d46b3691d41479b7b25d1fc4868` before wiring.
+
+### 36.28 DatePicker public cutover replay (decided-by-watchdog, 2026-11-19)
+
+Promote the runtime files from the verified shadow and carry the unchanged scoped unit
+evidence. Route the differential through the public candidate and its excluded frozen
+reference, with the own-field marker from the first cutover. Recheck the changed
+differential and run the prepared guarded desktop placement/pixel and pointer/hydration
+pairs serially. A contract or visual regression triggers the §36.23 rollback. Package
+and wide gates stay at the milestone.
+
+The local public route switched to DatePickerShell on tree
+`0af021ac05e86503a9d2a4c613835ee3f3289061`. The production files are byte-identical to the
+reviewed shadow. The only tree difference from the shadow is the test-only differential
+reroute and own-field marker, which passed 35/35. Carry 232/232 scoped UTC, 73/73 Bucharest
+and scoped TypeScript on the unchanged shadow code, including all 107 byte-identical
+public contracts. The frozen reference remains excluded.
+
+Guarded desktop replay passed 4/4 with matching outline strips and all six sampled
+1200×900 RGB pairs pixel-identical. Fine mouse and coarse touch hydration passed 1/1
+each. Both retained the frozen portal mode, field ring, Escape focus return and zero
+recoverable hydration errors. The touch witness also closed on a trusted backdrop tap.
+Telemetry was disabled, all guard self-tests passed with zero other denied destinations,
+and port 6031 closed. No rollback was needed in this scope. The 19 source fingerprints
+matched before and after in both worktrees.
+[Exact public wiring diff and evidence](/Users/a.kott/vanguard-verify/logs/date-picker-s3/public-cutover-retry/handoff.md).
+
+### 36.29 H24 DatePicker package milestone (decided-by-watchdog, 2026-11-19)
+
+The source inventory found zero production MUI X imports and 16 test-only import edges.
+All 19 frozen reference files are absent from the ESM and WordPress source projections
+and from the ESM declaration projection. The ESM entry resolves the own DatePicker shell.
+The WordPress entry resolves no DatePicker source. The only direct MUI X manifest entry is
+`@mui/x-date-pickers@9.17.0` under devDependencies for tests and fixtures. Keep that
+dependency, its lockfile entry and the derived MIT notice.
+[Static inventory](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/source-boundary.json).
+
+The approved milestone is exact isolated tree `a327c176c3180f765596d20364db53a1bb606735`.
+It adds the 13 reviewed DatePicker paths, the additive declaration witness, and the
+DateField MIT notice wording to the accepted H23 tree. TextField characterization,
+FormControl, theme-provider work and plan notes stay outside the snapshot. The public
+API files, 107-test contract and dependency pins retain their exact hashes.
+[Milestone source manifest](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/milestone-files.sha256) ·
+[Patch provenance](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/provenance.txt).
+
+Use one reserved Rule 13 slot for the guarded offline source TypeScript and canonical
+package gate. Verify the actual emitted JS and declaration paths in both bundles, all
+static and lazy chunks, both notices, the no-MUI-X consumer's packed DatePicker first
+render, and the exact archive checksum. The H23 main Rollup graph is the positive
+control with 138 MUI X module IDs and 484,590 rendered bytes. H23 remains the fallback
+artifact. A green gate releases the slot and the exact H24 archive directly to V1 for
+the focused packed consumer checks. The full consumer and Tier P sweeps stay assigned
+to the final candidate.
+
+The emitted audit also parses TypeScript triple-slash type and path references. The
+offline synthetic control went red on the original parser, then flagged both directives
+while ignoring the MIT notice comment. This audit change stayed outside the approved
+source snapshot. [Directive witness](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/audit-directive-green.log).
+
+**H24 package PASS.** The guarded offline source TypeScript check and canonical package
+gate both exited 0. No-preload source specs passed 2,865/2,865 across 387 files and the
+scripts project passed 79/79 across 12 files. The installed consumer fixtures passed
+34/34 in each default install and 44/44 in each WordPress install. The packed default
+DatePicker rendered its own field synchronously without an installed MUI X peer
+(Vitest 1/1). The supplemental shell wrapper failed while recording the exit status
+after Vitest had printed its passing summary. The emitted audit found zero MUI X or
+frozen reference edges in both bundles, including lazy chunks and declarations.
+Both MIT notices shipped, and all 4,049 packed dist files matched the build on disk.
+The eager Material count is 22/298 plus one allow-listed context module. The fallback
+audit is 22/22 and the WordPress dynamic import walk reached 336 files with zero missing.
+[Gate log](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/canonical-package.log) ·
+[First-render log](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/packed-first-render.log) ·
+[Emitted graph audit](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/emitted-boundaries.json).
+
+The watchdog's read-only verification matched 4,642/4,642 tracked blobs and file
+modes to the approved tree with zero extra non-ignored paths. The temporary-index
+approval remains untouched and is unnecessary for this handoff. The exact verified
+pack has SHA-256 `2afc5e74a51389473c5bc19d5b12974affbafe412e61d649a8c9abde73edd755`.
+[Verified pack sent to V1](/Users/a.kott/vanguard-verify/logs/h24-datepicker-milestone/fixture/pack/rankingcoach-vanguard-2.11.0.tgz) ·
+[Durable copy](/Users/a.kott/vanguard-verify/packs/a327c176c3180f765596d20364db53a1bb606735-h24.tgz) ·
+[Checksum register](/Users/a.kott/vanguard-verify/packs/SHA256SUMS).
+
+**Direct slot handoff.** V1 received the pack checksum and focused Rule 13 slot for
+guarded Storybook and unit-test checks against committed rc-webapp `73673465091`.
+Delivery receipt `message:mcp:a6ddd56a-6190-473d-a3ce-f20f19150bac:thread-send:7d297f78-b6ed-4647-b8dd-e88bf41fcdd8`
+started V1 run 126. The independent consumer verdict is pending. H23 remains the
+fallback artifact and the full consumer and Tier P sweeps remain assigned to the
+final candidate.
+[Vanguard Architecture and Visual Consistency](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/80fcbccb-4649-4a3a-88e7-93c70c8198d6).
+
+**H24 focused browser FAIL on the mobile shell (decided-by-watchdog, 2026-11-20).**
+Exact H24 Narrow reached the mobile dialog and focused a calendar gridcell. Two isolated
+pairs returned Day on .472 and BODY on H24 after Cancel, sampled after the calendar
+became hidden plus two animation frames. The trace ends there. It does not establish
+later focus. The sampled rectangles at open are for the **calendar** (320×336 on both,
+y280.6875 → y271.5), separate from settled **paper** geometry. At 390×844, the settled
+PNG paper fill spans rows 175–668 on .472 and 200–644 on H24 in both repeats. The
+115,467 differing open pixels include toolbar typography, native-looking edit and
+action buttons, and missing reference elevation. Narrow closed, desktop Data and
+legacy dash-locale settled screenshots matched. V1's two H24 nested-modal alias and
+hit-test runs passed. The two .472 nested diagnostics reached the scheduling form
+without opening a calendar, leaving the paired hit-test witness open.
+[Baseline Narrow](/Users/a.kott/vanguard-verify/v1/logs/h24-focused-v1/baseline-20261119T220543/narrow-1.json) ·
+[H24 Narrow](/Users/a.kott/vanguard-verify/v1/logs/h24-focused-v1/candidate-20261120T095640/narrow-1.json) ·
+[Settled screenshot comparison](/Users/a.kott/vanguard-verify/v1/logs/h24-focused-v1/pixels.json) ·
+[V1 verdict and direct release](/Users/a.kott/vanguard-verify/v1/logs/h24-focused-v1/verdict.md).
+
+TDD the focus and presentation gaps independently. Reproduce the trusted Day tap and
+Cancel click without pre-focusing the field. Record focus before open and after the
+actual dialog portal detaches, including a later bounded observation. Preserve
+ModalHost's close, ARIA and scroll-lock lifecycle. For presentation freeze the .472
+settled paper rect, height/elevation, header typography and edit/Cancel/OK computed
+styles. Scope any production change to DatePickerShell and its mobile stylesheet.
+Preserve semantic buttons, keyboard behavior, desktop/legacy-locale parity and aliases.
+Use the scoped regression slot after direct V1 release, ahead of the optional packed
+TextField marker replay. Keep H24 and H23 artifacts immutable and use the milestone
+gate for packages.
+
+**Scoped mobile source replay after V1 release.** At 390×844 the presentation
+differential reproduced the packed footprint (frozen paper height 494.390625 px,
+unmodified own 445 px) and the recorded typography, control and elevation differences.
+The two-file presentation patch in the prior source shadow passes 3/3 guarded Chromium
+stories. Frozen and patched paper are both `x35/y174.796875/w320/h494.390625`, with
+exact sampled styles and rects. The public and shell unit specs passed 142/142,
+including the 107 unchanged public tests. Rule 13 deferred the supplemental desktop
+rerun before Chromium launched. Desktop implementation and styles are outside the
+patch. With V1's capture-before-Cancel sequence in the scoped source case, Day was
+already active on the opening click on both routes and remained focused at detachment,
+after two frames and 250 ms later. This leaves the packed focus finding open. No focus
+or ModalHost change is justified by that source control. The exact pack digests
+were rechecked. [Triage, witness and patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-picker-triage/handoff.md).
+
+**H24 mobile successor (decided-by-watchdog, 2026-11-20).** The exact approved
+two-file patch, SHA-256 `0db17a8196e96a5c3946aea574e41f471acecc0660a4549e25e383cc7f663010`,
+is applied locally on `feature/ui-sdk-architecture-investigation` without a commit.
+Both file digests match the guarded source shadow. The integrated desktop replay
+passed 4/4 and all six paired frames matched at every RGB pixel. The standalone
+successor source is the approved H24 tree plus only those two mobile shell files.
+The read-only manifest checks all 4,642 original paths and modes, with 4,640 unchanged
+blobs and zero extra paths. Its computed tree ID is
+`2390cb44d97e78d1b39165f79b6f61841ecdd32c`. The single guarded offline milestone is
+for that exact snapshot. The exact H24 and H23 packages remain available. The pack-only
+focus finding remains open and supplies the hide, detachment and late follow-up checks
+for the focused successor consumer handoff. TextField is outside this snapshot.
+[Integrated fingerprints](/Users/a.kott/vanguard-verify/logs/h24-mobile-picker-triage/integration-after.sha256) ·
+[Desktop replay](/Users/a.kott/vanguard-verify/logs/date-picker-s3/public-cutover-retry/desktop/h24-mobile-style-integrated/placement.log) ·
+[Reviewed successor manifest summary](/Users/a.kott/vanguard-verify/logs/h24-mobile-successor/source-before-gate.json).
+
+**H24 mobile successor gate PASS.** The isolated TypeScript check and canonical
+offline gate exited 0. Source specs passed 2,865/2,865 without global preload,
+scripts passed 79/79, and the four installed consumers passed 156/156. The before
+and after source manifests match byte for byte. The verified production diff contains
+only `DatePickerShell.tsx` and `DatePickerShell.module.scss`, with the mobile toolbar,
+buttons and paper styling. The emitted audit found zero MUI X or frozen-reference
+edges in the ESM and WordPress runtime and declaration graphs. Both MIT notices
+shipped and all 4,049 packed dist files matched the build on disk. The eager count
+is 22/298 plus one allow-listed context module. The fallback audit is 22/22 and all
+336 WordPress dynamic-import targets resolve.
+[Verified diff](/Users/a.kott/vanguard-verify/logs/h24-mobile-picker-triage/mobile-presentation.patch) ·
+[Gate log](/Users/a.kott/vanguard-verify/logs/h24-mobile-successor/canonical-package.log) ·
+[Post-build source check](/Users/a.kott/vanguard-verify/logs/h24-mobile-successor/post-build-source-check.log) ·
+[Emitted audit](/Users/a.kott/vanguard-verify/logs/h24-mobile-successor/emitted-boundaries.json).
+
+Archive SHA-256 `8206e0603a04e8cb7c3a7ca0197f2a5c43c27fce3c281dcf4588dfba2eca8919`.
+The original H24 and H23 digest checks passed. The successor consumer scope is the
+guarded Narrow-only pair against .472 at committed rc-webapp `73673465091`. Compare
+settled mobile styling and sample Cancel focus at hide plus two frames, portal
+detachment and 250 ms later. The exact H24 focus finding remains open.
+[Successor pack](/Users/a.kott/vanguard-verify/packs/2390cb44d97e78d1b39165f79b6f61841ecdd32c-h24-mobile.tgz) ·
+[Checksum register](/Users/a.kott/vanguard-verify/packs/SHA256SUMS).
+
+The direct handoff started verifier run 129 with the verified archive and Rule 13
+slot. Delivery receipt `message:mcp:1211c210-3939-4263-bf58-b3260f020e1c:thread-send:c32d74fc-8c61-49b1-ba15-9236f4a1fa72`.
+[Vanguard Architecture and Visual Consistency](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/80fcbccb-4649-4a3a-88e7-93c70c8198d6).
+
+**Successor guarded Narrow verdict.** The settled mobile presentation targets
+matched .472 in 2/2 pairs, including the 320×494.390625 paper, elevation, distinct
+caption and date typography, and all three button styles and rects. Closed PNGs matched.
+Open screenshots retain 743 differing pixels at the calendar month label and chevron,
+and 14,664 at the highlighted input behind the dialog. Cancel focus failed 2/2.
+Both builds entered the dialog after the
+trusted Day tap, with the original Day active at the opening click and still connected
+and current after close. .472 had Day at Cancel click capture and at all three close
+checkpoints. The successor had Cancel through the click, then BODY at detachment,
+hide plus two frames and detachment plus 250 ms. The serialized day stayed the same.
+Probe transport passed and V1 returned the slot. [V1 verdict](/Users/a.kott/vanguard-verify/v1/logs/h24-mobile-successor-v1/verdict.md).
+
+**Offline focus discriminator.** The committed Narrow caller supplies
+`closeOnCLickAway`, which the earlier passing source focus fixture omitted. The
+shell's document `mousedown` listener treats Cancel as outside the field wrapper and
+calendar allow-list. This can dismiss and clear the live flag before the Cancel click.
+ModalHost's restore cleanup follows `open`, while Fade keeps the portal mounted for
+exit and schedules no later restore. The exact focus-attempt order remains to be
+measured. The drafted trusted-pair test adds the consumer prop and a prop-disabled
+control and records focus and the picker claim through mouse events and detachment.
+Keep any fix local to the picker after the intended red. The draft is unrun and
+the style patch and artifact identities are retained.
+[Offline focus evidence and test](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-repro/handoff.md).
+
+**Picker-local mobile focus fix (decided-by-watchdog, 2026-11-20).** The watchdog
+authorized production changes only if the exact consumer-prop red confirmed early
+outside dismissal. The guarded red passed the frozen and prop-disabled controls.
+With the consumer prop on, Cancel `mousedown` started at claim 1101. The claim dropped
+to 1100 and Day briefly regained focus, then Cancel retook focus before click.
+Detachment, hide plus two frames, and +250 ms all saw BODY. The original Day stayed
+mounted. The two added unit regressions independently went red at the premature claim
+release for controlled Cancel and keyboard actions. The four outside controls passed.
+
+The fix gives each DatePicker its own mobile paper ref and excludes only that paper
+from its outside listener. The green Chromium replay passed 3/3. The own consumer
+case kept claim 1101 through click, then restored the original Day at claim 1100 and
+held it through all close checkpoints. The two focused unit files passed 148/148,
+including the unchanged 107 public contracts, controlled Cancel rollback and
+publication order, keyboard editing, ordinary outside, foreign dialog and both
+backdrop paths. The production diff is confined to the instance ref, containment
+check and binding in `DatePickerShell.tsx`. The other file adds regression coverage.
+The mobile styles and ModalHost still match the immutable mobile-style source.
+[Exact two-file diff](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-repro/mobile-cancel-focus.patch) ·
+[Red and green event summary](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-repro/red-green-event-summary.txt) ·
+[Unit red](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-repro/unit-red.log) ·
+[Unit green](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-repro/unit-green.log).
+
+The watchdog reviewed the scoped evidence and approved one guarded offline
+milestone from the immutable `2390cb44d97e78d1b39165f79b6f61841ecdd32c` source
+plus those two files only. The exact focus patch SHA-256 is
+`fe39f05b7386db0438fc217c0c6950cdd7c3dee90cf66b2c1f5749eb89e69237`. The isolated
+tree ID computed without Git writes is `e90441d30d074f2938187561cab71f061dcd226d`.
+All 4,642 paths and modes were verified against the reviewed source. Its public
+entry and props, styles, ModalHost, public spec and dependency files are byte-identical
+to the immutable base. Preserve the original H23, H24 and mobile-style successor
+archives. Hand the verified focus successor and Rule 13 slot directly to V1 for
+the focused Narrow consumer comparison after the gate passes.
+[Source verification](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/source-before-gate.json).
+
+**Focus successor gate PASS.** Isolated TypeScript and the canonical guarded offline
+gate exited 0. The no-preload source specs passed 2,871/2,871, scripts passed 79/79,
+and all four installed consumers passed 156/156. The before and after source manifests
+match byte for byte. The packed manifest, both CSS files and all 1,067 declaration files
+match the mobile-style base byte for byte. The emitted audit found zero MUI X and
+frozen-reference edges in either bundle. Both MIT notices shipped and all 4,049 packed
+dist files match the build on disk. The fallback audit is 22/22, the eager count is
+22/298 plus one allowed context module, and all 336 WordPress dynamic-import targets resolve.
+[Gate log](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/canonical-package.log) ·
+[Post-gate source verification](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/source-after-gate.json) ·
+[Packed API and style comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/packed-boundary-parity.json) ·
+[Emitted audit](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/emitted-boundaries.json).
+
+The exact focus successor archive has SHA-256
+`c11fd6cac5546602b3703d13ec4715d264722f99e30ab15df59b58c7cd7fcd6f`. The H23, H24,
+and mobile-style successor archive digests were independently rechecked. V1's
+focused Narrow consumer scope is the trusted Day tap and mouse Cancel against .472,
+with original-Day focus at hide plus two frames, portal detachment and +250 ms.
+Settled paper and control styling remain part of the comparison. The month-label
+and chevron residual and the highlighted background input remain separate observations.
+[Focus successor pack](/Users/a.kott/vanguard-verify/packs/e90441d30d074f2938187561cab71f061dcd226d-h24-mobile-focus.tgz) ·
+[Checksum register](/Users/a.kott/vanguard-verify/packs/SHA256SUMS).
+
+The direct Rule 13 handoff started verifier run 131. Delivery receipt
+`message:mcp:1211c210-3939-4263-bf58-b3260f020e1c:thread-send:bd53afe9-996f-4f05-8945-e996eafdf2f0`.
+[Vanguard Architecture and Visual Consistency](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/80fcbccb-4649-4a3a-88e7-93c70c8198d6).
+
+**Focus successor Narrow replay inconclusive on resources.** The approved one-shot
+preflight cleared for Storybook and its served index matched the qualified saved .472
+index byte for byte. The first pre-Chromium interval measured 51.58% CPU idle against
+the required 60%. Chromium never started. No live JS fingerprint, story, focus,
+value or visual evidence was collected. V1 stopped Storybook, reaped the prior
+waiter, removed the one-shot branch and returned the clear slot directly to A.
+The package gate remains PASS and the Narrow focus and visual verdict remains open.
+[Verifier status and slot closure](/Users/a.kott/vanguard-verify/v1/logs/h24-mobile-focus-v1/status.md).
+
+**Single Narrow retry (decided-by-watchdog).** A verified the ports were clear and
+returned the slot directly to V1 for the same staged focus successor and qualified
+.472 reference. The sole Storybook may settle before guarded Chromium. The host
+check still requires at least 60% CPU idle in each of three two-second readings,
+at least 40% free memory, and the exclusive slot. The TextField replay remains queued
+until V1 returns the slot. Delivery receipt
+`message:mcp:1211c210-3939-4263-bf58-b3260f020e1c:thread-send:11fdf2b2-a6c6-4c13-ba5e-8933b24d8d69`.
+
+**Exact packed Narrow Cancel focus PASS.** The guarded retry compared the focus
+successor with both qualified .472 cycles at committed rc-webapp `73673465091`.
+Both successor cycles restored the original, still-connected Day immediately after
+Cancel and held it at portal detachment, hide plus two animation frames and detachment
+plus 250 ms. Hidden value `25/10/2026` remained unchanged. Settled paper,
+caption/date and edit/Cancel/OK metrics matched, and closed PNGs were identical.
+Each open pair retained 743 changed month-heading/chevron pixels and 14,664 changed
+field-underlay pixels, with zero differences elsewhere. The served index was exact,
+both live JS fingerprints and the guard passed, and the request audit saw zero
+non-GET requests. V1 preserved the prior refusal, stopped Storybook and Chromium,
+removed the temporary checksum-specific override and returned the clear slot to A.
+[Narrow verdict](/Users/a.kott/vanguard-verify/v1/logs/h24-mobile-focus-v1/verdict.md).
+
+**Accepted, decided-by-watchdog.** The two-file focus patch changes `DatePickerShell.tsx`
+and `_DatePickerShell.differential.spec.tsx`, SHA-256
+`fe39f05b7386db0438fc217c0c6950cdd7c3dee90cf66b2c1f5749eb89e69237`.
+The verified source tree is `e90441d30d074f2938187561cab71f061dcd226d` and the archive
+SHA-256 is `c11fd6cac5546602b3703d13ec4715d264722f99e30ab15df59b58c7cd7fcd6f`.
+The 743 month-heading/chevron pixels are accepted at this viewport. The 14,664
+field-underlay pixels are recorded separately below. [Focus patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-repro/mobile-cancel-focus.patch) ·
+[Exact archive](/Users/a.kott/vanguard-verify/packs/e90441d30d074f2938187561cab71f061dcd226d-h24-mobile-focus.tgz).
+
+**Scoped underlay diagnosis, decided-by-watchdog.** After the §36.10 replay, one guarded
+source-only Chromium session passed 7/7 fresh stories at 390×844. The early-disabled own tap
+reproduced the archived dominant blue fill `(96,148,168)`, and every pixel of the 312×47
+field differed from the transparent control. That control was pixel-identical to the late
+animations-allowed crops on the ordinary tap, keyboard, and frozen legs. The fresh
+early-disabled frozen tap had a weaker tint `(116,134,141)`, while the archived .472 Narrow
+had neutral dimming. Both own tap legs computed the same open field fill and border and had
+backdrop opacity 1 at the early-disabled observation. Only the diagnostic control changed
+the opener's tap color. This isolates transient tap highlighting in the source fixture and
+supports the packed attribution. The source witness does not establish a post-fix packed
+image result. **Closed, decided-by-watchdog.** The transient native tap feedback is
+accepted on the verified Chromium fixture. Retain the existing production styling and
+archive. [Attribution and protocol](/Users/a.kott/vanguard-verify/logs/h24-mobile-underlay-triage/attribution.md) ·
+[Crop metrics](/Users/a.kott/vanguard-verify/logs/h24-mobile-underlay-triage/paired-capture-20261120T134139/crop-comparison.json) ·
+[Guarded story result](/Users/a.kott/vanguard-verify/logs/h24-mobile-underlay-triage/paired-capture-20261120T134139/underlay.log).
+
+**Scoped public cutover approved (decided-by-watchdog).** Retain the local public wiring on
+exact picker tree `0af021ac05e86503a9d2a4c613835ee3f3289061`. The watchdog independently checked
+all 19 manifest hashes in the main and shadow worktrees, the unchanged public contract hash,
+the exact mouse and touch traces and both network-guarded pointer launches. The desktop
+check passed four placements and found zero differing RGB pixels across all six frames.
+[Source manifest](/Users/a.kott/vanguard-verify/logs/date-picker-s3/public-cutover-retry/source-files.sha256) ·
+[Main result](/Users/a.kott/vanguard-verify/logs/date-picker-s3/public-cutover-retry/integration-after.txt) ·
+[Shadow result](/Users/a.kott/vanguard-verify/logs/date-picker-s3/public-cutover-retry/shadow-after.txt).
+
+### 36.30 Pre–Tier C reconciliation (2026-11-20)
+
+The ready admission input is the accepted H24 mobile focus successor, source tree
+`e90441d30d074f2938187561cab71f061dcd226d`, archive SHA-256
+`c11fd6cac5546602b3703d13ec4715d264722f99e30ab15df59b58c7cd7fcd6f`.
+A fresh read-only comparison matched all 4,642 paths and modes in the isolated
+snapshot. The integration worktree matches on 4,640 paths. Its two differences are
+this plan and the synthetic callback-native TextField characterization spec, which
+records the current routing difference and was kept outside the gate. There are
+zero extra non-ignored paths in either comparison. HEAD remains `55dc611` and
+includes the master Gallery merge and both B integration commits. All four H23 and
+H24-family archive digests match the register. [Source and archive reconciliation](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/pre-tier-c-source-reconciliation.json) ·
+[Verified focus successor](/Users/a.kott/vanguard-verify/packs/e90441d30d074f2938187561cab71f061dcd226d-h24-mobile-focus.tgz).
+
+| Item | Before Tier C |
+|---|---|
+| DatePicker | Scoped source, package, desktop Data/legacy, composed publication and packed Narrow focus evidence recorded in §36.29. Both open-image residuals accepted at Narrow. The `.472` nested-calendar hit-test still has no qualified pair. Keep that gap in the final evidence. No DatePicker source or pack iteration is queued. |
+| FormControl | The §36.10 guard review leaves opaque descendants on the existing public implementation to preserve the bundled MUI context contract. The exact successor still emits the FormControl fallback as an ESM dynamic import, and neither FormControl module appears in the linked WordPress graph. Zero known production call sites and no conservative guard for the evidenced wrapped context shape. Retain the existing fallback under the approved compatibility rule. |
+| TextField and theme provider | Keep both eager under §36.10. The inner marker replay covers only the two declared profiles of original H24. Dynamic forwarding, external WordPress props, theme defaults and the cold unsupported-inner control remain prerequisites of any future ESM split. The callback-native synthetic case stays outside the release snapshot. |
+| Known historical source and pack failures | H23 declaration boundary and SearchableSelect caret are in the successor. Offline source library TypeScript, 2,871 no-preload specs, 79 scripts, 156 installed consumer tests and the 22/22 fallback audit passed on the exact successor. B's ProgressBar and historical case audit are closed. The emitted audit has zero MUI X and frozen-reference edges, and the package preserves the declaration/CSS identity with its mobile-style predecessor. |
+| Final source static and coverage evidence | The successor package gate covers library TypeScript, source specs/scripts and installed emitted types. It does not supply fresh `gates.sh` app/all-spec/contract/Biome evidence or the instrumented Storybook coverage result. Keep any final source checks on this exact isolated snapshot and collect the missing evidence in the final reserved slot. |
+| Final consumer evidence | V1's prior H22 visual chunks, throughput canary and H24 unit canaries qualify their recorded scopes only. WordPress fixture hits are distinct from final runtime parity and Tier P. Final browser shards, paired full rc-webapp units, WordPress and Tier P are reserved for the single final candidate. Keep the approved production CSS-order and WordPress-plugin input gaps visible. |
+
+**Admitted for Tier C (decided-by-watchdog).** Use the existing source snapshot and
+verified archive. A checked the archive digest and released the clear slot directly to
+V1 for one standard Rule 13 paired first Storybook shard and exact paired unit guard
+canaries. Match committed consumer `73673465091`, recheck served identities at start
+and end, require the deliberate denial self-tests, and retain complete paired expected
+keys and exclusion/error logs. Use qualified root-only manifests within their approved
+scope and discovery for extra targets. Run serially. V1 returns the clean slot directly
+to A. Delivery receipt
+`message:mcp:1211c210-3939-4263-bf58-b3260f020e1c:thread-send:0826175b-6773-4206-9f94-50579db94d57`.
+The full rc-webapp unit pair stays at the end. [Canonical gate evidence](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/canonical-package.log) ·
+[Final browser admission](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-throughput-canary/README.md) ·
+[Paired unit guard](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-unit/README.md).
+
+**Final source commands prepared offline.** After handback, run the exact snapshot's
+static gate, then combined source and browser coverage with the existing 35-file,
+95%-line and 85%-branch thresholds. Verify no outbound network for Node and Chromium,
+the two permitted runner ports, the browser denial self-test and fresh standard Rule 13
+preflight. Keep static and coverage outputs separate and reuse the accepted package
+gate. Commands and guard drafts stayed outside the snapshot. Offline preparation
+validated command syntax, Vitest option parsing, all 35 paths and the sandbox profile's
+syntax. The guarded transport witness and source gates are still pending.
+[Final source command handoff](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/README.md).
+
+**D9 Redux exit remains deferred.** The exact archive still requires
+`react-redux >=7.2.6` and `@reduxjs/toolkit >=1.7.1` as peers. The ESM legacy-dispatch
+and WordPress runtime still import `react-redux`. The F4/F5 local form path works
+without a Redux Provider. A full exit depends on consumer-side dispatch binding and
+separate approval. It stays outside the admitted candidate. Final work remains the
+source gates, eligible Tier C browser shards and final paired consumer coverage,
+including WordPress and Tier P. The historical paired consumer TypeScript verdict
+without consumer-installed MUI remains unrecorded for the exact candidate.
+
+### 36.31 Tier C c000 evidence and first diagnostic replay (2026-11-20)
+
+The admitted H24 focus successor was paired with `.472` on committed rc-webapp
+`73673465091`. The discovery follow-up passed **4/4 complete pairs**, with valid start and
+end served fingerprints and deliberate denial checks on each leg. The fifth discovery
+key, Saved Call Asset Details `waiting-for-backend`, has no PNG on either leg and
+remains open. The two exact unit guard canaries passed **4/4 each**, with all five
+expected deny signatures and the mocked Axios response on both. The full unit pair
+remains reserved for the end. V1 closed its runners and returned the clear slot.
+[V1 verdict and links to both guard records](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T141729/verdict.md) ·
+[Status](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T141729/status.log) ·
+[Discovery accounting](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T141729/discovery-accounting.json).
+
+The root manifest comparison is **provisional**. It records 114 PASS, 26 FAIL and one
+UNSTABLE among 141/145 complete pairs. The original candidate session had an opening
+fingerprint and stopped before the closing fingerprint. Later fingerprints qualify
+only their own discovery captures. Four candidate Account Logs style roots are empty
+(`loading`, `reports`, `user-logs`, `user-logs-with-ips`). Keep those missing keys apart
+from rendered comparisons. [Manifest accounting](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T141729/manifest-accounting.json) ·
+[Preserved raw comparison](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/out/tierc-c000-20261120T140506-candidate-manifest/diff-vs-tierc-c000-20261120T135013-baseline-Story.md).
+
+| Group | Provisional evidence and what remains to distinguish |
+|---|---|
+| Payment Lock Banner, six | Each candidate has the same 17-node added subtree; matched nodes have no reported style differences. Five subtrees contain the declined copy, and `retry-succeeds` contains the settled copy. The committed story seeds account state in `beforeEach` and its retry variants can advance state in `play`. The `SubAccount` candidate contains the declined copy even though the fixture expects the owner-contact copy. Check seed/render phase and variant before assigning a component cause. |
+| Animation phase, six plus one unstable | Payment Settings, Widget Comparison and Inventory, Billing Exports `first-load`, and Done and Scheduled loading stories have horizontal offset deltas on the same animated skeleton descendants. Widget Comparison `data` has one analogous unstable offset. Pin the animation timestamp on a diagnostic replay, preserve a normal frame and compare the static skeleton boxes separately. |
+| Billing table geometry, eight | The same node counts and table selectors accompany table widths about 0.8–1.2 px greater on the candidate, distributed mostly in the Created column and following Actions offset. The committed fixture uses Vanguard table head/body and a relative-time cell in an auto-layout table. The start-result rows also shift timestamp and status widths, and the selected-IDs story reports a separate 0→23 px type-tile margin. Freeze the story time and fonts before attributing any geometry to the table or the form. |
+| Remaining render/geometry, six | Three PartnerApiTester variants have a zero-size candidate root and 60–70 fewer nodes in the manifest. The fingerprinted passive `login-form` pass is a separate variant. Scheduled `all-buckets` redistributes title/trailing-text width by about 2.3–2.5 px, and TaskTray phone/tablet card heights move 92→72 / 72→70 px. Readiness and actual row contents/wrapping remain open. |
+
+**First diagnostic replay proposal.** On a later approved narrow slot, prioritize the
+six-row Payment Lock Banner family with `Retryable`, `NotLocked` and `SubAccount` on
+both exact builds, Direct Channel light, the original viewport, guarded passive
+discovery and start/end fingerprints. Capture the initial frame and the same seeded
+settled state on both sides. Use synthetic story state and measure the banner count,
+text and controls without clicking or issuing a retry. Expect one declined banner and
+one enabled Retry control for `Retryable`, zero banners for `NotLocked`, and one
+owner-contact banner with no declined copy or Retry control for `SubAccount`, as pinned
+by the committed stories. If the settled pair differs, trace the first divergence in
+seed, render and visible state. A proposed fix needs a focused assertion that is green
+on `.472`, red on the exact unfixed route for the same seeded state, then green on the
+smallest correction with all three controls retained. If the difference appears only at
+the initial capture boundary, preserve the timing evidence for the harness review.
+This proposal does not adjudicate the 26 flags. [Committed story path](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/account/PaymentLockBanner/_PaymentLockBanner.stories.tsx:24).
+
+**Decided-by-watchdog.** The three Payment Lock Banner controls may run inside V1's
+existing family-first replay if the first payment witness cannot establish equivalent
+settled state. The discovery and guard results keep their recorded scopes, and the
+manifest flags remain provisional. The helper slot contains no separate browser launch.
+
+### 36.32 Exact source static RED and lazy fallback proposal (2026-11-20)
+
+The exact isolated H24 focus successor (`e90441d…`) ran the prepared static phase after
+V1 handback. The bounded result was **VALID RED**, raw and reported exit 1. App, lib and
+MUI contract TypeScript were clean. All-spec TypeScript reported 21 diagnostics across
+six fixture files: DateRangeInput 2, SearchableSelect caret 1, class-junk scan 1, TextField
+prop routing 3, TextField reachability 11 and Popper dual-boundary 3. The failures cover
+fixture-only extra props, overly narrow select generics, native element/ref types, real
+mask slot adapters, the fixture's private registration lookup and modifier inference.
+The six local fixture typing edits are saved outside the H24 snapshot. The custom
+TypeScript wrapper and terminal request are parked; its setup failures supply no test
+result. Later validation uses the existing `tsconfig.spec.json` and Vitest `spec` project.
+[Static result](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/static.9jGykx/result.json) ·
+[Raw diagnostic log](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/static.9jGykx/static.log) ·
+[Parked wrapper setup output](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/types.xiWpO8/tsc.log).
+
+Biome reported six errors and 866 warnings, including 62 warning identities above the
+declared `master-ts7` baseline from `f02d3f5`: 37 in frozen references, seven in fixtures
+and 18 in shipped source. Those 62 identities add 85 occurrences over their individual
+baseline counts. Four errors are fixture component factories, one in TextField
+reachability and three in the two media-query specs. The two shipped errors are
+`noComponentHookFactories` on `Inner` and `Fallback` in the shared lazy fallback helper.
+They are a shipped lint blocker, with no runtime failure inferred from the lint result.
+Keep lint rules, declared baseline, frozen behavior, public props and test selection intact.
+B's mechanical production-warning proposals remain review-only. **Decided-by-watchdog:**
+coverage stays held. Static remains mandatory for final acceptance. The admitted
+c000 diagnostic replay may precede static per §36.46.
+[Full Biome JSON](/Users/a.kott/vanguard-verify/worktrees/h24-mobile-focus-successor-source/agentic-plans/mui-upgrade-gates/out/tier-c-e90441d-static.9jGykx/lint.json) ·
+[Declared baseline provenance](./mui-upgrade-gates/baseline/master-ts7/provenance.json).
+
+**Proposed helper-only fix, review pending.** Move the bodies of `Inner` and `Fallback`
+to module-scope render functions, then bind each once inside `lazyFallback` to that
+route's state and, for the outer function, its already bound inner component. This
+follows the existing module-level render/bind pattern in `withLazy`. Keep `Loaded`,
+`pending`, the single registry entry per route and the loader in their current per-route
+scope. The route can provide a `readLoaded` getter and the unchanged `preload` function
+to the bound render functions. The loaded branch renders the actual component directly.
+The cold branch mounts the same `Suspense fallback={null}` and throws the one pending
+promise from its inner component. This preserves the first-commit blank on cold ESM,
+deduplication across mounts and preloads, and immediate rendering after preload or from
+an inline module object. Each route keeps distinct, stable component identities, even
+when two routes resolve to the same component. Keep the nine literal import call sites
+and the WordPress `inlineMuiFallbacks` rewrite intact. No conversion to `React.lazy`,
+external API change or production edit is part of this draft. [Helper](../src/core/_internal/lazy-fallback.tsx) ·
+[Existing bind pattern](../src/helpers/with-lazy.tsx) · [WordPress transform](../config/inline-mui-fallbacks.ts).
+
+**Later red/green checks in an authorized slot.** The saved static result is the lint
+RED. Run targeted `biome lint src/core/_internal/lazy-fallback.tsx` before and after the
+edit, requiring the same two diagnostic identities before and zero after. Use the
+guarded existing `spec` project with no global preload for the helper spec, the
+Autocomplete cold/own routing spec and the existing preloaded FormControl and
+ProgressBar contract specs. Preserve the helper's cold blank, resolve-to-content, warm
+fresh mount and inline first-render assertions. An additive helper witness would hold
+one loader pending while two instances of the same route mount, assert one loader call
+and two initially empty outputs, then resolve and assert that rerender retains the
+loaded node while switching to a separate route remounts it. Keep preloading checks
+in the existing allow-listed fixtures. Targeted baseline and patched runtime outcomes
+should both be green for a lint-only refactor. A deliberately repeated loader or shared
+route instance should turn the corresponding additive witness red. Run
+`node scripts/check-fallback-audit.mjs` and require the current 22/22 accounting with
+zero unexpected or stale entries. Inspect the reference and literal rewrite with no
+call site changes. At the later approved packaging milestone, require the existing
+WordPress packed smoke to render the `sx` Autocomplete opt-out on the first turn,
+retain the inline filled TextField checks, and preserve the ESM/WP import boundaries.
+The accepted H24 package result is the reference for that comparison. [Helper spec](../src/core/_internal/_lazy-fallback.spec.tsx) ·
+[Autocomplete routing spec](../src/core/Autocomplete/_AutocompleteOwnRouting.spec.tsx) ·
+[Preloaded FormControl contract](../src/core/FormControl/_FormControl.mui.spec.tsx) ·
+[Preloaded ProgressBar contract](../src/core/ProgressBar/_ProgressBar.mui.spec.tsx) ·
+[WordPress packed smoke](./mui-upgrade-gates/package-fixture/smoke/bundle.test.tsx:155).
+
+After direct authorization and fresh Rule 13 preflight, the narrow commands on the
+reviewed source would be:
+
+```sh
+export NODE_OPTIONS="--max-old-space-size=4096 --require=/Users/a.kott/vanguard-verify/logs/h21-spec-network-guard.cjs"
+export npm_config_offline=true STORYBOOK_DISABLE_TELEMETRY=1 VG_NO_FALLBACK_PRELOAD=1
+./node_modules/.bin/biome lint src/core/_internal/lazy-fallback.tsx
+node node_modules/vitest/vitest.mjs run --project spec --maxWorkers=1 --no-file-parallelism \
+  src/core/_internal/_lazy-fallback.spec.tsx \
+  src/core/Autocomplete/_AutocompleteOwnRouting.spec.tsx \
+  src/core/FormControl/_FormControl.mui.spec.tsx \
+  src/core/ProgressBar/_ProgressBar.mui.spec.tsx
+node scripts/check-fallback-audit.mjs
+```
+
+Capture the pre-edit lint exit independently so the behavior controls can run on the
+same revision. The next source acceptance gate compiles the full existing spec project
+through `gates.sh`. It carries the saved six test-side typing corrections only after
+review and retains the app/lib/contract and full Biome checks. No replacement pack or
+browser gate is part of this step.
+
+**Helper-only refactor approved and verified (decided-by-watchdog).** The targeted
+pre-edit Biome command exited 1 with exactly `lint/correctness/noComponentHookFactories`
+for `Inner` and `Fallback`. The four guarded spec files then passed 38/38 on the original
+helper, including its existing cold, warm and inline controls and the additive route
+identity and deduplication witness. The helper now binds both module-scope render
+functions once per route. The per-route loader, pending promise and registry still
+use the original logic. The witness establishes the loaded branch on a parent rerender
+before recording the node, then checks warm-to-warm reuse and remount across distinct
+routes sharing one default component. It makes no node-identity claim across the
+cold-to-warm transition. [Lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/biome-red.json) ·
+[Baseline spec log](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/spec-before.log).
+
+The post-edit helper Biome check exited 0 with zero errors and warnings. The additive
+spec also passed targeted lint. The same guarded selections passed **38/38** again:
+helper 4, Autocomplete routing 11, FormControl 8 and ProgressBar 15. The guard self-test
+passed before each spec run. Post-edit fallback audit was **22/22** with zero unexpected,
+stale or reasonless entries. The nine literal caller files and WordPress rewrite file
+match their before hashes. This proves module-mode first render at source and preserves
+the literal rewrite boundary. Packed runtime remains covered by the existing archive
+evidence until a later replacement milestone. The overall static RED remains open and
+coverage is held. [Lint GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/biome-green.json) ·
+[Guarded spec result](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/spec-after.log) ·
+[Fallback audit](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/fallback-audit.log) ·
+[Call-site and rewrite hashes](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/rewrite-after.json).
+
+**Local lazy-fallback PASS accepted (decided-by-watchdog).** The exact two-file Git
+diff SHA-256 is `1b9422d05fd9f6041c1c32e866a111c007c7ae9d52f9b06eb9b0fa75b51f7594`.
+The 38/38 guarded before/after results, clean helper lint, 22/22 audit and identical
+nine call-site and rewrite manifests qualify that local diff. Verification on a
+packed successor is pending. The admitted H24 focus archive stays immutable.
+
+### 36.33 Fixture typing and component factories (2026-11-20)
+
+**Decided-by-watchdog.** Use the existing guarded `tsconfig.spec.json` once for the
+six saved typing corrections. Before moving the component bodies, the canonical
+compiler exited 0 with no diagnostics. The parked wrapper was not used. Targeted
+Biome RED reproduced four `noComponentHookFactories` errors: one TextField
+reachability harness, one media-query differential probe and two media-query SSR
+probes. Each now lives at module scope and receives its original per-run inputs.
+The fixtures preserve the same validity, focus, SSR and listener assertions.
+[Canonical TypeScript exit](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/tsc-spec-exit.txt) ·
+[Biome RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/biome-red.json).
+
+The three files had zero lint errors and warnings after extraction. The same
+**21/21** tests passed before and after with identical case names: TextField
+reachability 6, media-query differential 6 and media-query SSR 9. The Node guard
+self-test passed before the canonical compile and both spec runs. Only the three
+affected spec files ran. The other five typing correction files also had clean
+targeted lint. The canonical compiler was not repeated after extraction.
+[Biome GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/biome-green.json) ·
+[Typing-fixture lint](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/typing-fixtures-lint.json) ·
+[Spec baseline](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/spec-before.log) ·
+[Spec result](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/spec-after.log).
+
+**Outstanding static warnings.** Reconciliation combines the H24 full diagnostic
+report for byte-identical paths with the scoped clean checks for edited paths.
+All six known Biome errors are cleared locally. The **62 introduced warning
+identities** remain, with 85 occurrences above their baseline counts: 18 shipped
+source, seven fixtures and 37 frozen references. The plan and separately parked
+TextField characterization are outside this candidate reconciliation. The warning
+inventory remains a release blocker and the whole static gate is still due on the
+next reviewed snapshot. [Exact remaining paths, rules and messages](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/outstanding-static.json).
+
+**Proposed remediation order.** Start with fixture-only warnings whose fixes keep
+the same inputs and assertions, such as discarded callback return values. Review
+shipped mechanical changes separately. Keep B's proposals review-only. Examine the
+ten shipped hook dependency warnings against their actual rerender and cleanup
+contracts before editing. Key changes also need list identity evidence. Handle the
+37 frozen warnings in their own review, with 28 dependency warnings requiring
+particular care to preserve the reference behavior. Keep the lint rules, thresholds,
+declared baseline and test selection intact. Coverage remains held pending static
+acceptance. This slot produced local fixture edits and evidence only.
+
+**Scoped PASS accepted (decided-by-watchdog).** The accepted three-file Git diff
+against HEAD has SHA-256 `b3b69b6b1568d5927c7382ebd1108c89806fe155b86efc8852619368ff321cb9`.
+The pre-hoist canonical compile ran on 2026-11-20 at about 14:45:40–14:45:46 EET
+(6.06 seconds from opening the compiler log to writing its exit marker), with exit 0.
+The four fixture lint errors cleared and the same 21 cases passed before and after.
+The full static gate remains pending on the next reviewed snapshot.
+[Canonical compile preflight](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/resources-canonical.log) ·
+[Compiler exit](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4/tsc-spec-exit.txt).
+
+### 36.34 Four-file fixture warning batch and frozen references (2026-11-20)
+
+**Narrow fixture batch (decided-by-watchdog).** The same four files went from 11
+Biome warning occurrences to zero diagnostics: one discarded `forEach` callback
+result each in the DatePicker shell and error-logging fixtures, seven literal
+template-example warnings in junk-class test titles, and two conditional hook
+warnings in the theme differential. These account for four introduced warning
+identities. The two callback bodies now discard their result explicitly and the
+titles escape literal backticks and `${…}` while preserving the exact names.
+The theme fixture already creates a fresh output object, wraps and mounts one tree,
+and unmounts it per implementation. Separate module-scope probes keep that setup,
+the same provider wrappers, hook inputs and output normalization. Existing assertions
+are intact. Guarded pre/post spec results were **75/75** with identical full-name and
+status inventories: DatePicker 41, error logging 19, junk classes 8 and theme defaults
+7. The Node guard self-test passed before both legs. [Lint before](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/biome-red.json) ·
+[Lint after](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/biome-green.json) ·
+[Guarded baseline](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/spec-before.log) ·
+[Guarded result](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/spec-after.log) ·
+[Matched case inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/matched-case-inventory.json).
+
+Reconciliation against byte-identical paths in the H24 static report leaves **58**
+introduced identities and 74 excess occurrences: 18 shipped, three held fixtures
+(two Breadcrumbs, one TextHighlighted) and 37 frozen-reference identities.
+B's proposals remain review-only. The canonical compiler and full static gate were
+not repeated. [Outstanding diagnostic inventory and four path hashes](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/outstanding-static.json).
+
+**Frozen-reference provenance and current boundaries.** All 13 files behind the 37
+identities match their blobs and SHA-256 values in the accepted `e90441d…` snapshot.
+The inventory records tracked first-add commits, any documented source anchor and
+the exact §36.23 local DatePicker origin, plus direct spec or story imports for every
+file. The declared warning baseline remains `f02d3f5…`. Both app and lib TypeScript
+configs exclude specs and `.stories.tsx`, and all 13 reference modules remain roots
+in both. The spec config includes `_*.spec` as roots, with references loaded through
+fixture imports. The shared declaration config and the ESM Vite plugin explicitly
+exclude `*.mui-reference.ts[x]`. Three warning-bearing legacy `*.reference.tsx` files
+remain declaration roots. WordPress also narrows declaration emit to its entry graph.
+Under both filename patterns the exact H24 ESM and WordPress runtime graphs contain
+zero frozen reference modules. [Reference blobs, origins and importers](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json) ·
+[Config root membership](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/tsconfig-root-membership.json).
+
+**Legacy declaration boundary gap.** The prior H24 audit matched only
+`*.mui-reference`. Direct archive inspection found eight `*.reference.d.ts` files
+in ESM, including the warned Accordion, ListShowMore and Slider references. Those
+eight declaration payloads match H23 byte for byte. There are none in the WordPress
+archive and no other emitted declaration refers to their stems. The existing
+`./dist/*` export pattern covers their paths, so a rename or declaration exclusion
+would remove packaged paths. Committed rc-webapp `73673465091` had zero tracked
+matches for those stems under `html/react/src`. External consumers are outside that
+scan. Preserve the paths and flag any proposed removal for a separate D12 decision.
+The read-only pack finding leaves both archives and all exclusion rules unchanged.
+[Exact archive membership and SHA-256 values](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json) ·
+[Existing audit detector](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/audit-emitted-boundaries.py:20) ·
+[Export pattern](../package.json:81).
+
+**Proposed frozen-reference remediation, review pending.** Preserve the pinned
+pre-edit blobs as the comparator and keep each proposed edit in its own fixture
+diff. Start with the two narrow type/empty-pattern identities only after proving
+identical accepted inputs and, for any packaged path, declaration compatibility.
+Handle the prototype and coercion identities with explicit value-domain cases.
+Treat all three key identities as replay work over reorder, insertion and removal.
+For the 28 dependency identities and two conditional-hook identities, compare the
+old and proposed fixture across rerenders and unmounts with exact effect/callback
+counts, DOM and cleanup. For example, track `formconfig` presence and identity
+changes on the frozen Autocomplete and DateRangeInput paths before deciding whether
+the conditional hook can be normalized. Track DateRangePicker ref attachment and
+date/data updates before changing an effect trigger. Equivalent setup is unproven
+for those transitions and for the Slider's form-binding effects. Leave each such
+identity open until its comparator passes. Where an edit would change the old
+contract, report the specific dependency or path decision before proceeding.
+Run the existing importers, canonical static gate and eventual packed-boundary
+checks on the reviewed successor. Keep lint rules, thresholds, baseline and
+selection intact. This step changed no frozen references.
+
+**Scoped four-fixture PASS accepted (decided-by-watchdog).** The watchdog verified
+all 75 file/fullName/status rows and the 11 targeted warning occurrences dropping to
+zero. The exact current SHA-256 values are:
+
+| Fixture | SHA-256 |
+|---|---|
+| `src/core/DatePicker/_DatePickerShell.differential.spec.tsx` | `dbe85e3d4c51143d33dd20a15537c7a191da7e4f88af0d08621d81cf2dcead6a` |
+| `src/core/RcErrorBoundry/_error-logging.spec.tsx` | `21bd107ffa1e64673e2bedf0f93d837c17dcf3fc4fd7d00b834a12513d8acf27` |
+| `src/core/_internal/_theme-default-props.differential.spec.tsx` | `9420be62601eaf9efbaec7e438f181c61de620a6ab604d050645b78f48994146` |
+| `src/helpers/_junk-class-sites.spec.tsx` | `e1a67665409eda0f94ece8d8c50c25f7a1cd57344fd372497971a65054d718cd` |
+
+The 58 remaining warning identities and 74 excess occurrences are a reconciliation
+of the earlier full result with narrowly checked changes. The next canonical static
+run will produce a fresh inventory. [Accepted hashes and reconciliation](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/outstanding-static.json).
+
+### 36.35 Legacy reference declaration projection (2026-11-20)
+
+**D12 scope clarified (decided-by-watchdog).** H23 and H24 are local verification
+packs. Saved `.472` and cached `origin/master` have zero legacy reference matches.
+The eight first-add commits (`3911192`, `48a8270`, `80cef30`, `5c2630c`, `7c7dc1f`,
+`b9f8736`, `ecfabc0`, `62e5747`) are absent from locally known remote-tracking refs
+and tags per watchdog inspection. The exact eight current matches are fixture
+sources and their direct importers are specs or stories. The committed rc-webapp
+scan found zero exact imports. This evidence supports excluding those eight from
+the next local artifact, with no claim about every external release. All D12 keys
+and ordinary public declaration targets stay in scope for preservation.
+[Match and importer inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/projection-scope.json).
+
+**Scoped projection PASS accepted (decided-by-watchdog).** The three-file Git diff
+SHA-256 is `d34d0327c410d2d2da00d7c00bdacb769c0c8892bc90bf621d2ec0aeeb5b2d0f`.
+The additive declaration check pins existence of all eight test sources, keeps the
+eight paired public component roots, and checks both frozen suffixes. Before the
+emit edit, the two projection assertions failed for those eight roots and the ten
+other guarded script cases passed. The first GREEN preflight at 14:58 deferred the
+launch at 36% memory free (load 3.44). The guarded recheck qualified at 41% free
+and load 5.32. The same two script files passed **12/12**. The ESM projection
+changed 820→812 roots and the shared WordPress exclusion projection 821→813. Both
+deltas consist of exactly the eight fixture source paths, with zero additions.
+Fixture bytes, importers and runtime entry points stayed intact. The existing
+package export assertions use the accepted installed H24 artifact as their control.
+This is a source projection result. [RED log](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/spec-red.log) ·
+[First GREEN preflight](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/resources-green.log) ·
+[Qualifying recheck](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/resources-green-recheck.log) ·
+[GREEN log](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/spec-green.log) ·
+[Exact root-set delta](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/projection-delta.json).
+
+**One milestone pack proof.** Check both `*.mui-reference` and `*.reference` in
+exact ESM/WP archive member paths and runtime module IDs. Use actual parsed
+specifiers for static imports/re-exports, literal dynamic imports, import types,
+require and triple-slash types/paths. Review the complete archive member delta,
+drop exactly the eight ESM declarations, and preserve unrelated declaration bytes.
+Retain regular D12 export and resolver checks, runtime graphs, and ordinary
+WordPress entry reachability and runtime checks. The scratch input pins the
+accepted manifest, full member list, 1,067 declaration hashes and eight exact
+expected removals. No candidate artifact check has run.
+[Scratch milestone baseline](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/milestone-declaration-baseline.json).
+
+### 36.36 Two frozen-reference lint designs (2026-11-20)
+
+**Review plan approved (decided-by-watchdog).** Preserve the exact original blobs
+and use mounted old-versus-new comparisons. The first two design candidates are
+Toolbar's empty destructuring pattern and SnackbarRoot's empty props type.
+Dependency, key, conditional-hook, prototype and coercion changes remain held.
+Both files are `.mui-reference.tsx` fixtures outside the existing emit projections.
+[Pinned source and importer provenance](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json).
+
+**Toolbar — proposed one-line deletion.** Pin original blob
+`131d805c0b23fff7dbb837925adc1c4a0a95d37b`, SHA-256
+`d86d3efebbce666bfa6a87e1ef0fd40f55bdc2bb239ced48d72dfb7b64e9e0ec` (header
+source `a3f9ab4`, first-add commit `513cb72`). Remove `const {} = props` and keep
+the exact `{} & ToolbarProps` signature, outer container, MUI import and complete
+props spread. Before and after, the typed input domain is identical. For the
+observed mounted domain React supplies a props object, including default,
+Navbar `className`, dense/disabled gutters, and `Nav` children. The empty pattern
+reads no property on that object. A direct function call with `null` or
+`undefined` could throw at the original empty pattern and has no observed
+importer. Equivalence for those out-of-fixture direct calls is unproven. If a
+direct caller turns up, hold the deletion and review that specific input.
+
+In a later authorized slot, require targeted lint `noEmptyPattern` RED→GREEN
+and mount pinned versus proposed Toolbar through the same AppBar/provider tree.
+Compare normalized wrapper HTML, `.Toolbar-container`, `.MuiToolbar-root`,
+host element, class order, children and inline styles. Keep the existing
+AppBar differential's Navbar and dense cases and whole-tree/ref comparisons.
+The existing computed parity stories select `[data-side] .MuiToolbar-root`
+and `header` through all `data-case` rows, including the Navbar production-order
+fixture. Replay those unchanged when browser work is authorized.
+[Toolbar reference](../src/core/Toolbar/_Toolbar.mui-reference.tsx:11) ·
+[Mounted spec importer](../src/core/AppBar/_AppBar.differential.spec.tsx:27) ·
+[Computed style importer](../src/core/AppBar/_AppBarComputedParity.stories.tsx:68).
+
+**SnackbarRoot — proposed type-only replacement.** Pin original blob
+`83310836dffe004b6a9fccf9b92368e36287ba81`, SHA-256
+`bef9afb0beabad4d17599c788736b658d5f2b36b1a2c114964885d34fec6d8db` (header
+source `b0b02c2`, first-add `e56293b`). Replace only `type Props = {}` with
+`type Props = NonNullable<unknown>`. The installed TypeScript5 library defines
+`NonNullable<T>` as `T & {}`. Intersecting `unknown` with `{}` preserves the
+original type expression's domain, including structurally assignable object and
+primitive values, and retains the compiler's existing nullability settings.
+Under strict null checks both exclude `null` and `undefined`. The mounted importer
+uses only `<R />` with its empty React props object. Keep the unused props parameter
+and emitted runtime body identical, including pub-sub subscriptions and timers.
+Require a later bidirectional `ComponentProps` type witness on the canonical config.
+
+In a later authorized slot, require targeted lint `noBannedTypes` RED→GREEN.
+Mount pinned versus proposed roots with independent `vi.resetModules` registries
+and fake timers from the existing Snackbar differential. Compare canonical body
+markup including body style, `section`, `.MuiSnackbar-root` presence, alert text,
+and `onClose` counts through the 3000 ms auto-hide, replacement, and explicit
+service-close timelines. Use the existing normalization and assertions and keep
+reference subscription/cleanup behavior intact. [SnackbarRoot reference](../src/core/SnackbarRoot/_SnackbarRoot.mui-reference.tsx:9) ·
+[Mounted service importer](../src/core/Snackbar/_Snackbar.differential.spec.tsx:173).
+
+**Two-file implementation approved (decided-by-watchdog).** This slot covered
+Toolbar's empty pattern and SnackbarRoot's props type. The mounted React props
+domain above remains the scope of the Toolbar proof. A direct null or undefined
+function call is outside that witness. The two original blobs and exact patch
+are preserved. The two-file patch SHA-256 is
+`9b58e5279035279963254cd81f79232e166d764fadd6e197f3e0b`.
+[Pinned files and exact patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp).
+
+**Scoped lint and mounted PASS accepted (decided-by-watchdog).** Biome reproduced
+`lint/correctness/noEmptyPattern` at Toolbar line 12 and
+`lint/complexity/noBannedTypes` at SnackbarRoot line 9 on the pinned inputs.
+Those two warnings went to zero. Each guarded single-worker run passed 27/27
+cases (12 AppBar/Toolbar and 15 Snackbar), with identical file, full name and
+status inventories and unchanged runtime assertion code. A scratch trace-only
+Vite transform captured 53 byte-identical rows, including 22 AppBar/Toolbar
+mounts, 24 Snackbar arms, six fresh-module SnackbarRoot arms, and the auto-hide
+`onClose` count of one per side. The six root unmount snapshots had empty body
+style and markup. The trace SHA-256 is
+`f56c4b9da5b4404856209424e4b272be657d8377c161ccbe14f6c72cbce39cb2`.
+[Lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp/lint-before.json) ·
+[Lint GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp/lint-after.json) ·
+[Guarded mounted run comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp/comparison.log).
+
+**Type witness staged for the canonical compiler gate.** The Snackbar
+differential has a type-only bidirectional `React.ComponentProps` check against
+`Record<never, never>`. The guarded TypeScript 5.9.3 single-file proof confirmed
+that the witness domain equals the old literal and the new alias in both
+directions with strict null checks off and on. Narrowing the alias to `string`
+failed the expected constraints in both modes. The old and new SnackbarRoot
+emit identical JavaScript in the focused proof. The type-only addition also
+leaves the importer's JavaScript identical. The witness is recorded separately
+from the approved two-file patch. Canonical compiler validation and packed
+checks remain pending.
+[Type and runtime proof](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp/type-proof.log).
+
+**Warning reconciliation.** The prior inventory had 58 identities and 74 excess
+occurrences. The exact Toolbar and SnackbarRoot identities each had one excess
+occurrence and zero baseline occurrences. Removing those two leaves 56
+identities and 72 excess occurrences (35 frozen references, 18 shipped source,
+and 3 fixtures by identity). This is a reconciliation from scoped lint. The
+next static gate will produce a fresh inventory.
+[Path-and-rule reconciliation](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp/outstanding-static.json).
+
+### 36.37 ClickAway ref assignment (2026-11-20)
+
+**Scope approved (decided-by-watchdog).** Replace the comma expression in
+`ClickAway.handleRef` with a block. The internal node is assigned before the
+child ref is updated. Detach still clears the internal node before running
+the returned React 19 cleanup or clearing the child ref. The object-ref and
+no-ref paths still use the existing `setRef` helper.
+
+**Scoped PASS accepted (decided-by-watchdog).** Targeted Biome reproduced one
+`lint/complexity/noCommaOperator` warning at line 140, column 96, before the
+change and reported zero diagnostics after it. Before editing production,
+an additive witness pinned the object ref's node, its clearing before the
+replacement callback attaches to the same node, and one null call when that
+callback has no cleanup. The existing React 19 cleanup assertion stayed
+byte-identical. Guarded canonical `spec` runs with one worker passed **26/26**
+before and after (3 ref, 21 parity, 2 ClickAway resource cleanup). All 45 file,
+full-name and status rows matched, including the 19 unrelated cleanup cases
+skipped by the identical selector. Two earlier runs are preserved as filter
+setup evidence: the first selected only the cleanup cases; the second
+missed the colon-bearing parity suite. The two-file patch SHA-256 is
+`fe8a96924a60e8ee1905db20a58e2ee3db69bd890936c25914f4903b5a187df3`.
+[Lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/lint-red.json) ·
+[Lint GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/lint-green.json) ·
+[Guarded comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/comparison.log) ·
+[Initial filter setup](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/selection-setup-pre.vitest.log) ·
+[Suite filter setup](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/selection-suite-pre.vitest.log) ·
+[Exact patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/click-away-ref.patch).
+
+The scoped correction removes one shipped-source warning identity and one
+excess occurrence from the §36.36 inventory. The reconciled total is 55
+identities and 71 excess occurrences (35 frozen references, 17 shipped
+source, and 3 fixtures by identity). The canonical static gate remains pending.
+[Updated reconciliation](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM/outstanding-static.json).
+
+### 36.38 Remaining fixture lint warnings (2026-11-20)
+
+**Scope approved (decided-by-watchdog).** The two Breadcrumbs helpers key
+each entry by its existing URL fragment. In the parity helper the same
+fragment keys the link and text forms of an item. Item order, values, child
+nodes, null and stray-text controls, and assertion code stay intact.
+TextHighlighted passes the same undefined child through nested JSX.
+
+**Scoped PASS accepted (decided-by-watchdog).** Biome reproduced three warning identities at four locations:
+two index keys in the parity fixture, one in the cleanup fixture and one
+explicit children prop in TextHighlighted. The three files lint clean after
+the edits. The exact three-file patch SHA-256 is
+`6dd77930e90ad59f68848c4615dd31efe5e8963c56aff1b8c720cc9f8d466173`.
+A guarded one-worker replay passed 8/8 before and after with identical file,
+full-name and status rows. The scratch trace transform produced 389
+byte-identical Breadcrumbs records across 342 paired matrix rows, 42 timeline
+frames and five cleanup/contract observations. The traces include raw DOM,
+active element and per-timeline DOM node identities. The trace SHA-256 is
+`74b0111fce7a045d983be6a1c218a8eb19f7f031d4e9c871e4ee00d226e4478d`.
+Both automatic JSX modes emitted byte-identical TextHighlighted test JavaScript
+and produced a React element with its own `children` prop set to `undefined`.
+[Lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/lint-red.json) ·
+[Lint GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/lint-green.json) ·
+[Guarded trace and inventory comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/comparison.log) ·
+[JSX emit proof](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/text-highlighted-emit.log) ·
+[Exact patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/remaining-fixtures.patch).
+
+The fixture group accounts for three identities and four excess occurrences
+removed from the §36.37 inventory. The reconciled count is 52 identities and
+67 excess occurrences across 35 frozen-reference and 17 shipped-source
+identities. Canonical static validation is pending.
+[Updated reconciliation](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/outstanding-static.json).
+
+### 36.39 DateField selection helper (2026-11-20)
+
+**Scope approved (decided-by-watchdog).** Move `selectContents` to module
+scope with its body intact. Retain `[parts, selected, selection]` for selection
+after text replacement and leave the layout effect, direct Backspace and input
+call sites in place. The production patch SHA-256 is
+`f6f6959b0fb5ab74081a7b41459a9b40eb6da036a779b480b1d29e8139540f4d`.
+[Exact helper move](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/datefield-helper-hoist.patch).
+
+**Scoped lint and selection PASS accepted (decided-by-watchdog).** Before the move, Biome reported both the
+missing `selectContents` dependency and the extra `parts` dependency on the
+selection effect. After the move, the `selectContents` identity is gone and
+the behavior-required `parts` trigger still has its lint warning. Removing the
+single cleared identity and occurrence from §36.38 gives 51 identities and 66
+excess occurrences pending canonical static validation.
+[Lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/lint-red.json) ·
+[Lint after](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/lint-after.json) ·
+[Reconciled inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/outstanding-static.json).
+
+The additive spec uses actual jsdom focus, `Selection` and `Range`. A
+scratch-only transform removed `parts` from the effect. The witness failed
+at controlled replacement with the original Day still active, the rendered
+value already `22`, and an empty selection with offsets 0→0. The unmodified
+effect selected the new text and passed before the move. Pre and post both
+passed 32/32 in UTC and Europe/Bucharest, including the 31 original differential
+cases. All four inventories and four-frame traces matched. The original Day
+stayed active with both range boundaries on it at offsets 0→1, selecting
+`15` → `22` → `DD` → `DD` through focus, controlled replacement, controlled
+clear and direct empty Backspace.
+[Range witness patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/datefield-selection-witness.patch) ·
+[Intended mutation RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/mutation-UTC.vitest.log) ·
+[Four-run comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/comparison.log) ·
+[Matched selection trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/post-UTC.selection.ndjson).
+
+The first post-UTC preflight deferred at 39% memory free, before Vitest
+started.
+[Deferred preflight](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/post-UTC.preflight-deferred.log).
+
+The two admitted post-change GREEN legs qualified at 45% free in UTC and
+42% free in Europe/Bucharest.
+[UTC GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/post-UTC.vitest.log) ·
+[Bucharest GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/post-Bucharest.vitest.log).
+
+### 36.40 Public DatePicker year keyboard focus (2026-11-20)
+
+**Scope approved (decided-by-watchdog).** Add a frozen-versus-public witness
+using `userEvent` for ArrowRight and Enter. The RED starts with 2024 focused
+on both routes. ArrowRight moves the sole tab stop to 2025 without publishing
+on either route. The frozen route also focuses 2025, publishes March 15, 2025
+once on Enter, and returns to its day view. The public route leaves the
+actual focus on 2024. Enter consequently returns to March 2024 with zero
+publications. [Guarded RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/red-UTC.vitest.log) ·
+[Paired RED trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/red-UTC.year-trace.json).
+
+**Scoped PASS accepted (decided-by-watchdog).** The year leg of the existing layout effect now resolves the
+tabbable button through the existing `yearGrid` ref. The day selector and
+effect triggers stay intact. Both date-picker buttons and standalone calendar
+radio buttons use that native button lookup with their established roles.
+The prior year role, pointer containment and publication assertions are
+byte-identical. The only test addition is the keyboard witness. The exact
+two-file patch SHA-256 is
+`0dc314d117cee78c97947b852a0a79f07506f351b0b758a2c75dda471b6e78bc`.
+[Exact patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/exact-two-file.patch).
+
+Guarded UTC passed 157/157, including 42 shell, eight calendar and all 107
+public contract cases. Europe/Bucharest passed 50/50 across the two
+differentials with identical file, full-name and status rows. Both final
+witnesses match the frozen route through focus, tab stop, publication and
+return to the day view. The UTC frozen trace also matches its RED run.
+[Comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/comparison.log) ·
+[UTC GREEN trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/green-UTC.year-trace.json) ·
+[Bucharest GREEN trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/green-Bucharest.year-trace.json).
+
+The DateCalendar lint identities and counts match the prior reconciliation,
+and the shell witness has no lint diagnostics. Integrated static validation
+and admission remain pending.
+[Scoped lint inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/lint-current.json).
+
+### 36.41 Frozen DatePicker bound normalization helper (2026-11-20)
+
+**Scope approved (decided-by-watchdog).** Move `ensureUnixInSeconds` from
+the in-tree MUI reference to module scope with its body intact. The exact
+comparison permits only moving and unindenting that block. The min and max
+memo bodies and `[minDate]` and `[maxDate]` dependencies are byte-identical.
+The pinned pre-edit fixture SHA-256 is
+`4b7243a1189852c6ea9267484a9bc7f4bedb39f8dc00245400d6cf88aa73f879`.
+The helper-move patch SHA-256 is
+`880dc661cba12058c70b1decf0319b1a1ffea54f42ff33613378d23413f4b045`.
+[Pinned fixture](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/_DatePicker.mui-reference.tsx) ·
+[Exact patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/ensure-unix-in-seconds-hoist.patch).
+
+**Scoped PASS accepted (decided-by-watchdog).** Biome reproduced both `ensureUnixInSeconds` missing-dependency
+occurrences at the bound memos and reported zero diagnostics afterward.
+All 42 original shell differential cases and one scratch comparator passed
+before and after in UTC and Europe/Bucharest. The original spec hash and
+the 42 file, full-name and status rows match the accepted §36.40 inventory.
+The comparator captured each memo's actual normalized number, all 31
+rendered day buttons and both month-navigation buttons. Pre/post traces
+matched byte-for-byte in each timezone. Ten-digit seconds and 13-digit
+milliseconds with a subsecond remainder both enabled March 10–20 with
+month navigation disabled. Missing, zero and NaN each normalized to undefined
+on both sides, enabled March 1–31, and left navigation enabled. The runtime
+logs had no library diagnostics in any of the four runs.
+[Lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/lint-red.json) ·
+[Lint GREEN](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/lint-green.json) ·
+[Exact guarded comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/comparison.log) ·
+[UTC trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/post-UTC.boundary-trace.json) ·
+[Bucharest trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/post-Bucharest.boundary-trace.json).
+
+One frozen-reference identity and two excess occurrences are cleared,
+leaving 50 identities and 64 excess occurrences by reconciliation.
+Integrated static validation and admission remain pending.
+[Updated warning inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/outstanding-static.json).
+
+### 36.42 DateCalendar column and filler keys (2026-11-20)
+
+**Scope approved (decided-by-watchdog).** The header represents a numbered
+ARIA column. Hold `day.day()` as a key. In Pacific/Apia the guarded mounted
+January 2012 calendar in Romanian rendered Monday in the first and seventh
+columns after the 2011 skip date. The first-week adapter returned weekday
+numbers `[1, 2, 3, 4, 6, 0, 1]`. Use the seven explicit grid columns as the
+iteration input and keep their positional node identity. The proposed two
+year filler keys name the first and second appended layout slots. Their
+existing count formula, order and markup remain the comparison targets.
+[Mounted Apia baseline](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/pre-Apia.key-traces.ndjson) ·
+[Targeted lint RED](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/lint-before.json).
+
+**Scoped PASS accepted (decided-by-watchdog).** The production patch is confined to the two iteration
+inputs. The weekday renderer uses explicit columns 1–7 for its key and ARIA
+index, and takes the same date from the first week. The year renderer slices
+the two named trailing slots using the original filler-count formula. The
+markup, day and year focus logic, effect dependencies and original specs
+are byte-identical outside these iteration inputs. The exact patch SHA-256 is
+`01a38609f25ed9d740ab5a3fd0bcf09e4b752b3792b7d41c0bcef5911d1c3361`.
+Both `noArrayIndexKey` occurrences cleared. The existing `dayFocus, yearFocus`
+dependency diagnostic remains held.
+[Exact patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/datecalendar-keys.patch) ·
+[Lint after](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/lint-after.json).
+
+UTC passed 52/52 pre/post, including all 50 existing Calendar and Shell
+differential cases and the two scratch comparators. Eight weekday frames
+matched byte-for-byte with identical DOM, roles, order, tab stops and
+events. The seven original nodes stayed at their numbered columns across
+month and locale changes. The existing focus exit on locale rerender
+matched before and after. Seven year frames also matched, including filler
+counts 2→1→0→1→2 and the original 2024 and 2025 button nodes. The same 2025
+button retained focus and the sole tab stop through the controlled bounds
+changes, then Enter published and returned to the day grid. The isolated
+Apia pre/post check passed and matched all three frames, with two Mondays
+and seven stable columns. The optional Bucharest baseline deferred on
+memory before Vitest started.
+[Exact trace comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/comparison.log) ·
+[UTC trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/post-UTC.key-traces.ndjson) ·
+[Apia trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/post-Apia.key-traces.ndjson) ·
+[Bucharest preflight](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/pre-Bucharest.ready-6.log).
+
+One shipped-source identity and two excess occurrences are cleared, leaving
+49 identities and 62 excess occurrences by reconciliation. Integrated static
+validation and admission remain pending.
+[Updated warning inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/outstanding-static.json).
+
+### 36.43 MenuPopup paper ref and enter effect (2026-11-20)
+
+**Characterization approved (decided-by-watchdog).** The pinned MenuPopup
+source SHA-256 is
+`1007095e80875168fd6505bc7254f973db942a3274caf69080c196b99913bd07`.
+Biome reports one warning at the enter layout effect on line 94,
+`lint/correctness/useExhaustiveDependencies`, for `paperNode`. ModalHost opens
+before its delayed portal has a paper. The portal's ref callback updates
+`paperRef.current` synchronously, then queues `paperNode` for a later parent
+render. The state dependency schedules enter on attachment even when explicit
+origins keep `position` stable. The proof compared the existing ref read with
+a scratch-only state read, keeping the dependency and the position callback
+intact. [Pinned source and inputs](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/before.sha256) ·
+[Lint identity](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/lint-before.json) ·
+[Scratch variant](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/rejected-state-read.scratch.patch).
+
+**State-node substitution held (decided-by-watchdog).** Both guarded arms passed 3/3 with the unchanged
+MUI reopen-during-exit differential and two scratch timelines using callback
+and object refs. They matched on delayed mount, opening position and Grow,
+resize, focus restoration, early reopen on the original paper, and reopen
+after full detachment. The first internal difference occurred on close
+detachment. Live ref was null and committed state still named detached
+paper 1. The closed guard prevented style writes in both arms.
+
+The first write difference was the replacement commit while open. Both arms
+positioned attached paper 3 at top 648 px, left 848 px and origin 52 px by 32 px.
+The ref arm measured paper 3 at 104 px and applied Grow there. The state arm
+measured detached paper 2 at 96 px and sent the first five Grow writes there,
+starting with opacity 0. A subsequent commit let both arms settle on paper 3.
+Both ref types showed the same difference, although settled style, consumer
+ref order and focus matched. The scratch replacement used a forwarded
+`paperProps.key` and emitted the same React key-spread diagnostic in both
+arms. The first scratch attempt stopped because its fake timers were missing.
+That setup log is separate from the admitted 3/3 results.
+[Comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/comparison.log) ·
+[First divergence](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/first-divergence.json) ·
+[Current ref trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/ref-UTC.paper-timeline.ndjson) ·
+[State-read trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/state-UTC.paper-timeline.ndjson) ·
+[Matched file, full-name and status rows](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/file-fullname-status.json) ·
+[Setup attempt](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/menu-popup-paper-node.XjLilF/setup-timers-ref-UTC.vitest.log).
+
+The first Grow write is the hold criterion despite identical settled states
+and passing tests. Keep the live read and `paperNode` wakeup together. The
+source and persistent test hashes still match the pinned inputs. The
+`paperNode` warning remains in the scoped 49 identities and 62 excess
+occurrences. Integrated static validation and admission remain pending.
+
+### 36.44 FocusTrap effect lifecycle (2026-11-20)
+
+**Scratch characterization approved (decided-by-watchdog).** The pinned
+installed MUI 9.5.0 CJS and ESM FocusTrap sources use `[open]` for restoration
+and include both `disableAutoFocus` and `disableRestoreFocus` in containment.
+The pinned current source reports two `useExhaustiveDependencies` identities,
+missing `disableRestoreFocus` at line 152 and extra `disableAutoFocus,
+disableRestoreFocus` at line 175. Both variants change only their respective
+dependency array in the Vite scratch transform.
+[Pinned source and spec hashes](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/before.sha256) ·
+[Exact lint identities](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/lint-before.json) ·
+[Restore variant](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/restore.scratch.patch) ·
+[Containment variant](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/prune.scratch.patch).
+
+**Baseline parity.** Current FocusTrap and installed MUI matched all seven
+observed lifecycles and 219 events per side. The guarded baseline passed 13/13,
+including all six unchanged parity cases. The seven scratch scenarios cover
+close and unmount, StrictMode open mount, both restore-flag directions,
+auto-focus and enforcement changes while open, and all three flags changing
+on the open-close boundary. StrictMode focused the root, restored the opener,
+cleared the first interval and removed both listeners, then focused the root
+and registered the second generation. The fixture pinned document focus
+availability and recorded real jsdom active elements, listener identities
+and clock ticks.
+[Baseline raw trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/current-UTC.lifecycle.ndjson) ·
+[Baseline test inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/current.file-fullname-status.json).
+
+**Both dependency changes held (decided-by-watchdog).** Adding the restore flag produced 11/13
+passing cases. At 20 ms, changing `disableRestoreFocus` from false to true
+while open restores the opener before containment releases, then setup
+focuses the root. The reference instead starts by clearing containment while
+the first child remains active. At close the reference restores the opener
+using the opening flag, whereas the candidate leaves focus on the root.
+The reverse flag change first diverges at close, where the candidate restores
+the opener and the reference keeps the first child focused.
+[Restore-arm trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/restore-UTC.lifecycle.ndjson) ·
+[Restore test inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/restore.file-fullname-status.json).
+
+Removing the two containment dependencies produced 10/13 passing cases.
+The first divergence on a change to either flag at 20 ms is skipped cleanup.
+The reference clears interval 1 and removes focusin listener 1 and capture
+keydown listener 2, then installs listeners 3 and 4 and interval 2. The
+candidate retains the original generation. In the auto-focus case, after
+focus re-enters and is blurred to the body, that original interval pulls
+focus to the root at 50 ms. The reference stays on the body until its restarted
+interval runs at 70 ms. All six original cases still pass in both variants,
+and all unmounts release the tracked resources. The lifecycles still differ.
+[Containment-arm trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/prune-UTC.lifecycle.ndjson) ·
+[Containment test inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/prune.file-fullname-status.json) ·
+[First divergences](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/first-divergences.json) ·
+[Verified comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/focustrap-lifecycle.WmPIff/comparison.log).
+
+The local source, persistent parity spec and installed reference still
+match their pinned hashes. Both warning identities remain in the scoped
+49 identities and 62 excess occurrences pending integrated static validation.
+
+### 36.45 Frozen Accordion expansion effect (2026-11-20)
+
+**Scratch review approved (decided-by-watchdog).** The in-tree frozen
+fixture SHA-256 is
+`2b699c4d5c3b0e0d9fbe4ab64b696e9bf235802962895043defde7a25aa5d3be`.
+Biome reproduced the missing `isExpanded` dependency warning at line 32.
+The separate fragment diagnostic is informational and outside this review.
+The one scratch variant moves the same comparison and `expanded ?? false`
+fallback inside a pure functional state updater. The `[expanded]` trigger
+and other source bytes are fixed. The scratch patch SHA-256 is
+`221257a1ceca22f2dd3b1ff65d068a6bc78264f008cf3ef43f23f901d9aea5a2`.
+[Pinned inputs](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/before.sha256) ·
+[Exact lint identity](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/lint-before.json) ·
+[Scratch patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/functional-updater.scratch.patch).
+
+**Functional updater held (decided-by-watchdog).** Both guarded arms passed 25/25 with identical
+file, full-name and status rows. They include the 12 existing frozen-vs-own
+parity tests, three cleanup cases and ten scratch recordings. Nine complete
+commit, DOM and timer timelines matched, including omitted, true and false
+initial values, ordinary batched prop-and-click delivery, same-value
+rerenders, local toggles, control removal and reacquisition, parent echo and
+unmount mid-transition. Callback order and unmount/drain checkpoints match
+in all ten scenarios.
+[Exact runtime comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/comparison.log) ·
+[Matched test inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/file-fullname-status.json).
+
+The first differing rendered frame is the nested commit after the layout
+click. Local expansion is already true while the prop is false. The parent
+commits prop true and its layout effect clicks the summary before the
+frozen passive effect runs. Both callbacks publish false. The original
+effect sees its rendered true equal to the new prop and skips the setter,
+letting the queued local false close the accordion and start Collapse
+with one timer. The candidate queues the updater anyway. It runs after the
+local false, writes true, and leaves `aria-expanded` true with zero collapse
+timers. The difference survives the settled checkpoint. The fixture and specs
+still match the pinned hashes, and the warning stays in the scoped
+49 identities and 62 excess occurrences.
+[First rendered divergence](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/first-divergence.json) ·
+[Original trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/original-UTC.expansion.ndjson) ·
+[Functional trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/accordion-frozen-expansion.YmCvzv/functional-UTC.expansion.ndjson).
+
+### 36.46 Admitted c000 replay and release blockers (2026-11-20)
+
+**Scheduling supersession (decided-by-watchdog after user intervention).**
+§36.32's static-first ordering is lifted for diagnostic browser work on the
+already admitted immutable c000 candidate. Static remains RED and mandatory
+for final acceptance under the same gate, baseline, lint scope, coverage and
+tests. V1 has the clear shared slot for the frozen c000 replay only, against
+`.472` and rc-webapp `73673465091`. The archive checksum was reverified at
+handoff. Verification ports were clear with no scoped runner active, load
+2.95 and 43% memory free. The send returned `delivery: started` with receipt
+`message:mcp:1211c210-3939-4263-bf58-b3260f020e1c:thread-send:vanguard-a-20261120-c000-admitted-replay-direct-slot` and run ordinal 142.
+[VNG_REB Vanguard Architecture and Visual Consistency](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/80fcbccb-4649-4a3a-88e7-93c70c8198d6) ·
+[Admitted archive](/Users/a.kott/vanguard-verify/packs/e90441d30d074f2938187561cab71f061dcd226d-h24-mobile-focus.tgz).
+
+V1 uses the existing sealed inputs, capsule, guard and fingerprint checks,
+ports and cleanup controls. The six high-signal routes can go first only
+within the frozen scope and without a duplicate capture or provenance change.
+Otherwise the sealed full replay runs as-is. Keep the five open discovery
+keys, original raw flags and four prior qualified pairs. V1 returns the clean
+slot directly to A with the verdict and first confirmed runtime regression,
+if any. This slot ends at c000. c001, the final paired unit suite, coverage,
+Tier P, the package gate, all wider or measured work and the warning-by-warning
+trials remain held. The new source delta is outside the admitted archive.
+[Frozen replay note](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-c000-replay.md) ·
+[Preserved local source fingerprint](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/c000-handoff.wJwVLo/local-source-fingerprint.json).
+
+**Offline release assessment accepted (decided-by-watchdog).** The watchdog
+independently reproduced 34 warning identities and 44 excess occurrences in
+historical references, plus 15 identities and 18 excess occurrences in
+shipped source. The resulting 49/62 reconciliation is scoped evidence. The
+guarded H24 c000 pair remains the diagnostic priority, and the final canonical
+check remains open. The final static obligation is the existing app/lib TS7
+baseline comparison, zero contract and all-spec TypeScript errors, zero Biome
+errors, and no warning identity above its baseline multiplicity. The six
+known lint errors and the spec typing corrections have local evidence. The
+integrated source gate on the final candidate remains due. After static
+acceptance, retain the existing 35-file combined coverage gate at 95% lines
+and 85% branches per file, plus the separately scoped final consumer evidence.
+[Reconciled warnings](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/outstanding-static.json) ·
+[Canonical static gate](./mui-upgrade-gates/gates.sh) ·
+[Coverage gate](./mui-upgrade-gates/coverage.sh).
+
+| Remaining group | Release disposition |
+|---|---|
+| Shipped, proven trigger holds (5 identities / 5 excess) | DateCalendar and DateField selection/focus, MenuPopup portal attachment, and both FocusTrap effects retain their evidenced behavior. Clearing these warnings requires equivalent source behavior under the existing gate. |
+| Shipped, B review-only (10 / 13) | Form index typing, the local Table sorter rename and InlineSvg's local string annotation are mechanical candidates already documented. Pagination, Breadcrumbs and Slider keys need identity/focus evidence. InlineSvg mount effects need lifecycle proof. All remain held. |
+| Frozen references (34 / 44) | Preserve the Accordion batched-toggle behavior and the remaining pinned comparisons for form binding, overlays, date ranges, document loading and leaf components. Prototype/coercion, key, hook-order and callback changes need their supported input and effect contracts preserved. B-owned ListShowMore and Slider references stay review-only. |
+
+**Historical comparator bridge held (decided-by-watchdog).** Moving historical
+executable inputs outside `biome lint src` would change release-gate coverage.
+That requires an explicit user decision before implementation. The current
+source, gate, baseline, lint scope and slot constraints remain in force.
+Bridge design and implementation work and duplicate gate runs stay paused
+while c000 owns the slot.
+
+Any future bridge review must check the exact archive member paths and
+SHA-256 bytes for all eight legacy ESM declarations resolved under the
+existing `./dist/*` export. Account for each path against the pinned §36.35
+inventory and the separately approved declaration projection. Verify the
+WordPress graph independently, including both frozen-reference suffixes.
+Require unchanged story and spec discovery, transform and module resolution,
+compiler coverage, and mounted reference traces. Supported shipped deep paths
+and their declaration bytes remain protected. The shipped warning gate stays
+in force regardless of the bridge decision.
+[Pinned fixture provenance and exact importers](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json) ·
+[Eight-member declaration inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/milestone-declaration-baseline.json).
+
+#### 36.47 Tier C c000 source response cards
+
+**Payment Lock Banner.** The provisional records show 8 → 25 sampled nodes in
+Retryable and SubAccount, starting at the consumer's
+`PaymentLockBanner-module__banner` wrapper. Both candidate records show the
+declined title. SubAccount's committed play expects the owner-contact title
+and rejects the declined one. NotLocked is 8 → 8 with no banner on either side.
+The sealed collector can settle on the outer story shell. Its generic waits
+do not assert the account variant, successful play or visibility of the
+intended subtree, and its style walk skips `display:none` nodes. These
+captures establish a question about state at capture, with the cause open.
+[Provisional raw comparison](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/out/tierc-c000-20261120T140506-candidate-manifest/diff-vs-tierc-c000-20261120T135013-baseline-Story.md) ·
+[Sealed collector](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-c000-replay-prep/capture.cjs:141).
+
+- **State and package boundary.** At consumer `73673465091`, the story
+  synchronously dispatches the account thunk's fulfilled action with request
+  ID `story` into the decorator's `mainStore` and restores its snapshot at
+  teardown. The reducer stores `payload.account` verbatim and marks it fresh.
+  Retryable supplies `canRetry=true, isSubAccount=false, isLockedDueToSca=false`;
+  NotLocked supplies `lockInfo=null`; SubAccount supplies `canRetry=false,
+  isSubAccount=true, isLockedDueToSca=false`. The local selector and string
+  variant helper decide the branch before the app-owned wrapper. The retry
+  hook starts with `hasPaid=false, isRetrying=false, isRetryOfferedAgain=true`.
+  The banner's mount invalidation accepts a valid seed younger than 5 s.
+  `SettingsRoot` can separately invalidate on account-ID mismatch and refresh
+  via the fixture's same-seed GET. The Storybook alias resolves `vanguard`
+  to `@rankingcoach/vanguard`. Both exact package roots resolve to
+  `dist/index.js` and export `InfoBox`, `Render`, `Button`/`ButtonTypes`,
+  `Text`/`TextTypes` and the action-only `snackbarService` from their
+  correspondingly named `dist/index-*.js` modules (`index-SnackBarService.js`
+  for the service). `Render` and the service are byte-identical. Both packs
+  have `primary="primary"`, `text="text"` and `textHelp="text-help"`.
+  `InfoBox`, `Button` and `Text` differ in bytes and can affect rendered
+  descendants. Only consumer state selects the wrapper and title prop.
+  [Committed story seeds](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/account/PaymentLockBanner/_PaymentLockBanner.stories.tsx:41) ·
+  [Account reducer](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/redux-stores/settings/account-settings.store.ts:109) ·
+  [Banner branch](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/account/PaymentLockBanner/PaymentLockBanner.tsx:42) ·
+  [Vite alias](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/vite.config.ts:176).
+- **First discriminator and smallest proposed red.** If a qualified comparison
+  confirms a difference, observe the lock tuple on the seed dispatch and
+  the same Provider's first banner render, then at the first committed
+  wrapper and after any mocked account completion. Include action request
+  ID, derived variant, wrapper presence/visibility and the title passed to
+  `InfoBox`. The passive red uses the single failing committed seed with
+  equal state and equivalent readiness. Retryable must expose one declined
+  banner and an enabled retry button. SubAccount must expose one owner-contact
+  banner with no declined title or retry. NotLocked must have no banner.
+  If state or commit readiness differs, isolate that first discrepancy in
+  the harness before proposing a package edit. If the wrapper and title
+  prop agree and the descendant fails, narrow to that exact public export:
+  for example `InfoBox type="danger" position="start" width="100%"` with
+  the SubAccount title and `description={null}`. Prove reference green
+  and candidate red on the same semantic assertion first. This witness uses
+  synthetic data and no payment action.
+
+**Partner passive render.** The two flagged login stories mount
+`PartnerApiTesterLoginForm` directly with `isLoading=true,errorMessage=null`
+or `isLoading=false,errorMessage=<fixture rejection>`. The third flag,
+`LoggedInWithAdminToken`, renders `PartnerApiTesterSessionCard` directly
+with `useAdminTokenForRequests=true`. These stories bypass the production
+Redux login branch. Compare resolved args, first connected app-owned root
+(`partner-api-tester-login` or `partner-api-tester-session`) and its
+visibility, then heading, loading/disabled native fields, rejection text or
+admin-mode notice as applicable. Record a render error if the root never
+commits. Login uses the barrel's `Input`, `Button`, `Text`, `Alert` and
+the button/text enums. The session card also uses `CheckBox`.
+`index-Input.js` matches byte-for-byte while its `index-InputBase.js`
+dependency still needs inspection if the field diverges. Provisional
+captures retain only a zero-size sampled root on the candidate. The
+qualified passive `LoginForm` control covers only its default args. If a
+flag repeats with matching args and a committed root, assert the first
+missing or mis-stated child in the single failing fixture, then isolate its
+barrel export if needed. Keep it passive throughout.
+[Committed Partner stories](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/PartnerApiTester/_PartnerApiTester.stories.tsx:17) ·
+[Login root](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/PartnerApiTester/PartnerApiTesterLoginForm.tsx:44) ·
+[Session root](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/PartnerApiTester/PartnerApiTesterSessionCard.tsx:48) ·
+[Qualified discovery scope](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T141729/verdict.md).
+
+**Billing exports geometry.** The eight provisional history-table flags
+share one measured shift. The Created cell grows from 184.375 or 184.797 px
+to 185.547 px with its left edge unchanged. The 200 px Actions column keeps
+its width and starts 0.8–1.2 px farther right. The saved walk reaches the
+cells but records no body leaf text, so it cannot establish equal timestamp
+strings or intrinsic text widths. The separate FirstLoad flag contains
+skeletons and no table. The two Start stories also show a 246 → 249.4 px
+change on identical visible Last start timestamp text. That panel is an
+app-owned flex/grid layout with plain Vanguard `Text` and no `RelativeTime`
+or table. The selected-IDs form margin is a separate flag.
+[Provisional raw comparison](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/out/tierc-c000-20261120T140506-candidate-manifest/diff-vs-tierc-c000-20261120T135013-baseline-Story.md:377) ·
+[Start results header](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/BillingExports/StartResultsPanel/StartResultsPanel.tsx:56).
+
+- **Inputs and shipped path.** At `73673465091`, the committed stories
+  build synthetic job ISO timestamps from `Date.now()` before rendering a
+  fresh BillingExports store. The list handler returns them unchanged.
+  The Start fixtures also generate timestamps during their mocked response;
+  the page stamps Last start and uses a 30 s heartbeat for stalled status.
+  Created renders the app's browser-locale `formatCreatedAt` through
+  `Text translate={false}`, followed by `RelativeTime` for valid dates in a
+  nowrap column. The clock-based relative formatter is memoized by ISO.
+  The app owns the scroll box and native auto-layout `table` at 100% width,
+  passes 150/190 px column minima for Created/Actions through its context,
+  and gives Cancel/Download a fixed slot before Delete. The `vanguard`
+  alias resolves through both packs' `dist/index.js` to
+  `index-TableHeader.js` and `index-TableBody.js`, then
+  `index-TableBodyRenderer.js` and `index-TableCell.js`. Both packs forward
+  the same column styles. Their table CSS module mappings and matching
+  emitted rules are byte-identical. H24 adds table slot attributes with
+  no matching table slot selectors in the packed CSS. `index-RelativeTime.js`,
+  its clock hook and date/affix helpers are byte-identical. The
+  `index-Text.js` dependency differs, so text rendering and effective
+  font/cascade remain candidates alongside input timing.
+  [Synthetic timestamps and handlers](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/BillingExports/_BillingExports.stories.tsx:41) ·
+  [Date formatter](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/BillingExports/BillingExports.helpers.ts:140) ·
+  [History columns and cells](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/BillingExports/ExportHistoryTable/ExportHistoryTable.tsx:111) ·
+  [Actions slot](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/BillingExports/ExportRowActions/ExportRowActions.module.scss:10).
+- **First discriminator and proposed red.** If qualified evidence
+  preserves this delta, use the single passive Populated fixture at the
+  recorded desktop viewport, same clock from before seed construction,
+  locale/time zone, completed list and fonts, and same scroll position.
+  Pair visible ISO/row/status and both exact Created strings by job ID.
+  Measure the widest Created text run with a DOM Range, including its
+  effective font metrics and matched rules. Then compare the native
+  header/body widths and Actions offset relative to the table with the
+  same container width, padding and border. A repeated difference at the
+  text run with equal strings calls for a red at the exact `Text` or
+  `RelativeTime` composition. If text runs and box inputs agree but column
+  layout diverges, reduce to the width-determining rows and original
+  provider/header/body inside the same native-table constraints. Require
+  `.472` green and H24 red on the first failing measurement, retaining
+  row content and shape. Unequal seeds/readiness need attribution first.
+  The Start header, form margin and FirstLoad skeleton each require their
+  own witness if confirmed. No submit is needed for the table check.
+
+**Billing disposition (decided-by-watchdog).** Approved for conditional
+diagnosis. Freeze the clock before the fixture constructs its seeds and
+verify the actual font faces are loaded. Compare intrinsic text widths and
+effective styles before column widths. Keep the Start header, FirstLoad
+skeleton and form margin separate. The provisional deltas do not warrant a
+table change.
+
+**TaskTray pager geometry.** The provisional PhonePager flag is the third
+card in the Scheduled stack at its initial scroll position. Its native
+button is 257.4 px wide at the same origin in both builds and 92 → 72 px
+high. TabletPager uses the same Scheduled data in a wider frame, and the
+matching button is 307.8 px wide and 72 → 70 px high. The pager, Scheduled
+section and stack layer boxes match in both comparisons, with the same 179
+sampled nodes per side. Both flags are geometry-only. The native button is
+under a covered, inert stack layer (`data-depth=2`); the saved walk has no
+title or caption descendants for this button. A measured height under the
+cover does not establish changed visible wrapping.
+[Provisional flags](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/out/tierc-c000-20261120T140506-candidate-manifest/diff-vs-tierc-c000-20261120T135013-baseline-Story.md:574) ·
+[Stack layer markup](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ado/AdoDashboard/tasks/TaskCard/TaskStack.tsx:82) ·
+[Stack cover CSS](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ado/AdoDashboard/tasks/TaskCard/TaskStack.module.scss:97).
+
+- **Fixture and shipped path.** The committed stories at `73673465091`
+  set 390/820 px frame widths inside the same 1280×900 browser canvas. The
+  tray starts at three columns, then a local `ResizeObserver` reads its
+  content width and the story waits for `data-per-view=1/2` and paging.
+  CSS sets the page width from that state. The fine-pointer rule controls
+  the cursor, and reduced-motion controls animation. The paged tray shows
+  the all-buckets Scheduled stack, whose order is derived from synthetic
+  `nextRunAt` values. Given the saved Today=2/Tomorrow=1 counts, the
+  flagged third row maps to `ado-scheduled-row-3`, “Refresh business
+  hours”, with the locally formatted Tomorrow/time caption. Confirm the row
+  ID and text directly in any qualified evidence. `TaskCard` owns the native
+  button, two-column grid, wrapping title and trailing caption. Its
+  action-placement observer does not apply to this trailing-caption row.
+  The `vanguard` alias resolves through both packs' `dist/index.js` to
+  `Text`/`TextTypes`, `Icon`/`IconNames`, `Render` and `classNames` in
+  their matching `dist/index-*.js` modules. `Render` and `IconNames`
+  match byte-for-byte. `Text`, `Icon` and `classNames` differ in emitted
+  bytes. There is no Vanguard Button or viewport hook on this path.
+  [Pager stories](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ado/AdoDashboard/tasks/TaskTray/_TaskTray.stories.tsx:203) ·
+  [Local row measurement](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ado/AdoDashboard/tasks/TaskTray/TaskTray.tsx:169) ·
+  [Scheduled sorting](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ado/AdoDashboard/tasks/ScheduledSection/ScheduledSection.tsx:65) ·
+  [Row text and indicator](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/ado/AdoDashboard/tasks/ScheduledRow/ScheduledRow.tsx:46).
+- **First discriminator and disposition.** Hold any red witness until the
+  qualified replay repeats the difference. First pair the settled pager
+  state, row identity, stack depth/cover and exact title/caption under
+  the same clock, locale, loaded fonts and frame metrics. If the first
+  difference is still within the card, compare the head's title-line
+  rectangles, trailing-caption box and actual icon width against the
+  820 px control. Establish visibility or an effect on visible layout
+  before treating a covered-card height as a shipping regression.
+
+**TaskTray disposition (decided-by-watchdog).** Approved for conditional
+diagnosis. The covered-card height matters only if the difference persists
+on the same row under qualified inputs and changes visible geometry or
+interaction.
+
+**Skeleton horizontal offsets.** Widget Comparison Loading is the strongest
+saved provisional pair. Both sides show the same three overflow-hidden
+shells (448×32 and two 1120×320), radii, gradient colors and empty loading
+contents. Each large shell starts at x80. Its 2240 px gradient child moves
+from x−1770.8 to x589.9 with the same box and y coordinate. The corresponding
+inferred `transform` translations are −1850.8 and +509.9 px, or −82.6% and
++22.8% of the child width. The small child independently gives the same
+percentages. This is roughly 13% versus 94% of the configured horizontal
+travel, measured in space. The saved sampler omits computed `transform`
+and frame time, so exact sampled clock phase is unavailable. The exact
+`.472` and H24 packed `Skeleton`, spring core/web/shared modules and the
+matching emitted Skeleton CSS are byte-identical. The 1500 ms JavaScript
+spring loop writes inline `transform: translate(-100%,0)` through
+`translate(30%,0)`; the sealed CSS animation override and screenshot
+option do not synchronize those JS writes. The control is TaskTraySkeleton
+Phone, an app-CSS loading shell with matching sampled geometry and
+byte-identical PNGs. Its only saved DOM difference is one class string.
+[Widget Comparison loading fixture](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/html/react/src/components/admin/agent/WidgetComparison/_WidgetComparisonView.stories.tsx:37) ·
+[Animated Skeleton](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/Skeleton/Skeleton.tsx:43) ·
+[Sealed sampling and CSS override](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-c000-replay-prep/capture.cjs:141) ·
+[Saved offset comparison](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/out/tierc-c000-20261120T140506-candidate-manifest/diff-vs-tierc-c000-20261120T135013-baseline-Story.md:30).
+
+If the qualified result still needs attribution, use one guarded pair of
+the same Loading story. Retain a normal frame with computed matrix and a
+timestamp relative to the first spring write. For the supplemental frame,
+hold the gradient child at the same measured transform in both pages
+(for example −35%, halfway through travel), verify the matrix immediately
+before and after the shot, and compare the clipped pixels. Record shell
+rects, paint tokens, loading marker and visible content separately. Equal
+phase-pinned paint would explain a phase-only flag. Any residual would
+identify the first box or paint property that needs investigation. The
+held frame measures paint at equal position, with live timing evidence
+kept separately. No supplemental run authorized by this card.
+
+**Skeleton disposition (decided-by-watchdog).** Approved only as a conditional
+supplemental diagnostic. Keep the normal frame and isolate an equal-transform
+frame if attribution still requires it. No runtime admitted for this step.
+
+#### 36.48 c000 qualified replay and Payment handoff
+
+**INCOMPLETE, accepted as provenance-qualified (decided-by-watchdog).** V1
+returned the clear slot after the single sealed replay on consumer
+`73673465091`, .472 and H24 focus tree
+`e90441d30d074f2938187561cab71f061dcd226d` / archive SHA-256
+`c11fd6cac5546602b3703d13ec4715d264722f99e30ab15df59b58c7cd7fcd6f`.
+Both indexes and all four served fingerprint boundaries qualified. Nine
+deliberate-denial self-tests passed and seven request audits had zero
+escape attempts. No shipping regression was confirmed.
+[V1 verdict and guard evidence](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T155742/replay-verdict.md).
+
+| Evidence | Complete | Raw outcomes |
+|---|---:|---|
+| Candidate manifest vs saved qualified .472 | 141/141 | 115 pass, 25 flags, 1 unstable |
+| New paired discovery | 4/5 | 3 pass, 1 flag, 1 missing |
+| Prior qualified discovery retained | 4/4 | 4 pass |
+| Total | 149/150 | 122 pass, 26 flags, 1 unstable, 1 missing |
+
+All three historical PartnerApiTester flags cleared. The covered TaskTray
+phone card repeats 92 → 72 px with no pixel flag. Account Logs Loading
+remains a separate 2.947% pixel-only flag confined to skeleton shimmer
+shades, with the same 53 sampled nodes and intended pending state. Exact
+phase remains unverified. Saved Call Asset Waiting for Backend still has
+no root PNG on either side. The `0×0` scaffold and absence of an asset
+request support intentional null, with separate semantic coverage pending
+evidence about the Storybook error panel outside the sampled root. Keep
+the original captures, guard audits and both kinds of accounting.
+[Manifest accounting](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T155742/manifest-accounting.json) ·
+[Discovery accounting](/Users/a.kott/vanguard-verify/v1/logs/tierc-c000-20261120T155742/discovery-accounting.json).
+
+**Next slot released directly A → V1 (decided-by-watchdog).** Delivery
+`started`, verifier run 143, receipt
+`fc6b47a6-a01c-4374-a21d-47afab9404a2`. The fresh, guarded passive
+diagnostic covers only Retryable, SubAccount and NotLocked on the two
+exact builds, in committed shadows, Direct Channel light at 1280×900.
+Use independent clean iframe state, normal Rule 13 preflight, same-listener
+opening/closing fingerprints, deliberate denial and new labeled outputs.
+Their existing plays assert only. Compare first and settled wrapper,
+title and retry semantics, Storybook errors and any observable seed,
+provider or request readiness without mutation. Expected settled outcomes
+are declined plus enabled retry, owner-contact with no declined/retry,
+and no banner, respectively. No clicks or payment actions.
+
+The saved normal .472 Retryable and SubAccount both have eight sampled
+nodes and no banner. The new H24 manifest has 25 nodes and the declined
+title in both stories, including SubAccount, whose committed expectation
+is owner-contact. This is a capture of a different semantic state. A
+fresh pair with unmatched inputs or insufficient readiness remains a
+harness gap. Matching inputs and a verified first semantic divergence
+would become the scope for A's source TDD proposal. Retain the saved
+normal failures and all original files.
+
+After the three priority cases, V1 may take a passive Saved Call Asset
+null pair only with the same guarded listeners and without restarting or
+widening. Check live index identity, visible Storybook errors inside and
+outside the root, `0×0` scaffold, visible descendants and the asset request
+audit. Keep raw missing-PNG accounting regardless of the semantic result.
+V1 returns the slot and verdict directly. A remains on offline attribution
+and integration. c000 rerun, c001, wide or measured work, package and full
+units remain held.
+[Replay Payment captures](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-c000-replay-prep/out/tierc-c000-20261120T155742-candidate-manifest/styles) ·
+[V1 diagnostic thread](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/80fcbccb-4649-4a3a-88e7-93c70c8198d6).
+
+#### 36.49 Final-candidate verification delta (decided-by-watchdog)
+
+**Pinned comparison.** The 4,642-entry before/after manifest for admitted
+H24 focus tree `e90441d30d074f2938187561cab71f061dcd226d` matches byte
+for byte, SHA-256
+`56be9d764cd0f32c8c3e7861ddcd99855ddf7903c18ee5530b4902406fe700fd`.
+Against the preserved integration checkout at base
+`55dc6113c814fd3f198af5a2743ff76b92174612`, excluding this plan, 4,611
+paths match by blob, SHA-256 and mode. Thirty paths changed bytes, with
+no added or removed paths or mode changes. The saved tracked diff
+`281124958ee06ba931f44fd044ac68ce6a0d38e195774b5c6a77e4ff0455d0c2`
+and 11/11 untracked file hashes match. Git status is relative to HEAD.
+The public entries, package export map, dependencies, lockfile, styles
+and derived MIT notice source already shipped in admitted H24. All match.
+The 30 paths comprise four runtime files, two declaration configs and
+24 fixture files including the parked TextField characterization. That
+characterization stays outside the release snapshot under §36.30.
+[Admitted source manifest](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/file-manifest-before-gate.json) ·
+[Preserved integration fingerprint](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/c000-handoff.wJwVLo/local-source-fingerprint.json).
+
+| Delta | Accepted fingerprint and source evidence | Exact-artifact evidence still due and cheapest existing check |
+|---|---|---|
+| Shared `lazy-fallback.tsx` and its spec | §36.32 two-file SHA-256 `1b9422d05fd9f6041c1c32e866a111c007c7ae9d52f9b06eb9b0fa75b51f7594`, 38/38 guarded pre/post, 22/22 fallback audit, nine identical literal call sites and identical WP rewrite. [Spec result](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/spec-after.log) · [Rewrite inputs](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/lazy-fallback.jfRP5D/rewrite-after.json) | H24's packed results are controls. The default graph reaches the helper and split fallback chunks (including Autocomplete and FormControl); confirm those dynamic edges and intended prunings on the new graph. The existing no-preload source project and audit cover cold suspension, warm/preloaded sync and route identity. The default installed smoke covers immediate audited consumer shapes. WP reaches the helper and the inline MUI Autocomplete implementation in its entry; rerun installed WP same-turn `sx` opt-out and filled Input/Select/Textarea controls plus the graph walk. Source inline tests cannot substitute for the packed rewrite. Keep MuiTextField eager and retain the supported FormControl route. |
+| Picker runtime `DateField.tsx`, `DateCalendar.tsx` and additive field/shell witnesses | §36.39 helper/witness SHA-256 `f6f6959b0fb5ab74081a7b41459a9b40eb6da036a779b480b1d29e8139540f4d` / `7baca703f1ae3b846975e5d8cbe8782eee0bd1d1a038c696b0c2745adca10b63`; §36.40 year-focus `0dc314d117cee78c97947b852a0a79f07506f351b0b758a2c75dda471b6e78bc`; §36.42 keys `01a38609f25ed9d740ab5a3fd0bcf09e4b752b3792b7d41c0bcef5911d1c3361`. [Selection trace](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datefield-selection.OEpHPN/comparison.log) · [Year focus comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-year-focus.3vzg6y/comparison.log) · [Calendar keys comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datecalendar-keys.ZaQsr5/comparison.log) | The H24 ESM picker mount, controlled restore and paired browser results qualify that artifact. Use existing default installed DatePicker contract/smoke, no-installed-MUI-X first render and the final eligible consumer shard for the new one. Both picker modules are reachable in H24 ESM. Retain the WP negative export/type assertion and graph exclusion; there is no WP picker runtime case to repeat. |
+| Shared `ClickAway.tsx` and ref witness | §36.37 two-file SHA-256 `fe8a96924a60e8ee1905db20a58e2ee3db69bd890936c25914f4903b5a187df3`, 26/26 matched guarded cases with attach/cleanup ordering. [Patch and comparison](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/click-away-ref.S98HuM) | The H24 linked ESM graph directly uses this helper from DatePickerShell, DropdownMenu and Snackbar's internal module. The matching package/source regression evidence is the existing ClickAway parity/ref/cleanup cases in the no-preload suite plus final consumer overlay checks. H24's linked WP graph does not contain this helper. Verify that boundary in the new graph alongside ordinary WP smoke. |
+| Declaration configs and projection spec | §36.35 three-file SHA-256 `d34d0327c410d2d2da00d7c00bdacb769c0c8892bc90bf621d2ec0aeeb5b2d0f`, 2 intended red and 12/12 green. [Projection delta](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/projection-delta.json) · [Exact old archive members and hashes](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/milestone-declaration-baseline.json) | The old archive includes the eight test-only `.reference.d.ts` files under `./dist/*`. The source projection does not qualify the new tar. Audit the same eight exact paths against the old bytes, remove exactly those ESM declaration members and compare unrelated declaration bytes. Scan both new graphs and archives for both frozen suffixes and MUI X, including lazy chunks, actual parsed specifiers and triple-slash paths/types. Preserve D12 keys and resolve ordinary targets in installed `_package-exports` and the real consumer deep-path fixture. Check WP declaration roots/graph separately. Retain H23-positive MUI X control and verify the unchanged MIT notice in each new bundle. |
+| Remaining verification fixtures | §36.33 typing corrections and three hoists, exact hoist-batch SHA-256 `b3b69b6b1568d5927c7382ebd1108c89806fe155b86efc8852619368ff321cb9`; §36.34 four accepted file hashes (shell spec later stacked with §36.40); §36.36 Toolbar/SnackbarRoot `9b58e5279035279963254cd81f79232e166034d916e766d764fadd6e197f3e0b` plus Snackbar's separate type-domain witness; §36.38 Breadcrumbs/TextHighlighted `6dd77930e90ad59f68848c4615dd31efe5e8963c56aff1b8c720cc9f8d466173`; §36.41 frozen DatePicker `880dc661cba12058c70b1decf0319b1a1ffea54f42ff33613378d23413f4b045`. [Canonical typing evidence](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixtures.luwzq4) · [Four-fixture case inventory](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/matched-case-inventory.json) · [Mounted and type fixtures](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/frozen-references.NFRaHp) · [Fixture patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/remaining-fixtures.nvEVLJ/remaining-fixtures.patch) · [Picker comparator patch](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/datepicker-bound-helper.kUCXR0/ensure-unix-in-seconds-hoist.patch) | Old runtime bytes serve as controls while the new exclusion audit proves these paths remain outside both packed graphs. Integrated all-spec TypeScript, no-preload source specs and installed scripts are still due. The narrow typing and mounted evidence covers its saved cases and preserves assertions. The callback-native characterization stays local, with file SHA-256 `02dea1562e620211e463192e139140043d9bc06fbeeca7cbbc0cf90ed4b9e11d` and §36.10 scope. |
+
+The typing/setup group covers the DateRangeInput, SearchableSelect caret,
+class junk, TextField prop-routing and reachability, dual-boundary Popper
+and both media-query specs. The other generic fixture edits cover error
+logging, junk class sites, theme defaults, both Breadcrumbs specs and
+TextHighlighted. The three frozen sources and the Snackbar type witness
+remain test-only. [H24 ESM module graph](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/module-graph.dist.json) ·
+[H24 WP module graph](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/module-graph.dist-wordpress.json) ·
+[H24 package evidence](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/canonical-package.log).
+
+| Order and owner | Pending evidence before handoff |
+|---|---|
+| 1. V1 → A | Receive and classify the authorized Payment diagnostic and optional null witness. Preserve c000 accounting and resolve any actual run blocker or scoped source witness first. Runtime slot remains with V1 until direct handback. |
+| 2. A, reviewed exact source | Freeze the source input with plan and parked characterization excluded. Canonical static is still RED per §36.46, with 49 identities/62 excess occurrences as scoped reconciliation only. Require app/lib TS7 baseline comparison, zero contract/all-spec TypeScript errors, zero Biome errors and no warning above baseline multiplicity. Preserve the gate, scope and historical holds. On static PASS run existing guarded 35-file coverage at 95% lines/85% branches per file. |
+| 3. A, one authorized offline package milestone | Run the canonical guarded no-global-preload spec, package and installed scripts gate on that same source. Check both installed default and WP consumer profiles, dependency graph, 22/22 fallback audit, eager-MUI accounting, D12, notices and both emitted graph/member boundaries above. Archive the exact manifest, tar SHA and results. This provides the exact artifact for final-candidate designation. |
+| 4. A → verifiers after designation | Final paired rc-webapp Storybook and full unit suite, exact paired consumer TypeScript without consumer-installed MUI, WordPress scope and Tier P after Tier C under the existing final sequencing. Prior diagnostic shards, guard canaries and fixture-level WP checks retain their recorded scopes. Redux exit, eager TextField/theme boundary and the FormControl compatibility route stay as decided. |
+
+This is a read-only source comparison and planned order. Static, coverage,
+packaging and the final paired checks remain pending. No runtime started.
+[Canonical static](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/agentic-plans/mui-upgrade-gates/gates.sh) ·
+[Coverage](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/agentic-plans/mui-upgrade-gates/coverage.sh) ·
+[Canonical package](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/agentic-plans/mui-upgrade-gates/package.sh).
+
+#### 36.50 Scoped passive closure and final verification entry points
+
+**V1 clean handback.** Payment semantic PASS 3/3 per build on committed
+`73673465091` with .472 and exact admitted H24 focus. Fresh matched
+Redux seeds, successful Storybook completion and stable settled state
+confirmed Retryable declined and enabled, SubAccount owner-contact
+without retry or declined, and NotLocked loaded with explicit null and
+no banner. Archived blank .472 positives and H24's declined SubAccount
+did not recur. Their capture-readiness cause remains unknown. No
+Payment source change or TDD proposal.
+
+**Saved Call Asset, separate semantic coverage.** The exact
+`ads-google-ads-saved-call-asset-details--waiting-for-backend` fixture
+resolved on both live indexes, completed successfully with a 0×0 scaffold,
+and had no visible root content, inside/outside error panel or audited
+asset request. Raw missing root PNG remains incomplete. c000 stays
+INCOMPLETE and retains the original 149/150 screenshot accounting and
+flags. Both passive and closing leg exits were 0. All six guard self-tests
+and four fingerprint boundaries passed, with GET-only audits. The launcher
+exit 75 was an unrelated helper's argument matching the final process-name
+search. Executable and listener checks independently confirmed cleanup.
+[Passive verdict and evidence](/Users/a.kott/vanguard-verify/v1/logs/c000-passive-20261120T162437/verdict.md).
+
+**Exact input and slot approval (decided-by-watchdog).** A owns the clear
+slot for one guarded canonical static-only run. The isolated §36.49
+projection retains the H24 plan and parked TextField spec bytes. It has
+4,642 paths and 29 changed files against H24. The SHA-256 of the sorted
+UTF-8 `mode<TAB>SHA-256<TAB>path<LF>` rows is
+`a6d4f2679754434b7334b3058b674c9fef4604f92aa33e9871ff672d2c0bd956`.
+The same digest was independently confirmed by the watchdog. Require
+matching paths, modes and hashes before and after, fresh Rule 13, clear
+listeners and a passing deny-network self-test. Use the unchanged source
+gate, scope, rules and master baseline. The old H24-bound phase wrapper
+would select the wrong input. The scratch launcher had seven stray
+argument tokens corrected before any invocation, with the exact expanded
+argument vectors and Bash syntax checked. Direct watchdog ping delivery
+`steered`, receipt `8ff27acf-9773-4ff3-8bc8-6fbf13a89421`.
+[Pinned projection](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/approved-input.tsv) ·
+[Scratch launcher arguments](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/launcher-argv.json).
+
+| Entry point | Pin and scope |
+|---|---|
+| A static `bash agentic-plans/mui-upgrade-gates/gates.sh final-static-a6d4f267.NQvTml` | Approved once on the projection. App/lib TS7 compare to declared master baseline, contract and all-spec compilers require zero errors, full `biome lint src` retains zero errors and no excess warning multiplicity. Preserve all raw lanes and exits. |
+| A combined `coverage.sh <label>` semantics | After static PASS and separate authorization on the same source. Existing guarded transport uses installed Vitest `spec` + `storybook`, V8, 35 exact includes, per-file 95% lines and 85% branches, one worker and explicit loopback 6031/6032 browser/proxy. Keep the two socket witnesses, Chromium denial self-test and ordinary test selection. |
+| A `bash agentic-plans/mui-upgrade-gates/package.sh` | One later offline, guarded pack on the same source. Uses no-global-preload spec, one actual pack/build, installed scripts via `VG_PACKAGE_EXPORTS_ROOT`, contents/fallback/WP link/eager-MUI checks. Preserve archive-to-build identity, exact tar and consumer lock/resolution evidence. If offline resolution fails, preserve the tar and resolver output before proposing recovery. |
+| Installed D12 `package-fixture/run.sh` under `package.sh` | Installs default-declared/default-mui/wp-declared/wp-mui. The declared-only isolation probe requires `MODULE_NOT_FOUND` for Material, System and X. Default gated config runs `components.tsx`, `subpath.tsx` and both `d12-consumer-paths` files. Type-only tests resolve AIAssistant, PIN, hex, OverlayStacking and ModalSplitView declarations. Postinstall `d12-runtime-paths.log` separately resolves `style.css` and `dist/index-OverlayStackingService.js`, whose ambient declarations alone cannot establish runtime existence. Preserve WP negative DatePicker export and `sx` Autocomplete/filled controls. Full `skipLibCheck:false` output remains measured, not the installed gate. |
+| Final consumer on exact designated pack | Use the approved Tier C manifest/discovery harness with live indexes, start/end identity, complete paired keys and guards. Use staged `tierc-unit/stage.sh` then `run.sh canaries` and one `run.sh full` per exact leg at the end. The committed rc-webapp checker points to `html/react/tsconfig.json`. Archive its paired no-consumer-MUI compiler verdict with actual installed graph; the unit runner and installed fixture compile do not produce that verdict. Keep final WordPress runtime and Tier P in the existing sequence. |
+
+**Parked artifact supplement.** The H24 emitted audit accepts triple-slash
+type/path directives but recognizes only `.mui-reference` in archive
+member names, graph IDs, byte prefilter and parsed specifiers. The installed
+exports checker verifies relative import resolution and manifest targets,
+so it can pass with orphan test declarations still shipped. For the one
+later new tar, §36.35 needs the dual-suffix audit on both bundles, the exact
+eight-member removal versus the archived member/hash inventory, unrelated
+declaration byte comparison and a separate WordPress entry graph. Preserve
+the H23 MUI X positive control and the default declared-only packed
+DatePicker same-turn witness. The package smoke's controlled picker replay
+and the WP inline fallback checks cover their named behavior. Default ESM
+opt-out suspension timing is pinned at source, and packed default own-route
+shape smoke and dynamic graph checks have separate scopes. Package and
+coverage remain held in this static-only slot.
+[Static gate](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/agentic-plans/mui-upgrade-gates/gates.sh) ·
+[Guarded coverage protocol](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/run-phase.sh:43) ·
+[Package gate](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/agentic-plans/mui-upgrade-gates/package.sh) ·
+[Installed isolation and resolution sequence](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/agentic-plans/mui-upgrade-gates/package-fixture/run.sh:53) ·
+[Tier C full unit entry](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/tierc-unit/run.sh) ·
+[H24 emitted detector](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/audit-emitted-boundaries.py:20) ·
+[Parked eight-member baseline](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/declaration-boundary.4IQ4jo/milestone-declaration-baseline.json).
+
+#### 36.51 Exact integrated static verdict and next bounded scope
+
+**VALID RED.** The first exact integrated gate on the §36.50 projection
+ran once at 14:36:32 UTC, fresh Rule 13 load 36.11 and 61% memory free,
+with a passing deny-network self-test. The first launcher preflight
+deferred at load 44.10 and never invoked the gate. Its separate raw
+exit is archived. The admitted gate and its bounded runner exited 1.
+All four TypeScript lanes and Biome errors were zero. The complete raw
+lint JSON contains 843 warnings. Its path/rule/message multiplicities
+relative to the pinned master baseline give 49 introduced identities and
+62 excess occurrences, split into 15/18 shipped and 34/44 frozen.
+Every identity and multiplicity matches the prior reconciliation. The
+canonical run now supplies these counts. The bounded runner classified it
+VALID from the paired clocks. The supplemental OS sleep-log query timed out.
+[First preflight deferral](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/deferred-1.preflight.log) ·
+[Raw gate and diagnostics](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/gate.log) ·
+[Raw TypeScript lanes and complete lint JSON](/Users/a.kott/vanguard-verify/worktrees/final-integrated-static-a6d4f267.yT2Na5/agentic-plans/mui-upgrade-gates/out/final-static-a6d4f267.NQvTml) ·
+[Exact result](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/gate-result.json) ·
+[Pinned classifier inputs and joined warning inventory](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/integrated-static-inventory.json).
+
+**Source postcheck recovered with the gate closed.** The raw launcher
+exited 1 when its postcheck saw the single generated
+`.tsbuildinfo-app`, declared by the existing incremental app config.
+Its bytes were archived out of the isolated projection, SHA-256
+`87ed6f632dda0c345a35a1622be8b18a7f5a06347502b7fb66289f280469caaa`.
+The unchanged verifier then matched all 4,642 source paths, modes and
+hashes byte-for-byte with the precheck. The raw assertion and launcher
+exit remain preserved. Executable/process group and all verification
+listener checks were clear. No rerun of the canonical gate.
+[Raw source-after check](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/source-after.log) ·
+[Recovered source verification](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/source-recovery-after.log) ·
+[Archived compiler cache hash](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/generated-tsbuildinfo-archive.sha256) ·
+[Close evidence](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml).
+
+**Clean slot released A → V1 (decided-by-watchdog).** The sole approved
+next diagnostic is the fixed-clock, passive BillingExports Populated
+pair on .472 and the admitted H24 archive. V1 applies fresh Rule 13
+and existing capture guards, and returns the slot directly. Delivery
+`steered`, run 146, receipt `05b4eaf1-4d9f-47c8-b8ec-0b705556518f`.
+Watchdog start receipt `da784361-84a6-4ebd-827b-22bb0de6158c`, close
+receipt `5c62997d-ac89-4185-96ca-c94782ff57ab`. Coverage, c001,
+full units, package and Tier P remain held.
+[V1](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/80fcbccb-4649-4a3a-88e7-93c70c8198d6) ·
+[Watchdog](t3-thread://v2/e35503e3-cf61-4359-9313-451d57cd87cb/722326f5-024a-4cef-90a8-b30b19b29ef4).
+
+**Proposed remediation order, review only.** Keep the current rules,
+baseline, fixtures and release scope. The integrated result identifies
+the same blockers and supplies no authorization for a change.
+
+| Order | Group and minimum evidence |
+|---|---|
+| 1 | Three low-risk shipped identities (3 excess). Prior proposals are `Form`'s local `idx: number \| undefined`, `Table`'s local sorter rename preserving calls, and `InlineSvg`'s local `inlineSrc: string \| undefined`. If authorized as one batch, first reproduce exactly these three lint diagnostics and capture unchanged guarded case results. Pin array tree-order registration and the scalar absent index, table raw and custom sort value ordering in both directions, and source SVG payload/branch selection for literal, URI and base64 input with the existing guarded cache/fetch control where applicable. Reuse existing tests where they witness the needed behavior. Then require zero of the three identities, unchanged TypeScript/public props and identical case and observable traces. For the annotation-only cases the runtime emit must match. The intended red is the original lint diagnostic, with behavioral assertions green before and after. [Form characterization](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/Form/_FormCharacterization.spec.tsx) · [Table sort cases](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/Table/_TableSortPaging.spec.tsx) · [SVG fixture](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/StyledSVG/_StyledSVG.classNames.spec.tsx). |
+| 2 | Shipped list keys (3 identities / 6 excess) and InlineSvg mount effects (4/4). Keys require reorder, insert/remove and focus/active-node retention before a stable identity proposal. Mount dependencies require source-switch, overlap/late completion, callback and listener cleanup equivalence per lifecycle. These are separate from the three mechanical proposals. |
+| 3 | Five shipped trigger holds (5/5). DateCalendar/DateField focus and selection, MenuPopup's live paper wakeup, and FocusTrap's two effect lifecycles require a replacement that still satisfies their existing distinguishing witnesses. Preserve the proven focus, timer, ordering and cleanup semantics. |
+| 4 | Frozen comparators (34/44). Pin the accepted original blobs and exact spec/story importers. Prove equivalence for each affected rerender/effect, hook order, key identity, prototype or coercion domain before any suggested rewrite. The Accordion batched updater change is a proven mismatch. Moving executable comparators outside `biome lint src` remains held and requires an explicit user decision. Any later proposal must preserve D12, both emitted graphs, discovery, transform coverage and mounted trace behavior per §§36.35, 36.46. |
+
+Only the existing scoped proofs and this inventory are in scope while
+V1 owns runtime. No warning trials, source changes or follow-on launch
+were made.
+
+#### 36.52 Three mechanical shipped changes, review only
+
+**Approved review order (decided-by-watchdog).** The following is a
+proposal on the exact §36.50 input. V1 owns runtime during Billing. Wait
+for direct release and an implementation decision before source changes
+or validation.
+
+```diff
+--- a/src/core/Form/Form.tsx
++++ b/src/core/Form/Form.tsx
+@@ -158 +158 @@
+-        let idx;
++        let idx: number | undefined;
+--- a/src/core/Table/Table.tsx
++++ b/src/core/Table/Table.tsx
+@@ -132,3 +132,3 @@
+-  const valueOf = (row: TableRowProps) => (column?.sortValue ? column.sortValue(row) : row[sort.key]);
++  const getSortValue = (row: TableRowProps) => (column?.sortValue ? column.sortValue(row) : row[sort.key]);
+   const direction = sort.direction === 'asc' ? 1 : -1;
+-  return [...rows].sort((left, right) => direction * compareCellValues(valueOf(left), valueOf(right)));
++  return [...rows].sort((left, right) => direction * compareCellValues(getSortValue(left), getSortValue(right)));
+--- a/src/core/StyledSVG/InlineSvg.tsx
++++ b/src/core/StyledSVG/InlineSvg.tsx
+@@ -106 +106 @@
+-    let inlineSrc;
++    let inlineSrc: string | undefined;
+```
+
+| Accepted canonical lint red | Focused before/after behavior control on the same inputs |
+|---|---|
+| Form 158:13–16, `lint/suspicious/noImplicitAnyLet`, “This variable implicitly has the any type.” Baseline 0, observed 1. | Run the existing Form characterization and field-binding specs. The nested scalar edits Name to `Cy`; the legacy two-item array edits only the second label to `X` in tree order. Keep the explicit index binding case as a separate control. Compare DOM, value/state and callback results. The scalar branch still passes undefined to `FormElement`; the existing cases establish scalar behavior, without directly reading the `idx` prop. |
+| Table 132:9–16, `lint/suspicious/noShadowRestrictedNames`, “Do not shadow the global `valueOf` property.” Baseline 0, observed 1. | Run the existing SortPaging spec. Preserve raw numeric/text ascending and descending orders and `aria-sort`, controlled custom `sortValue`, the change callback and slice/paging. The diff preserves the same row lookup, argument order and number of call sites. |
+| InlineSvg 106:9–18, `lint/suspicious/noImplicitAnyLet`, same message as Form. Baseline 0, observed 1. | Run the existing StyledSVG class-name spec, which already mounts the percent-encoded `data:image/svg+xml;utf8,` fixture and a bundled caret. The selectors and assertions stay intact. This spec does not independently hit raw markup, base64 or the fetch fall-through. If a later narrow slot includes that branch witness, reuse its 24×24 SVG as literal text, percent-encoded text and base64, and one synthetic loader response to a non-inline source. Compare same SVG markup, callback order and fetch count before/after. The three inline legs must use no fetch. Use the same local fixture response and guard in both arms. |
+
+Source SHA-256 values for Form, Table and InlineSvg, in order, are
+`30affce3add5649158634fd39a8545ba6cf6653e6c9ea80e9fbd00d41b120223`,
+`3c41bc0267f98662faa0ea23c10c50cfe3304cd39f90d832dd1b32aa1c6bf87b` and
+`1b7ea995ecaca3fadff38e03155baa93befcc52283499fb4069be4bec4d08890`.
+Use the canonical lint JSON, SHA-256
+`73485f16bee0c8a69b46cceb329602b636f343946ec1028bb3126523f399595a`,
+as RED. The expected focused GREEN is those exact three identities
+absent and other findings on the same paths unchanged, including the
+four InlineSvg dependency warnings. Counts, case names, status rows and
+observable behavior must match pre/post. The annotation-only edits
+must erase at emit. Verify library types and unchanged public contracts
+within the admitted focused scope.
+[Canonical lint JSON](/Users/a.kott/vanguard-verify/worktrees/final-integrated-static-a6d4f267.yT2Na5/agentic-plans/mui-upgrade-gates/out/final-static-a6d4f267.NQvTml/lint.json) ·
+[Pinned comparison and baseline digest](/Users/a.kott/vanguard-verify/logs/final-integrated-static-a6d4f267.NQvTml/integrated-static-inventory.json).
+
+**Planned runner inputs, held.** If authorized, pass these four exact
+files together to the existing guarded, no-global-preload Vitest
+`spec` project with `--maxWorkers=1 --no-file-parallelism`, before and
+after the proposed diff. Retain full-name/status inventories. Compare
+focused post-edit Biome JSON for exactly the three production paths to
+the pinned raw red. Use fresh Rule 13 and the existing deny-network
+guard and self-test for each launch. No keys, effect deps, trigger holds
+or frozen comparators are part of this proposal. No canonical rerun
+or package work is scoped here.
+[Form characterization](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/Form/_FormCharacterization.spec.tsx) ·
+[Form binding](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/Form/_FormFieldBinding.spec.tsx) ·
+[Table sort/paging](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/Table/_TableSortPaging.spec.tsx) ·
+[SVG control](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/StyledSVG/_StyledSVG.classNames.spec.tsx).
+
+**Billing Populated scoped PASS, direct V1 handback.** The single passive
+.472/H24 pair on consumer `73673465091` fixed the clock before seed
+construction and matched locale, time zone, viewport, scroll and loaded
+Inter-Regular. The 20 rows, all 40 Created text rectangles, 137.5 px
+widest text run, 153.5 px Created column and 1045.234375 px Actions
+offset match. The Created crop had zero differing pixels. All four
+fingerprints and six denial self-tests passed, with zero audited
+escapes. The old width flag did not recur in this scope. The archived
+cause remains unknown and no Table fix is indicated. Keep the sealed
+c000 INCOMPLETE and preserve its flags. V1 returned verified clear
+listeners and executables. The mechanical batch still awaits its
+separate implementation decision.
+[Billing verdict and close evidence](/Users/a.kott/vanguard-verify/v1/logs/c000-billing-populated-20261120T164029/verdict.md).
+
+#### 36.53 Deferred ActionBarRoot source witness, review only
+
+The pinned V2 packed draft SHA-256 is
+`17cd9fb03806ea400a172b11152b7a0467781499cb5be40d6280d3d7128e224a`.
+The current Root, service and pub-sub source blobs match V2's
+recorded IDs (`4deeffb9…`, `231fc607…`, `048cf3bf…`). For a future
+authorized source leg, the proposed selectable test is
+`src/core/ActionBar/ActionBarRoot/_ActionBarRoot.observers.spec.tsx`
+under the normal guarded Vitest `spec` project in jsdom, one worker,
+no global preload. Use the real aliases
+`@vanguard/ActionBar/ActionBarRoot/ActionBarRoot`,
+`@vanguard/ActionBar/ActionBar.service` and `@helpers/pub-sub` in
+the same isolated source checkout. Reuse V2's two natural detachments,
+four mounted +1 checks and aged exact-zero assertions. Record admission,
+counts and the intended teardown RED before proposing a source fix.
+[Pinned draft](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/v2/_TierPActionBarObservers.test.jsx) ·
+[Source fallback and guarded procedure](/Users/a.kott/PhpstormProjects/mgm/rc-webapp/tmp/research/vanguard-ui-sdk-visual-baseline/v2/tierP-actionbar-observer-admission.md).
+
+The mount-only effect owns the four returned RxJS `Subscription`
+handles from `reactActionBarAddMessage`, `reactActionBarRemoveMessage`,
+`reactActionBarSetFooter`, and `reactActionBarHideFooter`. The proposed
+cleanup unsubscribes only those four handles. Each callback-form
+`$sub` registers with the singleton ReplaySubject for its channel.
+**Approved isolation (decided-by-watchdog).** Keep both numeric
+teardown/remount cycles publish-free on both legs. Collect the complete
+two-cycle trace before evaluating the exact-zero assertions. Run the
+service replay/hide control only in a separate isolated behavior leg.
+`$pub` drops events for channels with no subject yet, so in that leg
+first mount then naturally detach a real root. Publish one synthetic
+footer through `actionBarService.setFooter` while detached, then mount
+a new root and assert the footer button is visible from replay. Call
+`hideFooter` while mounted and assert it becomes hidden. Keep the
+ReplaySubjects and service state intact. Existing `_ActionBar.dataSlot.spec.tsx`
+checks component markup. `ServiceUseCase` supplies existing service
+behavior context and is outside this source-only runtime proposal.
+No ActionBar test, source edit, staging or runtime was performed.
+[Mount registrations](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/ActionBar/ActionBarRoot/ActionBarRoot.tsx:21) ·
+[ReplaySubject and publish behavior](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/helpers/pub-sub.ts:65) ·
+[Existing slot spec](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/ActionBar/_ActionBar.dataSlot.spec.tsx:11) ·
+[Existing service story](/Users/a.kott/WebstormProjects/rc-webapp-vanguard-git/src/core/ActionBar/stories/ServiceUseCase.story.tsx:41).
+
+#### 36.54 Isolated mechanical batch, focused PASS
+
+**Authorized and verified scope (decided-by-watchdog).** Start input was
+the exact 4,642-path §36.50 projection. The approved three-file patch is
+`cc4a67acb41ab7bf62841b3804355182e9ebfac957cf53bb0af6f78ca05d380e`.
+Only the Form index annotation, Table sorter local name and InlineSvg
+annotation changed. The final isolated path/mode/hash manifest has
+SHA-256 `11419caa67cd84fddb0045aadfd540d3f348eae9c5ff142fe28976d8e369a74d`.
+It matches the expected three-file delta after validation. The preserved
+A integration fingerprint outside this plan still matches §36.49.
+[Exact patch](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/approved-mechanical.patch) ·
+[Verified post-edit manifest](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/verified-post.tsv).
+
+- Both guarded no-global-preload legs selected only the same four
+  approved files. Each passed 22/22 with identical full-name/status
+  rows. The existing SVG cases cover a bundled caret and percent-encoded
+  URI. Raw markup, base64 and loader fall-through were outside the
+  runtime selection.
+  [Before](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/before.spec.json) ·
+  [After](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/after.spec.json).
+- Against the canonical red, the scoped post-edit lint removed exactly
+  the three approved warning identities and occurrences. The other
+  16 identities and occurrences on those paths match with zero
+  omitted diagnostics or errors. The raw experimental-reporter notice
+  is retained and checked explicitly by the offline parser.
+  [Raw post-edit lint](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/after.lint.log) ·
+  [Exact comparison](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/comparison.json).
+- Installed TypeScript 5.9.3 used the library options and checked the
+  three paths with zero diagnostics before and after. All three emitted
+  declarations match byte for byte. Form and InlineSvg JS match exactly.
+  Table JS matches after reversing just the declaration and two calls
+  of the local name. This is scoped type and emit evidence.
+  [Before types](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/before.type-emit.log) ·
+  [After types](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/after.type-emit.log).
+
+All five completed checks were VALID with raw exit 0 and passed the deny
+self-test. Rule 13 preserved the separate before-spec load deferral
+(60.83) and type/after-spec memory deferrals (33%, 36%, 36%, 39%).
+The approved before spec was run once. Owned runners and inhibitors are
+reaped and listeners clear. The exact patch is preserved for A's
+integration checkout pending its application decision. If integrated
+unchanged, the scoped projection would reconcile to 46 identities/59
+excess (12/15 shipped and 34/44 frozen). The existing exact canonical
+RED remains the verdict on the integration input. No follow-on slot
+has been used. The old temporary-index approval remains untouched.
+[Deferred preflights and guarded evidence](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N) ·
+[Clean slot evidence](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/close.log).
+
+**Integrated uncommitted (decided-by-watchdog).** Applied exactly the
+verified patch `cc4a67acb41ab7bf62841b3804355182e9ebfac957cf53bb0af6f78ca05d380e`
+in A's integration checkout on `feature/ui-sdk-architecture-investigation`.
+The three postimages are all mode 100644. Form SHA-256
+`7cd9ebf8e91ad03ad91dd09d742c16b6d95a6458f89ff126bb717210fa961f1f`,
+Table `c11c9620c867ba0f9e4d9f64134c5ef5de38f7439c4d7c0a2e1663e59e50ae3f`,
+and InlineSvg `67ddc115cf05b53273bf3d1148abecd93e56aaf44ee7b9f4a743ca4c07b2d538`.
+The 4,639 other working file bytes and modes matched at application.
+The 46/59 count remains a scoped estimate against the pinned
+canonical RED, with no gate or mechanical rerun.
+[Integration preimages](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/integration-before.tsv) ·
+[Integration postimages](/Users/a.kott/vanguard-verify/logs/mechanical-shipped-a6d4f267.X6Ob6N/integration-after.tsv).
+
+#### 36.55 Isolated ActionBarRoot observer cleanup
+
+**Qualified source RED (decided-by-watchdog).** The isolated base is
+`11419caa67cd84fddb0045aadfd540d3f348eae9c5ff142fe28976d8e369a74d`.
+The single added publish-free observer test has SHA-256
+`b83096d61e35757483b654de2cf93c19673d6deb666d1dce1be621975e192b4a`.
+All 4,643 paths, modes and hashes in its RED projection matched before
+and after, manifest
+`e1c9a059c7f55ac842db52e1f332d45fb88e18e8142606ab88cbb45b07e44458`.
+Fresh Rule 13 admitted load 11.06 with 43% memory free; the guard and
+listener checks passed. The single real-alias case reached its
+exact-zero assertion and failed with raw exit 1. It had distinct
+mounted bars, preserved all four +1 controls, and observed both DOM
+detachments. The first teardown and aged sample retained `[1,1,1,1]`;
+the second retained `[2,2,2,2]`. The case completed both cycles before
+the exact-zero assertion and did not publish.
+[RED trace and case](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/qualified-red.json) ·
+[Raw RED](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/red.log).
+
+**Isolated patch prepared after qualified RED (decided-by-watchdog).**
+Capture the four existing subscription returns and unsubscribe each in
+the mount effect cleanup. The callbacks, dependencies, service and
+ReplaySubjects stay intact. The production patch SHA-256 is
+`ad7d625e782b5e0c9904a637c26f38e2b8695f04b99687d0eb895060103a79eb`.
+The observer test keeps its exact RED bytes. The separate replay/hide
+fixture has SHA-256
+`622d5b5fd0090ee478ef59d2fb8f1636b0e14eddd12c4b874408f9e8e7e2a85f`.
+The 4,644-path post-edit manifest is
+`ccb1d067de531594167aa056b29e57dbeec2705bc23279553bfa264ef7c3fb14`.
+GREEN, existing slot spec and replay/hide each require fresh Rule 13,
+deny self-test, clear listeners and their own pinned process. Memory
+below 40% defers each launch. A's integration checkout contains only
+the approved mechanical batch, with the ActionBar changes held there
+pending review.
+[Isolated cleanup patch](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/actionbar-cleanup.patch) ·
+[Replayed footer fixture](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/_ActionBarRoot.service-replay.spec.tsx) ·
+[Pinned post-edit inputs](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/green-before.tsv).
+
+**Identical observer case GREEN.** The fresh isolated run passed 1/1
+with all four +1 controls on each mount, distinct detached DOM and
+`[0,0,0,0]` at both teardown and aged samples in both cycles. Raw
+exit 0, guard and listeners qualified. The existing ActionBar slot
+spec deferred at 39% memory free before runtime. Its separate
+process and the replay/hide leg remain due. Preserve completed RED
+and GREEN. [GREEN trace](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/green.log) ·
+[Slots preflight deferral](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/slots.deferred-1.preflight.log).
+
+**Scoped source PASS, ready for review.** The existing ActionBar
+slot spec passed 1/1 on the same source. The first separate replay
+process exited 1 at `Invalid Chai property: toBeVisible` after the
+footer was present at `translateY(0)`. Hide was unobserved. That raw
+harness failure and its `ccb1d067…` input manifest remain archived.
+The watchdog approved one corrected replay using the established
+file-local `@testing-library/jest-dom/vitest` import. Only that spec's
+bytes changed, with all 4,644 paths and modes matching the new
+`4f4c118a71d27bb720fa191790769e884a03ec39363e953436deef1bf120b80b`
+manifest before and after. The production SHA-256 remains
+`a361a2bb24b659191d13108f31ec95bb065328ec553e83a42ae7d30a1289a24a`.
+The retry used fresh Rule 13 at load 11.83 and 44% memory free,
+passed its guard, and exited 0 on the same named case. It observed
+no subscriber while detached, a visible replayed footer after
+remount, successful hide, and the same subject throughout. The
+completed observer and slot legs were reused.
+[Existing slot result](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/slots.json) ·
+[Original replay harness failure](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/replay.log) ·
+[Retry trace](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/replay-retry.log) ·
+[Qualified comparison](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/qualified-comparison.json).
+
+The exact review diff including both fixtures has SHA-256
+`b31ef69ce65fe754b59ad336c909856e7555c1f49f6b34d0fd079598dbf4df7d`.
+The original one-file cleanup patch remains unchanged. All five owned
+runner groups and inhibitors closed, and verification listeners are
+clear. The ActionBar diff remains isolated pending integration review.
+This is source-only cleanup and service evidence.
+[Combined review diff](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/actionbar-source-review-qualified.patch) ·
+[Final clean slot check](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/close-after-retry.log).
+
+**ActionBar integrated uncommitted (decided-by-watchdog).** Applied
+only the qualified three-file patch
+`b31ef69ce65fe754b59ad336c909856e7555c1f49f6b34d0fd079598dbf4df7d`.
+Mode 100644 is verified for the cleanup source and both new specs.
+Their SHA-256 values are the verified cleanup
+`a361a2bb24b659191d13108f31ec95bb065328ec553e83a42ae7d30a1289a24a`,
+unchanged observer witness
+`b83096d61e35757483b654de2cf93c19673d6deb666d1dce1be621975e192b4a`,
+and corrected replay fixture
+`4644187faec0746dd9b2a1a12df28ec59b031217898346f8f176ef2f54fa7537`.
+All 4,641 other working paths kept their bytes and modes, and the
+index was byte-identical before and after. The source-only teardown
+and replay verdicts carry to this diff. Exact packed evidence remains
+held. Completed cases were not repeated.
+[Integration postimages](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/integration-after.tsv) ·
+[Unmodified index digest](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/integration-index.sha256).
+
+#### 36.56 AIOrb ownership drafts, offline only
+
+During the ActionBar resource hold, drafted the previously reviewed
+B design outside both source trees. The publish-free jsdom draft
+captures root CSSOM presence, value and priority plus the unrelated
+root/body sentinels through a natural orb removal before restoration.
+The separate selector map pins real pseudo geometry, motion and color
+consumers and both natural removal orders, including the check that
+rejects a JS-only change. Its single-instance WordPress gate stays
+distinct from the multi-instance source check and the approved smoke
+order. All outcomes are predictions. No staging or AIOrb execution.
+[CSSOM draft](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/aiorb-offline-review/_AIOrb.root-style.spec.draft.tsx) ·
+[Loaded-CSS selectors and WordPress controls](/Users/a.kott/vanguard-verify/logs/actionbar-source-tdd.WCl7JH/aiorb-offline-review/loaded-css-selector-map.md) ·
+[Reviewed B proposal](/Users/a.kott/.t3/worktrees/rc-webapp-vanguard-git/feature-ui-sdk-b-data-s-aed05ed8753acf33/agentic-plans/ui-sdk-thread-b-log.md:1531).
+
+**Offline draft approved (decided-by-watchdog).** Positive single-instance
+visual/control legs use matching reference theme inputs and record loaded
+stylesheet proof for each leg. Seeded inline important host values belong
+to the separate ownership control. The CSS-only witness and its JS-only
+negative control stay separately selectable. AIOrb execution remains held.
+
+**AIOrb test-first admission and CSS witness (decided-by-watchdog).**
+After ActionBar integration, pinned a fresh isolated 4,645-path source
+projection with manifest SHA-256
+`d264a5be3b5a19814e68d71deb1aa1d562511b8fb4ab0f554b8f5319327b21c1`.
+The only addition to the accepted ActionBar source input is the unchanged
+two-case CSSOM draft, SHA-256
+`3eb648353e984aea66243ac8190986334910e9a3c2d5b8f6f828c8619e4da7be`.
+All projected paths, modes and bytes matched and the isolated dependency
+entry points resolve locally. Rule 13 deferred the RED leg at load 131.56
+and again at 131.81, with 40% free memory in the paired samples. There is
+no AIOrb test outcome. The single guarded jsdom RED remains first on fresh
+passing preflight.
+[Exact projection](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/approved-input.tsv) ·
+[First preflight](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/admission-check-1.log) ·
+[Second preflight](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/admission-check-2.log).
+
+During the resource hold, preserved the executable CSS witness draft in
+the evidence folder. The definition explicitly records the original root
+that survives and the original root that detaches in each removal order.
+The play captures separate host CSSOM and computed evidence before
+asserting either and records per-document loaded style proof. The
+additive offline comparator draft addresses the color review finding
+without changing the story draft. It requires four independent same-theme
+documents and positive unseeded reference controls. It compares actual
+radial colors and stops, border, small and large fills, and overlay for
+both step-4 and both survivor samples. It separates invalid support,
+stylesheet or provenance evidence from a qualified baseline mismatch.
+The unchanged source browser baseline and all CSS execution remain held
+for separate authorization, as do AIOrb production edits and packed
+checks.
+[Story draft](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/_AIOrbStyleOwnership.stories.draft.tsx) ·
+[Offline comparator draft](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/compare-loaded-css.draft.py) ·
+[Review handoff](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/loaded-css-comparator-handoff.md).
+
+**AIOrb jsdom RED split and r2 acceptance (decided-by-watchdog).** The
+first sealed run was valid but did not qualify. The pristine case failed at
+the ownership assertion as intended. The seeded case failed its precondition
+because jsdom 26.1.0 / cssstyle 4.6.0 drops custom-property priority on
+readback. Those r1 artifacts are kept unchanged. The watchdog approved
+splitting by environment capability. The jsdom spec and qualifier keep both
+cases, exact values, resize and natural-detach checkpoints and both
+sentinels, but seed ordinary declarations. The `!important` seeds, the
+sentinel priority and computed stylesheet parity stay REQUIRED AIOrb
+acceptance coverage in the paired Chromium witness. This does not relax any
+test, gate or Tier P criterion. The r2 projection differs only in the spec
+row, with manifest SHA-256
+`aa468c5d4c008293c58d10d75425c9e792f43a01a55e14dbf50c6fdddc65a436`. Its
+first attempt aborted on a T3 host restart before any test outcome, and that
+evidence is kept. The second attempt was VALID and RED and qualified: both
+cases fail at `host root CSSOM ownership before restoration`. Reviewed and
+accepted for pristine and ordinary pre-seeded ownership through resize and
+natural detach.
+[r1 verdict](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/red-verdict.md) ·
+[r2 qualified RED](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd-r2.LzcZl3/qualified-red.json).
+
+**AIOrb loaded-CSS Chromium baseline authorized (decided-by-watchdog).** One
+bounded unchanged-source run is authorized, using the reviewed four-document
+comparator unchanged. The isolated snapshot is the approved r1 projection
+plus the verbatim story draft and a scoped `.aiorb-scope` config built on the
+H24 pattern. AIOrb.tsx and AIOrb.module.scss are byte-identical, and the
+manifest has 4,648 paths. Storybook dev on :6031 runs under the existing H21
+deny-by-default Node egress guard. The collector derives from H23 and runs
+under the existing Chromium guard, which does a fresh Rule 13 check, routes
+through the loopback deny proxy and self-tests. Each leg gets a fresh context
+with light theme, 1024×768, DPR 1 and en-US. Served module and index
+fingerprints are taken at the start and end of each leg. A per-leg
+expectedStyleProof is re-derived from that leg's own loaded CSS-module
+response in a collector-owned proof document. The JS-only negative control
+stays a separate later leg. No production edits until this baseline
+qualifies and its receipt is reviewed.
+[Baseline harness](/Users/a.kott/vanguard-verify/logs/aiorb-css-baseline.YpzXP1/run-baseline.sh)
+
+**AIOrb fix conditions (decided-by-watchdog, user decision 3).** V1
+confirmed the r2 RED is valid for its stated reason. V1 also confirmed the
+defect is pre-existing on .472: `dist/index-AIOrb.js` has the same effect
+with deps `[state]` and no cleanup, and `vanguard.css` has the same `:root`
+block. The fix ships with the reproducing spec and starts only after the
+baseline bundle is sealed and the watchdog has been notified.
+1. False-green guard (V1 §1.4, MAJOR). Deleting the effect alone turns the
+   jsdom spec green but takes away the inner orbs' inputs. The module's
+   `:root {}` block derives `--orb-size-small/large`, both animation delays,
+   `--ai-orb-base-color-op` and `--overlay-orbs` from the values the JS
+   writes to the root. The jsdom spec is necessary but not sufficient.
+   Acceptance needs all three: jsdom GREEN, the four-document Chromium
+   comparator matching the unchanged-source single-orb reference per profile
+   (computed inner widths, delays, overlay and gradient colours), and the
+   JS-only negative control RED.
+2. Design. No writes to documentElement and no global `:root` block for
+   these names. The 7 inputs live on the orb's own element and the derived
+   declarations move into the orb's own scope. Two orbs of different sizes,
+   iframes and shadow roots then each resolve their own values. Size changes
+   must update. Today the root stays at 40px after Small→Medium because deps
+   are `[state]` only. Pin that as its own assertion.
+3. Additional proof: a StrictMode double mount (V1 2.6); a portal orb in the
+   same document next to an inline orb (2.3); and a host stylesheet rule
+   `:root{--container-size:…!important}` (2.7), with its before/after
+   behaviour stated and declared as a delta if it changes.
+4. Declared delta: Vanguard's stylesheet stops defining the generic names
+   (`--container-size`, `--color1/2/3`, …) on `:root`. rc-webapp reads none
+   of them; V1 found 0 readers apart from AIOrb's own 15 rules. WordPress
+   host themes are not visible to us. The variables are not renamed in this
+   fix, to keep the diff minimal; scoping is the fix.
+5. rc-webapp exposure: 2 direct sites, both Large and never on screen
+   together. The LoadingModal 'ai' variant has 0 callers. No visible impact
+   today; the only residue is 7 inline variables left on `<html>`.
+No commit.
+
+**AIOrb Chromium baseline attempt 1 not qualified; attempt 2 admitted
+(decided-by-watchdog).** Attempt 1 is accepted as not qualified, and its
+bundle stays preserved
+([receipt](/Users/a.kott/vanguard-verify/logs/aiorb-css-baseline.YpzXP1/baseline-receipt.md)).
+1. The scoped `.aiorb-scope/main.ts` viteFinal overrides `esbuild` to
+   `drop: ['debugger'], pure: []`. This is harness only, and the production
+   config is untouched. The served AIOrb.tsx and AIOrb.module.scss module
+   hashes must equal attempt 1's. Any difference stops the run unqualified.
+2. Stylesheet-proof predicate (story and collector mirror):
+   `root.matches(selector) && width === 'var(--container-size)' &&
+   rule.cssText.includes('--animation-duration-rotation')`. If Chromium 131's
+   cssText also omits the variable, fall back to the reduced predicate and
+   assert exactly one matching rule. The receipt states the observed cssText.
+3. The status field is the raw play status, not `storyFinished` (which
+   reported "success" while play threw). The collector fails closed on
+   `playFunctionThrewException` unless both traces are complete.
+4. One run in a new output dir with resealed manifests. Expected diffs from
+   attempt 1: story draft, collector and scoped config only. Same guards and
+   Chromium build, Rule 13 first. No third attempt without the watchdog.
+
+**AIOrb baseline attempt 2: condition 1 corrected (decided-by-watchdog).** The
+original condition 1 was mis-specified. A served-module hash embeds the
+absolute snapshot path, so it can never match across attempts. The corrected
+condition is "the esbuild override does not change AIOrb's transform", proven
+offline with no third run.
+1. scss: accepted as proven. The bodies are byte-identical once the snapshot
+   root is replaced by a fixed token.
+2. tsx, two checks. First, the sealed AIOrb.tsx contains 0 `console.` and
+   `debugger`. Second, esbuild transforms it under both option sets
+   (`drop:['console','debugger'], pure:['console.log']` and
+   `drop:['debugger'], pure:[]`), all other options as resolved, and the
+   outputs must be byte-identical.
+3. If both pass, run the unchanged comparator offline on the sealed a2
+   bundle. The launcher gate and the reduced-single predicate are accepted.
+4. Expected reading: on unchanged source the seeded legs throw (the leak,
+   observed in Chromium) and the reference legs complete. A qualified
+   baseline is exit 1 with the known shared-inner-width signature plus CSSOM
+   evidence, or exit 0. Exit 2 means not qualified.
+5. Future collectors save served module bodies and compare them with the
+   snapshot root tokenized.
+
+**AIOrb fix: successor accepted, control correction (decided-by-watchdog).**
+1. Successor accepted. Comparator exit 0 with 0 differences. The host root is
+   untouched, including the 312px `!important` seed and `--color1`. The
+   single-orb references are byte-identical to the qualified baseline
+   (condition 7). The host-stylesheet leg measures 40/40 outer and 4/6 inner
+   while the root computes 312px.
+   [successor](/Users/a.kott/vanguard-verify/logs/aiorb-css-successor.Qm2eHi/verdict.json)
+2. JS-only control: exit 2 is "not qualified" under the comparator's own
+   contract, and it is not relabelled. Offline correction: a
+   `--references-from <bundle>` option, for `js-only-control` only, takes the
+   references from the qualified a2 baseline. Without the option the
+   comparator must behave exactly as the pinned one: the successor gives
+   exit 0 with the same verdict hash, and the a2 baseline gives exit 1 with
+   the same verdict hash. Expected with the option: exit 1,
+   known-js-only-mismatch.
+3. The lint warning in the new spec file is fixed without touching any
+   assertion, then GREEN 7/7 on the formatted file.
+4. Step 9: targeted AIOrb + LoadingModal specs, the WP same-tick smoke, and
+   the CSS-order check if the emitted rule order changes.
+5. Declared deltas: (i) the stylesheet no longer defines `--container-size`,
+   `--color1/2/3` or the derived orb variables on `:root`; (ii) a host
+   `:root{--container-size:…}` no longer resizes the inner circles (before
+   31.2/46.8 from a 312px root, after the orb's own 4/6).
+
+**AIOrb Chromium acceptance closed: ACCEPTED (decided-by-watchdog, option
+(i)).** The acceptance tool REJECTED the negative control with exit 2, not
+exit 1. With baseline references the references pass, but every seeded orb
+frame fails the positive-style precondition (radial `none`, overlay
+transparent), because nothing feeds `--ai-orb-base-color` to the root block.
+The predicted shared 31.19/46.80 widths at step 4 are present in the raw
+trace. The expectation of exit 1 was wrong: the comparator's JS-only
+signature assumed only the size inputs are lost. The control's purpose was
+to show that a JS-only change cannot pass acceptance, and it is met more
+strongly than predicted. The pinned comparator remains the acceptance tool;
+the successor's exit 0 came from it (verdict 42112aa4…). The
+`--references-from` variant is archived with its diff and three
+identical-verdict proofs, and is not promoted.
+[control archive](/Users/a.kott/vanguard-verify/logs/aiorb-control-offline/comparator.diff)
+
+**InlineSvg stable `load` dependency (B's draft, admitted by A).** The
+mount effect's deps change from `[]` to `[load]`, applied on base sha256
+`67ddc115…`. biome useExhaustiveDependencies drops from 4 rows to 3; only the
+`load` row goes. The new `_InlineSvg.lifecycle.spec.tsx` is 5/5 GREEN on the
+base and on the patch with identical outcomes. B's StrictMode predictions
+(T4 one request, T5 late onError once) were observed on the base and pinned.
+Discrimination controls on temporary swaps: `[status]` turns T2 and T3 red,
+`[handleError]` turns T2 red, `[src]` turns T3 red, `[load]` stays green.
+StyledSVG is shared-level, so the full spec project and the junk-token
+check are owed before any pack.
+[evidence](/Users/a.kott/vanguard-verify/logs/inlinesvg-load-dep/)
+
+#### 36.57 Commit-ready inventory of the working tree (2026-11-23, offline)
+
+Base HEAD `55dc611`. 51 paths: 36 modified, 15 untracked. Each path was
+classified by its current SHA-256 against two sealed inputs. The first is the
+accepted post-ActionBar integration projection
+(`aiorb-cssom-tdd.Zaqx6y/approved-input.tsv`). The second is the c000
+untracked fingerprint, which equals admitted H24 focus successor `e90441d…`,
+archive `c11fd6ca…`. 46 paths equal the projection byte-for-byte. The other
+5 are this plan, AIOrb (3 paths) and InlineSvg `[load]`. One more path, the
+parked TextField characterization, equals the projection but stays out of the
+release set (§36.30, §36.49). Commits are made by the user. Subjects are
+conventional and carry no Co-Authored-By trailer. Status key: VI = verified
+independently by a verifier verdict; SV = self-verified (A's runs, watchdog
+review only); UV = unverified, not for the release commit set.
+
+| # | Commit subject | Paths | Evidence | Status |
+|---|---|---|---|---|
+| 1 | `feat(date-picker): replace the MUI X picker with an own field, shell and calendar` | DatePicker.tsx, DatePickerShell.tsx, DatePickerShell.module.scss, DateField.tsx, DateField.scss, date-field-sections.ts, calendar-adapter.ts, DateCalendar.tsx, _DatePicker.mui-reference.tsx, _DateField.mui-reference.tsx, _DateField.differential.spec.tsx, _DatePickerShell.differential.spec.tsx, _DateFieldComputedParity.stories.tsx, config/derived-notices.txt | H24 bytes: S2 independent PASS §36.18, H24 package PASS §36.29, mobile successor PASS, exact packed Narrow Cancel focus PASS, c000 Tier C replay (V1) INCOMPLETE 149/150 §36.46–§36.50. Post-H24 edits to DateField.tsx and DateCalendar.tsx (selection helper §36.39, year focus §36.40, calendar keys §36.42) are in no pack yet. | VI for the H24 bytes; SV for the §36.39/40/42 deltas. The .472 nested-calendar hit-test is still unpaired (§36.30) |
+| 2 | `fix(searchable-select): keep the own caret glyph and focus behaviour` | SearchableSelect.tsx, _SearchableSelect.caret.spec.tsx | H23 caret witness, V1 [verdict](/Users/a.kott/vanguard-verify/v1/logs/h23-caret-witness/verdict.md). Carried unchanged in H24 | VI |
+| 3 | `build(types): keep frozen reference fixtures out of the declaration build` | tsconfig.dts.json, vite.config.lib.ts, scripts/_dts-package-imports.spec.ts | The `.mui-reference` boundary is H23/H24 (package PASS, emitted audit 0 edges). The `.reference` widening is §36.35: 2 intended RED and 12/12 green, three-file `d34d0327…` | VI for `.mui-reference`; SV for `.reference`. The new-tar eight-member audit is still owed |
+| 4 | `fix(lazy-fallback): share one suspension helper across split routes` | src/core/_internal/lazy-fallback.tsx, _lazy-fallback.spec.tsx | §36.32: two-file `1b9422d0…`, 38/38 guarded before/after, 22/22 fallback audit, identical WP rewrite | SV. Packed dynamic-edge and WP same-turn checks are owed (§36.49 row 1) |
+| 5 | `fix(click-away): assign the forwarded ref before listeners attach` | src/primitives/react/ClickAway/ClickAway.tsx, _click-away-ref.spec.tsx | §36.37: `fe8a9692…`, 26/26 matched guarded cases | SV |
+| 6 | `test: correct fixture typing and frozen-reference setup` | Breadcrumbs (_Breadcrumbs.cleanup, _breadcrumbs-parity), _DateRangeInput.differential, _error-logging, _Snackbar.differential, _SnackbarRoot.mui-reference, _TextHighlighted, _Toolbar.mui-reference, _class-junk-scan, _MuiTextFieldPropRouting.differential, _MuiTextFieldReachability.differential, _theme-default-props.differential, both use-media-query specs, _junk-class-sites, _popper-dual-boundary.differential | §36.33 `b3b69b6b…`, §36.34, §36.36 `9b58e527…`, §36.38 `6dd77930…`, §36.41 `880dc661…`. Exact integrated static gate §36.51: all 4 TypeScript lanes 0 and Biome errors 0 | SV (test-only; not in any packed graph) |
+| 7 | `refactor: clear three mechanical lint findings in Form, Table and InlineSvg` | Form.tsx, Table.tsx, InlineSvg.tsx (only the hunk at line 106) | §36.54 patch `cc4a67ac…`: 22/22 identical before/after, lint −3 identities, emitted JS and declarations equal | SV |
+| 8 | `fix(action-bar): unsubscribe root observers on unmount` | ActionBarRoot.tsx, _ActionBarRoot.observers.spec.tsx, _ActionBarRoot.service-replay.spec.tsx | §36.55: qualified RED `[1,1,1,1]`/`[2,2,2,2]` → GREEN `[0,0,0,0]`; slot spec 1/1; replay/hide retry PASS; review diff `b31ef69c…`. Fix drafted from V2's Tier P observer finding | SV (watchdog accepted; packed evidence held) |
+| 9 | `fix(ai-orb): scope orb variables to the orb element` | AIOrb.tsx, AIOrb.module.scss, _AIOrb.root-style.spec.tsx | r2 qualified RED, jsdom 7/7, Chromium successor comparator exit 0 with reference equality (§36.56). V1 independent offline ACCEPT (reference sha `c6ded95f…`/`3504d0fb…`). Source-level WP smoke 5/5 | VI |
+| 10 | `fix(inline-svg): depend on the stable load callback` | InlineSvg.tsx (only the hunk at line 176), _InlineSvg.lifecycle.spec.tsx | Lint 4→3; lifecycle 5/5 on base and patch; controls discriminate (§36.56) | SV (watchdog accepted) |
+| 11 | `docs(vanguard): record the rebuild verification log` | agentic-plans/ui-sdk-architecture-investigation.md | — | docs |
+| — | NOT in the release set | src/core/_internal/InputBase/_TextFieldV9Compatibility.spec.tsx (`02dea156…`, parked callback-native characterization) | Kept outside every gate input under §36.30/§36.49. It needs an owner decision (keep as a local characterization or drop) and, if kept, a targeted run plus review | UV |
+
+InlineSvg.tsx carries two independent hunks: line 106 (commit 7) and line
+176 (commit 10). Commit them separately with `git add -p`, or merge commits 7
+and 10 into one. If kept separate, commit 7 must land first because
+the [load] patch was based on its postimage `67ddc115…`.
+Scoped lint after the integrated deltas: 49/62 at canonical RED, −3 from the
+mechanical batch, −1 from InlineSvg `[load]`. That gives 45 identities / 58
+excess (shipped 11/14, frozen 34/44). This is an estimate; the canonical
+re-run is still owed.
+[Projection](/Users/a.kott/vanguard-verify/logs/aiorb-cssom-tdd.Zaqx6y/approved-input.tsv) ·
+[c000 fingerprint](/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/c000-handoff.wJwVLo/local-source-fingerprint.json).
+
+**Inventory accepted as the commit plan (decided-by-watchdog).** It has 11
+groups. InlineSvg's two hunks are split with `git add -p`, and group 7 lands
+before group 10. (a) `_TextFieldV9Compatibility.spec.tsx` stays local and out
+of the release set: it is neither deleted nor staged, and it is revisited
+after the release. (b) The commits still wait for the user. Before that, owed
+item 2 runs on the exact release input, identified by RELEASE-INPUT-ID.
+
+**Rule 15 (decided-by-watchdog, 2026-11-23).** Host load around 75 with almost
+no CPU from our own processes came from macOS indexing and assessing each
+freshly created snapshot: Spotlight `mdworker_shared` ×3, `syspolicyd` and
+`trustd`. (1) Every NEW snapshot, worktree or shadow directory gets a
+`.noindex` suffix (for example `release-input.XXXX.noindex`), which Spotlight
+skips. Existing sealed directories keep their names, because their paths are
+in seals. (2) After creating a snapshot, wait for the indexing burst to pass
+before the Rule 13 check rather than counting deferrals. Admission still
+needs load < 40.
+RELEASE-INPUT-ID `ee8d38e0d63a6d22fc87b89a8c8ccaef0965122ce54f51f99e3d7e4e87eef1a7`
+is recorded, and the parked spec's HEAD blob in the snapshot is accepted.
+
+**Release-input checks accepted; provisional rc1 from the sealed snapshot
+(decided-by-watchdog).** RELEASE-INPUT-ID
+`ee8d38e0d63a6d22fc87b89a8c8ccaef0965122ce54f51f99e3d7e4e87eef1a7`:
+- library tsc: 0 errors;
+- spec: 391 files, 2,888 passed, 0 skipped;
+- junk-token: 8/8 + 8/8;
+- scripts: 63 passed and 16 skipped. All 16 skips need dist and are OWED at
+  the pack step; they are recorded as owed, not as passed.
+
+The two harness incidents are no-result attempts.
+[run](/Users/a.kott/vanguard-verify/logs/release-input.LNWhSP/run/summary.txt)
+
+The candidate pack is built from the sealed snapshot, not from a commit.
+Label `rc1-ee8d38e0d63a`. It is provisional: it becomes the candidate for
+commit X only if manifest(X) == RELEASE-INPUT-ID. No commit, tag or push.
+Order: (1) the 35-file coverage gate on the snapshot; (2) one guarded package.sh
+pack with every §36.49/§36.50 exact-artifact check plus V2's AIOrb wrong-pack
+pre-check; (3) gates.sh is not run for a verdict; the static gate stays rc1's
+one open gate (warnings, blocked on the user's two lint answers); (4) hand
+off to V1 and V2. CPU queue: B, then A, then V2. Rule 13 is strict; stop if
+memory drops below 25%.
+
+**FINDING 3: animated Text first frame (decided-by-watchdog).** 768ca96 put
+the react-spring word animation behind React.lazy + Suspense with a
+first-frame fallback. React 19's FALLBACK_THROTTLE_MS = 300 keeps the words
+invisible for about 310 ms, then replaces the nodes, in both bundles (B's
+paired WP smoke). .472 fades the same nodes in at once. Decision: option 1,
+revert the lazy boundary. "As few visual changes as possible" is a hard limit
+and outranks a D10 saving. Under D10: "lazy split of the word animation
+withdrawn; a non-Suspense design is a next-step proposal, not this major."
+Test change APPROVED. Cases 1 and 2 of `_Text.animateWords.lazy.spec.tsx`
+were added by 768ca96 itself. They assert the design being withdrawn (the
+animation module is not loaded for plain Text; the fallback equals the first
+frame), which is an implementation choice, not a behaviour .472 has. The
+revert makes both false or unbuildable. The behaviour they stood for is
+replaced by a stricter contract derived from .472, in
+`_Text.animateWords.first-frame.spec.tsx`. Case 3 moves byte-for-byte to
+`_Text.animateWords.spec.tsx`; only the file name and describe title change.
+Its final DOM must stay byte-identical. The deletion goes in the same change
+as the revert, and the removed wrapper's biome-ignore goes with it.
+
+**FINDING 3 fixed locally, test first.** 768ca96 is reverted for Text only:
+- `Text.tsx` and `text-animate-words-style.tsx` match the pre-768ca96 bytes
+  exactly;
+- `text-animated-words-lazy.tsx` is deleted, together with its biome-ignore.
+  Suppressions in src go from 9 to 8.
+
+Kept from 768ca96, since independent: `Text.types.tsx` imports
+`TextAnimationProps` with `import type`, which has no runtime effect. B's
+thread log entry stays as history.
+
+RED on the current tree, admitted run: `sameNodesSettle: false`, meaning the
+first-commit spans are replaced. `settledInsideWindow` stayed true under fake
+timers, so the plateau shows only in real time: case 3 took 330 ms on the
+lazy tree and 40 ms after the fix. An earlier run without Rule 13 admission
+is preserved as `red.unadmitted.log`.
+
+GREEN: Text 4 files, 9/9. Case 3 moves byte-for-byte to
+`_Text.animateWords.spec.tsx`. Its pinned final DOM has SHA-256
+`2a3d04e154d79e09f7ff9b63f3583864b271e87ce5fbb65354f1bd6fef44eb36`
+before and after. The moved file keeps the original's unformatted `WRAP`
+line, so biome would only re-wrap that line.
+
+The restored files' 8 warnings are all master-baseline identities at
+multiplicity 1, so 0 excess.
+
+Bundle cost, honestly: Text's eager closure returns to roughly B's pre-split
+86.9 KB gzip, up from 61.9. B's later paired measurement puts the cost at
+~19 KB. Link, Alert and Button return the same way. The exact eager numbers
+come with the rc1 pack.
+
+D10: "lazy split of the word animation withdrawn; a non-Suspense design is a
+next-step proposal, not this major."
+
+Commit-plan row 12 (after row 10): `fix(text): render the word animation
+eagerly again`. Paths: `Text.tsx`, `text-animate-words-style.tsx`,
+D `text-animated-words-lazy.tsx`, D `_Text.animateWords.lazy.spec.tsx`
+(cases 1 and 2 removed with watchdog approval, case 3 moved),
+`_Text.animateWords.spec.tsx`, `_Text.animateWords.first-frame.spec.tsx`.
+Status: SV.
+[evidence](/Users/a.kott/vanguard-verify/logs/text-animate-words-eager.noindex/)
+
+**USER DECISIONS 2026-11-23 (relayed by the watchdog).**
+- U1 COMMITS: "yes you can commit but make sure it's on a branch separate from
+  any other code". Commit only on `feature/ui-sdk-architecture-investigation`,
+  with no push, tag or merge.
+- U2 LINT GATE: "yes, but config changes if really needed, no errors on
+  handover". Approved: (a) the SHA-pinned copy budget for frozen-reference
+  identities; (b) the 12 justified `biome-ignore` comments covering 14
+  occurrences. The Biome config, lint scope and baseline stay untouched.
+- U3 VERIFICATION POLICY: "do cheap ones and expand, don't do full
+  verifications on any small change". Per fix: targeted specs for the
+  component and its direct dependents, plus one focused browser check only
+  when the change is visual. Per candidate: one full spec + scripts run, one
+  coverage gate, one pack. Verifiers start focused on what changed since the
+  last verified pack and expand afterwards; Tier C, the paired full units and
+  Tier P run once, on the final candidate.
+
+HARD LIMIT restated: NO database access of any kind (no read, no write, no
+bin/console, no PHP, no SQL, no backend). This work is frontend only.
+
+**U2 applied.**
+(a) The alias block in `compare-clean-biome.cjs` and
+`baseline/master-ts7/frozen-reference-aliases.json` (B's draft: 10 aliases,
+34 identities). All 10 frozen SHAs match and all 34 have a master budget.
+Unit checks on the compare tool:
+- the alias applies → exit 0;
+- a changed frozen SHA → "alias void", exit 1;
+- a missing master budget → throws;
+- control without the alias file → introduced.
+
+(b) 12 comments for 14 occurrences, applied after the mechanical patch and
+`[load]`, with B's texts placed by content anchor. Comments 8 (Breadcrumbs
+separator) and 12 (Slider thumb) first reported `suppressions/unused`, so they
+use B's documented fallback directly above the `key=` attribute, with the
+same text. Scoped lint on the 8 files goes from 22 to 8 warnings: exactly the
+14 targeted occurrences gone, 0 new diagnostics, 0 unused suppressions,
+0 errors. Emitted JS is byte-identical for all 8 files under the build's
+minify and under whitespace-only minify. A plain transform keeps statement
+comments in three JSX files, but the difference is comment text only.
+
+Full `biome lint src` through the patched compare tool: 0 errors, 823
+warnings, 0 introduced identities. This is a prediction for the static
+gate's lint lane, not the gate itself. `biome-ignore` comments in src:
+8 → 20.
+[evidence](/Users/a.kott/vanguard-verify/logs/lint-u2.noindex/)
