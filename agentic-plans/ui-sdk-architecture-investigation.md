@@ -5204,6 +5204,59 @@ e90441d. The slot is back with V2. Static gate: GREEN. Commit: done.
 profiles MATCH, host collision PASS in both orders, Text first frame 2/2). V1's focused check PASSED on rc-webapp HEAD 3018e8d (all groups, no candidate-only finding; text
 first word visible after 8–42 ms vs .472 6–36 ms). V2's HEAD count lanes: no leak on 9 lanes.
 
+**FINAL CANDIDATE (supersedes rc1 for release).** `/Users/a.kott/vanguard-verify/packs/final-56fde55967ba.tgz`,
+SHA-256 `5a8ba1b986ee34f95283dfd7704799f8c52c0632f9426a3c6fd67d7e6e402e83`, commit 76dff3f6, RELEASE-INPUT-ID-7
+`56fde55967ba6b6ce13bcecb2d0d4ba2a67cff414ed99cf5c75f204e26416943`. The only source differences from rc1 are the docs
+generator, README and one spec comment. Gates on it: scripts 79, static GREEN, storybook GREEN, package GREEN,
+audits GREEN. Coverage carries over from rc1, because src is identical apart from that spec comment.
+Build is not byte-reproducible (chunk numbering, one hoisted import). Compared with rc1, dist-wordpress, all CSS
+and all .d.ts are byte-identical. In dist/ ESM, about 180 files differ only by the numbering of same-named shared
+chunks: after normalizing the suffixes, 2,636 of 2,637 JS files are identical. The one remaining difference is
+htmlparser2's Parser chunk, where rc1 carries a redundant bare `import "./index-decode.js"` and a different
+minified class name. decode is byte-identical and still evaluates once before Parser through the Tokenizer
+import. Tier C, the paired units and Tier P run on this final pack.
+
+**Next cut commits (on 76dff3f6, 2026-11-23, owner go).**
+1. c04e22e0 fix(drawer): bound the drawer channel replay and unsubscribe DrawerRoot on unmount
+2. 2925f005 test(drawer): guard story for drawer portal release
+3. e38a48e5 test(date-picker): keep a slow shell differential test from breaking the rest of the file
+4. dd65757c fix(date-field): MUI X child order and outlined input class
+5. 6a4e95a5 fix(date-picker): MUI X open, close and focus transitions
+6. 9fba35ef chore(build): deterministic chunk numbering and no build timestamp
+7. the docs commit (plan log, hand-over draft, KNOWN-ISSUES.md; hash in the cut report).
+The field's mousedown section resolver landed in dd65757c (staging slip).
+
+**Build determinism (next cut, decided-by-watchdog 2026-11-23; prepared, not yet applied).** From the next cut, two
+builds of the same input are byte-identical in dist/ and dist-wordpress/. Same-named chunks are numbered by a fixed
+rule (first-party module first, then by module id) instead of build order. `vanguard-asset-analysis.json` carries a
+`timestamp` only when the build sets `SOURCE_DATE_EPOCH`. File names change only where they collided before:
+
+| Group | Module | Today (build-order dependent) | Next cut |
+|---|---|---|---|
+| Arrow | own Arrow component | `index-Arrow.js` | `index-Arrow.js` |
+| Arrow | @popperjs/core arrow modifier | `index-arrow2.js` | `index-arrow2.js` |
+| classNames | own `helpers/classNames` | `index-classNames.js` | `index-classNames.js` |
+| classNames | npm `classnames` | `index-classnames2.js` | `index-classnames2.js` |
+| Popper | own primitives Popper | `index-Popper.js` | `index-Popper.js` |
+| Popper | MUI Popper | `index-Popper2.js` | `index-Popper2.js` |
+| Popper | @popperjs/core popper | `index-popper3.js` | `index-popper3.js` |
+| Transition | own `core/transition` helpers | `index-transition.js` or `index-transition2.js` | `index-transition.js` |
+| Transition | own primitives Transition | `index-Transition2.js` or `index-Transition.js` | `index-Transition2.js` |
+| Transition | react-transition-group Transition | `index-Transition3.js` | `index-Transition3.js` |
+| Ripple | MUI ButtonBase Ripple | `index-Ripple.js` | **`index-Ripple2.js`** |
+| Ripple | own `primitives/core/ripple` | `index-ripple2.js` | **`index-ripple.js`** |
+
+No consumer imports any of these files directly: rc-webapp `html/react/src` and `nexus`, and the package fixture,
+have 0 hits. The release identity also changes scheme with that cut: `agentic-plans/*.md` (plan, logs, hand-overs)
+no longer count, so ID-7 and the next ID cannot be compared by manifest hash. Both hashes of the unchanged shipped
+set are given once at that cut.
+
+**Test infrastructure (next cut).** `vitest.config.ts` gains five `@mui/x-date-pickers` entries in the Storybook
+project's `optimizeDeps.include`. This is the test runner's dependency pre-bundle list, not a product change: the
+new DatePicker open/close parity story imports the frozen MUI X reference, and without them Vite re-optimises
+mid-run and loads a second React. `_DatePickerShell.differential.spec.tsx` runs with a 15 s test timeout for the
+same reason class (a timeout inside an async act() scope breaks the rest of the file).
+
 **What it is.** `@rankingcoach/vanguard@2.11.0` (version not bumped), built
 from commit 63de883f on `feature/ui-sdk-architecture-investigation`.
 - Pack: `/Users/a.kott/vanguard-verify/packs/rc1-704c3717c90f.tgz`,
@@ -5291,6 +5344,9 @@ remaining fallback props, together with the RtlProvider allow-list and RTL
 routing. Do the Redux exit (D9): the peers react-redux and RTK stay for now.
 Implement the real-pointer reset in the storybook test setup (proposal).
 Ship a non-Suspense design for the Text word-animation split (D10).
+Follow-up (C): make the ESM build byte-reproducible. Rollup chunk numbering of same-named shared chunks and
+one hoisted side-effect import differ between builds of identical source (check `output.hoistTransitiveImports`
+and deterministic chunk naming).
 Follow-ups (cost only): find the source of the +1 commit on DropdownMenu with a Chromium React profiling run;
 consider handing Pagination focus over in the click handler instead of the layout effect (PG1 contract).
 
@@ -5386,3 +5442,202 @@ change (decided-by-watchdog).
 Breadcrumbs and Pagination by comments only. Correction: the library build keeps these
 comments in dist, so the "emitted JS identical" check, done under minify, did not model the
 real dist bytes. Screens match .472.
+
+**Final cut decision (decided-by-watchdog): option (A), with (C) as a follow-up.**
+`final-56fde55967ba.tgz` (SHA-256 `5a8ba1b9…`) is THE candidate.
+- The byte-identity rule assumed a reproducible build, and the build is not
+  reproducible. Option (B) would have shipped an artifact no gate built.
+- Carry-over: dist-wordpress, CSS and `.d.ts` are byte-identical, so B's WP
+  smoke and V2's D6/Text WordPress legs carry over as they are.
+- Under chunk-name normalization, V1's focused pass and V2's 9 count lanes on
+  rc1 carry over only as interim evidence. Tier C exercises the final pack's
+  ESM in full.
+- Evidence:
+  - `index-decode.js` is byte-identical in both packs. Its top level runs 4
+    TS-enum IIFEs and `o(R); o(_);`, building local decoders only.
+  - In the final pack, `index-Parser.js:1` → `index-Tokenizer.js:1` → `index-decode.js`.
+  - Parser binds nothing from decode, and rc1's extra import was bare.
+- The final-cut fix on the way: `76dff3f6` keeps the `src/` path out of the
+  VanguardStyle page.
+[pack-vs-pack](/Users/a.kott/vanguard-verify/logs/final-56fde55967ba.noindex/pack-vs-pack.json)
+
+**Drawer leak (Tier P V2), decided-by-watchdog 2026-11-23.**
+- V2's CDP probe attributes one retained portal per cycle to a Blink pending
+  CSSTransition:
+  - Escape path on both builds: the backdrop fade;
+  - unmount-while-closing path on FINAL only: the own paper's slide.
+- A's reproduction attempts:
+  - jsdom: Escape, remount and closeLast paths, with forced GC;
+  - Vitest-browser Chromium with `--expose-gc`: WeakRef + GC, 20 cycles per path.
+- Both stay bounded (≤ 2 reachable) on the unfixed tree, and `transitioncancel` is dispatched at removal.
+  The watchdog treats CDP observer retention as a live hypothesis; V2 runs a no-CDP control.
+- Fix B (cancel the portal-root animations at detach in ModalHost) is HELD until then.
+  The FINAL "not shippable" verdict is withdrawn to "on hold".
+- C applied in the working tree, test-first, uncommitted:
+  - drawer channels replay 1 (`pub-sub.ts` `REPLAY_LIMIT`);
+  - DrawerRoot keeps both Subscriptions, unsubscribes on unmount, and unregisters its ledger entry if
+    unmounted while open.
+- RED → GREEN:
+  - `_DrawerRoot.retention.spec.tsx` payload growth 8 → 0;
+  - `_DrawerRoot.lifecycle.spec.tsx` observers `[6,6]` → stable, and the ledger slot is freed;
+  - the late-mount convergence guard is green before and after.
+- Targeted: 50 files, 570/570.
+- Guard story `_DrawerRootTransitionRelease.stories.tsx`: 2×10 Escape and 20 remount cycles, ≤ 2 reachable
+  under GC. The check is skipped when `window.gc` is absent, i.e. in the ordinary storybook project.
+[evidence](/Users/a.kott/vanguard-verify/logs/drawer-leak-tdd.noindex/)
+
+### Drawer leak: trusted-input finding and watchdog decisions (2026-11-23)
+
+- Fix B (ModalHost animation cancel at detach) refuted by V2 E1; removed, patch kept as
+  `drawer-leak-tdd.noindex/fix-B-modalhost-animation-cancel.REFUTED-by-V2-E1.patch`.
+- Fix C (drawer channels replay 1, DrawerRoot unsubscribes + frees ledger slot) works structurally
+  (V2: buffers 1, observers 1) but does not change portal retention; kept as a hygiene fix.
+- Repo-harness RED (expose-gc Chromium, WeakRef+gc): a single autoFocus Input drawer leaks one portal
+  per cycle after TRUSTED input (Playwright hover over the portal, or a trusted Escape key); synthetic
+  events with identical focus/selection stay bounded. Same for the MUI 9.5 reference drawer on every
+  path (Escape, close-then-unmount, unmount-while-open). Real input elsewhere + 2 s idle does not
+  release it; a running page animation neither prevents nor releases it.
+- decided-by-watchdog D1: the Escape cell is NOT waived (pre-existing in .472, in production); it does
+  not gate the order of work — the FINAL-only remount cell goes first.
+- decided-by-watchdog D2: use the repo RED oracle; existence proof against the MUI reference
+  (result: MUI leaks the same, so no own-vs-MUI imitation target in this harness); lifetime test
+  (result: true leak).
+- decided-by-watchdog D3: report after each experiment set; no src commit until a change is GREEN in
+  the repo harness AND on V2's oracle.
+- Open: why .472 remount = 0 on V2's oracle (MUI version shipped by .472, or no user activation in
+  those cells). Evidence: `story-parity-diag.noindex/drawer-{content-bisect,dist-bisect,focus-diag,own-vs-mui}-*`.
+- CORRECTION (same day, null controls N1–N5): the hover-based REDs above were a Playwright/Vitest
+  tooling artifact (`userEvent.hover(el)` retains even a plain-DOM div; a raw-CDP mouse move does not).
+  Re-measured with raw-CDP Escape: plain DOM 1, bare React portal 1, direct Drawer host (own or MUI) 1–2.
+  Repo-harness leaking shape: DrawerRoot remounted per cycle + per-cycle opener effect calling
+  DrawerService.open + Escape close (synthetic suffices) → 8/8, also with a production React build, and
+  equally for a DrawerRoot copy rendering the MUI 9.5 reference drawer. Focus, the opener's second close
+  and trusted input are not factors. V2's oracle instead shows .472 0/0/0 vs FINAL 10/10/9 on the
+  cleanup path and a direct own `<Drawer open>` unmounted while open = 10/10, so the two harnesses
+  reproduce different shapes; next step is heap retainer paths (V2) before any fix.
+- RETRACTION (same day): the repo-harness "DrawerService path leaks 8–10/10" results (dev and prod React,
+  own and MUI mini roots, trusted and synthetic Escape, and every focus-diag cell built on that harness)
+  were a harness bug: the remounted root and the per-cycle opener were sibling elements keyed by the same
+  counter, React warned "two children with the same key", never deleted the old roots (cleanup count 0),
+  and their pub-sub close subscriptions pinned the old portals (heap path: PubSubService close
+  ReplaySubject observers → dispatch closure → dead fiber → ModalHost modalRef → portal). With unique keys
+  the same cell is bounded (real root 1, MUI 2). Valid product evidence is V2's oracle only: direct
+  `<Drawer open>` + autofocused Input, FINAL remount 10 / Escape 11, .472 remount 0 / Escape 10, retainer
+  Pending activities → CSSTransition. Lesson: check harness stderr for React key warnings.
+- rules v2026-11-23 adopted (owner-approved VERIFICATION-RULES.md, rc-webapp tmp/research/vanguard-ui-sdk-visual-baseline):
+  evidence labels single-source/confirmed/refuted on every result; harness admission (known-bad fails,
+  known-good passes, zero console errors/React warnings, non-zero exit gates); gate ports via gate-lock.sh;
+  retainer paths before toggles; no fix before the mechanism is shown in the page.
+- REFUTED (V2 E3–E7, single-source): "a cancelled transition's queued transitioncancel is never dispatched".
+  At removal getAnimations is empty, transitioncancel never fires, cancel/finish/transition-none hooks do not
+  release the portal. Holder stays Blink pending activity → CSSTransition → KeyframeEffect (V2 retainer).
+- Harness console trap admitted (known-bad fails, known-good passes, runner exit 1): diag-run-trap.sh.
+- 4a manifest scope proposal: drop agentic-plans/*.md at depth 1 (32 paths, nothing else); 4b ESM chunk
+  determinism: cause = preserveModules basename collisions (355 suffixed names, order-dependent); draft 1
+  makes the file set identical but leaves 57 _virtual-reference diffs and renames 480 files (not acceptable).
+- decided-by-watchdog (4a): manifest-v2 APPROVED for the next cut, applied with that cut only; its hand-over
+  states the identity scheme changed (ID-7 vs next ID not comparable by manifest hash; give both hashes for
+  the unchanged shipped set once).
+- decided-by-watchdog (4b): one more bounded iteration; acceptance = dist and dist-wordpress byte-identical
+  over two builds, zero renames among today's unsuffixed names, package-gate consumers and D12 fixture
+  untouched; otherwise cause + proposal go to the follow-up list. Nothing applied without config-diff review.
+- decided-by-watchdog (5): drawer transition direction closed; no further drawer work from A until V2
+  reports the production run and heap facts.
+- 4b iteration 2 result (snapshot only, not applied; awaiting watchdog config-diff review): post-render renumbering of
+  colliding chunks by sorted module id, grouped case-insensitively (Rollup dedups case-insensitively), plus
+  asset-analyzer timestamp only under SOURCE_DATE_EPOCH → two lib builds byte-identical (3450 files, 0 diffs) and
+  two dist-wordpress builds byte-identical (584 files, 0 diffs). Name changes vs today: only the 4 case-collision
+  groups (Arrow/arrow, classNames/classnames, Popper/popper, Transition/transition; 8 names). D12 fixture names
+  (index-Button.js, index-OverlayStackingService.js) unchanged. Diffs: chunk-determinism-4b.noindex/config-iter2b.diff,
+  asset-analyzer.diff.
+- decided-by-watchdog (4b): deterministic-build change ACCEPTED for the next cut with conditions (a) no consumer
+  deep-imports of the case-collision names, (b) before/after module map in the hand-over, (c) no reader of the
+  asset-analysis timestamp, (d) package gate + D12 + two-build comparison at the cut. (a) and (c) done: 0 hits.
+  (b) done; proposed first-party-first ranking (config-iter2c.diff): byte-identical, only the Ripple group changes vs
+  today (MUI Ripple → index-Ripple2.js, own ripple → index-ripple.js; no consumer); awaiting watchdog nod.
+- _DrawerRootContentRelease.stories.tsx: never-admitted (no known-bad); local evidence only, not committed.
+- decided-by-watchdog (owner decision): final-56fde55967ba (76dff3f6) FROZEN as the testable build; issues go to
+  agentic-plans/KNOWN-ISSUES.md (copied, uncommitted). iter2c approved in place of iter2b. Drawer retention now
+  `confirmed` (V2, DEV + production React): pre-existing on Escape, regression on host-unmount.
+- Next-cut plan prepared, not run: vanguard-verify/logs/next-cut-plan.noindex (CUT-PLAN.md, cut.sh, commit texts).
+- Retention spec gets gc in-file (gates run without --expose-gc); known-bad RED without fix C, GREEN with it.
+- BillingExports fieldset 23→0: REFUTED (V1: consumer auto-margin readout + load jitter on both builds).
+- 1.12 DateField outlined input (V1 A03 + jsdom differential agree): hidden input precedes the notched fieldset and
+  lacks `MuiPickersOutlinedInput-input` (DateField.tsx:406-433, 9ba4da51 oversight; MUI X order fieldset → input).
+  No CSS depends on order/class. Fix + 4-state parity spec prepared as patch
+  (datefield-outlined-structure.noindex), not applied; DatePickerShell 5 s timing check pending a quiet run.
+- DatePicker open/close (V2 behaviour verdict): (a) field click while open and (c) Escape from a section while open
+  confirmed (V2 production + jsdom + Chromium differential vs frozen MUI X 9.17); cause DatePickerShell.tsx show()
+  early return (:113-114, :212) and Escape only on the popper (:250-260). Fix + jsdom spec + Chromium parity story
+  prepared as patch (datepicker-open-close.noindex), not applied. (b) Day-vs-Month focus after Escape from the
+  calendar does not reproduce against the in-repo frozen reference in Chromium: single-source (V2).
+- Harness: trap config now prebundles @mui/x-date-pickers (root, AdapterMoment, DatePicker, hooks, models).
+- decided-by-watchdog: file-level `vi.setConfig({ testTimeout: 15000 })` in _DatePickerShell.differential.spec.tsx
+  replaces the per-test timeout and the afterEach idea (mechanism: a timeout inside an async act() scope leaves it
+  open; later renders nest and never flush; reproduced 41/42). Follow-up (not this cut): settle() must not be able to
+  leave an act scope open (await inside try/finally, or real timers for that test).
+- decided-by-watchdog: the five @mui/x-date-pickers optimizeDeps entries in vitest.config.ts join commit 2c
+  (test-harness dependency list only; keeps the Chromium open/close parity story, the only focus-target oracle).
+- Paired comparison #2 (single-source, load 7–14): HEAD+hygiene 290/290 ×3 vs +1.12+open/close 297/297 ×3,
+  0 non-pass, no timeout/cascade, no consistent duration change (datepicker-open-close.noindex/paired-timing-2).
+- DatePicker oracle check (single-source, Chromium, dp-pins-1): the in-repo `_DatePicker.mui-reference.tsx` equals
+  .472's shipped wrapper (same JSX in dist index-DatePicker.js, same MUI X 9.17 / material 9.5, no consumer theme
+  overrides) and reproduces V2's .472 column on day pick, Enter, year-view focus, focus trap and Escape-then-click.
+  Own differs there (focus to BODY, no trap, year view focuses the switch). Icon rendered by both (lazy asset).
+  Gap = missing differential cases, not a wrong reference.
+- Reference check (2): each `*.mui-reference.tsx` diffed against its original source at 9d3b75b (the .472 build
+  commit): 16/19 equal apart from imports, export rename, formatting or type-only lint; DateField/DateCalendar
+  references are MUI X 9.17 fixtures (no .472 wrapper); Autocomplete and DateRangeInput carry the F3 form binding
+  (writeScalar) instead of .472's dispatch(setStateValue) on the formconfig write path (declared F3 delta).
+  Evidence: vanguard-verify/logs/reference-vs-472.noindex.
+
+### Transition coverage matrix, own-core overlays and pickers (2026-11-23, decided-by-watchdog lesson: coverage)
+
+Method (single-source, static): pattern scan of each component's `_*.spec.ts(x)` and `_*.stories.tsx` (own core and
+its primitives). Cells: ✓ ≥3 matches, · 1–2, — none. A match means the test text names the transition, not that
+it is compared against the .472 reference; read it as "where to look", and as a gap list where it shows —.
+DatePicker: before the prepared behaviour patch (2c), which adds focus after close, Tab/Shift+Tab and re-open.
+V2's behaviour pins for these components get mapped onto this table as they land.
+
+| Component | open: pointer | open: keyboard | close: Escape | close: outside/click-away | close: select/pick | focus on open | focus after close | Tab / Shift+Tab | re-open |
+|---|---|---|---|---|---|---|---|---|---|
+| Select (4 files) | ✓ | ✓ | ✓ | · | ✓ | · | — | · | — |
+| Autocomplete (14 files) | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | · |
+| SearchableSelect (6 files) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | · | — | · |
+| Menu (11 files) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| DropdownMenu (3 files) | ✓ | ✓ | ✓ | ✓ | ✓ | · | ✓ | · | — |
+| Popover (18 files) | ✓ | — | ✓ | · | — | ✓ | — | · | — |
+| Modal (20 files) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ |
+| Drawer (8 files) | ✓ | — | ✓ | ✓ | · | · | ✓ | — | — |
+| Pagination (5 files) | ✓ | ✓ | — | — | ✓ | — | — | — | — |
+| Breadcrumbs (5 files) | ✓ | · | — | — | — | — | — | — | — |
+| DatePicker (21 files) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | · | — |
+| DateRangePicker (7 files) | ✓ | — | — | ✓ | ✓ | · | — | — | — |
+Reference oracles (next to the matrix): 16 `*.mui-reference.tsx` equal the .472 source (9d3b75b); Autocomplete and
+DateRangeInput differ by the F3 form binding on the formconfig write path (jsdom check pending);
+`_DateField.mui-reference.tsx` and `_DateCalendar.mui-reference.tsx` are MUI X 9.17 fixtures: oracles for MUI X
+behaviour, NOT for the .472 Vanguard wrapper (which used them only inside DatePicker).
+- F3 write path vs .472 (jsdom, real store): Autocomplete pick / free entry / clear equal (confirmed: F3 binding
+  equals .472 dispatch); DateRangeInput incomplete selection equal; complete selection unreachable in jsdom (inputRef
+  unattached on both sides), static diff shows only the dispatcher source and the same formconfig object.
+- DatePicker re-checks: keyboard year choice reproduced (focus lands on the view switch) and fixed by the year-view
+  focus change; Escape from calendar / year view not reproduced from source with V2's fixture (own = frozen, both
+  return to the opener section); pending V2's opener log. Behaviour story now 24 cells (15 RED on HEAD, 24/24 fixed).
+- DatePicker opener (V2, settled): both builds return focus to the opener section; the difference was the hit target —
+  a press on a separator (`sectionAfter`) or the field padding focuses a section in MUI X (useFieldRootProps
+  handleMouseDown) and none in the own DateField. Chromium hit-target story 4/4 RED → GREEN with a DateField
+  mousedown resolver (separator → its section, padding/blank → first section unless focused, gap → closest by x).
+  Folded into 2c (applies on top of 2b; 2a→2b→2c reproduces the tested tree). Full DatePicker + DateRangePicker
+  storybook set 76/76 ×2 and jsdom 297/297 with 2a–2c; my stories park the real pointer bottom-right at the end.
+- Coverage matrix, declared difference (V2 production, not user-reachable): Select with the listbox open and focus
+  moved programmatically to the combobox — own pulls focus back into the list and Escape closes; .472 keeps focus on
+  the combobox and Escape does not close. All other V2 behaviour tables (Select, Autocomplete, SearchableSelect, Menu,
+  DropdownMenu, Popover hover, PopoverModal, ModalService, Drawer, Pagination, Breadcrumbs) identical across builds.
+- Select declared difference, reachability (single-source static, fixture 3018e8d9c5a via git archive): of 97 rc-webapp
+  files rendering a Vanguard Select, 1 passes `inputRef` (EditPrimaryCategory, read-only `.value` on save) and 1 has
+  focus calls (GoogleAdsPortfolioStrategyCreateModal: form's first input = Name Input, dialog Tab trap, restore), none
+  focusing a Select combobox; no reachable caller of the declared cell. Evidence: logs/select-focus-check.noindex.
+- Staging slip (2026-11-23, stage 1 of the next cut): DateField.tsx carried both the 2b hunk and 2c's mousedown
+  section resolver; staging the whole file put the resolver into dd65757c. decided-by-watchdog (A): no rewrite; 2c
+  commits without it and says so. The field's mousedown section resolver landed in dd65757c (staging slip). Rule from
+  here: files touched by two planned commits are staged per hunk, and each commit's --stat is checked against its plan.
