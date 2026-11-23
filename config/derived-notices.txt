@@ -61,7 +61,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ================================================================================
 @mui/x-date-pickers@9.17.0 (MIT) — MUI X Date Calendar: AdapterMoment calendar operations, DateCalendar,
-DayCalendar, PickersCalendarHeader, PickersSlideTransition and YearCalendar.
+DayCalendar, PickersCalendarHeader, PickersSlideTransition and YearCalendar. Outlined DateField sections:
+useField and PickersTextField.
 --------------------------------------------------------------------------------
 MIT License
 

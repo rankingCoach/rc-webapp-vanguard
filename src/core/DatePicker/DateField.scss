@@ -1,0 +1,233 @@
+// Outlined section field styling adapted from @mui/x-date-pickers@9.17.0 PickersTextField (MIT).
+:where([data-vg-core][data-slot='date-field']) {
+  --vg-date-field-font: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  --vg-date-field-size: 1rem;
+  --vg-date-field-ink: rgba(0, 0, 0, 0.87);
+  --vg-date-field-label: rgba(0, 0, 0, 0.6);
+  --vg-date-field-outline: rgba(0, 0, 0, 0.23);
+  --vg-date-field-disabled: rgba(0, 0, 0, 0.26);
+  --vg-date-field-primary: #1976d2;
+  --vg-date-field-error: #d32f2f;
+  --vg-date-field-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  &[data-vg-typography='vanguard'] {
+    --vg-date-field-size: 1.1428571428571428rem;
+  }
+
+  .MuiInputLabel-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    display: block;
+    font: 400 var(--vg-date-field-size) / 1.4375em var(--vg-date-field-font);
+    letter-spacing: 0.00938em;
+    padding: 0;
+    color: var(--vg-date-field-label);
+    transform-origin: top left;
+    transform: translate(14px, 16px) scale(1);
+    pointer-events: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: calc(100% - 24px);
+    transition:
+      color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms,
+      transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms,
+      max-width 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+    &.MuiInputLabel-shrink {
+      transform: translate(14px, -9px) scale(0.75);
+      max-width: calc(133% - 32px);
+      pointer-events: auto;
+      user-select: none;
+    }
+
+    &.Mui-focused {
+      color: var(--vg-date-field-primary);
+    }
+
+    &.Mui-disabled {
+      color: rgba(0, 0, 0, 0.38);
+    }
+
+    &.Mui-error,
+    &.Mui-error .MuiInputLabel-asterisk {
+      color: var(--vg-date-field-error);
+    }
+  }
+
+  .MuiPickersOutlinedInput-root {
+    color: var(--vg-date-field-ink);
+    font: 400 var(--vg-date-field-size) / 1.5 var(--vg-date-field-font);
+    cursor: text;
+    padding: 0 14px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+    letter-spacing: 0.00938em;
+    width: 100%;
+    border-radius: 4px;
+
+    &:hover .MuiPickersOutlinedInput-notchedOutline {
+      border-color: var(--vg-date-field-ink);
+    }
+
+    @media (hover: none) {
+      &:hover .MuiPickersOutlinedInput-notchedOutline {
+        border-color: var(--vg-date-field-outline);
+      }
+    }
+
+    &.Mui-focused .MuiPickersOutlinedInput-notchedOutline {
+      border-width: 2px;
+      border-color: var(--vg-date-field-primary);
+    }
+
+    &.Mui-error .MuiPickersOutlinedInput-notchedOutline {
+      border-color: var(--vg-date-field-error);
+    }
+
+    &.Mui-disabled {
+      color: var(--vg-date-field-disabled);
+      cursor: default;
+
+      .MuiPickersOutlinedInput-notchedOutline {
+        border-color: var(--vg-date-field-disabled);
+      }
+    }
+  }
+
+  .MuiPickersInputBase-sectionsContainer {
+    padding: 16.5px 0;
+    font-family: var(--vg-date-field-font);
+    font-size: inherit;
+    line-height: 1.4375em;
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    letter-spacing: inherit;
+    width: 182px;
+    outline: none;
+    direction: ltr;
+  }
+
+  &[data-empty]:not(:focus-within) .MuiPickersInputBase-sectionsContainer {
+    opacity: 0.42;
+  }
+
+  &[data-empty][data-label]:not(:focus-within) .MuiPickersInputBase-sectionsContainer {
+    opacity: 0;
+  }
+
+  &:where([dir='rtl'], [dir='rtl'] *) .MuiPickersInputBase-sectionsContainer {
+    justify-content: end;
+  }
+
+  .MuiPickersSectionList-section {
+    display: inline-block;
+    font-family: var(--vg-date-field-font);
+    font-size: inherit;
+    letter-spacing: inherit;
+    line-height: 1.4375em;
+    white-space: nowrap;
+  }
+
+  .MuiPickersSectionList-sectionContent {
+    font-family: var(--vg-date-field-font);
+    line-height: 1.4375em;
+    letter-spacing: inherit;
+    width: fit-content;
+    outline: none;
+  }
+
+  @supports (-webkit-app-region: drag) {
+    .MuiPickersInputBase-root:not(:focus-within) .MuiPickersSectionList-sectionContent {
+      -webkit-user-modify: read-only;
+      user-select: none;
+    }
+  }
+
+  .MuiPickersInputBase-sectionBefore,
+  .MuiPickersInputBase-sectionAfter {
+    white-space: pre;
+    letter-spacing: inherit;
+  }
+
+  .MuiPickersInputBase-input {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .MuiPickersOutlinedInput-notchedOutline {
+    text-align: left;
+    position: absolute;
+    inset: -5px 0 0;
+    margin: 0;
+    padding: 0 8px;
+    pointer-events: none;
+    border-radius: inherit;
+    border: 1px solid var(--vg-date-field-outline);
+    overflow: hidden;
+    min-width: 0;
+
+    > legend {
+      float: unset;
+      width: auto;
+      overflow: hidden;
+      padding: 0;
+      line-height: 11px;
+      transition: width 150ms var(--vg-date-field-ease-out) 0ms;
+    }
+  }
+
+  &[data-label] .MuiPickersOutlinedInput-notchedOutline {
+    > legend {
+      display: block;
+      height: 11px;
+      font-size: 0.75em;
+      line-height: inherit;
+      visibility: hidden;
+      max-width: 0.01px;
+      white-space: nowrap;
+      transition: max-width 50ms var(--vg-date-field-ease-out) 0ms;
+
+      > span {
+        font-family: var(--vg-date-field-font);
+        font-size: inherit;
+        display: inline-block;
+        padding: 0 5px;
+        opacity: 0;
+        visibility: visible;
+      }
+    }
+
+    &[data-notched='true'] > legend {
+      max-width: 100%;
+      transition: max-width 100ms var(--vg-date-field-ease-out) 50ms;
+    }
+  }
+}
+
+.MuiPickersTextField-root:where([data-vg-core][data-slot='date-field']) {
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  vertical-align: top;
+  width: 100%;
+  max-width: 100%;
+}

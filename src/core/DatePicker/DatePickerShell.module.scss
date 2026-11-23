@@ -1,0 +1,123 @@
+@use '../../primitives/react/ButtonBase/button-base' as base;
+
+$picker-font: Roboto, Helvetica, Arial, sans-serif;
+
+.desktopField :global(.MuiPickersTextField-root[data-vg-core][data-slot='date-field'] .MuiPickersOutlinedInput-notchedOutline > legend) {
+  // Keep the legacy vanguard-input outline without collapsing the standalone DateField notch.
+  display: none;
+}
+
+.desktopPaper {
+  // The frozen desktop Paper uses the bundled MUI light palette, including in a dark Vanguard canvas.
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.87);
+
+  :global(.MuiPickersCalendarHeader-switchViewIcon) {
+    font-size: var(--vg-calendar-icon);
+  }
+}
+
+.mobilePaper {
+  background: var(--fn-bg-surface, white);
+  color: var(--fn-fg);
+}
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobilePaper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 32px;
+  min-width: 320px;
+  max-width: calc(100% - 64px);
+  max-height: calc(100% - 64px);
+  overflow: auto;
+  border-radius: 4px;
+  // The frozen mobile dialog uses Material Paper elevation 24.
+  box-shadow:
+    0 11px 15px -7px rgba(0, 0, 0, 0.2),
+    0 24px 38px 3px rgba(0, 0, 0, 0.14),
+    0 9px 46px 8px rgba(0, 0, 0, 0.12);
+}
+
+.toolbar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 0;
+  padding: 16px 24px;
+
+  > button {
+    @include base.button-base-reset;
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 24px;
+    color: rgba(0, 0, 0, 0.54);
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+}
+
+.toolbarLabel,
+.toolbarDate {
+  font-family: $picker-font;
+  font-weight: 400;
+}
+
+.toolbarLabel {
+  font-size: 12px;
+  line-height: 2.66;
+  letter-spacing: 0.08333em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.toolbarDate {
+  font-size: 34px;
+  line-height: 1.235;
+  letter-spacing: 0.00735em;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px;
+
+  > button {
+    @include base.button-base-reset;
+    min-width: 64px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-family: $picker-font;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.75;
+    letter-spacing: 0.02857em;
+    text-transform: uppercase;
+    color: #1976d2;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: rgba(25, 118, 210, 0.04);
+      }
+    }
+  }
+}

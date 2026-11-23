@@ -27,6 +27,7 @@ export interface DateCalendarProps {
   disableHighlightToday?: boolean;
   showDaysOutsideCurrentMonth?: boolean;
   reduceAnimations?: boolean;
+  yearButtonRole?: 'button' | 'radio';
   onChange?: (value: Moment | null, selection: 'finish' | 'partial', view?: View) => void;
   onMonthChange?: (value: Moment) => void;
   onYearChange?: (value: Moment) => void;
@@ -56,6 +57,8 @@ const CalendarIcon = ({ name }: { name: keyof typeof paths }) => (
 
 const slideDuration = 375;
 const slideClass = 'MuiPickersSlideTransition-';
+const weekdayColumns = [1, 2, 3, 4, 5, 6, 7] as const;
+const yearFillerSlots = ['first-year-filler', 'second-year-filler'] as const;
 
 export const DateCalendar = ({
   locale,
@@ -71,6 +74,7 @@ export const DateCalendar = ({
   disableHighlightToday = false,
   showDaysOutsideCurrentMonth = false,
   reduceAnimations,
+  yearButtonRole = 'radio',
   onChange,
   onMonthChange,
   onYearChange,
@@ -154,9 +158,10 @@ export const DateCalendar = ({
 
   useLayoutEffect(() => {
     if (!focusGrid || slide) return;
-    const focused = root.current?.querySelector<HTMLElement>(
-      view === 'day' ? '[role="gridcell"][tabindex="0"]' : '[role="radio"][tabindex="0"]',
-    );
+    const focused =
+      view === 'day'
+        ? root.current?.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')
+        : yearGrid.current?.querySelector<HTMLButtonElement>('button[tabindex="0"]');
     focused?.focus();
   }, [dayFocus, focusGrid, slide, view, yearFocus]);
 
@@ -371,17 +376,20 @@ export const DateCalendar = ({
           className="MuiDayCalendar-root"
         >
           <div role="row" aria-rowindex={1} className="MuiDayCalendar-header">
-            {weeks[0].map((day, index) => (
-              <span
-                key={index}
-                role="columnheader"
-                aria-colindex={index + 1}
-                aria-label={adapter.format(day, 'dddd')}
-                className="MuiTypography-root MuiTypography-caption MuiDayCalendar-weekDayLabel"
-              >
-                {adapter.format(day, 'ddd').charAt(0).toUpperCase()}
-              </span>
-            ))}
+            {weekdayColumns.map((column) => {
+              const day = weeks[0][column - 1];
+              return (
+                <span
+                  key={column}
+                  role="columnheader"
+                  aria-colindex={column}
+                  aria-label={adapter.format(day, 'dddd')}
+                  className="MuiTypography-root MuiTypography-caption MuiDayCalendar-weekDayLabel"
+                >
+                  {adapter.format(day, 'ddd').charAt(0).toUpperCase()}
+                </span>
+              );
+            })}
           </div>
           <div
             role="none"
@@ -409,7 +417,7 @@ export const DateCalendar = ({
             return (
               <button
                 type="button"
-                role="radio"
+                role={yearButtonRole}
                 key={year}
                 aria-checked={selected}
                 aria-current={year === today.year() ? 'date' : undefined}
@@ -427,8 +435,8 @@ export const DateCalendar = ({
               </button>
             );
           })}
-          {Array.from({ length: (3 - (years.length % 3)) % 3 }, (_, index) => (
-            <div key={index} className="MuiYearCalendar-buttonFiller" />
+          {yearFillerSlots.slice(0, (3 - (years.length % 3)) % 3).map((slot) => (
+            <div key={slot} className="MuiYearCalendar-buttonFiller" />
           ))}
         </div>
       )}
