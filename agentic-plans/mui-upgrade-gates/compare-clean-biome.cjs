@@ -13,6 +13,20 @@ for(const d of report.diagnostics){
 if(errors!==report.summary.errors||warningCount!==report.summary.warnings)throw new Error('Incomplete diagnostic inventory');
 const baseline=JSON.parse(fs.readFileSync(baselinePath,'utf8')).inventory;
 if(!baseline||typeof baseline!=='object')throw new Error('Malformed master warning baseline');
+// Frozen comparator copies: per-identity copy of the original path's master budget, sha-pinned (user decision U2, 2026-11-23).
+const aliasPath=path.join(path.dirname(baselinePath),'frozen-reference-aliases.json');
+if(fs.existsSync(aliasPath)){
+ const crypto=require('node:crypto');
+ for(const a of JSON.parse(fs.readFileSync(aliasPath,'utf8')).aliases){
+  const sha=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,a.frozen))).digest('hex');
+  if(sha!==a.sha256){console.log(`alias void (frozen file changed): ${a.frozen}`);continue;}
+  for(const [rule,message] of a.identities){
+   const n=baseline[JSON.stringify([a.original,rule,message])]||0;
+   if(!n)throw new Error(`alias has no master budget: ${a.original} ${rule} ${message}`);
+   baseline[JSON.stringify([a.frozen,rule,message])]=n;
+  }
+ }
+}
 const introduced=[...warnings].filter(([identity,n])=>n>(baseline[identity]||0));
 console.log(`Biome: ${errors} errors (must be 0); ${warningCount} warnings, ${introduced.length} introduced identities`);
 introduced.slice(0,40).forEach(([identity,n])=>console.log(identity+' '+(baseline[identity]||0)+' -> '+n));

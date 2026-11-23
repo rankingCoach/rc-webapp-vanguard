@@ -1,0 +1,222 @@
+{
+ "master": "f02d3f5a2fa9ae287923d24e64b3b3feb6755f01",
+ "mode": "copy-budget, exact identities, sha-pinned",
+ "aliases": [
+  {
+   "frozen": "src/core/AIAssistant/AIAssistentPanel/_AIAssistantPanel.mui-reference.tsx",
+   "original": "src/core/AIAssistant/AIAssistentPanel/AIAssistantPanel.tsx",
+   "sha256": "fa642a9b50f551e2b15f52da5c988f14f89f9c14d042caa915c842a9b49d95ca",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on setStatus."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on submitCommandInput."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook specifies more dependencies than necessary: value, prevAction, status."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/Accordion/_AccordionMui.reference.tsx",
+   "original": "src/core/Accordion/Accordion.tsx",
+   "sha256": "2b699c4d5c3b0e0d9fbe4ab64b696e9bf235802962895043defde7a25aa5d3be",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on isExpanded."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/Autocomplete/_Autocomplete.mui-reference.tsx",
+   "original": "src/core/Autocomplete/Autocomplete.tsx",
+   "sha256": "7bccb1fbfb60e042ab3ad2e5f32ce40da8190ddb6012cc133da48c98e342ccb4",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on formconfig."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook specifies a dependency more specific than its captures: formconfig?.stateValue"
+    ],
+    [
+     "lint/correctness/useHookAtTopLevel",
+     "This hook is being called conditionally, but all hooks must be called in the exact same order in every component render."
+    ],
+    [
+     "lint/suspicious/noArrayIndexKey",
+     "Avoid using the index of an array as key property in an element."
+    ],
+    [
+     "lint/suspicious/noPrototypeBuiltins",
+     "Do not access Object.prototype method 'hasOwnProperty' from target object."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/AutocompleteWithAnchor/_AutocompleteWithAnchor.mui-reference.tsx",
+   "original": "src/core/AutocompleteWithAnchor/AutocompleteWithAnchor.tsx",
+   "sha256": "d21bbf2b7658fc6aee9249a9844adde62d5ee6ed54a43d960dfca443f49a203f",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on onOpenChange."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook specifies more dependencies than necessary: inputRef."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/DateRangeInput/_DateRangeInput.mui-reference.tsx",
+   "original": "src/core/DateRangeInput/DateRangeInput.tsx",
+   "sha256": "9d3d528bd7be28b30abec9ff31c8cd89f6aa3fac6c5cfdb9c4d1f245d32258aa",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on inputRef.current."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on inputRef?.current?.value."
+    ],
+    [
+     "lint/correctness/useHookAtTopLevel",
+     "This hook is being called conditionally, but all hooks must be called in the exact same order in every component render."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/DateRangePicker/_DateRangePicker.mui-reference.tsx",
+   "original": "src/core/DateRangePicker/DateRangePicker.tsx",
+   "sha256": "f902534fc36d1d6ed58d6cfe26b4d9097bbace674dcd00b726b5d0a1155a64d6",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on leftAbsoluteData.endDate."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on leftAbsoluteData.startDate."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on minDateAsDate."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on onChange."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on rightAbsoluteData.endDate."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on rightAbsoluteData.startDate."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on staticRangesInternal.find."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook specifies more dependencies than necessary: parentRef.current."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook specifies more dependencies than necessary: staticRanges.current."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/Documents/DocumentDisplay/_DocumentDisplay.mui-reference.tsx",
+   "original": "src/core/Documents/DocumentDisplay/DocumentDisplay.tsx",
+   "sha256": "0772af5e441db432f3e7997791c5eabcd08c27af70e6dbf965ebed608bfe7082",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on fileMimeTypeProp."
+    ],
+    [
+     "lint/suspicious/noDoubleEquals",
+     "Using == may be unsafe if you are relying on type coercion."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/List/ListShowMore/_ListShowMoreMui.reference.tsx",
+   "original": "src/core/List/ListShowMore/ListShowMore.tsx",
+   "sha256": "d0ec60777bc8d9ab17d8215e336667bf37d8367515e9d802b6e23264bc377441",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook specifies more dependencies than necessary: limit, listElements."
+    ],
+    [
+     "lint/suspicious/noArrayIndexKey",
+     "Avoid using the index of an array as key property in an element."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/SearchableSelect/_SearchableSelect.mui-reference.tsx",
+   "original": "src/core/SearchableSelect/SearchableSelect.tsx",
+   "sha256": "e11d3bcd677bd6bdcb62dfbd6b0dc14a241cdc6918f9e319fc3f22ec9374360b",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/suspicious/noArrayIndexKey",
+     "Avoid using the index of an array as key property in an element."
+    ]
+   ]
+  },
+  {
+   "frozen": "src/core/Slider/_SliderMui.reference.tsx",
+   "original": "src/core/Slider/Slider.tsx",
+   "sha256": "6c5f33a1636e289066e54569411fe0f10724a63b877aeea052cd2e9133023100",
+   "provenance": "/Users/a.kott/vanguard-verify/logs/h24-mobile-focus-successor/final-source-checks/fixture-warnings.UFiWXp/frozen-reference-provenance.json",
+   "identities": [
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on formconfig."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on formconfig._inputRef."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on formconfig?._inputRef."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on formconfig?.setStateValue."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on handleOnChange."
+    ],
+    [
+     "lint/correctness/useExhaustiveDependencies",
+     "This hook does not specify its dependency on targetRef."
+    ]
+   ]
+  }
+ ]
+}
