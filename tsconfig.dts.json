@@ -19,5 +19,7 @@
     "src/stores",
     "src/examples"
   ],
-  "exclude": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.stories.tsx", "**/*.story.tsx", "**/stories/**", "src/custom-hooks/use-dynamic-import/assets/**"]
+  "exclude": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.stories.tsx", "**/*.story.tsx",
+    "**/*.mui-reference.ts", "**/*.mui-reference.tsx", "**/*.reference.ts", "**/*.reference.tsx",
+    "**/stories/**", "src/custom-hooks/use-dynamic-import/assets/**"]
 }

@@ -70,7 +70,8 @@ export const BaseViteConfig: UserConfig = {
       // tsconfig.dts.json widens tsconfig.lib.json to every module the public declarations import.
       tsconfigPath: resolve(__dirname, "./tsconfig.dts.json"),
       // The WordPress entry has its own declaration build (vite.config.wordpress.ts).
-      exclude: ["src/index-wordpress.ts", "**/*.spec.ts", "**/*.spec.tsx", "**/*.stories.tsx", "**/*.story.tsx", "**/stories/**",
+      exclude: ["src/index-wordpress.ts", "**/*.spec.ts", "**/*.spec.tsx", "**/*.stories.tsx", "**/*.story.tsx",
+        "**/*.mui-reference.ts", "**/*.mui-reference.tsx", "**/*.reference.ts", "**/*.reference.tsx", "**/stories/**",
         "src/custom-hooks/use-dynamic-import/assets/**"],
       // Note: vite-plugin-dts needs the TS JS compiler API, which TS 7 dropped -- it gets its own TS 5 copy via .pnpmfile.cjs
       // This is acceptable as .d.ts generation is separate from type checking

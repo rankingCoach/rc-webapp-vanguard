@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+import ts from 'typescript5';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -38,6 +39,69 @@ const KNOWN_UNDECLARED = [
 const root = resolve(__dirname, '..');
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as Record<string, Record<string, string>>;
 const declared = new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})]);
+
+const declarationExcludes = (viteConfig: string) => {
+  const source = ts.createSourceFile(viteConfig, readFileSync(join(root, viteConfig), 'utf8'), ts.ScriptTarget.Latest);
+  let exclude: string[] | undefined;
+  let found = false;
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node) && node.expression.getText(source) === 'dts') {
+      if (found) throw new Error(`Multiple dts calls in ${viteConfig}`);
+      found = true;
+      const options = node.arguments[0];
+      if (!options || !ts.isObjectLiteralExpression(options)) throw new Error(`Cannot read dts options in ${viteConfig}`);
+      const property = options.properties.find(
+        (item): item is ts.PropertyAssignment => ts.isPropertyAssignment(item) && item.name.getText(source) === 'exclude',
+      );
+      if (property) {
+        if (!ts.isArrayLiteralExpression(property.initializer)) throw new Error(`Cannot read dts exclude in ${viteConfig}`);
+        exclude = property.initializer.elements.map((item) => {
+          if (!ts.isStringLiteral(item)) throw new Error(`Non-literal dts exclude in ${viteConfig}`);
+          return item.text;
+        });
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  if (!found) throw new Error(`Missing dts call in ${viteConfig}`);
+  return exclude;
+};
+
+describe.each(['vite.config.lib.ts', 'vite.config.wordpress.ts'])('%s declaration boundary', (viteConfig) => {
+  it('excludes frozen MUI fixtures while keeping actual picker declarations', () => {
+    const projectPath = join(root, 'tsconfig.dts.json');
+    const project = ts.readConfigFile(projectPath, ts.sys.readFile);
+    expect(project.error).toBeUndefined();
+    // Check each effective exclude against the shared source set. WordPress narrows its emit further to its entry graph.
+    const explicitExcludes = declarationExcludes(viteConfig);
+    const exclude = explicitExcludes?.length ? explicitExcludes : project.config.exclude;
+    const config = ts.parseJsonConfigFileContent({ ...project.config, exclude }, ts.sys, root, undefined, projectPath);
+    const files = config.fileNames.map((file) => relative(root, file).replaceAll('\\', '/'));
+    const reference = 'src/core/DatePicker/_DateCalendar.mui-reference.tsx';
+    expect(existsSync(join(root, reference))).toBe(true);
+    expect(existsSync(join(root, 'src/core/DatePicker/_DatePicker.mui-reference.tsx'))).toBe(true);
+    expect(files.filter((file) => /\.mui-reference\.[cm]?tsx?$/.test(file))).toEqual([]);
+    expect(files).toContain('src/core/DatePicker/DatePicker.tsx');
+    expect(files).toContain('src/core/DatePicker/DateCalendar.tsx');
+
+    const legacyFixtures = [
+      ['src/core/Accordion/_AccordionMui.reference.tsx', 'src/core/Accordion/Accordion.tsx'],
+      ['src/core/Breadcrumbs/_BreadcrumbsMui.reference.tsx', 'src/core/Breadcrumbs/Breadcrumbs.tsx'],
+      ['src/core/Button/_ButtonMui.reference.tsx', 'src/core/Button/Button.tsx'],
+      ['src/core/Chip/_ChipMui.reference.tsx', 'src/core/Chip/Chip.tsx'],
+      ['src/core/List/ListShowMore/_ListShowMoreMui.reference.tsx', 'src/core/List/ListShowMore/ListShowMore.tsx'],
+      ['src/core/Pagination/_PaginationMui.reference.tsx', 'src/core/Pagination/Pagination.tsx'],
+      ['src/core/Slider/_SliderMui.reference.tsx', 'src/core/Slider/Slider.tsx'],
+      ['src/core/StyledSVG/_StyledSVGLegacy.reference.tsx', 'src/core/StyledSVG/StyledSVG.tsx'],
+    ];
+    for (const [fixture, component] of legacyFixtures) {
+      expect(existsSync(join(root, fixture))).toBe(true);
+      expect(files).toContain(component);
+    }
+    expect(files.filter((file) => /\.reference\.[cm]?tsx?$/.test(file)).sort()).toEqual([]);
+  });
+});
 
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
