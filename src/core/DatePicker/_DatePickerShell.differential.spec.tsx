@@ -57,6 +57,11 @@ const pointer = (startsFine: boolean) => {
   };
 };
 
+// Mechanism: a test that times out inside settle() leaves its async act() scope open, so every later render in this
+// file nests into that scope and never flushes (one timeout failed 41 of 42). Do not lower this back to the default.
+// Measured: slowest test 1.5–2.6 s warm, above 5 s cold or under load (the package gate runs 3 workers).
+vi.setConfig({ testTimeout: 15000 });
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
