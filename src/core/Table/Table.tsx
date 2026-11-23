@@ -129,9 +129,9 @@ const compareCellValues = (left: unknown, right: unknown): number => {
 const sortRows = (rows: TableRowProps[], columns: TableColumnProps[], sort?: TableSort | null): TableRowProps[] => {
   if (!sort) return rows;
   const column = columns.find((candidate) => candidate.alias === sort.key);
-  const valueOf = (row: TableRowProps) => (column?.sortValue ? column.sortValue(row) : row[sort.key]);
+  const getSortValue = (row: TableRowProps) => (column?.sortValue ? column.sortValue(row) : row[sort.key]);
   const direction = sort.direction === 'asc' ? 1 : -1;
-  return [...rows].sort((left, right) => direction * compareCellValues(valueOf(left), valueOf(right)));
+  return [...rows].sort((left, right) => direction * compareCellValues(getSortValue(left), getSortValue(right)));
 };
 
 export const Table = (props: TableProps) => {

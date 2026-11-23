@@ -155,7 +155,7 @@ export const Form = <T,>(props: Props<T>) => {
       // error too.
 
       if (React.isValidElement(child)) {
-        let idx;
+        let idx: number | undefined;
         const childConfig = extractFormConfig(child);
         const formConfigKey = extractFormConfigKey(child);
         const stringKey = childConfig.stateFieldName;

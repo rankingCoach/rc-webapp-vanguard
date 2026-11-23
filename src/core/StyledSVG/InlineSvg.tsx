@@ -103,7 +103,7 @@ function ReactInlineSVG(props: Props) {
 
   const getContent = useCallback(async () => {
     const dataURI = /^data:image\/svg[^,]*?(;base64)?,(.*)/u.exec(src);
-    let inlineSrc;
+    let inlineSrc: string | undefined;
 
     if (dataURI) {
       inlineSrc = dataURI[1] ? window.atob(dataURI[2]) : decodeURIComponent(dataURI[2]);
