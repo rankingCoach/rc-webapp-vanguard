@@ -281,6 +281,11 @@ packs. The watchdog closed the `277bc04` sweep as partial and directed the broad
 3. **SnackbarRoot pub-sub unsubscribe fix.** Only after the H17 PASS (§7.8).
 4. **ModalHost two-phase (f1924b5).** Commits per open vs MUI: Drawer 3 = 3, SearchableSelect 5 vs 6. Order spec:
    `src/primitives/react/Modal/_modal-host-order.spec.tsx`.
+5. **final3 (2026-11-23, ID-10 ea48a66b, pack final3-ea48a66befe7.tgz).** DatePicker focus restore to the opener
+   section and no restore after a click-away to a control (KNOWN-ISSUES 1.16). Restore-on-click-away existed since
+   9ba4da51 without a cell; became visible in final2 because dd65757c's mousedown resolver gives the field focus before
+   open. Browser connection closed, seen twice (ID-8 storybook run 1 at file 205; ID-10 coverage at first story file),
+   no assertion involved, mechanism unknown, diagnostics armed (KNOWN-ISSUES 3.11).
 
 ## 12. User to-do items logged in the plan ("Decisions for the user")
 

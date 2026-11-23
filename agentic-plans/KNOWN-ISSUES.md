@@ -61,6 +61,7 @@ Labels: `confirmed` = two independent methods agree; `single-source` = one harne
 | 3.8 | Test tooling: Vitest/Playwright `userEvent.hover(element)` keeps its target element alive (plain DOM 5 of 5 retained; raw CDP mouse move 1). Any leak probe using it is invalid. | confirmed (null control) |
 | 3.9 | Test tooling: harness stories need a console trap; React duplicate-key warnings produced a false leak reading that was retracted. Trap exists in A's harness. | confirmed |
 | 3.10 | Follow-up: reset the real pointer in Vanguard's `.storybook/vitest.setup.ts` (one hover per story test) instead of per-story parking. | open |
+| 3.11 | Test run: browser connection closed, seen twice (ID-8 storybook run 1 at file 205; ID-10 coverage at the first story file). No assertion was involved; mechanism unknown; diagnostics armed. ID-10: the close came after story 1 (`_DatePickerBehaviourParity`) and before story 2; the repeat with diagnostics was green (656/656), the forced pair behaviour story → `_DrawerRootTransitionRelease` 3 of 3 green with no close line, the Drawer story alone 3 of 3 green. | open, mechanism unknown | A `coverage.aDAu2D`, `coverage.0Nr2OK`, `covfile-pair-*` |
 
 ## 4. Not verified
 

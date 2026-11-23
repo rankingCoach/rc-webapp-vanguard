@@ -5746,3 +5746,16 @@ behaviour, NOT for the .472 Vanguard wrapper (which used them only inside DatePi
   - KNOWN-ISSUES 1.16 (fix) and 2.6 (.472 timing artifacts) added.
   - Next: V1 releases the lock, then gate-lock acquire A, new ID (v2b), stage 2 once, pack final3-<id12>, audits, and
     compare against final2 and final-56fde.
+- 2026-11-23 — final3 cut on ID-10 (ea48a66b, HEAD 08a4f16c). All stage-2 legs VALID with no sleep:
+  - static PASS; spec 2962; storybook 1496.
+  - Coverage: first leg RED (browser connection closed after story 1, 259 story files not run). Watchdog decision:
+    the Drawer story alone 3/3 green; the armed repeat green (656/656, 4395, thresholds met); the forced pair 3/3 green.
+    Recorded as "seen twice, mechanism unknown" (KNOWN-ISSUES 3.11). DEBUG_FILE was truncated by a second writer, so
+    the pair runs sent debug output to stderr.
+  - Package PASS: source 396/2899; consumers 156/156; scripts 79/79.
+  - Audits: emitted and WP dynamic imports clean (0 missing); artifact checks equal to ID-9 except the pack sha.
+  - Pack final3-ea48a66befe7.tgz, sha256 7c7a80a2…0e53b.
+  - Normalised compare: vs final2 only dist/index-DatePickerShell.js; vs final-56fde the same 8 groups as final2 vs
+    final-56fde.
+  - Correction: the WP bundle has no DatePickerShell. The earlier "fix present in dist-wordpress/index.js" came from an
+    unrelated "DETAILS" match.
