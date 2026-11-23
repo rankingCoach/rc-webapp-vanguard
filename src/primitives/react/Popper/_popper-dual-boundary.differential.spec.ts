@@ -67,7 +67,7 @@ type Branches = { flip: boolean; overflow: boolean };
 // PopoverModal supplies flip altBoundary/padding and an offset measured from the anchor and card heights.
 // MUI BasePopper seeds both modifiers with altBoundary = disablePortal, so the portaled overflow inherits false.
 // Popper.js defaults the boundary to clippingParents, the root boundary to viewport, and strategy to absolute.
-const centeredModifiers = ({ flip, overflow }: Branches, distance: number): PopperModifierLike[] => [
+const centeredModifiers = ({ flip, overflow }: Branches, distance: number) => [
   { name: 'flip', options: { boundary: 'clippingParents', rootBoundary: 'viewport', altBoundary: flip, padding: 8 } },
   {
     name: 'preventOverflow',
@@ -81,7 +81,7 @@ const centeredModifiers = ({ flip, overflow }: Branches, distance: number): Popp
   },
   { name: 'offset', options: { offset: [0, distance] } },
   { name: 'computeStyles', options: { gpuAcceleration: false } },
-];
+] satisfies PopperModifierLike[];
 
 const trial = ({
   placement,

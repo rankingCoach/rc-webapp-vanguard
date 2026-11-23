@@ -11,21 +11,23 @@ import { useMediaQuery } from './use-media-query';
  * defaultMatches. First client render with a matching matchMedia: the store value (MUI useSyncExternalStore path).
  */
 type Hook = typeof useMediaQuery;
+type ProbeProps = { hook: Hook; options: Parameters<Hook>[1] };
 const matching = (q: string) =>
   ({ matches: true, media: q, addEventListener: () => {}, removeEventListener: () => {} }) as unknown as MediaQueryList;
 
-const server = (hook: Hook, options: Parameters<Hook>[1]) => {
-  const Probe = () => <span>{String(hook('(min-width:1px)', options))}</span>;
-  return renderToString(<Probe />);
+const ServerProbe = ({ hook, options }: ProbeProps) => <span>{String(hook('(min-width:1px)', options))}</span>;
+
+const ClientProbe = ({ hook, options, values }: ProbeProps & { values: boolean[] }) => {
+  values.push(hook('(min-width:1px)', options));
+  return null;
 };
+
+const server = (hook: Hook, options: Parameters<Hook>[1]) =>
+  renderToString(<ServerProbe hook={hook} options={options} />);
 
 const firstClient = (hook: Hook, options: Parameters<Hook>[1]) => {
   const values: boolean[] = [];
-  const Probe = () => {
-    values.push(hook('(min-width:1px)', options));
-    return null;
-  };
-  const view = render(<Probe />);
+  const view = render(<ClientProbe hook={hook} options={options} values={values} />);
   view.unmount();
   return values;
 };

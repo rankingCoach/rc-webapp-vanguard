@@ -30,7 +30,7 @@ const clean = (legacy: string) =>
 const tokens = (c: string | null | undefined) => (c ?? '').split(' ');
 
 describe('junk class tokens: rewritten template-literal sites', () => {
-  it('Form: `Form-container ${className}` → classNames', () => {
+  it(`Form: \`Form-container \${className}\` → classNames`, () => {
     for (const className of [undefined, '', 'mine', 'a b']) {
       const { container, unmount } = render(
         <Form className={className}>
@@ -45,7 +45,7 @@ describe('junk class tokens: rewritten template-literal sites', () => {
     }
   });
 
-  it('SectionMissing: `BusinessProfileSectionMissing-container ${className}` → classNames', () => {
+  it(`SectionMissing: \`BusinessProfileSectionMissing-container \${className}\` → classNames`, () => {
     for (const className of [undefined, '', 'mine']) {
       const { container, unmount } = render(
         <SectionMissing title="t" description="d" buttonText="b" buttonCallback={() => {}} className={className} />,
@@ -59,7 +59,7 @@ describe('junk class tokens: rewritten template-literal sites', () => {
     }
   });
 
-  it('RadioButton: label `RadioButton-label ${labelClassName}` and the text div template → classNames', () => {
+  it(`RadioButton: label \`RadioButton-label \${labelClassName}\` and the text div template → classNames`, () => {
     for (const theme of ['standard', 'bordered', 'success'] as const)
       for (const checked of [false, true])
         for (const disabled of [undefined, false, true])
@@ -87,7 +87,7 @@ describe('junk class tokens: rewritten template-literal sites', () => {
 });
 
 describe('junk class tokens: template-literal sites found by the story scan', () => {
-  it('Divider: `rc-divider ${className}` → classNames', () => {
+  it(`Divider: \`rc-divider \${className}\` → classNames`, () => {
     for (const className of [undefined, '', 'mine']) {
       const { container, unmount } = render(<Divider className={className} />);
       // former default: className = '' → `rc-divider ` (trailing space)
@@ -98,7 +98,7 @@ describe('junk class tokens: template-literal sites found by the story scan', ()
     }
   });
 
-  it("TagList: classNames(`TagList-container ${className ?? ''} ${gap}`) → classNames per token", () => {
+  it(`TagList: classNames(\`TagList-container \${className ?? ''} \${gap}\`) → classNames per token`, () => {
     for (const variant of [undefined, 'tag', 'chip', 'chip-filled'] as const)
       for (const className of [undefined, '', 'mine']) {
         const { container, unmount } = render(<TagList tags={[]} variant={variant} className={className} />);
@@ -115,7 +115,7 @@ describe('junk class tokens: template-literal sites found by the story scan', ()
       }
   });
 
-  it('Gallery: `gallery-list ${className}` → classNames', () => {
+  it(`Gallery: \`gallery-list \${className}\` → classNames`, () => {
     vi.mocked(useLazyImage).mockReturnValue({
       isLazyLoading: false,
       isLazyError: false,
@@ -132,7 +132,7 @@ describe('junk class tokens: template-literal sites found by the story scan', ()
     }
   });
 
-  it("DragAndDropFile: `${styles.dropzone} ${dragging ? styles.dragging : ''}` → classNames", () => {
+  it(`DragAndDropFile: \`\${styles.dropzone} \${dragging ? styles.dragging : ''}\` → classNames`, () => {
     const { container } = render(<DragAndDropFile onFileDrop={() => {}} />);
     const zone = container.querySelector('[class*="dropzone"]') as HTMLElement;
     const base = zone.getAttribute('class') as string;

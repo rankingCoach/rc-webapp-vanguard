@@ -21,16 +21,24 @@ const resolveFns = (value: unknown): unknown => {
   return value;
 };
 
-const Probe = ({ impl, props, out }: { impl: 'mui' | 'own'; props: AnyProps; out: { value?: unknown } }) => {
-  const resolved =
-    impl === 'mui' ? useThemeProps({ props, name: 'MuiTextField' }) : useThemeDefaultProps(props, 'MuiTextField');
+type ProbeProps = { props: AnyProps; out: { value?: unknown } };
+
+const MuiProbe = ({ props, out }: ProbeProps) => {
+  const resolved = useThemeProps({ props, name: 'MuiTextField' });
+  out.value = resolveFns(resolved);
+  return null;
+};
+
+const OwnProbe = ({ props, out }: ProbeProps) => {
+  const resolved = useThemeDefaultProps(props, 'MuiTextField');
   out.value = resolveFns(resolved);
   return null;
 };
 
 const run = (impl: 'mui' | 'own', wrap: (child: React.ReactElement) => React.ReactElement, props: AnyProps) => {
   const out: { value?: unknown } = {};
-  const view = render(wrap(<Probe impl={impl} props={props} out={out} />));
+  const Probe = impl === 'mui' ? MuiProbe : OwnProbe;
+  const view = render(wrap(<Probe props={props} out={out} />));
   view.unmount();
   return out.value;
 };

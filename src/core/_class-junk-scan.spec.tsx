@@ -55,7 +55,7 @@ describe('own-core class attributes carry no junk tokens', () => {
   });
 
   it('SearchableSelect open', async () => {
-    const view = render(<SearchableSelect options={OPTIONS} value="b" />);
+    const view = render(<SearchableSelect<string> options={OPTIONS} value="b" />);
     await userEvent.click(view.getByRole('combobox'));
     await settle();
     expect(scan()).toEqual([]);

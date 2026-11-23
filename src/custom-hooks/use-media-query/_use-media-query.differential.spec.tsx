@@ -41,14 +41,23 @@ const fakeMatchMedia = (initial: Record<string, boolean>) => {
 };
 
 type Hook = typeof useMediaQuery;
+type ProbeProps = {
+  hook: Hook;
+  query: string;
+  options: Parameters<Hook>[1];
+  matchMedia: typeof window.matchMedia;
+  values: boolean[];
+};
+
+const Probe = ({ hook, query, options, matchMedia, values }: ProbeProps) => {
+  values.push(hook(query, { ...options, matchMedia: options?.matchMedia === null ? undefined : matchMedia }));
+  return null;
+};
+
 const run = (hook: Hook, query: string, options: Parameters<Hook>[1], steps: [string, boolean][]) => {
   const values: boolean[] = [];
   const fake = fakeMatchMedia({ '(min-width:1025px)': true });
-  const Probe = () => {
-    values.push(hook(query, { ...options, matchMedia: options?.matchMedia === null ? undefined : fake.matchMedia }));
-    return null;
-  };
-  const view = render(<Probe />);
+  const view = render(<Probe hook={hook} query={query} options={options} matchMedia={fake.matchMedia} values={values} />);
   for (const [q, m] of steps) act(() => fake.set(q, m));
   view.unmount();
   return { values, log: fake.log };

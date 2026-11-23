@@ -9,8 +9,6 @@ import { ComponentContainer } from '../ComponentContainer/ComponentContainer';
 type Props = {} & ToolbarProps;
 
 export const ToolbarMuiReference = (props: Props) => {
-  const {} = props;
-
   return (
     <ComponentContainer className={'Toolbar-container'}>
       <ToolbarBase {...props} />

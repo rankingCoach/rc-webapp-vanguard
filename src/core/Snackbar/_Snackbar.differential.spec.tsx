@@ -4,6 +4,17 @@ import { act, fireEvent, render } from '../../../test-utils/test-utils';
 import { SnackbarMuiReference } from './_Snackbar.mui-reference';
 import { Snackbar } from './Snackbar';
 
+// Record<never, never> expresses the frozen empty object type without the banned literal.
+type PreviousSnackbarRootProps = Record<never, never>;
+type FrozenSnackbarRootProps = React.ComponentProps<
+  typeof import('../SnackbarRoot/_SnackbarRoot.mui-reference').SnackbarRootMuiReference
+>;
+type AssertDomain<T extends true> = T;
+type SnackbarRootPropsDomain = [
+  AssertDomain<[PreviousSnackbarRootProps] extends [FrozenSnackbarRootProps] ? true : false>,
+  AssertDomain<[FrozenSnackbarRootProps] extends [PreviousSnackbarRootProps] ? true : false>,
+];
+
 /**
  * Differential parity, jsdom: Vanguard Snackbar / SnackbarRoot on the own core vs the frozen MUI 9.5 implementation.
  * Same props and timeline (open → enter transition → auto-hide timer, hover / focus / window-blur pause and resume,

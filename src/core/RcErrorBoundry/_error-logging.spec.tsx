@@ -151,7 +151,9 @@ describe('Vanguard error logging: only through the consumer’s logger', () => {
 
     /** Which of the loggers gets the next log (index, or -1 for none) */
     const activeOf = (loggers: ReturnType<typeof vi.fn>[]) => {
-      loggers.forEach((l) => l.mockClear());
+      loggers.forEach((l) => {
+        l.mockClear();
+      });
       generateErrorBoundaryData('t');
       return loggers.findIndex((l) => l.mock.calls.length > 0);
     };

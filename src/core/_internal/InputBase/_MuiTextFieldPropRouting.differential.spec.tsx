@@ -8,6 +8,7 @@ import { MuiTextField } from './MuiTextField';
 
 type Props = VanguardTextFieldProps<'outlined'>;
 type Field = React.ComponentType<Props>;
+type CustomInput = NonNullable<NonNullable<Props['InputProps']>['inputComponent']>;
 
 const Reference: Field = ({ InputProps, InputLabelProps, inputProps, FormHelperTextProps, slotProps, ...props }) => (
   <FrozenMuiTextField
@@ -113,7 +114,8 @@ describe('outlined TextField top-level props versus frozen MUI 9.5', () => {
           onKeyDown: record('root-down'),
           onKeyUp: record('root-up'),
           InputProps: {
-            inputComponent: VerificationPinInputIMask,
+            // The real PIN mask accepts the wrapper's handler type and discards native key handlers.
+            inputComponent: VerificationPinInputIMask as unknown as CustomInput,
             onKeyDown: record('input-down'),
             onKeyUp: record('input-up'),
           },
@@ -216,7 +218,7 @@ describe('outlined TextField top-level props versus frozen MUI 9.5', () => {
 
   it('routes div attributes, class, style and root ref only to FormControl and input attributes only to the control', () => {
     const trace = (Field: Field) => {
-      const ref = createRef<HTMLElement>();
+      const ref = createRef<HTMLDivElement>();
       const inputRef = createRef<HTMLInputElement>();
       const rootAttrs = {
         title: 'Field title',
@@ -350,7 +352,7 @@ describe('outlined TextField top-level props versus frozen MUI 9.5', () => {
         const ref = createRef<HTMLTextAreaElement>();
         const view = render(<Field variant="outlined" multiline {...bounds} autoFocus inputRef={ref} />);
         try {
-          const native = view.container.querySelector('textarea:not([aria-hidden])');
+          const native = view.container.querySelector<HTMLTextAreaElement>('textarea:not([aria-hidden])');
           return {
             rows: native?.rows,
             focused: document.activeElement === native,

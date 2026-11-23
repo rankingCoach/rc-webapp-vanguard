@@ -5,11 +5,14 @@ import { Breadcrumbs } from './Breadcrumbs';
 
 /** Track g: no timer (ripple) or document/window listener survives an expand cycle; DOM contract; no junk class tokens. */
 const items = (n: number) =>
-  Array.from({ length: n }, (_, i) => (
-    <a key={i} href={`#${i}`}>
-      {i}
-    </a>
-  ));
+  Array.from({ length: n }, (_, i) => {
+    const fragment = `#${i}`;
+    return (
+      <a key={fragment} href={fragment}>
+        {i}
+      </a>
+    );
+  });
 
 describe('Breadcrumbs cleanup and contract', () => {
   beforeEach(() => vi.useFakeTimers());

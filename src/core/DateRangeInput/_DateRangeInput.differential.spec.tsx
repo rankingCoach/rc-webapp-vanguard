@@ -35,8 +35,10 @@ const html = (el: React.ReactElement) => {
 
 describe('date-range adornments on the own InputAdornment', () => {
   it('DateRangeInput (end adornment inside the own frame: declared delta)', () => {
-    const own = html(<DateRangeInput name="range" label="Range" />);
-    const mui = html(<DateRangeInputMuiReference name="range" label="Range" />);
+    // Retain the original JavaScript caller shape on both sides of the DOM comparison.
+    const props = { name: 'range', label: 'Range' };
+    const own = html(<DateRangeInput {...props} />);
+    const mui = html(<DateRangeInputMuiReference {...props} />);
     expect(own).toBe(withFrameContext(mui));
   });
   it('DateRangePickerBaseInputAdornment standalone (no frame: identical)', () => {

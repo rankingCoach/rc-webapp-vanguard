@@ -32,15 +32,16 @@ const describeTree = (el: Element): Node => ({
   children: [...el.children].map(describeTree),
 });
 const items = (n: number, kind: 'link' | 'text' | 'mixed') =>
-  Array.from({ length: n }, (_, i) =>
-    kind === 'link' || (kind === 'mixed' && i < n - 1) ? (
-      <a key={i} href={`#${i}`}>
+  Array.from({ length: n }, (_, i) => {
+    const fragment = `#${i}`;
+    return kind === 'link' || (kind === 'mixed' && i < n - 1) ? (
+      <a key={fragment} href={fragment}>
         Item {i}
       </a>
     ) : (
-      <span key={i}>Item {i}</span>
-    ),
-  );
+      <span key={fragment}>Item {i}</span>
+    );
+  });
 const element = (impl: Impl, p: Partial<BreadcrumbsProps>, n: number, kind: 'link' | 'text' | 'mixed') => {
   const C = impl === 'mui' ? BreadcrumbsMui : Breadcrumbs;
   return (

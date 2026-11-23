@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Snackbar } from '../Snackbar/Snackbar';
 import { SnackbarType } from './SnackBarService';
 
-type Props = {};
+type Props = NonNullable<unknown>;
 
 //TODO the direction should be given from opts
 function SlideTransitionLeft(props: SlideProps) {

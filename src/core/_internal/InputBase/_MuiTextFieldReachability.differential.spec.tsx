@@ -21,6 +21,52 @@ const Reference = ({ InputProps, inputProps, InputLabelProps, ...props }: Vangua
 );
 
 type Field = React.ComponentType<VanguardTextFieldProps>;
+type CustomInput = NonNullable<NonNullable<VanguardTextFieldProps['InputProps']>['inputComponent']>;
+// The reachable wrappers supply these named mask controls through the legacy MUI input slot.
+const DateMask = DateRangePickerIMaskInput as unknown as CustomInput;
+const PhoneMask = PhoneNumberIMask as unknown as CustomInput;
+
+type MaskHarnessProps = {
+  kind: 'phone' | 'date';
+  onCheck: (invalid: boolean, focusedControl: Element | null) => void;
+};
+
+const RegisteredMaskHarness = ({ kind, onCheck }: MaskHarnessProps) => {
+  const form = useFormStore({
+    initialValues: { mask: '' },
+    inputs: { mask: { fieldType: 'Input', validation: { required: true, minLength: 20 } } },
+  });
+  const focusInvalid = () => {
+    const invalid = !form.isValid();
+    if (!invalid) {
+      onCheck(false, null);
+      return;
+    }
+    // FormElement registers its own bound ref, separate from the seed config's ref.
+    const config = form.formConfig as typeof form.formConfig & {
+      _internalInputs?: { current: { mask?: { _inputRef?: { current: HTMLInputElement | null } } } };
+    };
+    const control = config._internalInputs?.current.mask?._inputRef?.current;
+    control?.focus();
+    onCheck(true, document.activeElement);
+  };
+
+  return (
+    <Form config={form.formConfig}>
+      <Input
+        field="mask"
+        label="Masked field"
+        textFieldProps={{
+          InputProps: { inputComponent: kind === 'date' ? DateMask : PhoneMask },
+          inputProps: kind === 'phone' ? { phoneMask: '(000)000-0000' } : {},
+        }}
+      />
+      <button type="button" onClick={focusInvalid}>
+        Check form
+      </button>
+    </Form>
+  );
+};
 
 const autocompleteKeys = {
   root: ['disabled', 'fullWidth', 'id', 'size', 'slotProps'],
@@ -109,7 +155,8 @@ async function autocompleteTrace(Field: Field) {
     />,
   );
   try {
-    const input = view.getByRole<HTMLInputElement>('combobox', { name: 'Fruit' });
+    const input = view.getByRole('combobox', { name: 'Fruit' });
+    if (!(input instanceof HTMLInputElement)) throw new Error('Expected an Autocomplete input');
     const root = input.closest<HTMLElement>('.MuiOutlinedInput-root');
     const field = input.closest('.MuiTextField-root');
     if (!root || !field) throw new Error('Missing outlined TextField frame');
@@ -176,7 +223,7 @@ async function maskedTrace(Field: Field, variant: 'phone' | 'date') {
           label={label}
           value={date ? value : undefined}
           inputRef={nativeRef}
-          InputProps={{ inputComponent: date ? DateRangePickerIMaskInput : PhoneNumberIMask }}
+          InputProps={{ inputComponent: date ? DateMask : PhoneMask }}
           inputProps={date ? {} : { phoneMask: '(000)000-0000' }}
           onChange={(event) => {
             const next = event.target?.value ?? event.currentTarget.value;
@@ -298,7 +345,7 @@ describe('reachable outlined TextField routes versus frozen MUI 9.5', () => {
       };
       const view = render(
         <Field
-          InputProps={{ inputComponent: PhoneNumberIMask }}
+          InputProps={{ inputComponent: PhoneMask }}
           inputProps={{ ref: observe('htmlInput'), phoneMask: '(000)000-0000' }}
           inputRef={observe('inputRef')}
         />,
@@ -315,39 +362,13 @@ describe('reachable outlined TextField routes versus frozen MUI 9.5', () => {
     'focuses the registered %s control when the consumer rejects an invalid Form',
     async (kind) => {
       let invalid: boolean | undefined;
-      let focusedControl: HTMLElement | null = null;
-      const Harness = () => {
-        const form = useFormStore({
-          initialValues: { mask: '' },
-          inputs: { mask: { fieldType: 'Input', validation: { required: true, minLength: 20 } } },
-        });
-        const focusInvalid = () => {
-          invalid = !form.isValid();
-          if (!invalid) return;
-          // FormElement registers its own bound ref, separate from the seed config's ref.
-          const control = form.formConfig._internalInputs?.current.mask?._inputRef?.current;
-          control?.focus();
-          focusedControl = document.activeElement as HTMLElement | null;
-        };
-
-        return (
-          <Form config={form.formConfig}>
-            <Input
-              field="mask"
-              label="Masked field"
-              textFieldProps={{
-                InputProps: { inputComponent: kind === 'date' ? DateRangePickerIMaskInput : PhoneNumberIMask },
-                inputProps: kind === 'phone' ? { phoneMask: '(000)000-0000' } : {},
-              }}
-            />
-            <button type="button" onClick={focusInvalid}>
-              Check form
-            </button>
-          </Form>
-        );
+      let focusedControl: Element | null = null;
+      const onCheck = (nextInvalid: boolean, nextFocusedControl: Element | null) => {
+        invalid = nextInvalid;
+        focusedControl = nextFocusedControl;
       };
 
-      const view = render(<Harness />);
+      const view = render(<RegisteredMaskHarness kind={kind} onCheck={onCheck} />);
       try {
         const input = view.container.querySelector('input.MuiOutlinedInput-input');
         expect(input).not.toBeNull();
