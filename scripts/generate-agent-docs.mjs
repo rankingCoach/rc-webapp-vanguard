@@ -410,7 +410,7 @@ export const SPECIAL_PAGES = {
       return [
         '# VanguardStyle',
         '',
-        'Namespace of the shared utility class names from the global stylesheet (`src/styles/general.module.scss`). Each member is a CSS-module class name string, applied with `className`.',
+        'Namespace of the shared utility class names from the global stylesheet. Each member is a CSS-module class name string, applied with `className`.',
         '',
         '- Kind: value (namespace)',
         `- Import: \`import { VanguardStyle } from '${PKG}';\``,
