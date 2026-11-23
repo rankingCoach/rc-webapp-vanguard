@@ -28,7 +28,8 @@ function vitePluginAssetAnalyzer(options = {}) {
           type: 'asset',
           fileName: 'vanguard-asset-analysis.json',
           source: JSON.stringify({
-            timestamp: new Date().toISOString(),
+            // Reproducible output: a build time only when the build pins one (SOURCE_DATE_EPOCH).
+            ...(process.env.SOURCE_DATE_EPOCH ? { timestamp: new Date(Number(process.env.SOURCE_DATE_EPOCH) * 1000).toISOString() } : {}),
             mode: 'full',
             buildOptimization: {
               enabled: false,

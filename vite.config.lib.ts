@@ -164,6 +164,7 @@ export const BaseViteConfig: UserConfig = {
           if (name && name.includes('/')) {
             const parts = name.split('/');
             const componentName = parts[parts.length - 1] === 'index' ? parts[parts.length - 2] : parts[parts.length - 1];
+            if (chunkInfo.facadeModuleId) intendedName.set(chunkInfo.facadeModuleId, 'index-' + componentName + '.js');
             return 'index-' + componentName + '.js';
           }
           return '[name].js';
@@ -248,7 +249,7 @@ export const LibraryOnlyConfig: UserConfig = {
   // The asset folder is consumed through the import.meta.glob URL modules (use-dynamic-import); copying it as a
   // public dir shipped every image a second time as an unused raw file.
   publicDir: false,
-  plugins: [lexicalProductionVariant()],
+  plugins: [lexicalProductionVariant(), deterministicChunkNumbering()],
   build: {
     rollupOptions: {
       // React subpaths (react-dom/server, react-dom/client, react/jsx-dev-runtime) come from the consumer's React.
@@ -256,5 +257,59 @@ export const LibraryOnlyConfig: UserConfig = {
     },
   },
 };
+
+
+// Deterministic numbering for chunks that share an entry name (preserveModules + `index-<basename>.js`): Rollup
+// suffixes duplicates (Name2, Name3, ...) in processing order, which differs between builds. Re-number each such
+// group by sorted module id after rendering and rewrite the relative import specifiers; every other name is untouched.
+const intendedName = new Map<string, string>();
+function deterministicChunkNumbering() {
+  return {
+    name: 'vanguard-deterministic-chunk-numbering',
+    enforce: 'post' as const,
+    generateBundle(_options: unknown, bundle: Record<string, { type: string; fileName: string; facadeModuleId?: string | null; code?: string }>) {
+      const groups = new Map<string, { fileName: string; id: string }[]>();
+      for (const item of Object.values(bundle)) {
+        if (item.type !== 'chunk' || !item.facadeModuleId) continue;
+        const base = intendedName.get(item.facadeModuleId);
+        if (!base) continue;
+        // Rollup de-duplicates names case-insensitively (index-Transition.js / index-transition2.js share a group).
+        const key = base.toLowerCase();
+        groups.set(key, [...(groups.get(key) ?? []), { fileName: item.fileName, id: item.facadeModuleId }]);
+      }
+      const rename = new Map<string, string>();
+      for (const members of groups.values()) {
+        if (members.length < 2) continue;
+        // First-party modules first (they keep the unsuffixed name, as they mostly do today), then by id.
+        const rank = (id: string) => (id.includes('/node_modules/') || id.startsWith('\0') ? 1 : 0);
+        const wanted = [...members].sort((a, b) => rank(a.id) - rank(b.id) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+        const targets = wanted.map((m, index) => {
+          const base = intendedName.get(m.id)!;
+          return index === 0 ? base : `${base.slice(0, -'.js'.length)}${index + 1}.js`;
+        });
+        const current = new Set(members.map((m) => m.fileName.toLowerCase()));
+        if (targets.some((t) => !current.has(t.toLowerCase())) || new Set(targets.map((t) => t.toLowerCase())).size !== targets.length) {
+          throw new Error(`deterministic numbering: ${targets.join(', ')} vs ${[...current].join(', ')}`);
+        }
+        wanted.forEach((m, index) => {
+          if (m.fileName !== targets[index]) rename.set(m.fileName, targets[index]);
+        });
+      }
+      if (rename.size === 0) return;
+      const moved = Object.entries(bundle).filter(([fileName]) => rename.has(fileName));
+      for (const [fileName] of moved) delete bundle[fileName];
+      for (const [fileName, item] of moved) {
+        item.fileName = rename.get(fileName)!;
+        bundle[item.fileName] = item;
+      }
+      const specifier = /\.\/(index-[^"'`]+?\.js)(?=["'`])/g;
+      for (const item of Object.values(bundle)) {
+        if (item.type === 'chunk' && item.code) {
+          item.code = item.code.replace(specifier, (match, file: string) => (rename.has(file) ? `./${rename.get(file)}` : match));
+        }
+      }
+    },
+  };
+}
 
 export default defineConfig(mergeConfig(BaseViteConfig, LibraryOnlyConfig));
