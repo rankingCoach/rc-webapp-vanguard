@@ -5018,9 +5018,14 @@ memory drops below 25%.
 
 **FINDING 3: animated Text first frame (decided-by-watchdog).** 768ca96 put
 the react-spring word animation behind React.lazy + Suspense with a
-first-frame fallback. React 19's FALLBACK_THROTTLE_MS = 300 keeps the words
-invisible for about 310 ms, then replaces the nodes, in both bundles (B's
-paired WP smoke). .472 fades the same nodes in at once. Decision: option 1,
+first-frame fallback. The measured regression is that the first-commit word spans are
+replaced by new spans (about 9 ms in Chromium) and the fade starts about 5–17 ms
+later. Over a real network the chunk fetch adds latency that a local run cannot
+show. .472 fades the same nodes in at once. CORRECTION (V2 Chromium, H24
+positive control, locally served chunks): there is NO 300 ms plateau. The
+~310–340 ms figure was B's jsdom reading. The "React Suspense
+FALLBACK_THROTTLE_MS = 300" mechanism was an attribution that a browser did not
+reproduce. The commit message of 101f5bc overstates it; it is not amended. Decision: option 1,
 revert the lazy boundary. "As few visual changes as possible" is a hard limit
 and outranks a D10 saving. Under D10: "lazy split of the word animation
 withdrawn; a non-Suspense design is a next-step proposal, not this major."
@@ -5047,8 +5052,8 @@ thread log entry stays as history.
 
 RED on the current tree, admitted run: `sameNodesSettle: false`, meaning the
 first-commit spans are replaced. `settledInsideWindow` stayed true under fake
-timers, so the plateau shows only in real time: case 3 took 330 ms on the
-lazy tree and 40 ms after the fix. An earlier run without Rule 13 admission
+timers. In jsdom real time, case 3 took 330 ms on the lazy tree and 40 ms
+after the fix (a jsdom reading; see the Chromium correction above). An earlier run without Rule 13 admission
 is preserved as `red.unadmitted.log`.
 
 GREEN: Text 4 files, 9/9. Case 3 moves byte-for-byte to
@@ -5120,3 +5125,264 @@ warnings, 0 introduced identities. This is a prediction for the static
 gate's lint lane, not the gate itself. `biome-ignore` comments in src:
 8 → 20.
 [evidence](/Users/a.kott/vanguard-verify/logs/lint-u2.noindex/)
+
+**rc1 sequence after the commit series (2026-11-23).**
+- Step 3: path (A). A verified the user's own message in the watchdog
+  thread (position 12772) and committed the 14-group series as 9ba4da5 …
+  9a37342 on `feature/ui-sdk-architecture-investigation`. The committed tree
+  manifest equals RELEASE-INPUT-ID-3 `a44344e6…`. No push, tag or trailer;
+  the parked spec stays unstaged.
+- ID-3 full run green. STATIC GATE GREEN at 02:50, the first canonical PASS.
+- Coverage RED on ID-3, two causes:
+  1. `_ActionBarRoot.observers.spec.tsx` asserted that the H21 preload was
+     installed, so it failed in any plain run. The 3 assertions and 2 imports
+     were removed with approval (16358c1d) → ID-4 `d6a518b8…`.
+  2. Transport: the storybook project ignored the root `--browser.api.port`
+     and used Vitest's `defaultBrowserPort` 63315, which the sandbox denies.
+     Fixed with a harness-only config copy adding `api: { port: 6031, host:
+     '127.0.0.1', strictPort: true }`; the sandbox is unchanged.
+- Coverage on ID-4: thresholds 35/35 met with both projects (99.25% lines,
+  96.25% branches), but 4 story tests red.
+- CLASSIFICATION (decided-by-watchdog):
+  - Slider parity is (i)+(ii). It is green alone and red after
+    `_DateFieldComputedParity` on both ID-4 and e90441d, with the identical
+    diff: the MUI thumb/track in hover colour.
+  - The Autocomplete gate failure is (ii), the same leak.
+  - Mechanism: `_DateFieldComputedParity` moves the real Playwright mouse
+    (`vitest/browser` page click). The next story file measures a real
+    `:hover` on the MUI pane, and synthetic events cannot recover it.
+  - Not a product regression.
+  - Autofill flake, Rule 5 distribution of 20 fresh-browser runs per tree:
+    ID-4 0/20 (median 136.5 ms, p90 146), e90441d 0/20 (median 137, p90 147).
+    It is a pre-existing rare reference-pane race; lazy-fallback is not
+    implicated.
+- Fix 63de883f: `parkPointer()` hovers a fixed, topmost neutral element
+  before every rest-state read in both parity stories, the same for both
+  panes. The Autofill waitFor gets an explicit 3 s ceiling. No assertion
+  changed and no file excluded. Targeted on the fixed tree: DateField→Slider
+  9/9, DateField→Autocomplete 11/11, each file alone green. The ID-4 control
+  reproduced the failure (2 failed). The commit body has 3 lines of 102–105
+  characters (commitlint allows 100); hooks are not installed and nothing is
+  amended.
+- Follow-up proposal, not for rc1: a single real-pointer reset in
+  `.storybook/vitest.setup.ts` (beforeEach). It costs about one hover per
+  story test (~10–30 s per storybook run). No story relies on hover carried
+  over from another file.
+- RELEASE-INPUT-ID-5
+  `704c3717c90fd0fb3ea5b7dc92319f2dc320d6ee658c446c42d3ac71d1bcc554` is
+  commit 63de883f. Delta vs ID-4: the 2 story files.
+
+**rc1 CUT (2026-11-23 04:04).** Pack `rc1-704c3717c90f.tgz`, SHA-256
+`c613eb237b33ccc196c43f4e1fea18cdb0aa349ec6b002d8a530160e5f638c8b`, built from
+RELEASE-INPUT-ID-5 = commit 63de883f.
+
+| Gate | Result |
+|---|---|
+| Static | GREEN (on ID-3; ID-4 and ID-5 add test and story deltas only) |
+| Coverage | GREEN with both projects; 35/35 at ≥95% lines and ≥85% branches |
+| Package | GREEN: spec 2,887; scripts 79/79 (16 dist tests ran); consumers 156/156 on react 19.2.0, react-redux 9.3.1, RTK 2.13.0; fallback 22/22; WP 0 missing; eager MUI 22/298 +1; dist identity 4,038 |
+| Dual-suffix emitted audit | GREEN |
+| AIOrb wrong-pack check | 0/0, with the H24 control firing |
+
+Declaration deltas vs H24: the 8 `.reference.d.ts` files, plus the lazy Text
+wrapper `.d.ts` and its `AnimatedWords` default (neither in .472). CSS delta:
+the AIOrb rule move only. Text's eager closure is 84.5 KB gzip.
+
+Redux majors at rc-webapp HEAD 3018e8d9c5a: the peers are satisfied; there are
+no removed RTK 2 / react-redux 9 APIs in src (the two hits are byte-identical
+to master).
+
+Handed to V1 and V2 in §4 format with the 55-path changed-file list vs
+e90441d. The slot is back with V2. Static gate: GREEN. Commit: done.
+[artifact checks](/Users/a.kott/vanguard-verify/logs/rc1-704c3717c90f.noindex/artifact-checks.json) ·
+[changed files](/Users/a.kott/vanguard-verify/logs/rc1-704c3717c90f.noindex/changed-vs-h24-e90441d.tsv)
+
+## USER HANDOVER DRAFT: rc1 (2026-11-23, written by implementer A, verdicts pending)
+
+**Verdicts so far.** B's paired WordPress smoke PASSED (76 paired green, 0 findings; Text settles in
+25 ms without node replacement). V2's focused Chromium check PASSED (wrong-pack 0/0, D6 all
+profiles MATCH, host collision PASS in both orders, Text first frame 2/2). V1's focused check PASSED on rc-webapp HEAD 3018e8d (all groups, no candidate-only finding; text
+first word visible after 8–42 ms vs .472 6–36 ms). V2's HEAD count lanes: no leak on 9 lanes.
+
+**What it is.** `@rankingcoach/vanguard@2.11.0` (version not bumped), built
+from commit 63de883f on `feature/ui-sdk-architecture-investigation`.
+- Pack: `/Users/a.kott/vanguard-verify/packs/rc1-704c3717c90f.tgz`,
+  SHA-256 `c613eb237b33ccc196c43f4e1fea18cdb0aa349ec6b002d8a530160e5f638c8b`.
+- Release input ID-5:
+  `704c3717c90fd0fb3ea5b7dc92319f2dc320d6ee658c446c42d3ac71d1bcc554`.
+- Gates: static GREEN, coverage GREEN (spec + storybook, 35/35), package
+  GREEN (4 consumers 156/156 on react 19.2.0, react-redux 9.3.1,
+  RTK 2.13.0).
+- Status: provisional until V1/V2 focused verdicts; then Tier C, the paired
+  full units, Tier P and WordPress run once on the final candidate.
+
+**Install (consumer, e.g. rc-webapp `html/react`).**
+`pnpm add /Users/a.kott/vanguard-verify/packs/rc1-704c3717c90f.tgz` (or
+`npm install <path>`). Check the hash first:
+`shasum -a 256 <path>` must print `c613eb23…c8b`. The WordPress bundle is in
+the same tarball under `dist-wordpress/`.
+
+**rc1 vs .472, as a consumer sees it.**
+1. Most MUI-based components now render on Vanguard's own core: 29 of 31
+   are verified. They keep the same public props and the same MUI class
+   names. Emotion is not used for migrated components, so their CSS comes
+   from `vanguard.css`.
+2. Declared visual and behaviour deltas:
+   - AIOrb no longer writes `--container-size`, `--color1/2/3` or its
+     derived variables onto `<html>`. Vanguard's stylesheet no longer defines
+     them on `:root`; they live on `.ai-orb`. Two orbs of different sizes now
+     each render correctly, and a resize updates. A host stylesheet
+     `:root{--container-size:…}` no longer resizes the orb's inner circles.
+     rc-webapp reads none of these names.
+   - `sx` on the migrated components applies only flat style objects (D5).
+     Theme callbacks, arrays, nested selectors, breakpoints and spacing
+     shorthands are ignored with a dev warning. rc-webapp has 0 such uses.
+   - The masked DateRangePicker adornment no longer carries the generated
+     `css-…-MuiInputAdornment-root` Emotion class (H21).
+   - ToggleButtonGroup arrow-key roving ignores events whose target isn't a
+     roving item (D6; no visual impact).
+   - Animated Text (`animateWords`) behaves as on .472 again: the first-frame
+     word spans animate in place. The withdrawn lazy split replaced them with
+     new spans and started the fade later; over a real network the chunk
+     fetch would add more. react-spring is back in Text's eager graph
+     (84.5 KB gzip).
+3. Subpath exports: rc1's `exports` map EQUALS .472's (`.`, `./style.css`,
+   `./dist/*`, `./package.json`; checked by B against the packed manifests).
+   The four wildcard subpaths `./core/*`, `./common/*`, `./components/*` and
+   `./helpers/*` stay absent (D12, user-confirmed 2026-11-19). They exist
+   only in the master 2.11.0 manifest, which predates the MUI update, so a
+   .472 consumer loses nothing.
+   `.`, `./style.css` and `./dist/*` stay, including
+   `dist/index-OverlayStackingService.js`, the ModalSplitView types,
+   `dist/index-es.js` and the `dist/index-<File>.js` naming.
+4. Peer ranges: react and react-dom `>=19.2.0`, react-redux `>=7.2.6`,
+   @reduxjs/toolkit `>=1.7.1`. rc-webapp HEAD 3018e8d9c5a (19.2.0, 9.3.1,
+   2.14.0) satisfies them, and Vanguard src uses no API removed in RTK 2 or
+   react-redux 9.
+
+**Declared cost delta (React commits per interaction, V2 HEAD lanes).** Lower than .472 on select
+(11→8), datepicker (16→11) and textarea (6→4). About one higher on pagination (11.1→12.8),
+dropdown-file (13→14) and dropdown-cover (10→11). No leak and no visible difference; follow-ups below.
+
+**Still yours to decide or check (open items).**
+1. FormControl stays on the existing public MUI implementation through its
+   lazy fallback (compatibility rule §36.10/§36.30). It is not ported and
+   has 0 known production call sites.
+2. Theme-provider / TextField bridge: the TextField route and
+   VanguardThemeProvider stay eager (§36.10). A future ESM split needs dynamic
+   forwarding, external WordPress props, theme defaults and the cold
+   unsupported-inner control first.
+3. DatePicker locale format table (dash vs underscore keys): pre-existing,
+   unchanged, locked by `_locale-date-pattern.bug-lock.spec.ts`. Keep or fix.
+4. Before release, check `<head>` CSS order in the built rc-webapp (13 tie
+   rules), the pages that import `style.css` statically, and the WordPress
+   enqueue order (theme CSS after `vanguard.css` wins ties).
+5. Whether the WordPress plugin passes fallback props to
+   Autocomplete/Input/Select/Textarea.
+6. The .472 nested-calendar hit-test for DatePicker has no qualified pair
+   yet.
+7. The parked `_TextFieldV9Compatibility.spec.tsx` edit stays local; revisit
+   after the release.
+8. A docs commit with this plan log is pending. The plan is part of the
+   release input, so it waits until the verdicts are in.
+
+**Next-major list (not in this release).** Remove `@mui/material` and the
+remaining fallback props, together with the RtlProvider allow-list and RTL
+routing. Do the Redux exit (D9): the peers react-redux and RTK stay for now.
+Implement the real-pointer reset in the storybook test setup (proposal).
+Ship a non-Suspense design for the Text word-animation split (D10).
+Follow-ups (cost only): find the source of the +1 commit on DropdownMenu with a Chromium React profiling run;
+consider handing Pagination focus over in the click handler instead of the layout effect (PG1 contract).
+
+**Commits on top of 55dc611 (16).**
+1. 9ba4da5 feat(date-picker): own field, shell and calendar (MUI X adapted, MIT credited)
+2. 4c9ad36 fix(searchable-select): own caret glyph and focus behaviour
+3. 84d0cad chore(types): frozen reference fixtures out of the declaration build
+4. f0f8db6 fix(lazy-fallback): one suspension helper across split routes
+5. 2fede38 fix(click-away): forwarded ref assigned before listeners attach
+6. 3412a43 test: fixture typing and frozen-reference setup
+7. cf1d194 refactor: three mechanical lint findings (Form, Table, InlineSvg)
+8. d7d1a9d fix(action-bar): root observers unsubscribed on unmount
+9. 068687a fix(ai-orb): orb variables scoped to the orb element
+10. 62bf3e4 fix(inline-svg): mount effect depends on the stable load callback
+11. 101f5bc fix(text): word animation eager again (no node replacement or delayed start; its message overstates a 300 ms gap)
+12. a10e7df chore(gates): master lint budgets copied to sha-pinned frozen references
+13. 0f92685 chore(lint): 12 justified suppressions for 14 MUI-parity findings
+14. 9a37342 chore(vanguard): rebuild verification log
+15. 16358c1d test(action-bar): network self-check kept out of the observer spec
+16. 63de883f test(parity): real pointer parked before rest-state reads
+
+**Final cut after V1 (decided-by-watchdog, 2026-11-23).** One final cut follows
+V1's verdict even if V1 passes, because rc1 ships wrong agent docs. B found:
+- 27 component pages claiming "still renders MUI internally" (18 false,
+  9 imprecise);
+- DatePicker's DOM contract missing date-field and date-calendar;
+- 3 README errors: package name, peers, postinstall description.
+
+Final cut = rc1 plus only:
+- B's generator/README patch;
+- the first-frame spec header comment;
+- the plan log and handover draft;
+- targeted fixes for any V1 finding.
+
+It is prepared offline and not committed or gated until V1's verdict is in.
+Acceptance without re-verification, if no runtime fix is needed: the final
+pack's `dist`/`dist-wordpress` JS, CSS and `.d.ts` are byte-identical to rc1
+per file; only `docs/`, `skills/`, README and `llms.txt` may differ. Then one
+static gate, one spec run and one pack. Coverage is not repeated if src is
+byte-identical outside spec-file comments. A reviews B's patch against the
+source first, including the 9 imprecise notes.
+
+**Final-cut preparation, uncommitted (A, 2026-11-23).** B's agent-surface patch
+is applied to the working tree (`scripts/generate-agent-docs.mjs`,
+`README.md`). A reviewed the 9 "imprecise" notes against rc1 source 63de883f:
+7 match (AppBar, Toolbar, ProgressBar, Snackbar, Popover, Autocomplete, Menu)
+and 2 are corrected.
+- InputBase: a custom `inputComponent` is own core, ported in H21/H22 and not
+  in `OWN_TEXT_FALLBACK_INPUT_KEYS`. The fallback triggers are
+  filled/standard variants, a native select, MUI
+  `classes`/`slots`/`sx`/`inputProps` on the input, and function-valued slot
+  props.
+- FormControl: Vanguard's FormControl is NOT exported by the WordPress entry.
+  The MUI FormControl modules in the WP graph are MUI internals of its
+  TextField. B's note said "inline in WordPress".
+
+The first-frame spec header comment is corrected (comment only). The handover
+D12 line is corrected: rc1's `exports` map equals .472's. Waiting for B's two
+missing pages (VanguardStyle, lottieAnimation) and V1's verdict before any
+commit, gate or pack.
+Update: B's patch v2 (205 lines, which adds the VanguardStyle and
+lottieAnimation pages) replaces v1. It was re-applied from the HEAD blobs
+with A's two corrections; both new pages match the source exports.
+[prep evidence](/Users/a.kott/vanguard-verify/logs/final-cut-prep.noindex/)
+
+**rc1 focused verdicts: all PASS (2026-11-23).** B's WordPress smoke (jsdom), V2 focused (Chromium
+D6, Text first frame, wrong-pack), V2's HEAD count lanes (9, no leak) and V1 focused (rc-webapp
+HEAD 3018e8d, all groups, no candidate-only finding). GO for the final cut with no runtime
+change (decided-by-watchdog).
+
+**+1 commit analysis (no src change; jsdom Profiler, a temporary spec that is archived).**
+- Pagination next/prev cycle: own `[5,6]` vs MUI reference `[4,4]` commits per click pair.
+  A bare ButtonBase click is equal (own 2 = MUI 2), so it is not ripple or focus-visible.
+  Direct page-2/page-1 clicks are equal (`[5,5]` both). The extra appears only when the
+  clicked Previous button becomes disabled: Pagination's focus hand-over layout effect
+  (`Pagination.tsx:158-166`) moves focus to the `aria-current` page. That costs
+  focus-state commits, and the next page-2 click blurs that button for one more. The end
+  focus target matches MUI, as pinned by `_pagination-parity.spec.tsx` click and keyboard
+  timelines.
+  Inherent to the current hand-over implementation, not a leak. A cheaper path (hand over
+  in the click handler without the extra layout-effect pass) would touch the PG1 focus
+  contract, so it is a follow-up, not low-risk for this cut.
+- DropdownMenu: jsdom shows own FEWER (`[4,6]` vs master `[4,7]`), so V2's browser +1 is not
+  reproducible without real layout and timing. The candidates are OwnPopper's
+  `setPlacement` after a real flip, and own Fade/Transition timing vs
+  react-transition-group. Follow-up: attribute with a Chromium React profiling run on the
+  FileCard story.
+- Both are recorded as a declared cost delta in the handover, not fixed.
+  [evidence](/Users/a.kott/vanguard-verify/logs/commit-profile.noindex/)
+
+**V1 note confirmed from source.** Slider (2 `biome-ignore` comments) and Table (local
+`valueOf` → `getSortValue`, 2 lines) differ from the H24 source only by lint changes;
+Breadcrumbs and Pagination by comments only. Correction: the library build keeps these
+comments in dist, so the "emitted JS identical" check, done under minify, did not model the
+real dist bytes. Screens match .472.
