@@ -1,5 +1,5 @@
 import { classNames } from '@helpers/classNames';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import styles from './AIOrb.module.scss';
 
@@ -25,15 +25,6 @@ export interface AIOrbProps {
 
 export const AIOrb = (props: AIOrbProps) => {
   const { state = AIOrbStatus.Waiting, size = AIOrbSize.Medium, className } = props;
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const style = getOrbStyle() as Record<string, string>;
-
-    Object.keys(style).forEach((key) => {
-      root.style.setProperty(key, style[key]);
-    });
-  }, [state]);
 
   const getOrbStyle = (): React.CSSProperties => {
     // Default settings (For state Waiting)

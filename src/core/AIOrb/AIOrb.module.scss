@@ -1,4 +1,4 @@
-:root {
+.ai-orb {
     // --app-bg: hsl(0deg, 0%, 100%);
     --container-size: 25vh;
 
@@ -19,9 +19,7 @@
     // --color3: hsl(from var(--ai-orb-base-color) h s 98);
     --ai-orb-base-color-op: rgba(from var(--ai-orb-base-color) r g b / 20%);
     --overlay-orbs: var(--ai-orb-base-color);
-}
 
-.ai-orb {
     width: var(--container-size);
     height: var(--container-size);
     aspect-ratio: 1 / 1;
