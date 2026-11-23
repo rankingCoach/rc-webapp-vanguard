@@ -64,6 +64,13 @@ export default defineConfig({
             '@mui/x-date-pickers/PickersLayout',
             '@mui/x-date-pickers/DateField',
             '@mui/x-date-pickers/dateViewRenderers',
+            // The frozen DatePicker reference (open/close parity story) imports these; without them Vite re-optimises
+            // mid-run and loads a second React.
+            '@mui/x-date-pickers',
+            '@mui/x-date-pickers/AdapterMoment',
+            '@mui/x-date-pickers/DatePicker',
+            '@mui/x-date-pickers/hooks',
+            '@mui/x-date-pickers/models',
           ],
         },
         plugins: [

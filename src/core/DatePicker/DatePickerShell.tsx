@@ -93,6 +93,11 @@ export const DatePickerShell = ({
   const opener = useRef<HTMLElement | null>(null);
   const originalStamp = useRef<number | undefined>(undefined);
   const focusRestore = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // MUI X focuses the field's first section after the picker closes (pick, OK/Cancel/backdrop/Escape on mobile).
+  const firstSection = () => fieldHost.current?.querySelector<HTMLElement>('[role="spinbutton"]') ?? null;
+  const restoreAfterMobileExit = useRef(false);
+  // Remount the calendar on every open so its autoFocus moves focus to the selected day again (MUI X re-open).
+  const [openCount, setOpenCount] = useState(0);
 
   useEffect(
     () => () => {
@@ -119,24 +124,31 @@ export const DatePickerShell = ({
     originalStamp.current = value;
     setZIndex(OverlayStackingService.register(claim, 'popover'));
     setMobileExiting(false);
+    setOpenCount((count) => count + 1);
     setOpen(true);
   };
 
-  const dismiss = useCallback(() => {
-    if (!live.current) return;
-    live.current = false;
-    OverlayStackingService.unregister(claim);
-    setZIndex(OVERLAY_BASE_Z_INDEX);
-    if (desktop) {
-      const target = opener.current;
-      focusRestore.current = setTimeout(() => {
-        if (target?.isConnected) target.focus();
-      });
-    } else {
-      setMobileExiting(true);
-    }
-    setOpen(false);
-  }, [claim, desktop]);
+  // `restoreTo`: the element to focus after closing (default: the element focused when the popup opened); `null` keeps
+  // focus where it is (a click on the field already moved it to the clicked section).
+  const dismiss = useCallback(
+    (restoreTo?: HTMLElement | null) => {
+      if (!live.current) return;
+      live.current = false;
+      OverlayStackingService.unregister(claim);
+      setZIndex(OVERLAY_BASE_Z_INDEX);
+      if (desktop) {
+        const target = restoreTo === undefined ? opener.current : restoreTo;
+        focusRestore.current = setTimeout(() => {
+          if (target?.isConnected) target.focus();
+        });
+      } else {
+        restoreAfterMobileExit.current = true;
+        setMobileExiting(true);
+      }
+      setOpen(false);
+    },
+    [claim, desktop],
+  );
 
   useEffect(() => {
     if (!open || !closeOnCLickAway) return;
@@ -167,7 +179,7 @@ export const DatePickerShell = ({
   }, [onChange]);
   const choose: NonNullable<React.ComponentProps<typeof DateCalendar>['onChange']> = (next, selection) => {
     if (!Object.is(next?.valueOf(), value)) publish(next);
-    if (desktop && selection === 'finish') dismiss();
+    if (desktop && selection === 'finish') dismiss(firstSection());
   };
   const cancel = () => {
     if (!Object.is(value, originalStamp.current)) onChange?.(originalStamp.current);
@@ -176,6 +188,7 @@ export const DatePickerShell = ({
 
   const calendar = (
     <DateCalendar
+      key={openCount}
       locale={adapterLocale}
       value={date}
       minDate={min}
@@ -209,9 +222,17 @@ export const DatePickerShell = ({
         <div
           className={desktop ? `vanguard-input ${shellStyles.desktopField}` : 'vanguard-input'}
           ref={fieldHost}
-          onClick={show}
+          onClick={() => {
+            // MUI X: a click on the field while the desktop popup is open closes it; focus stays on the clicked section.
+            if (desktop && live.current) dismiss(null);
+            else show();
+          }}
           onKeyDownCapture={(event) => {
             if (!desktop && event.key === 'Enter') show();
+            // MUI X: Escape in a date section closes the desktop popup and focuses the field's first section.
+            if (desktop && live.current && event.key === 'Escape') {
+              dismiss(fieldHost.current?.querySelector<HTMLElement>('[role="spinbutton"]') ?? null);
+            }
           }}
         >
           <DateField
@@ -248,6 +269,29 @@ export const DatePickerShell = ({
             className="MuiPickersPopper-root"
             style={{ zIndex }}
             onKeyDown={(event: React.KeyboardEvent) => {
+              if (event.key === 'Tab') {
+                // MUI X FocusTrap: Tab and Shift+Tab cycle inside the open desktop popup.
+                const stops = [
+                  ...event.currentTarget.querySelectorAll<HTMLElement>(
+                    'button, [href], input, select, textarea, [tabindex]',
+                  ),
+                ].filter(
+                  (node) => node.tabIndex >= 0 && !node.hasAttribute('disabled') && node.getClientRects().length > 0,
+                );
+                if (stops.length === 0) return;
+                const first = stops[0];
+                const last = stops[stops.length - 1];
+                const active = document.activeElement;
+                const inside = event.currentTarget.contains(active);
+                if (event.shiftKey && (active === first || !inside)) {
+                  event.preventDefault();
+                  last.focus();
+                } else if (!event.shiftKey && (active === last || !inside)) {
+                  event.preventDefault();
+                  first.focus();
+                }
+                return;
+              }
               if (event.key !== 'Escape') return;
               event.stopPropagation();
               const host = fieldHost.current;
@@ -273,13 +317,17 @@ export const DatePickerShell = ({
             style={{ zIndex: mobileZIndex }}
             backdropInvisible={false}
             backdropTransition={{ enter: 225, exit: 195 }}
-            onClose={dismiss}
+            onClose={() => dismiss()}
           >
             <Fade
               in={open}
               onExited={() => {
                 setMobileExiting(false);
                 setKeyboard(false);
+                if (restoreAfterMobileExit.current) {
+                  restoreAfterMobileExit.current = false;
+                  firstSection()?.focus();
+                }
               }}
             >
               <div
@@ -291,7 +339,9 @@ export const DatePickerShell = ({
                 className={`MuiDialog-paper ${shellStyles.mobilePaper}`}
               >
                 <div className={`MuiDatePickerToolbar-root ${shellStyles.toolbar}`}>
-                  <div id={title} className={shellStyles.toolbarLabel}>Select date</div>
+                  <div id={title} className={shellStyles.toolbarLabel}>
+                    Select date
+                  </div>
                   <div className={shellStyles.toolbarDate}>{date?.isValid() ? date.format('ddd, MMM D') : '—'}</div>
                   <ButtonBase
                     focusRipple
@@ -314,8 +364,12 @@ export const DatePickerShell = ({
                   calendar
                 )}
                 <div className={`MuiDialogActions-root ${shellStyles.actions}`}>
-                  <ButtonBase focusRipple onClick={cancel}>Cancel</ButtonBase>
-                  <ButtonBase focusRipple onClick={dismiss}>OK</ButtonBase>
+                  <ButtonBase focusRipple onClick={cancel}>
+                    Cancel
+                  </ButtonBase>
+                  <ButtonBase focusRipple onClick={() => dismiss()}>
+                    OK
+                  </ButtonBase>
                 </div>
               </div>
             </Fade>

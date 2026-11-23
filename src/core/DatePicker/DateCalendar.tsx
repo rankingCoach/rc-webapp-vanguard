@@ -199,7 +199,6 @@ export const DateCalendar = ({
     for (
       let next = adapter.addDays(day, step);
       step === 1 ? !next.isAfter(edge, 'day') : !next.isBefore(edge, 'day');
-
     ) {
       if (!cannotSelect(next)) return next;
       next = adapter.addDays(next, step);
@@ -458,7 +457,12 @@ export const DateCalendar = ({
           role="none"
           aria-live="polite"
           className="MuiPickersCalendarHeader-labelContainer"
-          onClick={() => !disabled && showView(view === 'day' ? 'year' : 'day')}
+          onClick={() => {
+            if (disabled) return;
+            showView(view === 'day' ? 'year' : 'day');
+            // MUI X focuses the newly shown view (the selected year / day), not the switch button.
+            setFocusGrid(true);
+          }}
         >
           {prefersReducedMotion ? (
             heading
