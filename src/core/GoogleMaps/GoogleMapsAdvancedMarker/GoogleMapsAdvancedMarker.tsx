@@ -19,9 +19,16 @@ export interface GoogleMapsAdvancedMarkerProps {
   isJsApiLoaded?: boolean;
   /** Callback when marker is clicked, receives marker ID */
   onClick?: (id: string) => void;
-  /** Callback when mouse enters marker area */
+  /**
+   * Callback when the pointer enters the marker (including custom `children` content).
+   * Driven by the DOM `pointerenter` event: `domEvent` is the PointerEvent and
+   * `latLng` is the marker position, not the exact pointer position.
+   */
   onMouseOver?: (e: google.maps.MapMouseEvent) => void;
-  /** Callback when mouse leaves marker area */
+  /**
+   * Callback when the pointer leaves the marker.
+   * Driven by the DOM `pointerleave` event; same event shape as `onMouseOver`.
+   */
   onMouseOut?: (e: google.maps.MapMouseEvent) => void;
   /** Marker position coordinates */
   pos: { lat: number; lng: number };
@@ -40,6 +47,16 @@ export interface GoogleMapsAdvancedMarkerProps {
    */
   children?: ReactNode;
 }
+
+/**
+ * Wraps a DOM pointer event in the MapMouseEvent shape the hover props are typed with,
+ * so they keep the same signature as `onDragEnd` and the legacy GoogleMapsMarker.
+ */
+const toMapMouseEvent = (domEvent: PointerEvent, lat: number, lng: number): google.maps.MapMouseEvent => ({
+  domEvent,
+  latLng: new google.maps.LatLng(lat, lng),
+  stop: () => domEvent.stopPropagation(),
+});
 
 /**
  * GoogleMapsAdvancedMarker Component
@@ -63,6 +80,8 @@ export interface GoogleMapsAdvancedMarkerProps {
 export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) => {
   const { onClick, onMouseOver, onMouseOut, id, zIndex, pos, title, draggable, onDragEnd, children, isJsApiLoaded } =
     props;
+
+  const { lat, lng } = pos;
 
   const map = useGoogleMap();
 
@@ -130,23 +149,26 @@ export const GoogleMapsAdvancedMarker = (props: GoogleMapsAdvancedMarkerProps) =
     };
   }, [markerInstance, onClick, id]);
 
-  // MouseOver listener
+  // Hover listeners. AdvancedMarkerElement never emits 'mouseover'/'mouseout' through
+  // addListener, but it is a DOM element, so pointerenter/pointerleave fire on it
+  // (for custom content too, and whether or not the marker is clickable).
   useEffect(() => {
     if (!markerInstance || !onMouseOver) return;
-    const listener = markerInstance.addListener('mouseover', onMouseOver);
+    const handlePointerEnter = (domEvent: PointerEvent) => onMouseOver(toMapMouseEvent(domEvent, lat, lng));
+    markerInstance.addEventListener('pointerenter', handlePointerEnter);
     return () => {
-      google.maps.event.removeListener(listener);
+      markerInstance.removeEventListener('pointerenter', handlePointerEnter);
     };
-  }, [markerInstance, onMouseOver]);
+  }, [markerInstance, onMouseOver, lat, lng]);
 
-  // MouseOut listener
   useEffect(() => {
     if (!markerInstance || !onMouseOut) return;
-    const listener = markerInstance.addListener('mouseout', onMouseOut);
+    const handlePointerLeave = (domEvent: PointerEvent) => onMouseOut(toMapMouseEvent(domEvent, lat, lng));
+    markerInstance.addEventListener('pointerleave', handlePointerLeave);
     return () => {
-      google.maps.event.removeListener(listener);
+      markerInstance.removeEventListener('pointerleave', handlePointerLeave);
     };
-  }, [markerInstance, onMouseOut]);
+  }, [markerInstance, onMouseOut, lat, lng]);
 
   // DragEnd listener
   useEffect(() => {
