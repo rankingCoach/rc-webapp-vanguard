@@ -14,6 +14,7 @@ import { WithMapIdAndMarkers as _WithMapIdAndMarkers } from "./stories/WithMapId
 import { WithAdvancedMarker as _WithAdvancedMarker } from "./stories/WithAdvancedMarker.story";
 import { WithAdvancedMarkerCustomIcon as _WithAdvancedMarkerCustomIcon } from "./stories/WithAdvancedMarkerCustomIcon.story";
 import { WithAdvancedMarkerHTML as _WithAdvancedMarkerHTML } from "./stories/WithAdvancedMarkerHTML.story";
+import { WithAdvancedMarkerHover as _WithAdvancedMarkerHover } from "./stories/WithAdvancedMarkerHover.story";
 import { WithMultipleAdvancedMarkers as _WithMultipleAdvancedMarkers } from "./stories/WithMultipleAdvancedMarkers.story";
 
 export const Default: Story = { ..._Default };
@@ -28,6 +29,7 @@ export const WithMapIdAndMarkers: Story = { ..._WithMapIdAndMarkers };
 export const WithAdvancedMarker: Story = { ..._WithAdvancedMarker };
 export const WithAdvancedMarkerCustomIcon: Story = { ..._WithAdvancedMarkerCustomIcon };
 export const WithAdvancedMarkerHTML: Story = { ..._WithAdvancedMarkerHTML };
+export const WithAdvancedMarkerHover: Story = { ..._WithAdvancedMarkerHover };
 export const WithMultipleAdvancedMarkers: Story = { ..._WithMultipleAdvancedMarkers };
 
 export default {
