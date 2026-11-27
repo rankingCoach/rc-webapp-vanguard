@@ -5759,3 +5759,8 @@ behaviour, NOT for the .472 Vanguard wrapper (which used them only inside DatePi
     final-56fde.
   - Correction: the WP bundle has no DatePickerShell. The earlier "fix present in dist-wordpress/index.js" came from an
     unrelated "DETAILS" match.
+- 2026-11-23 — Tooling (watchdog note): V2 ran `git worktree add --detach` on this repo, which created
+  /Users/a.kott/vanguard-verify/v2/v2-wt-76dff3f6.noindex (76dff3f6, detached). The watchdog said worktrees/; the
+  actual path is v2/. Metadata only in .git/worktrees/; no checkout, branch or commit change here. `git worktree list`
+  shows 23 entries, among them two older V2 worktrees (v2-wt-32a6b93a…, v2-wt-9d3b75b). Clean-up is mine, at the end,
+  once the trees are no longer evidence. V2 will use COW copies of the release-input snapshots from now on.
