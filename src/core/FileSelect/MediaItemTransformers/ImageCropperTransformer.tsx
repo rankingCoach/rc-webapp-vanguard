@@ -59,8 +59,17 @@ export class ImageCropperTransformer extends MediaItemTransformer {
    */
   transform = (files: InternalFile[]): Promise<InternalFile[] | null> => {
     return new Promise((resolve) => {
-      this.resolveTransformPromise = resolve; // Store resolve function
-      this.openImageCropper(files[0].file as File);
+      const pickedFile = files[0];
+      // Every crop the modal returns (primary and secondary) comes from the same picked file.
+      this.resolveTransformPromise = (croppedFiles) => {
+        resolve(
+          croppedFiles?.map((croppedFile) => ({
+            ...croppedFile,
+            originalFile: pickedFile.originalFile ?? pickedFile.file,
+          })) ?? null,
+        );
+      };
+      this.openImageCropper(pickedFile.file as File);
     });
   };
 

@@ -65,6 +65,11 @@ export type MediaItemFile = {
   mediaItemName?: string;
   mediaItemLabel?: string;
   file?: File | Blob;
+  /**
+   * The file exactly as the user picked it, before the cropper or the compressor produced `file`.
+   * Equal to `file` when no transformer changed it. Set on items that come from the file input.
+   */
+  originalFile?: File | Blob;
   fileType?: ContentType;
   metadata?: MediaItemMetadata;
   /** Usually a `GalleryMediaItemType` value (`photo`, `video`, `DOCUMENT`). */
